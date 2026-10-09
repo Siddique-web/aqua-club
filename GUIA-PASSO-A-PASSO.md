@@ -118,6 +118,15 @@ O site atualiza sozinho em 1–2 minutos.
 ### C6. Domínio próprio (opcional)
 Settings → Pages → **Custom domain** (ex.: `aquaclub.co.mz`) e siga as instruções de DNS do GitHub.
 
+### C7. Hospedar na Vercel (alternativa ao GitHub Pages)
+1. https://vercel.com → **Sign Up → Continue with GitHub**.
+2. **Add New → Project** → escolha o repositório `aqua-club` → **Import**.
+3. ⚠️ Antes de clicar Deploy: em **Root Directory** clique **Edit** e escolha a pasta **`site`**. **Framework Preset: Other.** Deixe **Build Command**, **Output Directory** e **Install Command** vazios (sem "Override").
+4. **Deploy**. O site abre sem base de dados e sem variáveis de ambiente.
+5. Se a Vercel já tinha sido criada com outra pasta: **Settings → General → Root Directory = `site` → Save**, depois **Deployments → ⋯ → Redeploy** (sem cache).
+6. Abra sempre o endereço **de produção** (Settings → Domains, ou o botão **Visit** do projeto). Os endereços do tipo `aqua-club-xxxxx-...vercel.app` dos deploys antigos **ficam para sempre com a versão antiga**.
+7. Se aparecer "Falta configurar o Supabase…", a Vercel está a servir a pasta `sistema` (app antiga): repita o ponto 5.
+
 > Alternativa sem GitHub: arraste a pasta `site` para https://app.netlify.com/drop.
 
 ---
