@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "Aqua Club Staff",
+    "slug": "aqua-club-staff",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#07203A"
+  }
+}

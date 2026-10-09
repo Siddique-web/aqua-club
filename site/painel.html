@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Painel do restaurante — Aqua Club</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cyan:#00A8FF;--cyan-d:#0069A8;--cyan-soft:#E6F6FF;--cyan-line:#BFE7FF;--yellow:#FFD700;--ink:#0A0A0A;--muted:#4a5560;--ok:#CFF3DF;--bad:#F7D4D4;--fh:"Poppins",system-ui,sans-serif;--fb:"Inter",system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:#F4F7FA;color:var(--ink);font:400 .95rem/1.5 var(--fb)}
+h1,h2,h3,p{margin:0}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #000;outline-offset:2px}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;padding:.7rem 1rem;background:#fff;border-bottom:4px solid var(--cyan)}
+.top img{width:38px;height:38px;border-radius:50%}
+.top h1{font:800 1.05rem var(--fh);text-transform:uppercase;color:var(--cyan-d)}
+.top .sp{flex:1}
+.pill{display:inline-block;padding:.25rem .75rem;border-radius:999px;background:var(--cyan-soft);font:700 .75rem var(--fh)}
+.pill.live{background:var(--ok)}.pill.demo{background:var(--yellow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:40px;padding:.5rem 1.1rem;border:2px solid transparent;border-radius:999px;background:var(--cyan);color:#000;font:800 .78rem var(--fh);letter-spacing:.05em;text-transform:uppercase;transition:transform .2s,background-color .2s}
+.btn:hover{transform:translateY(-2px);background:var(--yellow)}
+.btn.line{background:#fff;border-color:#000}.btn.line:hover{background:#000;color:#fff}
+.btn.sm{min-height:34px;padding:.3rem .8rem;font-size:.72rem}
+.btn.bad{background:#fff;border-color:#B42318;color:#B42318}.btn.bad:hover{background:#B42318;color:#fff}
+.btn[disabled]{opacity:.5;pointer-events:none}
+main{max-width:1400px;margin:0 auto;padding:1rem}
+.login{max-width:420px;margin:12vh auto;padding:1.6rem;background:#fff;border-radius:24px;box-shadow:0 20px 50px -26px rgba(0,60,100,.5);display:grid;gap:.9rem}
+.login h2{font:800 1.4rem var(--fh);text-transform:uppercase}
+label{display:grid;gap:.3rem;font:700 .8rem var(--fh)}
+input,select,textarea{font:inherit;padding:.65rem .9rem;border:2px solid var(--cyan-line);border-radius:14px;background:#fff;min-height:44px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,168,255,.25)}
+.msg{min-height:1.3em;font-weight:600;color:#B42318}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem}
+.kpi{padding:.9rem 1rem;border-radius:18px;background:#fff;border:1.5px solid var(--cyan-line)}
+.kpi small{display:block;font:700 .7rem var(--fh);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.kpi b{font:800 1.5rem/1.2 var(--fh)}
+.kpi.warn{background:var(--yellow);border-color:var(--yellow)}
+@media(min-width:900px){.kpis{grid-template-columns:repeat(5,1fr)}}
+.tabs{display:flex;gap:.4rem;margin:1rem 0;overflow-x:auto}
+.tab{flex:none;padding:.65rem 1.2rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;font:800 .82rem var(--fh)}
+.tab[aria-selected=true]{background:var(--cyan);border-color:var(--cyan)}
+.board{display:grid;gap:1rem}
+@media(min-width:900px){.board{grid-template-columns:repeat(4,1fr);align-items:start}}
+.col h2{display:flex;justify-content:space-between;margin-bottom:.5rem;font:800 .85rem var(--fh);letter-spacing:.06em;text-transform:uppercase}
+.col h2 span{padding:.1rem .6rem;border-radius:999px;background:#fff;border:1.5px solid var(--cyan-line)}
+.card{display:grid;gap:.4rem;padding:.9rem 1rem;margin-bottom:.7rem;border-radius:18px;background:#fff;border:1.5px solid var(--cyan-line);box-shadow:0 10px 24px -20px rgba(0,60,100,.6)}
+.card.late{border-color:#B42318;box-shadow:0 0 0 3px rgba(180,35,24,.15)}
+.card.new{animation:flash 1.4s ease 3}
+@keyframes flash{50%{background:var(--yellow)}}
+.row{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}
+.row b{font:800 .95rem var(--fh)}.row small{color:var(--muted)}
+.who{font-weight:700}.who a{color:var(--cyan-d)}
+.items{margin:0;padding:0;list-style:none;font-size:.88rem}
+.items small{color:var(--muted)}
+.chips{display:flex;gap:.35rem;flex-wrap:wrap}
+.chip{display:inline-block;padding:.2rem .65rem;border-radius:999px;background:#EEF3F6;font:700 .7rem var(--fh)}
+.chip.paid{background:var(--ok)}.chip.unpaid{background:var(--yellow)}.chip.cancelled{background:var(--bad)}.chip.decl{background:var(--cyan-soft)}
+.acts{display:flex;gap:.4rem;flex-wrap:wrap}
+.empty{padding:1.5rem;text-align:center;color:var(--muted);border:2px dashed var(--cyan-line);border-radius:18px}
+.tbl{display:grid;gap:.8rem}
+@media(min-width:900px){.tbl{grid-template-columns:repeat(3,1fr)}}
+.tc{padding:1rem 1.1rem;border-radius:20px;background:#fff;border:2px solid var(--cyan-line);display:grid;gap:.5rem}
+.tc.warn{border-color:#B42318}
+.tc h3{font:800 1.1rem var(--fh);text-transform:uppercase}
+.tc .tot{font:800 1.7rem var(--fh)}
+.filters{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}
+.filters>*{flex:1 1 160px}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;font-size:.88rem}
+th,td{padding:.6rem .7rem;text-align:left;border-bottom:1px solid #E5ECF1;vertical-align:top}
+th{background:var(--cyan-soft);font:800 .72rem var(--fh);letter-spacing:.06em;text-transform:uppercase}
+tr.click{cursor:pointer}tr.click:hover{background:#F4FBFF}
+.scroll{overflow-x:auto;border-radius:18px}
+dialog{border:0;border-radius:24px;padding:0;width:min(640px,calc(100% - 1rem));max-height:92vh;overflow:auto;box-shadow:0 30px 70px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(0,20,35,.6)}
+.dp{display:grid;gap:.9rem;padding:1.3rem}
+.dp h2{font:800 1.3rem var(--fh);text-transform:uppercase}
+.kv{display:grid;grid-template-columns:8.5rem 1fr;gap:.3rem .8rem;font-size:.9rem}
+.kv dt{font:800 .7rem var(--fh);letter-spacing:.07em;text-transform:uppercase;color:var(--cyan-d)}
+.kv dd{margin:0}
+.tl{margin:0;padding:0;list-style:none;display:grid;gap:.3rem;font-size:.85rem}
+.tl li{padding:.4rem .7rem;border-left:4px solid var(--cyan);background:#F4F7FA;border-radius:0 10px 10px 0}
+.demo-note{margin:.8rem 0 0;padding:.7rem 1rem;border-radius:14px;background:var(--yellow);font-weight:600}
+@media print{.top,.tabs,.acts,.btn{display:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <img src="assets/logo.png" alt="">
+  <h1>Painel do restaurante</h1>
+  <span class="pill" id="modeTag"></span>
+  <span class="sp"></span>
+  <span id="who" style="font-weight:700"></span>
+  <button class="btn line sm" id="logout" type="button" hidden>Sair</button>
+</header>
+
+<main id="loginView" hidden>
+  <form class="login" id="loginForm">
+    <h2>Entrar</h2>
+    <p>Área reservada à equipa. Use o e-mail e a palavra-passe criados no Supabase (Authentication → Users).</p>
+    <label>E-mail<input type="email" id="email" autocomplete="username" required></label>
+    <label>Palavra-passe<input type="password" id="pass" autocomplete="current-password" required></label>
+    <p class="msg" id="loginMsg" role="alert"></p>
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+</main>
+
+<main id="app" hidden>
+  <p class="demo-note" id="demoNote" hidden>Modo demonstração: estes pedidos são de exemplo e nada é guardado. Para usar a sério, preencha <code>BACKEND</code> no topo deste ficheiro (e no <code>index.html</code>) e crie os utilizadores da equipa.</p>
+  <section class="kpis" id="kpis" aria-label="Resumo"></section>
+  <nav class="tabs" role="tablist" aria-label="Secções">
+    <button class="tab" role="tab" data-tab="active" aria-selected="true">Pedidos ativos</button>
+    <button class="tab" role="tab" data-tab="tables" aria-selected="false">Contas por mesa</button>
+    <button class="tab" role="tab" data-tab="history" aria-selected="false">Histórico e clientes</button>
+  </nav>
+  <section id="tab-active" class="board"></section>
+  <section id="tab-tables" hidden></section>
+  <section id="tab-history" hidden>
+    <div class="filters">
+      <input type="search" id="q" placeholder="Procurar por nome, telemóvel, código ou mesa" aria-label="Procurar">
+      <select id="fpay" aria-label="Pagamento"><option value="">Todos os pagamentos</option><option value="open">Por pagar / a confirmar</option><option value="paid">Pagos</option></select>
+      <input type="date" id="fdate" aria-label="Data">
+      <button class="btn line" id="csv" type="button">Exportar CSV</button>
+    </div>
+    <div class="scroll"><table><thead><tr><th>Código</th><th>Data</th><th>Mesa</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Pagamento</th></tr></thead><tbody id="hbody"></tbody></table></div>
+    <p class="msg" id="hcount" style="color:var(--muted)"></p>
+  </section>
+</main>
+
+<dialog id="dlg" aria-labelledby="dT"><div class="dp" id="dBody"></div></dialog>
+<dialog id="payd" aria-labelledby="pT"><div class="dp">
+  <h2 id="pT">Marcar como pago</h2>
+  <p id="pInfo"></p>
+  <label>Forma de pagamento<select id="pMethod"><option value="cash">Dinheiro</option><option value="card">Cartão</option><option value="mpesa">M-Pesa</option><option value="emola">e-Mola</option><option value="other">Outro</option></select></label>
+  <label>Referência (opcional)<input id="pRef" maxlength="40"></label>
+  <div class="acts"><button class="btn" id="pOk" type="button">Confirmar pagamento</button><button class="btn line" type="button" data-close>Cancelar</button></div>
+</div></dialog>
+
+<script>
+/* ===== CONFIGURAÇÃO — o mesmo URL e chave do index.html (Supabase → Project Settings → API) ===== */
+const BACKEND = { url: '', key: '' };
+const POLL_MS = 10000;
+const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos fica a vermelho */
+
+(function () {
+  'use strict';
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const money = (n) => Number(n || 0).toLocaleString('pt-PT') + ' MT';
+  const nice = (c) => String(c || '').replace(/-/g, ' ');
+  const when = (ts) => new Date(ts).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  const mins = (ts) => Math.max(0, Math.floor((Date.now() - new Date(ts).getTime()) / 60000));
+  const phone = (d) => (/^258\d{9}$/.test(d || '') ? '+258 ' + d.slice(3, 5) + ' ' + d.slice(5, 8) + ' ' + d.slice(8) : d ? '+' + d : '');
+  const ST = { received: 'Recebido', preparing: 'Em preparação', on_the_way: 'A caminho', delivered: 'Entregue', cancelled: 'Cancelado' };
+  const PAY = { unpaid: 'Por pagar', pay_requested: 'Conta pedida', paid_declared: 'Pagamento a confirmar', paid: 'Pago' };
+  const METHOD = { cash: 'Dinheiro', card: 'Cartão', mpesa: 'M-Pesa', emola: 'e-Mola', local: 'No local', other: 'Outro' };
+  const NEXT = { received: 'preparing', preparing: 'on_the_way', on_the_way: 'delivered' };
+  const NEXT_TXT = { received: 'Aceitar → Em preparação', preparing: 'Pronto → A caminho', on_the_way: 'Entregue na mesa' };
+
+  const live = Boolean(BACKEND.url && BACKEND.key) && new URLSearchParams(location.search).get('demo') !== '1';
+  let sb = null, orders = [], events = {}, tab = 'active', current = null, user = '', known = new Set(), fresh = new Set();
+
+  /* ---------- dados ---------- */
+  function demoData() {
+    const mk = (i, code, table, name, ph, lines, status, pay, ago) => ({ id: 'demo' + i, code, table_code: table, lines, total_mzn: lines.reduce((s, l) => s + l.unitPriceMzn * l.quantity, 0), status, customer_name: name, customer_phone: ph,
+      accepted_terms: true, accepted_at: new Date(Date.now() - ago * 60000).toISOString(), payment_status: pay, payment_method: pay === 'paid' ? 'mpesa' : null, payment_ref: pay === 'paid' ? 'MP7788' : null,
+      paid_at: pay === 'paid' ? new Date().toISOString() : null, created_at: new Date(Date.now() - ago * 60000).toISOString(), updated_at: new Date().toISOString() });
+    const L = (n, p, q, note) => ({ name: n, unitPriceMzn: p, quantity: q, notes: note });
+    orders = [
+      mk(1, 'AQ-1008-K3F9', 'Mesa-04-Rooftop', 'Ana Machava', '258841234567', [L('Bruschettas', 350, 2, 'sem cebola'), L('Sumos naturais', 200, 2)], 'received', 'unpaid', 2),
+      mk(2, 'AQ-1008-P2QM', 'Mesa-12-Piscina', 'Carlos Sitoe', '258829876543', [L('Cocktails refrescantes', 450, 3)], 'preparing', 'unpaid', 9),
+      mk(3, 'AQ-1008-ZZ41', 'Mesa-08-Piscina', 'Nádia Cumbe', '258856001122', [L('Petiscos variados', 650, 1), L('Mousse gourmet', 300, 2)], 'on_the_way', 'pay_requested', 16),
+      mk(4, 'AQ-1008-H8WD', 'Mesa-15-Sala', 'João Bila', '258871112233', [L('Mousse gourmet', 300, 2)], 'delivered', 'unpaid', 42),
+      mk(5, 'AQ-1008-B6RT', 'Mesa-16-Sala', 'Marta Tembe', '258845550000', [L('Bruschettas', 350, 1), L('Sumos naturais', 200, 1)], 'delivered', 'paid_declared', 30),
+      mk(6, 'AQ-1007-A1CE', 'Mesa-01-Rooftop', 'Pedro Langa', '258827770011', [L('Petiscos variados', 650, 2)], 'delivered', 'paid', 1500)
+    ];
+    events = { demo4: [{ at: orders[3].created_at, actor: 'cliente', event: 'criado', detail: { nome: 'João Bila' } }] };
+  }
+  async function load() {
+    if (!live) return;
+    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false }).limit(500);
+    if (error) throw error;
+    data.forEach((o) => { if (known.size && !known.has(o.id)) { fresh.add(o.id); beep(); document.title = '(!) Novo pedido — Painel'; } });
+    orders = data; known = new Set(data.map((o) => o.id));
+  }
+  async function update(id, patch) {
+    if (live) { const { error } = await sb.from('orders').update(patch).eq('id', id); if (error) { alert('Não foi possível guardar: ' + error.message); return; } }
+    const o = orders.find((x) => x.id === id); Object.assign(o, patch, { updated_at: new Date().toISOString() });
+    if (!live) (events[id] = events[id] || []).push({ at: new Date().toISOString(), actor: user || 'demo', event: patch.payment_status ? 'pagamento' : 'estado', detail: patch });
+    render();
+  }
+  async function eventsOf(id) {
+    if (!live) return events[id] || [];
+    const { data } = await sb.from('order_events').select('*').eq('order_id', id).order('at'); return data || [];
+  }
+  function beep() { try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(a.destination); o.start(); setTimeout(() => { o.stop(); a.close(); }, 220); } catch (e) { /* sem som */ } }
+
+  /* ---------- vistas ---------- */
+  const unpaidOf = (o) => o.status !== 'cancelled' && (o.payment_status === 'unpaid' || o.payment_status === 'pay_requested');
+  const items = (o) => (o.lines || []).map((l) => `<li>${l.quantity}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''} <small>· ${money(l.unitPriceMzn * l.quantity)}</small></li>`).join('');
+  const payChip = (o) => `<span class="chip ${o.payment_status === 'paid' ? 'paid' : o.payment_status === 'paid_declared' ? 'decl' : 'unpaid'}">${PAY[o.payment_status]}${o.payment_method && o.payment_status !== 'unpaid' ? ' · ' + (METHOD[o.payment_method] || o.payment_method) : ''}</span>`;
+  function card(o) {
+    const late = o.status === 'delivered' && unpaidOf(o) && mins(o.created_at) > LATE_MIN;
+    const el = document.createElement('article'); el.className = 'card' + (late ? ' late' : '') + (fresh.has(o.id) ? ' new' : '');
+    el.innerHTML = `<div class="row"><b>${esc(o.code)}</b><small>${esc(nice(o.table_code))} · há ${mins(o.created_at)} min</small></div>
+      <div class="who">${esc(o.customer_name)} · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a></div>
+      <ul class="items">${items(o)}</ul>
+      <div class="row"><b>${money(o.total_mzn)}</b><span class="chips">${payChip(o)}</span></div>
+      ${late ? '<small style="color:#B42318;font-weight:700">Conta em aberto há mais de ' + LATE_MIN + ' min — falar com o cliente</small>' : ''}
+      <div class="acts">${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${unpaidOf(o) || o.payment_status === 'paid_declared' ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}<button class="btn sm line" data-open="${o.id}">Detalhes</button></div>`;
+    return el;
+  }
+  function renderActive() {
+    const cols = [['received', 'Recebidos', (o) => o.status === 'received'], ['preparing', 'Em preparação', (o) => o.status === 'preparing'], ['on_the_way', 'A caminho', (o) => o.status === 'on_the_way'], ['delivered', 'Entregues — por pagar', (o) => o.status === 'delivered' && o.payment_status !== 'paid']];
+    const box = $('#tab-active'); box.innerHTML = '';
+    cols.forEach(([, label, f]) => {
+      const list = orders.filter(f).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      const c = document.createElement('div'); c.className = 'col'; c.innerHTML = `<h2>${label}<span>${list.length}</span></h2>`;
+      if (!list.length) c.insertAdjacentHTML('beforeend', '<p class="empty">Sem pedidos</p>'); list.forEach((o) => c.appendChild(card(o))); box.appendChild(c);
+    });
+  }
+  function renderTables() {
+    const g = {}; orders.filter((o) => o.status !== 'cancelled' && o.payment_status !== 'paid').forEach((o) => { (g[o.table_code] = g[o.table_code] || []).push(o); });
+    const box = $('#tab-tables'); box.innerHTML = '';
+    const keys = Object.keys(g).sort((a, b) => Math.min(...g[a].map((o) => +new Date(o.created_at))) - Math.min(...g[b].map((o) => +new Date(o.created_at))));
+    if (!keys.length) { box.innerHTML = '<p class="empty">Nenhuma mesa com conta em aberto. 🎉</p>'; return; }
+    const wrap = document.createElement('div'); wrap.className = 'tbl';
+    keys.forEach((k) => {
+      const list = g[k], tot = list.reduce((s, o) => s + o.total_mzn, 0), oldest = Math.max(...list.map((o) => mins(o.created_at))), names = [...new Set(list.map((o) => o.customer_name))].join(', ');
+      const decl = list.every((o) => o.payment_status === 'paid_declared');
+      const el = document.createElement('article'); el.className = 'tc' + (oldest > LATE_MIN && list.some((o) => o.status === 'delivered') ? ' warn' : '');
+      el.innerHTML = `<h3>${esc(nice(k))}</h3><div class="tot">${money(tot)}</div><p>${list.length} pedido(s) · ${esc(names)}</p><p><small>O mais antigo há ${oldest} min</small></p>
+        <div class="chips">${decl ? '<span class="chip decl">Pagamento a confirmar</span>' : '<span class="chip unpaid">Por pagar</span>'}</div>
+        <ul class="items">${list.map((o) => `<li><b>${esc(o.code)}</b> · ${esc(o.customer_name)} (<a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a>) · ${money(o.total_mzn)} · ${esc(ST[o.status])}</li>`).join('')}</ul>
+        <div class="acts"><button class="btn sm" data-closetable="${esc(k)}">Fechar conta (pago)</button><button class="btn sm line" data-print="${esc(k)}">Imprimir</button></div>`;
+      wrap.appendChild(el);
+    });
+    box.appendChild(wrap);
+  }
+  function filtered() {
+    const q = $('#q').value.trim().toLowerCase(), fp = $('#fpay').value, fd = $('#fdate').value;
+    const qd = q.replace(/\D/g, '');
+    return orders.filter((o) => (!q || [o.code, o.customer_name, o.customer_phone, o.table_code].join(' ').toLowerCase().includes(q) || (qd.length >= 3 && String(o.customer_phone || '').includes(qd)))
+      && (!fp || (fp === 'paid' ? o.payment_status === 'paid' : o.payment_status !== 'paid' && o.status !== 'cancelled'))
+      && (!fd || (o.created_at || '').slice(0, 10) === fd));
+  }
+  function renderHistory() {
+    const list = filtered(), body = $('#hbody'); body.innerHTML = '';
+    list.forEach((o) => {
+      const tr = document.createElement('tr'); tr.className = 'click'; tr.tabIndex = 0;
+      tr.innerHTML = `<td><b>${esc(o.code)}</b></td><td>${when(o.created_at)}</td><td>${esc(nice(o.table_code))}</td><td>${esc(o.customer_name)}<br><small>${esc(phone(o.customer_phone))}</small></td><td>${money(o.total_mzn)}</td><td>${esc(ST[o.status])}</td><td>${payChip(o)}</td>`;
+      tr.addEventListener('click', () => openDetail(o.id)); tr.addEventListener('keydown', (e) => { if (e.key === 'Enter') openDetail(o.id); });
+      body.appendChild(tr);
+    });
+    $('#hcount').textContent = list.length + ' pedido(s)' + (list.length ? ' · total ' + money(list.filter((o) => o.status !== 'cancelled').reduce((s, o) => s + o.total_mzn, 0)) : '');
+  }
+  function renderKpis() {
+    const active = orders.filter((o) => ['received', 'preparing', 'on_the_way'].includes(o.status)).length;
+    const unpaid = orders.filter(unpaidOf).reduce((s, o) => s + o.total_mzn, 0);
+    const decl = orders.filter((o) => o.status !== 'cancelled' && o.payment_status === 'paid_declared').reduce((s, o) => s + o.total_mzn, 0);
+    const today = new Date().toISOString().slice(0, 10);
+    const sold = orders.filter((o) => o.payment_status === 'paid' && (o.paid_at || '').slice(0, 10) === today).reduce((s, o) => s + o.total_mzn, 0);
+    const tbl = new Set(orders.filter((o) => o.status !== 'cancelled' && o.payment_status !== 'paid').map((o) => o.table_code)).size;
+    $('#kpis').innerHTML = `<div class="kpi"><small>Pedidos ativos</small><b>${active}</b></div><div class="kpi ${unpaid ? 'warn' : ''}"><small>Por pagar</small><b>${money(unpaid)}</b></div><div class="kpi"><small>A confirmar</small><b>${money(decl)}</b></div><div class="kpi"><small>Mesas com conta aberta</small><b>${tbl}</b></div><div class="kpi"><small>Recebido hoje</small><b>${money(sold)}</b></div>`;
+  }
+  function render() { renderKpis(); renderActive(); renderTables(); renderHistory(); if (current && $('#dlg').open) fillDetail(current); }
+
+  /* ---------- detalhe ---------- */
+  async function openDetail(id) { current = id; await fillDetail(id); if (!$('#dlg').open) $('#dlg').showModal(); }
+  async function fillDetail(id) {
+    const o = orders.find((x) => x.id === id); if (!o) return; const ev = await eventsOf(id);
+    const canPay = o.status !== 'cancelled' && o.payment_status !== 'paid';
+    $('#dBody').innerHTML = `<div class="row"><h2 id="dT">${esc(o.code)}</h2><button class="btn line sm" data-close type="button">Fechar</button></div>
+      <dl class="kv"><dt>Cliente</dt><dd><b>${esc(o.customer_name)}</b> · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a> · <a href="https://wa.me/${esc(o.customer_phone)}" target="_blank" rel="noopener">WhatsApp</a></dd>
+        <dt>Mesa</dt><dd>${esc(nice(o.table_code))}</dd><dt>Pedido feito</dt><dd>${when(o.created_at)}</dd>
+        <dt>Termos aceites</dt><dd>${o.accepted_terms ? 'Sim, em ' + when(o.accepted_at || o.created_at) : '<b>Não</b>'}</dd>
+        <dt>Estado</dt><dd>${esc(ST[o.status])}${o.cancel_reason ? ' — ' + esc(o.cancel_reason) : ''}</dd>
+        <dt>Pagamento</dt><dd>${payChip(o)}${o.payment_ref ? ' · ref. ' + esc(o.payment_ref) : ''}${o.paid_at ? ' · ' + when(o.paid_at) : ''}</dd></dl>
+      <ul class="items">${items(o)}</ul><div class="row"><b>Total</b><b>${money(o.total_mzn)}</b></div>
+      <div class="acts">${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${canPay ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}</div>
+      ${o.status !== 'cancelled' && o.payment_status !== 'paid' ? `<details><summary style="cursor:pointer;font-weight:700">Cancelar pedido (só a equipa)</summary><label style="margin-top:.6rem">Motivo (obrigatório)<textarea id="cReason" rows="2" maxlength="140"></textarea></label><div class="acts" style="margin-top:.5rem"><button class="btn sm bad" data-cancel="${o.id}">Cancelar este pedido</button></div></details>` : ''}
+      <h3 style="font:800 .8rem var(--fh);text-transform:uppercase;letter-spacing:.07em">Histórico do pedido</h3>
+      <ul class="tl">${ev.length ? ev.map((e) => `<li><b>${when(e.at)}</b> · ${esc(e.actor || '')} · ${esc(e.event)}${e.detail ? ' — ' + esc(Object.entries(e.detail).filter(([, v]) => v != null && v !== '').map(([k, v]) => k.replace(/_/g, ' ') + ': ' + (typeof v === 'object' ? JSON.stringify(v) : (ST[v] || PAY[v] || METHOD[v] || (v === true ? 'sim' : v)))).join(', ')) : ''}</li>`).join('') : '<li>Sem registos.</li>'}</ul>`;
+  }
+
+  /* ---------- ações ---------- */
+  let payIds = [];
+  function askPay(ids, label) { payIds = ids; $('#pInfo').textContent = label; $('#pRef').value = ''; $('#payd').showModal(); }
+  $('#pOk').addEventListener('click', async () => {
+    const method = $('#pMethod').value, ref = $('#pRef').value.trim(), now = new Date().toISOString();
+    for (const id of payIds) await update(id, { payment_status: 'paid', payment_method: method, payment_ref: ref || null, paid_at: now });
+    $('#payd').close();
+  });
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.close !== undefined) { b.closest('dialog').close(); return; }
+    if (b.dataset.next) { const o = orders.find((x) => x.id === b.dataset.next); await update(o.id, { status: NEXT[o.status] }); }
+    else if (b.dataset.pay) { const o = orders.find((x) => x.id === b.dataset.pay); askPay([o.id], o.code + ' · ' + o.customer_name + ' · ' + money(o.total_mzn)); }
+    else if (b.dataset.closetable) { const list = orders.filter((o) => o.table_code === b.dataset.closetable && o.status !== 'cancelled' && o.payment_status !== 'paid'); askPay(list.map((o) => o.id), nice(b.dataset.closetable) + ' · ' + list.length + ' pedido(s) · ' + money(list.reduce((s, o) => s + o.total_mzn, 0))); }
+    else if (b.dataset.cancel) { const r = ($('#cReason') || {}).value || ''; if (r.trim().length < 3) { alert('Escreva o motivo do cancelamento.'); return; } await update(b.dataset.cancel, { status: 'cancelled', cancel_reason: r.trim() }); }
+    else if (b.dataset.open) openDetail(b.dataset.open);
+    else if (b.dataset.print) printTable(b.dataset.print);
+  });
+  function printTable(k) {
+    const list = orders.filter((o) => o.table_code === k && o.status !== 'cancelled' && o.payment_status !== 'paid');
+    const w = window.open('', '_blank'); if (!w) return;
+    w.document.write(`<title>Conta ${esc(nice(k))}</title><body style="font-family:sans-serif;max-width:360px"><h2>Aqua Club — ${esc(nice(k))}</h2>${list.map((o) => `<p><b>${esc(o.code)}</b> · ${esc(o.customer_name)}<br>${(o.lines || []).map((l) => l.quantity + '× ' + esc(l.name) + ' — ' + money(l.unitPriceMzn * l.quantity)).join('<br>')}</p>`).join('')}<h3>Total: ${money(list.reduce((s, o) => s + o.total_mzn, 0))}</h3></body>`);
+    w.document.close(); w.print();
+  }
+  $('#csv').addEventListener('click', () => {
+    const rows = [['Código', 'Data', 'Mesa', 'Cliente', 'Telemóvel', 'Itens', 'Total MT', 'Estado', 'Pagamento', 'Método', 'Referência']].concat(filtered().map((o) => [o.code, when(o.created_at), nice(o.table_code), o.customer_name, phone(o.customer_phone), (o.lines || []).map((l) => l.quantity + 'x ' + l.name).join('; '), o.total_mzn, ST[o.status], PAY[o.payment_status], METHOD[o.payment_method] || '', o.payment_ref || '']));
+    const csv = '\ufeff' + rows.map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(';')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'pedidos-aqua-club.csv'; a.click();
+  });
+  $$('.tab').forEach((t) => t.addEventListener('click', () => { tab = t.dataset.tab; $$('.tab').forEach((x) => x.setAttribute('aria-selected', String(x === t))); ['active', 'tables', 'history'].forEach((k) => { $('#tab-' + k).hidden = k !== tab; }); }));
+  ['q', 'fpay', 'fdate'].forEach((id) => $('#' + id).addEventListener('input', renderHistory));
+  $$('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) document.title = 'Painel do restaurante — Aqua Club'; });
+  setInterval(() => { if (!document.hidden) render(); }, 30000);
+
+  /* ---------- arranque ---------- */
+  async function start() {
+    $('#loginView').hidden = true; $('#app').hidden = false; $('#logout').hidden = !live;
+    try { await load(); } catch (e) { $('#app').insertAdjacentHTML('afterbegin', '<p class="demo-note">Não foi possível carregar os pedidos: ' + esc(e.message || e) + '</p>'); }
+    render(); known = new Set(orders.map((o) => o.id));
+    if (live) {
+      sb.channel('orders-live').on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, async () => { try { await load(); render(); } catch (e) { /* tenta no próximo ciclo */ } }).subscribe();
+      setInterval(async () => { try { await load(); render(); } catch (e) { /* sem rede */ } }, POLL_MS);
+    }
+  }
+  async function init() {
+    $('#modeTag').textContent = live ? 'Ligado' : 'Demonstração'; $('#modeTag').className = 'pill ' + (live ? 'live' : 'demo');
+    if (!live) { $('#demoNote').hidden = false; demoData(); start(); return; }
+    await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); }).catch(() => { $('#loginMsg').textContent = 'Sem ligação à internet.'; });
+    sb = window.supabase.createClient(BACKEND.url, BACKEND.key);
+    const { data } = await sb.auth.getSession();
+    if (data && data.session) { user = data.session.user.email; $('#who').textContent = user; start(); } else { $('#loginView').hidden = false; }
+  }
+  $('#loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); $('#loginMsg').textContent = '';
+    const { data, error } = await sb.auth.signInWithPassword({ email: $('#email').value.trim(), password: $('#pass').value });
+    if (error) { $('#loginMsg').textContent = 'E-mail ou palavra-passe incorretos.'; return; }
+    user = data.session ? data.session.user.email : $('#email').value; $('#who').textContent = user; start();
+  });
+  $('#logout').addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
+  init();
+})();
+</script>
+</body>
+</html>

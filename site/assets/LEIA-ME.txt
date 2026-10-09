@@ -1,0 +1,14 @@
+Fotografias e logótipo usados pelo site (substitua pelos originais quando quiser, mantendo os nomes):
+
+logo.png / favicon.png        logótipo circular
+hero-aerea.jpg                vista aérea
+piscina.jpg, piscina-guarda-sois.jpg, piscina-edificio.jpg, panorama.jpg   piscina e espaço exterior
+kids.jpg, parque.jpg, parque-jogos.jpg                                      área kids, parque e ténis de mesa
+zona-jogos.jpg, bar.jpg, bar-balcao.jpg                                     bilhares e bar
+restaurante.jpg, salao.jpg, salao-mesa.jpg                                  restaurante
+petiscos.jpg, prato-petiscos*.jpg, sobremesas.jpg, prato-mousse*.jpg        pratos (menu e mural)
+prato-bar.jpg, prato-sala.jpg                                               atenção: são o bar e a sala (não pratos); usadas como cartões de ambiente no mural
+
+Para acrescentar fotos novas: guarde aqui o ficheiro (JPG, ~1400 px de largura, menos de 400 KB) e use o nome em
+ • MENU (campo img) · WALL (mural) · SL (galeria 3D) · blocos "Espaços" no index.html.
+Ainda sem fotografia: toboáguas, rio lento, cabanas, cocktails, sumos e pratos principais.

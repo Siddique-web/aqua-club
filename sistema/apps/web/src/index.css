@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-abyss: #07203A;
+  --color-lagoon: #0F4C6B;
+  --color-tide: #2C7A91;
+  --color-champagne: #EADFC8;
+  --color-gold: #C9A66B;
+  --color-pearl: #FAF7F0;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-sans: Manrope, system-ui, sans-serif;
+  --blur-glass: 18px;
+}
+
+body { margin: 0; background: #07203A; }
+@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

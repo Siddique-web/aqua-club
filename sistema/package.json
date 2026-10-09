@@ -1,0 +1,12 @@
+{
+  "name": "aqua-club",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "web": "npm run dev -w apps/web",
+    "staff": "npm run start -w apps/staff",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test -w apps/web",
+    "build:web": "npm run build -w apps/web"
+  }
+}
