@@ -1,6 +1,1 @@
-{
-  "framework": null,
-  "installCommand": null,
-  "buildCommand": null,
-  "outputDirectory": "site"
-}
+{"framework":null,"installCommand":"echo skip","buildCommand":"echo skip","outputDirectory":"site","cleanUrls":true}
