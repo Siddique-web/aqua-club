@@ -1,5 +1,5 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { supabase } from './supabase';
+import { isSupabaseConfigured, supabase } from './supabase';
 import type { WaiterCall, WaiterCallReason, Table } from '../types';
 
 /* Linha da BD (snake_case) → modelo de domínio */
@@ -19,6 +19,19 @@ const toCall = (r: Row): WaiterCall => ({
 
 /** Cliente: cria uma chamada em nome da mesa. */
 export async function createWaiterCall(table: Table, reason: WaiterCallReason, note?: string): Promise<WaiterCall> {
+  if (!isSupabaseConfigured()) {
+    return {
+      id: `demo-call-${Date.now()}`,
+      tableId: table.id,
+      tableCode: table.code,
+      zone: table.zone,
+      reason,
+      note,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+  }
+
   const { data, error } = await supabase()
     .from('waiter_calls')
     .insert({ table_id: table.id, table_code: table.code, zone: table.zone, reason, note, status: 'pending' })
@@ -33,6 +46,20 @@ export async function createWaiterCall(table: Table, reason: WaiterCallReason, n
  * só um UPDATE afecta uma linha — o outro recebe `null` (já foi atendida).
  */
 export async function acceptWaiterCall(callId: string, waiter: { id: string; name: string }): Promise<WaiterCall | null> {
+  if (!isSupabaseConfigured()) {
+    return {
+      id: callId,
+      tableId: 'demo-table',
+      tableCode: 'Mesa-04-Rooftop',
+      zone: 'rooftop',
+      reason: 'request_bill',
+      status: 'accepted',
+      createdAt: new Date().toISOString(),
+      acceptedAt: new Date().toISOString(),
+      acceptedBy: waiter,
+    };
+  }
+
   const { data, error } = await supabase()
     .from('waiter_calls')
     .update({ status: 'accepted', accepted_by_id: waiter.id, accepted_by_name: waiter.name, accepted_at: new Date().toISOString() })
@@ -43,6 +70,7 @@ export async function acceptWaiterCall(callId: string, waiter: { id: string; nam
 }
 
 export async function completeWaiterCall(callId: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
   const { error } = await supabase().from('waiter_calls')
     .update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', callId);
   if (error) throw error;
@@ -53,6 +81,7 @@ export function subscribeToCalls(
   filter: string | undefined,
   onChange: (call: WaiterCall, event: 'INSERT' | 'UPDATE') => void,
 ): () => void {
+  if (!isSupabaseConfigured()) return () => undefined;
   const channel: RealtimeChannel = supabase()
     .channel(`waiter_calls:${filter ?? 'all'}`)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'waiter_calls', ...(filter ? { filter } : {}) },
@@ -62,6 +91,7 @@ export function subscribeToCalls(
 }
 
 export async function fetchPendingCalls(): Promise<WaiterCall[]> {
+  if (!isSupabaseConfigured()) return [];
   const { data, error } = await supabase().from('waiter_calls').select('*')
     .in('status', ['pending', 'accepted']).order('created_at', { ascending: true });
   if (error) throw error;

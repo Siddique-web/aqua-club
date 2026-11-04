@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
+    "dev": "npm run web",
     "web": "npm run dev -w apps/web",
     "staff": "npm run start -w apps/staff",
     "typecheck": "npm run typecheck --workspaces --if-present",

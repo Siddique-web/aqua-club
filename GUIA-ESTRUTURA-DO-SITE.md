@@ -101,3 +101,10 @@ Este guia descreve **o site tal como está feito** (nada foi retirado: fotos, me
 - Nenhum site consegue **impedir fisicamente** que alguém saia sem pagar. O que o sistema faz é **identificar, registar o compromisso e mostrar a conta em aberto** a cliente e equipa, o que dissuade e dá prova (nome, telemóvel, hora, termos aceites). Para bares com muito movimento, considere pedir o pagamento **no momento do pedido** ou um valor de reserva nas cabanas.
 - O nome e o número são os que o cliente escreve; no modo WhatsApp o número do remetente confirma-o. Revise os "Termos do pedido" com um jurista e informe os clientes sobre o tratamento dos dados.
 - O site **não cobra online**. Pagamento por M-Pesa/e-Mola/cartão com confirmação automática exige conta empresarial e chaves do fornecedor, num servidor.
+
+## Barra inferior e Área do garçom
+- **Barra inferior** (pílula fixa, `site/garcom.js` + `site/garcom.css`): `Início`, `Garçom`, `Estatísticas`, `Tema`. O botão ativo fica preto com texto amarelo; as cores e tipos de letra são os do site.
+- **Área do garçom**: abre por cima do site (atalho `#garcom`). Detalhes em `GUIA-GARCONS.md`.
+- **Chamar garçom** (cliente): agora mostra *à espera → aceite por [nome] → concluído*, permite avaliar e retoma o chamado se a página for recarregada.
+- Os botões flutuantes “Chamar garçom” e “Pedido” sobem para ficar acima da barra.
+

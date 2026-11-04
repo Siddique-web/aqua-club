@@ -3,6 +3,8 @@
 -- histórico (auditoria) e segurança por papéis.
 -- Correr DEPOIS de schema.sql:  Supabase → SQL Editor → New query → Run.
 -- Pode ser corrido mais do que uma vez sem estragar nada.
+-- ATENÇÃO: este ficheiro recria regras antigas (política larga dos pedidos e set_payment).
+--          Se já correu o schema_v3_garcons.sql e voltar a correr este, CORRA O V3 OUTRA VEZ a seguir.
 -- =====================================================================
 
 -- 1) Novos campos nos pedidos --------------------------------------------------

@@ -201,7 +201,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
   /* ---------- vistas ---------- */
   const unpaidOf = (o) => o.status !== 'cancelled' && (o.payment_status === 'unpaid' || o.payment_status === 'pay_requested');
   const items = (o) => (o.lines || []).map((l) => `<li>${l.quantity}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''} <small>· ${money(l.unitPriceMzn * l.quantity)}</small></li>`).join('');
-  const payChip = (o) => `<span class="chip ${o.payment_status === 'paid' ? 'paid' : o.payment_status === 'paid_declared' ? 'decl' : 'unpaid'}">${PAY[o.payment_status]}${o.payment_method && o.payment_status !== 'unpaid' ? ' · ' + (METHOD[o.payment_method] || o.payment_method) : ''}</span>`;
+  const payChip = (o) => `<span class="chip ${o.payment_status === 'paid' ? 'paid' : o.payment_status === 'paid_declared' ? 'decl' : 'unpaid'}">${PAY[o.payment_status]}${o.payment_method && o.payment_status !== 'unpaid' ? ' · ' + esc(METHOD[o.payment_method] || o.payment_method) : ''}</span>`;
   function card(o) {
     const late = o.status === 'delivered' && unpaidOf(o) && mins(o.created_at) > LATE_MIN;
     const el = document.createElement('article'); el.className = 'card' + (late ? ' late' : '') + (fresh.has(o.id) ? ' new' : '');
@@ -312,7 +312,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
   }
   $('#csv').addEventListener('click', () => {
     const rows = [['Código', 'Data', 'Mesa', 'Cliente', 'Telemóvel', 'Itens', 'Total MT', 'Estado', 'Pagamento', 'Método', 'Referência']].concat(filtered().map((o) => [o.code, when(o.created_at), nice(o.table_code), o.customer_name, phone(o.customer_phone), (o.lines || []).map((l) => l.quantity + 'x ' + l.name).join('; '), o.total_mzn, ST[o.status], PAY[o.payment_status], METHOD[o.payment_method] || '', o.payment_ref || '']));
-    const csv = '\ufeff' + rows.map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(';')).join('\n');
+    const csv = '\ufeff' + rows.map((r) => r.map((c) => { let t = String(c); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; }).join(';')).join('\n');
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'pedidos-aqua-club.csv'; a.click();
   });
   $$('.tab').forEach((t) => t.addEventListener('click', () => { tab = t.dataset.tab; $$('.tab').forEach((x) => x.setAttribute('aria-selected', String(x === t))); ['active', 'tables', 'history'].forEach((k) => { $('#tab-' + k).hidden = k !== tab; }); }));

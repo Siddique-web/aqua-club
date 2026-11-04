@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { fetchMenu, type MenuItem } from '@aqua/shared';
 import { useCart } from './cartStore';
-import type { MenuItem } from '@aqua/shared';
 
 const item = (id: string, price: number): MenuItem => ({
   id, category: 'sushi', name: `Prato ${id}`, sensoryDescription: '', ingredients: [], allergens: [],
@@ -29,5 +29,11 @@ describe('carrinho', () => {
     s.add(item('a', 100));
     s.setNotes('a', 'sem cebola');
     expect(useCart.getState().lines[0]?.notes).toBe('sem cebola');
+  });
+
+  it('retorna menu de demonstração quando o Supabase não está configurado', async () => {
+    const menu = await fetchMenu();
+    expect(menu.length).toBeGreaterThan(0);
+    expect(menu[0]?.name).toBeTruthy();
   });
 });

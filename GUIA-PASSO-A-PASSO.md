@@ -137,9 +137,10 @@ Com isto, os pedidos e chamadas chegam ao **painel da equipa**, o cliente vê o 
 1. **Supabase:** crie conta em https://supabase.com → **New project**.
 2. **SQL Editor → New query**, cole e corra (**Run**), por esta ordem:
    1. `sistema/supabase/schema.sql` (tabelas, mesas de exemplo, tempo real);
-   2. `sistema/supabase/schema_v2_pedidos.sql` (identificação do cliente, pagamentos, auditoria **e segurança**). Cada um deve terminar em "Success".
+   2. `sistema/supabase/schema_v2_pedidos.sql` (identificação do cliente, pagamentos, auditoria **e segurança**);
+   3. `sistema/supabase/schema_v3_garcons.sql` (contas pessoais dos garçons, chamados seguros e papéis; ver `GUIA-GARCONS.md`). Cada um deve terminar em "Success". Se voltar a correr o v2, corra o v3 a seguir.
 3. **Mesas:** em **Table Editor → tables**, deixe só as mesas reais, com o **mesmo código** dos QR Codes (`Mesa-04-Rooftop`).
-4. **Equipa:** **Authentication → Users → Add user** (e-mail + palavra-passe) para cada pessoa que vai usar o painel.
+4. **Equipa:** cada pessoa cria a sua conta em `…/#garcom` (**Criar conta**). Você promove a sua conta a administrador com uma linha de SQL e aprova os outros na aba **Equipa** (passo a passo em `GUIA-GARCONS.md`). Contas que já existiam antes do v3 passam a administradores ativos.
 5. **Chaves:** **Project Settings → API**: copie o **Project URL** e a chave **anon public**. (⚠️ Nunca use a chave `service_role` no site.)
 6. Em `site/index.html` **e** em `site/painel.html`, no topo do script:
    ```js
@@ -155,7 +156,7 @@ Com isto, os pedidos e chamadas chegam ao **painel da equipa**, o cliente vê o 
    6. Tente abrir o painel numa janela sem sessão: pede login. O cliente **não** consegue ler pedidos de outras pessoas.
 
 **Segurança já incluída:** o cliente (anónimo) só pode **criar** pedidos, sempre "por pagar" e com termos aceites; só vê o estado do **próprio** pedido (pelo código); só a equipa autenticada lê e altera tudo; todas as mudanças de estado e pagamento ficam registadas (quem, quando).
-**Atenção:** as tabelas das mesas e das chamadas de garçom continuam abertas ao cliente (servem a app dos garçons de teste e não têm dados pessoais). Para a app dos garçons em produção, ponha também login (Supabase Auth).
+**Com o v3:** as tabelas das mesas, do menu, da equipa e dos chamados já **não** estão abertas à escrita pela chave pública; só a equipa aprovada lê pedidos e chamados.
 
 ---
 ## PARTE E — Usar o painel da equipa
@@ -175,7 +176,10 @@ cp .env.example apps/staff/.env      # preencha EXPO_PUBLIC_SUPABASE_URL e EXPO_
 npm run typecheck && npm test && npm run build:web
 npm run staff                        # leia o QR Code com a app Expo Go
 ```
-(O painel `site/painel.html` já cobre pedidos e contas; a app dos garçons é para as chamadas.)
+(O painel `site/painel.html` já cobre pedidos e contas. **Atenção:** estas apps antigas deixam de funcionar depois do SQL v3; a **Área do garçom** do site (Parte G) substitui-as.)
+
+## PARTE G — Área do garçom (chamados, contas e estatísticas)
+A barra inferior do site abre a Área do garçom: login pessoal, fila de chamados com cronómetro, aceitar/concluir/devolver, histórico, estatísticas, perfil e gestão da equipa. O cliente vê o estado do chamado a mudar e pode avaliar o atendimento. **Guia completo: `GUIA-GARCONS.md`** (inclui a demonstração de 2 minutos com `?modo=demo`).
 
 ---
 ## Pagamentos — o que existe e o que não existe
@@ -189,6 +193,7 @@ npm run staff                        # leia o QR Code com a app Expo Go
 | O WhatsApp não abre | O navegador bloqueou a janela: toque em "Não abriu? Toque aqui" |
 | "Esta mesa não existe no sistema" | O código da mesa não está na tabela `tables` do Supabase |
 | O painel pede login e não entra | Crie o utilizador em Authentication → Users; confirme o `BACKEND` no `painel.html` |
-| Não aparece nada no painel | `BACKEND` vazio (demonstração) ou o SQL v2 não foi corrido |
+| Não aparece nada no painel | `BACKEND` vazio (demonstração), o SQL v2/v3 não foi corrido, ou a conta ainda não foi aprovada em **Equipa** |
+| Criei conta de garçom e não entro | Está pendente: um administrador tem de aprovar (`GUIA-GARCONS.md`) |
 | O site não aparece no GitHub Pages | Settings → Pages → Source = GitHub Actions; veja o separador Actions |
 | Letras diferentes | Sem internet o Google Fonts não carrega; é só estético |

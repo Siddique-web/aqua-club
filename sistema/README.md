@@ -1,5 +1,7 @@
 # Aqua Club — plataforma digital (React + React Native + Supabase)
 
+> ⚠️ **Legado.** As apps `apps/web` (cliente/admin) e `apps/staff` (garçons) usam tabelas abertas à escrita e **deixam de funcionar depois do `supabase/schema_v3_garcons.sql`**. O fluxo atual de chamados, contas de garçom e estatísticas está no site (`site/`, ver `../GUIA-GARCONS.md`). Esta pasta fica como referência de arquitetura; o que continua a ser usado aqui são os ficheiros SQL em `supabase/`.
+
 Monorepo (npm workspaces) em TypeScript:
 
 | Pasta | O que é |
