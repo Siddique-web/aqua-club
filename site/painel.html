@@ -99,7 +99,7 @@ dialog::backdrop{background:rgba(0,20,35,.6)}
 <main id="loginView" hidden>
   <form class="login" id="loginForm">
     <h2>Entrar</h2>
-    <p>Área reservada à equipa. Use o e-mail e a palavra-passe criados no Supabase (Authentication → Users).</p>
+    <p>Área da administração. Entre com a conta da equipa.</p>
     <label>E-mail<input type="email" id="email" autocomplete="username" required></label>
     <label>Palavra-passe<input type="password" id="pass" autocomplete="current-password" required></label>
     <p class="msg" id="loginMsg" role="alert"></p>
@@ -108,14 +108,16 @@ dialog::backdrop{background:rgba(0,20,35,.6)}
 </main>
 
 <main id="app" hidden>
-  <p class="demo-note" id="demoNote" hidden>Modo demonstração: estes pedidos são de exemplo e nada é guardado. Para usar a sério, preencha <code>BACKEND</code> no topo deste ficheiro (e no <code>index.html</code>) e crie os utilizadores da equipa.</p>
+  <p class="demo-note" id="demoNote" hidden>Os dados vêm do sistema em tempo real. Garçons: abra também /os/#/staff com o PIN.</p>
   <section class="kpis" id="kpis" aria-label="Resumo"></section>
   <nav class="tabs" role="tablist" aria-label="Secções">
     <button class="tab" role="tab" data-tab="active" aria-selected="true">Pedidos ativos</button>
+    <button class="tab" role="tab" data-tab="calls" aria-selected="false">Chamados</button>
     <button class="tab" role="tab" data-tab="tables" aria-selected="false">Contas por mesa</button>
     <button class="tab" role="tab" data-tab="history" aria-selected="false">Histórico e clientes</button>
   </nav>
   <section id="tab-active" class="board"></section>
+  <section id="tab-calls" class="board" hidden></section>
   <section id="tab-tables" hidden></section>
   <section id="tab-history" hidden>
     <div class="filters">
@@ -138,10 +140,9 @@ dialog::backdrop{background:rgba(0,20,35,.6)}
   <div class="acts"><button class="btn" id="pOk" type="button">Confirmar pagamento</button><button class="btn line" type="button" data-close>Cancelar</button></div>
 </div></dialog>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
-/* ===== CONFIGURAÇÃO — o mesmo URL e chave do index.html (Supabase → Project Settings → API) ===== */
-const BACKEND = { url: '', key: '' };
-const POLL_MS = 10000;
+const POLL_MS = 8000;
 const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos fica a vermelho */
 
 (function () {
@@ -154,47 +155,95 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
   const when = (ts) => new Date(ts).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   const mins = (ts) => Math.max(0, Math.floor((Date.now() - new Date(ts).getTime()) / 60000));
   const phone = (d) => (/^258\d{9}$/.test(d || '') ? '+258 ' + d.slice(3, 5) + ' ' + d.slice(5, 8) + ' ' + d.slice(8) : d ? '+' + d : '');
-  const ST = { received: 'Recebido', preparing: 'Em preparação', on_the_way: 'A caminho', delivered: 'Entregue', cancelled: 'Cancelado' };
-  const PAY = { unpaid: 'Por pagar', pay_requested: 'Conta pedida', paid_declared: 'Pagamento a confirmar', paid: 'Pago' };
+  const ST = { review: 'Em análise', received: 'Em análise', preparing: 'Em preparação', ready: 'Pronto', on_the_way: 'Pronto', delivered: 'Entregue', cancelled: 'Cancelado', no_confirm: 'Sem confirmação' };
+  const PAY = { unpaid: 'Por pagar', pay_requested: 'Conta pedida', paid_declared: 'Pagamento a confirmar', declared: 'Pagamento a confirmar', paid: 'Pago', rejected: 'Rejeitado' };
   const METHOD = { cash: 'Dinheiro', card: 'Cartão', mpesa: 'M-Pesa', emola: 'e-Mola', local: 'No local', other: 'Outro' };
-  const NEXT = { received: 'preparing', preparing: 'on_the_way', on_the_way: 'delivered' };
-  const NEXT_TXT = { received: 'Aceitar → Em preparação', preparing: 'Pronto → A caminho', on_the_way: 'Entregue na mesa' };
+  const NEXT = { review: 'preparing', received: 'preparing', preparing: 'ready', ready: 'delivered', on_the_way: 'delivered' };
+  const NEXT_TXT = { review: 'Aceitar → A preparar', received: 'Aceitar → A preparar', preparing: 'Marcar pronto', ready: 'Entregue', on_the_way: 'Entregue na mesa' };
 
-  const live = Boolean(BACKEND.url && BACKEND.key) && new URLSearchParams(location.search).get('demo') !== '1';
-  let sb = null, orders = [], events = {}, tab = 'active', current = null, user = '', known = new Set(), fresh = new Set();
+  let orders = [], calls = [], events = {}, tab = 'active', current = null, user = '', known = new Set(), fresh = new Set();
+
+  async function api(path, opts = {}) {
+    const res = await fetch('/api' + path, {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      method: opts.method || 'GET',
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.error || 'fail'), { code: data.error });
+    return data;
+  }
+  function mapOrder(o) {
+    return {
+      id: String(o.id),
+      code: o.code,
+      table_code: o.place_label || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || ''),
+      lines: (o.items || []).map((it) => ({ name: it.name, unitPriceMzn: it.unit_price, quantity: it.qty, notes: '' })),
+      total_mzn: o.total,
+      status: o.status,
+      customer_name: o.customer_name || o.customer?.name || '',
+      customer_phone: o.customer_phone || o.customer?.phone || '',
+      accepted_terms: true,
+      accepted_at: o.created_at,
+      payment_status: o.payment_status === 'declared' ? 'paid_declared' : o.payment_status,
+      payment_method: o.payment_method,
+      payment_ref: o.payment_ref || o.paid_code,
+      paid_at: o.paid_at,
+      created_at: o.created_at,
+      updated_at: o.created_at,
+      rawId: o.id,
+      mapsUrl: o.navUrl || o.mapsUrl || '',
+      lat: o.lat, lng: o.lng
+    };
+  }
 
   /* ---------- dados ---------- */
-  function demoData() {
-    const mk = (i, code, table, name, ph, lines, status, pay, ago) => ({ id: 'demo' + i, code, table_code: table, lines, total_mzn: lines.reduce((s, l) => s + l.unitPriceMzn * l.quantity, 0), status, customer_name: name, customer_phone: ph,
-      accepted_terms: true, accepted_at: new Date(Date.now() - ago * 60000).toISOString(), payment_status: pay, payment_method: pay === 'paid' ? 'mpesa' : null, payment_ref: pay === 'paid' ? 'MP7788' : null,
-      paid_at: pay === 'paid' ? new Date().toISOString() : null, created_at: new Date(Date.now() - ago * 60000).toISOString(), updated_at: new Date().toISOString() });
-    const L = (n, p, q, note) => ({ name: n, unitPriceMzn: p, quantity: q, notes: note });
-    orders = [
-      mk(1, 'AQ-1008-K3F9', 'Mesa-04-Rooftop', 'Ana Machava', '258841234567', [L('Bruschettas', 350, 2, 'sem cebola'), L('Sumos naturais', 200, 2)], 'received', 'unpaid', 2),
-      mk(2, 'AQ-1008-P2QM', 'Mesa-12-Piscina', 'Carlos Sitoe', '258829876543', [L('Cocktails refrescantes', 450, 3)], 'preparing', 'unpaid', 9),
-      mk(3, 'AQ-1008-ZZ41', 'Mesa-08-Piscina', 'Nádia Cumbe', '258856001122', [L('Petiscos variados', 650, 1), L('Mousse gourmet', 300, 2)], 'on_the_way', 'pay_requested', 16),
-      mk(4, 'AQ-1008-H8WD', 'Mesa-15-Sala', 'João Bila', '258871112233', [L('Mousse gourmet', 300, 2)], 'delivered', 'unpaid', 42),
-      mk(5, 'AQ-1008-B6RT', 'Mesa-16-Sala', 'Marta Tembe', '258845550000', [L('Bruschettas', 350, 1), L('Sumos naturais', 200, 1)], 'delivered', 'paid_declared', 30),
-      mk(6, 'AQ-1007-A1CE', 'Mesa-01-Rooftop', 'Pedro Langa', '258827770011', [L('Petiscos variados', 650, 2)], 'delivered', 'paid', 1500)
-    ];
-    events = { demo4: [{ at: orders[3].created_at, actor: 'cliente', event: 'criado', detail: { nome: 'João Bila' } }] };
-  }
   async function load() {
-    if (!live) return;
-    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false }).limit(500);
-    if (error) throw error;
-    data.forEach((o) => { if (known.size && !known.has(o.id)) { fresh.add(o.id); beep(); document.title = '(!) Novo pedido — Painel'; } });
-    orders = data; known = new Set(data.map((o) => o.id));
+    const d = await api('/admin/overview');
+    const mapped = (d.recent || []).map(mapOrder);
+    mapped.forEach((o) => { if (known.size && !known.has(o.id)) { fresh.add(o.id); beep(); document.title = '(!) Novo pedido — Painel'; } });
+    orders = mapped;
+    calls = d.calls || [];
+    known = new Set(mapped.map((o) => o.id));
   }
   async function update(id, patch) {
-    if (live) { const { error } = await sb.from('orders').update(patch).eq('id', id); if (error) { alert('Não foi possível guardar: ' + error.message); return; } }
-    const o = orders.find((x) => x.id === id); Object.assign(o, patch, { updated_at: new Date().toISOString() });
-    if (!live) (events[id] = events[id] || []).push({ at: new Date().toISOString(), actor: user || 'demo', event: patch.payment_status ? 'pagamento' : 'estado', detail: patch });
+    const o = orders.find((x) => x.id === id);
+    const body = {};
+    if (patch.status) body.status = patch.status;
+    if (patch.payment_status === 'paid') body.payment_status = 'paid';
+    if (patch.payment_status === 'paid_declared') body.payment_status = 'declared';
+    try { await api('/admin/orders/' + (o.rawId || id), { method: 'PATCH', body }); }
+    catch (e) { alert('Não foi possível guardar: ' + (e.message || e)); return; }
+    Object.assign(o, patch, { updated_at: new Date().toISOString() });
+    (events[id] = events[id] || []).push({ at: new Date().toISOString(), actor: user || 'admin', event: patch.payment_status ? 'pagamento' : 'estado', detail: patch });
     render();
   }
   async function eventsOf(id) {
-    if (!live) return events[id] || [];
-    const { data } = await sb.from('order_events').select('*').eq('order_id', id).order('at'); return data || [];
+    return events[id] || [];
+  }
+  function elapsedCall(ts) {
+    const raw = String(ts || '').replace(' ', 'T');
+    const t = Date.parse(/Z$|[+-]\d\d:\d\d$/.test(raw) ? raw : raw + 'Z');
+    if (!Number.isFinite(t)) return '—';
+    const s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+    const m = Math.floor(s / 60);
+    return m >= 60 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : m + ':' + String(s % 60).padStart(2, '0');
+  }
+  function renderCalls() {
+    const box = $('#tab-calls'); if (!box) return;
+    const liveC = calls.filter((c) => c.status === 'pending' || c.status === 'accepted');
+    const done = calls.filter((c) => c.status !== 'pending' && c.status !== 'accepted').slice(0, 30);
+    box.innerHTML = `<div class="col"><h2>À espera / a caminho<span>${liveC.length}</span></h2>${
+      liveC.length ? liveC.map((c) => `<article class="card ${c.status === 'pending' ? 'new' : ''}">
+        <div class="row"><b>Mesa ${c.table_number}</b><small class="timer" data-from="${c.created_at}">${elapsedCall(c.created_at)}</small></div>
+        <p>${esc(c.reason)} · ${esc(c.customer_name || c.note || '')}</p>
+        <p><span class="chip">${c.status === 'pending' ? 'À espera' : 'Aceite'}</span></p>
+      </article>`).join('') : '<p class="empty">Nenhum chamado agora.</p>'
+    }</div>
+    <div class="col"><h2>Histórico de chamados<span>${done.length}</span></h2>${
+      done.length ? done.map((c) => `<article class="card"><div class="row"><b>Mesa ${c.table_number}</b><small>${esc(c.status)}</small></div><p>${esc(c.reason)} · ${esc(c.customer_name || '')}</p></article>`).join('') : '<p class="empty">—</p>'
+    }</div>`;
   }
   function beep() { try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(a.destination); o.start(); setTimeout(() => { o.stop(); a.close(); }, 220); } catch (e) { /* sem som */ } }
 
@@ -206,16 +255,28 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const late = o.status === 'delivered' && unpaidOf(o) && mins(o.created_at) > LATE_MIN;
     const el = document.createElement('article'); el.className = 'card' + (late ? ' late' : '') + (fresh.has(o.id) ? ' new' : '');
     el.innerHTML = `<div class="row"><b>${esc(o.code)}</b><small>${esc(nice(o.table_code))} · há ${mins(o.created_at)} min</small></div>
-      <div class="who">${esc(o.customer_name)} · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a></div>
+      <div class="who">${esc(o.customer_name)} · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a>${o.mapsUrl ? ` · <a href="${esc(o.mapsUrl)}" target="_blank" rel="noopener">Google Maps</a>` : ''}</div>
       <ul class="items">${items(o)}</ul>
       <div class="row"><b>${money(o.total_mzn)}</b><span class="chips">${payChip(o)}</span></div>
       ${late ? '<small style="color:#B42318;font-weight:700">Conta em aberto há mais de ' + LATE_MIN + ' min — falar com o cliente</small>' : ''}
-      <div class="acts">${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${unpaidOf(o) || o.payment_status === 'paid_declared' ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}<button class="btn sm line" data-open="${o.id}">Detalhes</button></div>`;
+      <div class="acts">${o.payment_status === 'paid_declared' ? `<button class="btn sm" data-confpay="${o.id}">Confirmar transferência → A preparar</button>` : ''}${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${unpaidOf(o) || o.payment_status === 'paid_declared' ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}<button class="btn sm line" data-open="${o.id}">Detalhes</button></div>`;
     return el;
   }
   function renderActive() {
-    const cols = [['received', 'Recebidos', (o) => o.status === 'received'], ['preparing', 'Em preparação', (o) => o.status === 'preparing'], ['on_the_way', 'A caminho', (o) => o.status === 'on_the_way'], ['delivered', 'Entregues — por pagar', (o) => o.status === 'delivered' && o.payment_status !== 'paid']];
+    const cols = [['review', 'Em análise', (o) => o.status === 'review' || o.status === 'received' || o.status === 'no_confirm'], ['preparing', 'Em preparação', (o) => o.status === 'preparing'], ['ready', 'Prontos', (o) => o.status === 'ready' || o.status === 'on_the_way'], ['delivered', 'Entregues — por pagar', (o) => o.status === 'delivered' && o.payment_status !== 'paid']];
     const box = $('#tab-active'); box.innerHTML = '';
+    const decl = orders.filter((o) => o.status !== 'cancelled' && o.payment_status === 'paid_declared');
+    if (decl.length) {
+      const payCol = document.createElement('div'); payCol.className = 'col'; payCol.style.gridColumn = '1 / -1';
+      payCol.innerHTML = `<h2>Transferências a confirmar<span>${decl.length}</span></h2>`;
+      decl.forEach((o) => {
+        const method = o.payment_method === 'emola' ? 'e-Mola Movitel 87 452 1897' : o.payment_method === 'mpesa' ? 'M-Pesa Vodacom 84 596 1528' : (METHOD[o.payment_method] || o.payment_method || '');
+        const el = card(o);
+        el.insertAdjacentHTML('beforeend', `<p><b>${esc(method)}</b> · titular Siddique Faizy Rego${o.payment_ref ? ' · SMS ' + esc(o.payment_ref) : ''}</p>`);
+        payCol.appendChild(el);
+      });
+      box.appendChild(payCol);
+    }
     cols.forEach(([, label, f]) => {
       const list = orders.filter(f).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
       const c = document.createElement('div'); c.className = 'col'; c.innerHTML = `<h2>${label}<span>${list.length}</span></h2>`;
@@ -251,14 +312,14 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const list = filtered(), body = $('#hbody'); body.innerHTML = '';
     list.forEach((o) => {
       const tr = document.createElement('tr'); tr.className = 'click'; tr.tabIndex = 0;
-      tr.innerHTML = `<td><b>${esc(o.code)}</b></td><td>${when(o.created_at)}</td><td>${esc(nice(o.table_code))}</td><td>${esc(o.customer_name)}<br><small>${esc(phone(o.customer_phone))}</small></td><td>${money(o.total_mzn)}</td><td>${esc(ST[o.status])}</td><td>${payChip(o)}</td>`;
+      tr.innerHTML = `<td><b>${esc(o.code)}</b></td><td>${when(o.created_at)}</td><td>${esc(nice(o.table_code))}${o.mapsUrl ? `<br><a href="${esc(o.mapsUrl)}" target="_blank" rel="noopener">Maps</a>` : ''}</td><td>${esc(o.customer_name)}<br><small>${esc(phone(o.customer_phone))}</small></td><td>${money(o.total_mzn)}</td><td>${esc(ST[o.status])}</td><td>${payChip(o)}</td>`;
       tr.addEventListener('click', () => openDetail(o.id)); tr.addEventListener('keydown', (e) => { if (e.key === 'Enter') openDetail(o.id); });
       body.appendChild(tr);
     });
     $('#hcount').textContent = list.length + ' pedido(s)' + (list.length ? ' · total ' + money(list.filter((o) => o.status !== 'cancelled').reduce((s, o) => s + o.total_mzn, 0)) : '');
   }
   function renderKpis() {
-    const active = orders.filter((o) => ['received', 'preparing', 'on_the_way'].includes(o.status)).length;
+    const active = orders.filter((o) => ['review', 'received', 'preparing', 'ready', 'on_the_way', 'no_confirm'].includes(o.status)).length;
     const unpaid = orders.filter(unpaidOf).reduce((s, o) => s + o.total_mzn, 0);
     const decl = orders.filter((o) => o.status !== 'cancelled' && o.payment_status === 'paid_declared').reduce((s, o) => s + o.total_mzn, 0);
     const today = new Date().toISOString().slice(0, 10);
@@ -266,7 +327,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const tbl = new Set(orders.filter((o) => o.status !== 'cancelled' && o.payment_status !== 'paid').map((o) => o.table_code)).size;
     $('#kpis').innerHTML = `<div class="kpi"><small>Pedidos ativos</small><b>${active}</b></div><div class="kpi ${unpaid ? 'warn' : ''}"><small>Por pagar</small><b>${money(unpaid)}</b></div><div class="kpi"><small>A confirmar</small><b>${money(decl)}</b></div><div class="kpi"><small>Mesas com conta aberta</small><b>${tbl}</b></div><div class="kpi"><small>Recebido hoje</small><b>${money(sold)}</b></div>`;
   }
-  function render() { renderKpis(); renderActive(); renderTables(); renderHistory(); if (current && $('#dlg').open) fillDetail(current); }
+  function render() { renderKpis(); renderCalls(); renderActive(); renderTables(); renderHistory(); if (current && $('#dlg').open) fillDetail(current); }
 
   /* ---------- detalhe ---------- */
   async function openDetail(id) { current = id; await fillDetail(id); if (!$('#dlg').open) $('#dlg').showModal(); }
@@ -275,7 +336,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const canPay = o.status !== 'cancelled' && o.payment_status !== 'paid';
     $('#dBody').innerHTML = `<div class="row"><h2 id="dT">${esc(o.code)}</h2><button class="btn line sm" data-close type="button">Fechar</button></div>
       <dl class="kv"><dt>Cliente</dt><dd><b>${esc(o.customer_name)}</b> · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a> · <a href="https://wa.me/${esc(o.customer_phone)}" target="_blank" rel="noopener">WhatsApp</a></dd>
-        <dt>Mesa</dt><dd>${esc(nice(o.table_code))}</dd><dt>Pedido feito</dt><dd>${when(o.created_at)}</dd>
+        <dt>Mesa</dt><dd>${esc(nice(o.table_code))}${o.mapsUrl ? ` · <a href="${esc(o.mapsUrl)}" target="_blank" rel="noopener">Abrir no Google Maps</a>` : ''}</dd><dt>Pedido feito</dt><dd>${when(o.created_at)}</dd>
         <dt>Termos aceites</dt><dd>${o.accepted_terms ? 'Sim, em ' + when(o.accepted_at || o.created_at) : '<b>Não</b>'}</dd>
         <dt>Estado</dt><dd>${esc(ST[o.status])}${o.cancel_reason ? ' — ' + esc(o.cancel_reason) : ''}</dd>
         <dt>Pagamento</dt><dd>${payChip(o)}${o.payment_ref ? ' · ref. ' + esc(o.payment_ref) : ''}${o.paid_at ? ' · ' + when(o.paid_at) : ''}</dd></dl>
@@ -298,6 +359,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.close !== undefined) { b.closest('dialog').close(); return; }
     if (b.dataset.next) { const o = orders.find((x) => x.id === b.dataset.next); await update(o.id, { status: NEXT[o.status] }); }
+    else if (b.dataset.confpay) { await update(b.dataset.confpay, { payment_status: 'paid' }); }
     else if (b.dataset.pay) { const o = orders.find((x) => x.id === b.dataset.pay); askPay([o.id], o.code + ' · ' + o.customer_name + ' · ' + money(o.total_mzn)); }
     else if (b.dataset.closetable) { const list = orders.filter((o) => o.table_code === b.dataset.closetable && o.status !== 'cancelled' && o.payment_status !== 'paid'); askPay(list.map((o) => o.id), nice(b.dataset.closetable) + ' · ' + list.length + ' pedido(s) · ' + money(list.reduce((s, o) => s + o.total_mzn, 0))); }
     else if (b.dataset.cancel) { const r = ($('#cReason') || {}).value || ''; if (r.trim().length < 3) { alert('Escreva o motivo do cancelamento.'); return; } await update(b.dataset.cancel, { status: 'cancelled', cancel_reason: r.trim() }); }
@@ -315,7 +377,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const csv = '\ufeff' + rows.map((r) => r.map((c) => { let t = String(c); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; }).join(';')).join('\n');
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'pedidos-aqua-club.csv'; a.click();
   });
-  $$('.tab').forEach((t) => t.addEventListener('click', () => { tab = t.dataset.tab; $$('.tab').forEach((x) => x.setAttribute('aria-selected', String(x === t))); ['active', 'tables', 'history'].forEach((k) => { $('#tab-' + k).hidden = k !== tab; }); }));
+  $$('.tab').forEach((t) => t.addEventListener('click', () => { tab = t.dataset.tab; $$('.tab').forEach((x) => x.setAttribute('aria-selected', String(x === t))); ['calls', 'active', 'tables', 'history'].forEach((k) => { $('#tab-' + k).hidden = k !== tab; }); }));
   ['q', 'fpay', 'fdate'].forEach((id) => $('#' + id).addEventListener('input', renderHistory));
   $$('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
   document.addEventListener('visibilitychange', () => { if (!document.hidden) document.title = 'Painel do restaurante — Aqua Club'; });
@@ -323,29 +385,36 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
 
   /* ---------- arranque ---------- */
   async function start() {
-    $('#loginView').hidden = true; $('#app').hidden = false; $('#logout').hidden = !live;
-    try { await load(); } catch (e) { $('#app').insertAdjacentHTML('afterbegin', '<p class="demo-note">Não foi possível carregar os pedidos: ' + esc(e.message || e) + '</p>'); }
+    $('#loginView').hidden = true; $('#app').hidden = false; $('#logout').hidden = false;
+    try { await load(); } catch (e) { $('#app').insertAdjacentHTML('afterbegin', '<p class="demo-note">Não foi possível carregar: ' + esc(e.message || e) + '</p>'); }
     render(); known = new Set(orders.map((o) => o.id));
-    if (live) {
-      sb.channel('orders-live').on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, async () => { try { await load(); render(); } catch (e) { /* tenta no próximo ciclo */ } }).subscribe();
-      setInterval(async () => { try { await load(); render(); } catch (e) { /* sem rede */ } }, POLL_MS);
+    if (window.io) {
+      const s = window.io({ transports: ['websocket', 'polling'] });
+      const refresh = async () => { try { await load(); render(); } catch (e) { /* */ } };
+      s.on('order:new', refresh); s.on('order:updated', refresh);
+      s.on('call:new', () => { beep(); document.title = '(!) Chamado — Painel'; refresh(); });
+      s.on('call:updated', refresh);
     }
+    setInterval(async () => { try { await load(); render(); } catch (e) { /* */ } }, POLL_MS);
+    setInterval(() => { document.querySelectorAll('[data-from]').forEach((el) => { el.textContent = elapsedCall(el.dataset.from); }); }, 1000);
   }
   async function init() {
-    $('#modeTag').textContent = live ? 'Ligado' : 'Demonstração'; $('#modeTag').className = 'pill ' + (live ? 'live' : 'demo');
-    if (!live) { $('#demoNote').hidden = false; demoData(); start(); return; }
-    await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); }).catch(() => { $('#loginMsg').textContent = 'Sem ligação à internet.'; });
-    sb = window.supabase.createClient(BACKEND.url, BACKEND.key);
-    const { data } = await sb.auth.getSession();
-    if (data && data.session) { user = data.session.user.email; $('#who').textContent = user; start(); } else { $('#loginView').hidden = false; }
+    $('#modeTag').textContent = 'Tempo real'; $('#modeTag').className = 'pill live';
+    try {
+      const me = await api('/auth/me');
+      if (me.user && me.user.role === 'admin') { user = me.user.email; $('#who').textContent = user; start(); return; }
+    } catch (e) { /* login */ }
+    $('#loginView').hidden = false;
   }
   $('#loginForm').addEventListener('submit', async (e) => {
     e.preventDefault(); $('#loginMsg').textContent = '';
-    const { data, error } = await sb.auth.signInWithPassword({ email: $('#email').value.trim(), password: $('#pass').value });
-    if (error) { $('#loginMsg').textContent = 'E-mail ou palavra-passe incorretos.'; return; }
-    user = data.session ? data.session.user.email : $('#email').value; $('#who').textContent = user; start();
+    try {
+      const r = await api('/auth/login', { method: 'POST', body: { email: $('#email').value.trim(), password: $('#pass').value, remember: true } });
+      if (r.user.role !== 'admin') { $('#loginMsg').textContent = 'Esta conta não é da administração.'; return; }
+      user = r.user.email; $('#who').textContent = user; start();
+    } catch (err) { $('#loginMsg').textContent = 'E-mail ou palavra-passe incorrectos.'; }
   });
-  $('#logout').addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
+  $('#logout').addEventListener('click', async () => { await api('/auth/logout', { method: 'POST', body: {} }); location.reload(); });
   init();
 })();
 </script>

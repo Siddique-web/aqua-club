@@ -1,0 +1,27 @@
+{
+  "name": "aqua-club-plataforma",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Aqua Club — restaurante, pedidos, mesas e administração em tempo real",
+  "scripts": {
+    "start": "node --experimental-sqlite server/index.mjs",
+    "dev": "node --experimental-sqlite --watch server/index.mjs",
+    "test": "node scripts/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "socket.io": "^4.8.1"
+  }
+}

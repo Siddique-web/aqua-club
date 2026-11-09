@@ -1,12 +1,30 @@
-# Aqua Club — site, pedidos à mesa e painel do restaurante
+# Aqua Club — CRBM Beira
 
-| Pasta | O que é |
-|---|---|
-| `site/` | O site (HTML puro, sem instalação): galeria, atrações, espaços, menu com preços, pedido à mesa, chamar garçom, conta/pagamento, reservas, FAQ e contacto. **`site/painel.html`** é o painel da equipa. |
-| `sistema/` | (Opcional) Base de dados Supabase, app dos garçons e painel admin. Só é preciso para o restaurante ver os pedidos em tempo real. |
-| `GUIA-ESTRUTURA-DO-SITE.md` | Estrutura das secções, onde vai cada fotografia, layout, botões e regras dos pedidos. |
-| `GUIA-GARCONS.md` | **Área do garçom**: contas pessoais, chamados cliente⇄garçom em tempo real, estatísticas e gestão da equipa (com demonstração de 2 minutos). |
-| `tests/` | Testes automáticos: SQL em PostgreSQL real, fluxo completo num navegador (demonstração e ao vivo). |
-| `GUIA-PASSO-A-PASSO.md` | Como testar, configurar, lançar no GitHub e ligar a base de dados. |
+Site do complexo (slides, menu, pedidos) e plataforma de restaurante (garçom, administração, pagamentos) num só arranque.
 
-Começar: abra `GUIA-PASSO-A-PASSO.md`.
+## Arranque
+
+Requisito: **Node.js 22+**.
+
+```bash
+cd plataforma
+npm install
+npm start
+```
+
+Abra **http://localhost:5173**
+
+O servidor publica a pasta `site/` (site público) e a API em `/api` (pedidos, chamados, painel).
+
+- Cliente: `/`
+- Painel: `/painel.html`
+- Administração: `/os`
+- Terminal do garçom: `/os#/staff`
+
+As contas da equipa e os PIN **não** estão neste repositório. Use as credenciais já criadas na base de dados local, ou defina `AQUA_ADMIN_EMAIL` e `AQUA_ADMIN_PASSWORD` só no ambiente do servidor.
+
+## Produção
+
+A pasta `site/` continua a ser a origem publicada no Vercel (ficheiros estáticos). Pedidos em tempo real, SQLite e Socket.IO correm com `npm start` na `plataforma/` (Node 22).
+
+Não publique ficheiros `.env` nem a pasta `plataforma/data/`.

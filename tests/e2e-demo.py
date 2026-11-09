@@ -20,7 +20,8 @@ def check(cond, msg):
     if cond: ok_n += 1; print('  ✓', msg)
     else: fail_n += 1; print('  ✗ FALHOU:', msg)
 
-def login(w, email, pw='demo1234'):
+def login(w, email, pw=None):
+    pw = pw or os.environ.get('AQUA_DEMO_PASSWORD') or ''
     w.fill('form[data-form=in] input[name=email]', email); w.fill('form[data-form=in] input[name=password]', pw)
     w.click('form[data-form=in] button[type=submit]')
 
