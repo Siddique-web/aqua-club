@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=cart1"></script>
+<script src="i18n.js?v=cats1"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
 <style>
 :root{
   --cyan:#00A8FF; --cyan-d:#0069A8; --cyan-soft:#E6F6FF; --cyan-line:#BFE7FF; --yellow:#FFD700;
-  --ink:#0A0A0A; --muted:#3D4852; --head:76px;
+  --ink:#0A0A0A; --muted:#3D4852; --head:72px;
   --fh:"Poppins","Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif; --fb:"Inter","Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;
   --ease:.3s ease;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
@@ -52,23 +52,23 @@ h1,h2,h3,p{margin:0}
 /* header */
 .header{position:fixed;inset:0 0 auto 0;z-index:90;background:#fff;border-bottom:4px solid var(--cyan);padding-top:env(safe-area-inset-top,0px);transition:box-shadow var(--ease)}
 .header.scrolled,.header.open{box-shadow:0 8px 24px rgba(0,0,0,.12)}
-.bar{display:flex;align-items:center;justify-content:space-between;height:var(--head)}
-.brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;transition:transform var(--ease)}
-.brand:hover{transform:scale(1.05)}
-.brand img{width:48px;height:48px;border-radius:50%}
-.brand span{display:flex;flex-direction:column;font-family:var(--fh);text-transform:uppercase;color:var(--cyan-d);line-height:1}
-.brand b{font-size:1.35rem;font-weight:800}
-.brand small{margin-top:4px;font-size:.55rem;font-weight:600;letter-spacing:.3em}
+.header .wrap{padding-inline:.85rem}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.65rem;min-height:var(--head);height:auto;padding:.5rem 0}
+.brand{display:flex;align-items:center;gap:.65rem;min-width:0;text-decoration:none}
+.brand img{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none;background:#e8f6ff}
+.brand span{display:flex;flex-direction:column;justify-content:center;min-width:0;font-family:var(--fh);text-transform:uppercase;color:var(--cyan-d);line-height:1}
+.brand b{font-size:clamp(1.02rem,4.1vw,1.42rem);font-weight:800;letter-spacing:.04em;white-space:nowrap}
+.brand small{margin-top:.28rem;font-size:clamp(.42rem,1.55vw,.58rem);font-weight:700;letter-spacing:.16em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav{display:none}
 .nav ul{display:flex;gap:.25rem;list-style:none;margin:0;padding:0}
 .nav a{position:relative;display:block;padding:.5rem .65rem;font:800 .78rem var(--fh);letter-spacing:.07em;text-transform:uppercase;color:#000;text-decoration:none;white-space:nowrap;transition:color var(--ease)}
 .nav a::after{content:"";position:absolute;left:.65rem;right:.65rem;bottom:-2px;height:3px;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform var(--ease)}
 .nav a:hover{color:var(--cyan-d)} .nav a:hover::after{transform:scaleX(1)}
-.head-right{display:flex;align-items:center;gap:.75rem}
+.head-right{display:flex;align-items:center;gap:.5rem;flex:none}
 .langpick{position:relative;flex:none}
-.lang-btn{display:inline-flex;align-items:center;gap:.45rem;min-height:42px;padding:.28rem .7rem .28rem .32rem;border:2px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .7rem var(--fh);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background-color var(--ease),transform var(--ease),border-color var(--ease)}
-.lang-btn:hover,.langpick.open .lang-btn{background:var(--cyan);border-color:var(--cyan);transform:translateY(-1px)}
-.lang-btn .chev{width:.9rem;height:.9rem;transition:transform var(--ease)}
+.lang-btn{display:inline-flex;align-items:center;gap:.42rem;min-height:46px;padding:.22rem .72rem .22rem .26rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background-color var(--ease),border-color var(--ease)}
+.lang-btn:hover,.langpick.open .lang-btn{background:var(--cyan);border-color:var(--cyan)}
+.lang-btn .chev{width:.85rem;height:.85rem;transition:transform var(--ease)}
 .langpick.open .lang-btn .chev{transform:rotate(180deg)}
 .flag{--s:1.7rem;position:relative;display:inline-block;width:var(--s);height:var(--s);flex:none;border-radius:50%;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.12);background:#ccc}
 .lang-btn .flag{--s:1.85rem;box-shadow:0 0 0 2px #fff,0 0 0 3px #000,0 2px 6px rgba(0,0,0,.18)}
@@ -94,7 +94,8 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .waiter-box{display:flex;gap:1rem;align-items:center;background:var(--cyan-soft);padding:1rem;border-radius:12px;margin:1rem 0}
 .waiter-box img{width:64px;height:64px;border-radius:50%;object-fit:cover}
 .head-right .btn{display:none;padding:.6rem 1.1rem;min-height:44px}
-.burger{width:46px;height:46px;border:2px solid #000;background:#fff;display:grid;place-items:center;cursor:pointer;transition:background-color var(--ease),color var(--ease)}
+.burger{width:50px;height:50px;border:2.5px solid #000;border-radius:4px;background:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:background-color var(--ease),color var(--ease)}
+.burger .ico{width:1.35rem;height:1.35rem}
 .burger:hover{background:#000;color:#fff}
 .mmenu{display:none;position:fixed;inset:calc(var(--head) + 4px + env(safe-area-inset-top,0px)) 0 0 0;background:#fff;overflow:auto;padding:1rem 1rem 3rem;animation:fade .3s ease}
 .header.open .mmenu{display:block}
@@ -104,8 +105,16 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .mmenu li a:hover{transform:translateX(8px);color:var(--cyan-d)}
 .mmenu .btn{margin-top:1.5rem;width:100%}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-@media(min-width:640px){.head-right .btn{display:inline-flex}}
-@media(min-width:1100px){.nav{display:block}.burger{display:none}.wrap{padding-inline:2rem}}
+@media(max-width:380px){.lang-btn > span:not(.flag){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.lang-btn{padding-inline:.28rem}.brand img{width:48px;height:48px}}
+@media(min-width:1100px){
+  .header .wrap,.wrap{padding-inline:2rem}
+  .nav{display:block}
+  .burger{display:none}
+  .head-right .btn{display:inline-flex}
+  .brand img{width:56px;height:56px}
+  .brand b{font-size:1.45rem}
+  .brand small{font-size:.58rem;letter-spacing:.2em}
+}
 
 /* hero slideshow */
 .hero{position:relative;isolation:isolate;overflow-x:clip;overflow-y:visible;background:#fff}
@@ -185,9 +194,9 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 @media(min-width:1100px){.hero-grid{padding-inline:6rem}}
 
 /* secções */
-section{position:relative;overflow-x:clip}
+section{position:relative}
 .band{padding:5rem 0}
-#menu.band{padding:2.6rem 0 2.6rem}
+#menu.band{padding:2.6rem 0 8.5rem}
 #menu .menu-head{margin:0 0 1.35rem;display:grid;gap:.35rem}
 #menu .menu-head .sh{display:grid;justify-items:start;gap:.35rem}
 #menu .menu-head .eyebrow{margin:0 0 .15rem;font-size:clamp(.72rem,2.4vw,.92rem);letter-spacing:.18em;line-height:1.2}
@@ -197,15 +206,16 @@ section{position:relative;overflow-x:clip}
 #menu .how-inline{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin:.55rem 0 0;padding:0;list-style:none;counter-reset:step}
 #menu .how-inline li{display:flex;align-items:center;gap:.4rem;font:700 .82rem var(--fh);color:var(--muted)}
 #menu .how-inline li::before{counter-increment:step;content:counter(step);width:1.35rem;height:1.35rem;border-radius:50%;background:var(--cyan);color:#04283F;display:grid;place-items:center;font-size:.72rem;flex:none}
-#menu .mtool{position:sticky;top:calc(var(--head) + 4px);z-index:22;display:grid;grid-template-columns:1fr auto;gap:.5rem .7rem;align-items:center;background:rgba(255,248,236,.94);backdrop-filter:blur(10px);padding:.45rem 0 .4rem;margin-top:.35rem;border-bottom:1px solid rgba(0,0,0,.06)}
-#menu,#menu .wrap{max-width:100%;overflow-x:clip}
+#menu .mtool{position:sticky;top:var(--head);z-index:22;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.45rem .55rem;align-items:center;background:rgba(255,248,236,.96);backdrop-filter:blur(12px);padding:.4rem 0 .5rem;margin-top:.35rem;border-bottom:1px solid rgba(0,0,0,.06)}
+#menu,#menu .wrap{max-width:100%}
+#menu .mstick{display:contents}
 #menu .mtabs{grid-column:1/-1}
 #menu .wall-panel{margin:0 0 1.1rem}
 #menu .wall{height:min(52svh,420px)}
 @media(max-width:900px){#menu .how-inline,#menu .menu-head .sh p{display:none}}
 #menu .place-chip{grid-column:1/-1;max-width:none;width:100%}
 @media(min-width:720px){#menu .wall{height:min(58svh,520px);grid-template-columns:repeat(3,1fr)}}
-@media(min-width:1000px){#menu .wall{height:min(64svh,580px)}#menu .mtool{grid-template-columns:1fr auto auto auto}#menu .mtabs,#menu .place-chip{grid-column:auto}#menu .place-chip{width:auto;max-width:min(100%,380px)}}
+@media(min-width:1000px){#menu .wall{height:min(64svh,580px)}#menu .mtool{grid-template-columns:minmax(0,1fr) auto}#menu .place-chip{grid-column:auto;width:auto;max-width:min(100%,380px)}}
 .paper{background:var(--cyan-soft)}
 .sh h2{font-size:clamp(2.2rem,6vw,3.75rem);color:var(--cyan-d)}
 .sh .bar2{width:80px;height:6px;background:#000;margin-top:1rem}
@@ -498,10 +508,18 @@ input,select,textarea{border-radius:14px}
 .how li::before{content:counter(h);flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--yellow);font:800 .9rem var(--fh)}
 @media(min-width:900px){.how{grid-template-columns:repeat(3,1fr)}}
 .mtool{display:grid;gap:.8rem;margin-top:.8rem}
-.mtabs{display:flex;flex-wrap:wrap;gap:.4rem;overflow:visible;padding-bottom:.2rem;max-width:100%}
+.mtabs{display:flex;flex-wrap:nowrap;gap:.4rem;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;padding:.1rem 0 .35rem;max-width:100%;touch-action:pan-x}
+.mtabs::-webkit-scrollbar{display:none}
 .mtab{flex:none;padding:.5rem .85rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;color:#000;font:800 .72rem var(--fh);cursor:pointer;transition:transform var(--ease),border-color var(--ease),background-color var(--ease)}
 .mtab:hover{border-color:var(--cyan);transform:translateY(-2px)}
 .mtab[aria-selected=true]{background:var(--cyan);border-color:var(--cyan)}
+.mtab-more{background:#04283F;color:#fff;border-color:#04283F}
+.mtab-more[aria-expanded=true]{background:var(--yellow);color:#000;border-color:var(--yellow)}
+.mcat-dlg{width:min(540px,100%);max-height:min(86dvh,720px);border:0;padding:0;margin:auto auto 0;border-radius:28px 28px 0 0;background:#fff}
+.mcat-dlg .dhead{padding:1.1rem 1.2rem .4rem}
+.mcat-all{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;padding:.4rem 1.15rem 1.5rem}
+.mcat-all .mtab{width:100%;text-align:center;white-space:normal;line-height:1.25;padding:.7rem .6rem}
+@media(min-width:720px){.mcat-dlg{margin:auto;border-radius:28px}.mcat-all{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .msearch{display:flex;align-items:center;gap:.5rem;background:#fff;border:2px solid var(--cyan-line);border-radius:999px;padding:0 1rem;transition:border-color var(--ease),box-shadow var(--ease)}
 .msearch:focus-within{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,168,255,.25)}
 .msearch input{border:0;background:transparent;min-height:46px;padding:0;box-shadow:none!important}
@@ -847,7 +865,7 @@ html:has(dialog[open]){overflow:hidden}
       <ul>
         <li><a href="#inicio" data-i18n="nav.home">Início</a></li>
         <li><a href="#menu" data-i18n="nav.menu">Menu</a></li>
-        <li><a href="#atracoes" data-i18n="nav.attractions">Atrações</a></li>
+        <li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li>
         <li><a href="#horarios" data-i18n="nav.hours">Horários</a></li>
         <li><a href="#contactos" data-i18n="nav.contact">Contacto</a></li>
         <li><a href="/os#/conta" data-i18n="nav.account">Conta</a></li>
@@ -878,7 +896,7 @@ html:has(dialog[open]){overflow:hidden}
     <ul>
       <li><a href="#inicio" data-i18n="nav.home">Início</a></li>
       <li><a href="#menu" data-i18n="nav.menu">Menu</a></li>
-      <li><a href="#atracoes" data-i18n="nav.attractions">Atrações</a></li>
+      <li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li>
       <li><a href="#horarios" data-i18n="nav.hours">Horários</a></li>
       <li><a href="#contactos" data-i18n="nav.contact">Contacto</a></li>
       <li><a href="/os#/conta" data-i18n="nav.account">Conta</a></li>
@@ -945,12 +963,19 @@ html:has(dialog[open]){overflow:hidden}
     <div class="wall" id="wall" role="group" data-i18n-aria="menu.wallAria"></div>
   </div>
   <div class="mtool">
+    <div class="mstick">
+      <label class="msearch"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg><span class="sr" data-i18n="menu.search">Procurar no menu</span><input type="search" id="mq" data-i18n-placeholder="menu.search" placeholder="Procurar no menu" autocomplete="off"></label>
+      <button type="button" class="sort-az" id="msort" aria-pressed="false" data-i18n="menu.az">A–Z</button>
+    </div>
     <div class="mtabs" id="mtabs" role="tablist" data-i18n-aria="menu.cats"></div>
-    <label class="msearch"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg><span class="sr" data-i18n="menu.search">Procurar no menu</span><input type="search" id="mq" data-i18n-placeholder="menu.search" placeholder="Procurar no menu" autocomplete="off"></label>
-    <button type="button" class="sort-az" id="msort" aria-pressed="false" data-i18n="menu.az">A–Z</button>
     <button type="button" class="place-chip" id="placeChip"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span><b id="placeChipT" data-i18n="place.set">Definir onde está</b><small id="placeChipS"></small></span></button>
     <label class="mtable" hidden>Mesa<select id="menuTable"></select></label>
   </div>
+  <dialog class="dlg mcat-dlg" id="mcatDlg" aria-labelledby="mcatDlgT">
+    <div class="dhead"><h2 id="mcatDlgT" data-i18n="menu.allCats">Todas as categorias</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
+    <p class="menu-note" style="margin:.2rem 1.2rem .6rem;text-align:left" data-i18n="menu.moreHint">Toque numa categoria para ver só esses pratos.</p>
+    <div class="mcat-all" id="mcatAll"></div>
+  </dialog>
   <div class="waiter-box" id="waiterBox" hidden></div>
   <div class="mgrid" id="mgrid"></div>
   <p class="menu-note" data-i18n="menu.note">Tem alguma alergia ou restrição alimentar? Informe o garçom antes de pedir. Os preços e a disponibilidade podem mudar.</p>
@@ -963,21 +988,6 @@ html:has(dialog[open]){overflow:hidden}
   <div class="wb-in"></div>
   <div class="wv bot"><i class="w w1 wvh"></i><i class="w w2 wvh"></i><i class="w w3 wvh"></i></div>
 </div>
-
-<!-- ATRAÇÕES -->
-<section class="band paper" id="atracoes" aria-labelledby="atr-t">
-  <div class="wrap">
-    <div class="sh center reveal"><span class="eyebrow" data-i18n="atr.eye">Atrações</span><h2 class="display" id="atr-t" data-i18n="atr.title">Tudo num só lugar</h2><div class="bar2" aria-hidden="true"></div><p data-i18n="atr.lead">Seis zonas pensadas para todas as idades, com salva-vidas e equipa de apoio durante todo o horário de funcionamento.</p></div>
-    <div class="agrid">
-      <article class="acard reveal r-up" id="z-piscina" style="--d:0ms"><div class="circle"><img src="assets/piscina.jpg" alt="" loading="lazy"></div><span class="tag y" data-i18n="atr.fav">Favorito</span><h3 data-i18n="atr.poolT">Piscina de Ondas &amp; Lazer</h3><p data-i18n="atr.poolP">Águas cristalinas e espaços amplos com espreguiçadeiras e zonas de sombra para relaxar sob o sol.</p></article>
-      <article class="acard reveal r-up" id="z-toboaguas" style="--d:90ms"><div class="circle"><svg class="ico" aria-hidden="true"><use href="#i-slide"/></svg></div><span class="tag y" data-i18n="atr.radical">Radical</span><h3 data-i18n="atr.slideT">Parque de Toboáguas</h3><p data-i18n="atr.slideP">Descidas rápidas e curvas cheias de emoção para quem procura adrenalina e diversão em segurança.</p></article>
-      <article class="acard reveal r-up" id="z-rio" style="--d:180ms"><div class="circle"><svg class="ico" aria-hidden="true"><use href="#i-river"/></svg></div><span class="tag c" data-i18n="atr.relax">Relax</span><h3 data-i18n="atr.riverT">Rio Lento</h3><p data-i18n="atr.riverP">Deixe-se levar numa boia pelo nosso percurso circular de água corrente. Ideal para relaxar a mente e o corpo.</p></article>
-      <article class="acard reveal r-up" id="z-kids" style="--d:0ms"><div class="circle"><img src="assets/kids.jpg" alt="" loading="lazy"></div><span class="tag y" data-i18n="atr.families">Famílias</span><h3 data-i18n="atr.kidsT">Aqua Kids &amp; Playground</h3><p data-i18n="atr.kidsP">Um espaço dedicado aos mais novos com piscina rasa, mini-escorregas coloridos, trampolim e parque infantil seguro em piso emborrachado.</p></article>
-      <article class="acard reveal r-up" id="z-bar" style="--d:90ms"><div class="circle"><img src="assets/bar.jpg" alt="" loading="lazy"></div><span class="tag c" data-i18n="atr.gastro">Gastronomia</span><h3 data-i18n="atr.barT">Bar &amp; Gastronomia à Beira da Água</h3><p data-i18n="atr.barP">Cocktails, sumos, petiscos e sobremesas servidos à beira da água, com zona de jogos: bilhares e ténis de mesa.</p><a class="btn btn-line" href="#menu" data-i18n="hero.ctaMenu">Ver o menu</a></article>
-      <article class="acard reveal r-up" id="z-cabanas" style="--d:180ms"><div class="circle"><svg class="ico" aria-hidden="true"><use href="#i-cabana"/></svg></div><span class="tag y" data-i18n="atr.vip">Exclusivo</span><h3 data-i18n="atr.cabT">Cabanas VIP &amp; Eventos Privados</h3><p data-i18n="atr.cabP">Espaços privados e confortáveis com serviço de atendimento personalizado à mesa. Perfeito para aniversários, reuniões de família ou eventos de empresa.</p><a class="btn btn-line" href="#experiencias" data-i18n="atr.seeExp">Ver experiências</a></article>
-      </div>
-  </div>
-</section>
 
 <!-- ESPAÇOS -->
 <section class="band" id="espacos" aria-labelledby="esp-t"><div class="wrap">
@@ -1085,7 +1095,7 @@ html:has(dialog[open]){overflow:hidden}
         <a href="#" data-social="whatsapp" aria-label="WhatsApp"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg></a>
       </div>
     </div>
-    <nav class="reveal" style="--d:100ms" data-i18n-aria="foot.links"><h2 data-i18n="foot.links">Links rápidos</h2><ul><li><a href="#inicio" data-i18n="nav.home">Início</a></li><li><a href="#atracoes" data-i18n="nav.attractions">Atrações</a></li><li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li><li><a href="#menu" data-i18n="nav.menu">Menu</a></li><li><a href="#experiencias" data-i18n="nav.experiences">Experiências</a></li><li><a href="#bilhetes" data-i18n="nav.booking">Reservas</a></li><li><a href="#faq" data-i18n="nav.faq">Perguntas frequentes</a></li></ul></nav>
+    <nav class="reveal" style="--d:100ms" data-i18n-aria="foot.links"><h2 data-i18n="foot.links">Links rápidos</h2><ul><li><a href="#inicio" data-i18n="nav.home">Início</a></li><li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li><li><a href="#menu" data-i18n="nav.menu">Menu</a></li><li><a href="#experiencias" data-i18n="nav.experiences">Experiências</a></li><li><a href="#bilhetes" data-i18n="nav.booking">Reservas</a></li><li><a href="#faq" data-i18n="nav.faq">Perguntas frequentes</a></li></ul></nav>
   </div>
   <div class="wm" aria-hidden="true">AQUA CLUB</div>
   <div class="legal"><div class="wrap" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem"><p style="margin:0;max-width:none">© <span id="year"></span> <span data-i18n="foot.copy">Aqua Club. Todos os direitos reservados.</span></p><p style="margin:0;max-width:none"><span data-i18n="foot.mz">Beira, Moçambique ·</span> <a href="painel.html" style="color:inherit;opacity:.7" data-i18n="foot.staff">Área da equipa</a></p></div></div>
@@ -1903,6 +1913,7 @@ const REVIEWS = [];
   /* menu */
   let cat = 'todos', query = '', sortAz = false;
   const mtabs = $('#mtabs'), mgrid = $('#mgrid');
+  const CAT_PIN = ['rapidos', 'todos', 'entradas', 'pizzas', 'carnes', 'peixes', 'sobremesas', 'cocktails'];
   const CAT_ALIAS = {
     petiscos: ['entradas', 'petiscos'],
     entradas: ['entradas', 'petiscos'],
@@ -1921,40 +1932,80 @@ const REVIEWS = [];
   }
   function paintCatTabs(root, selected) {
     if (!root) return;
-    root.querySelectorAll('.mtab').forEach((b) => {
+    root.querySelectorAll('.mtab:not(.mtab-more)').forEach((b) => {
       const id = b.dataset.cat || b.dataset.shop;
       b.setAttribute('aria-selected', String(id === selected));
     });
   }
+  function pinCats() {
+    const ids = CAT_PIN.filter((id) => CATS.some((c) => c[0] === id));
+    if (cat && !ids.includes(cat) && CATS.some((c) => c[0] === cat)) ids.splice(Math.min(2, ids.length), 0, cat);
+    const seen = new Set();
+    return ids.map((id) => CATS.find((c) => c[0] === id)).filter((row) => row && !seen.has(row[0]) && seen.add(row[0]));
+  }
+  function addCatBtn(root, key, id, label, selected) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mtab';
+    b.setAttribute('role', 'tab');
+    b.dataset[key] = id;
+    b.textContent = label;
+    b.setAttribute('aria-selected', String(id === selected));
+    root.appendChild(b);
+    return b;
+  }
   function fillCatTabs(root, key) {
     if (!root) return;
+    const compact = root.id === 'mtabs' || root.id === 'shopCats';
+    const selected = key === 'cat' ? cat : (root.dataset.cat || 'todos');
     root.innerHTML = '';
+    const list = compact ? pinCats() : CATS;
+    list.forEach(([id, label]) => addCatBtn(root, key, id, label, selected));
+    if (compact && CATS.length > list.length) {
+      const more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'mtab mtab-more';
+      more.setAttribute('aria-expanded', 'false');
+      more.setAttribute('aria-controls', 'mcatDlg');
+      more.textContent = '+ ' + tr('menu.more');
+      more.addEventListener('click', (e) => { e.stopPropagation(); openCatSheet(); });
+      root.appendChild(more);
+    }
+  }
+  function openCatSheet() {
+    const dlg = $('#mcatDlg'), box = $('#mcatAll');
+    if (!dlg || !box) return;
+    box.innerHTML = '';
     CATS.forEach(([id, label]) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'mtab';
-      b.setAttribute('role', 'tab');
-      b.dataset[key] = id;
-      b.textContent = label;
-      b.setAttribute('aria-selected', String(id === (key === 'cat' ? cat : (root.dataset.cat || 'todos'))));
-      root.appendChild(b);
+      const b = addCatBtn(box, 'cat', id, label, cat);
+      b.addEventListener('click', () => {
+        setMenuCat(id);
+        dlg.close();
+      });
     });
+    dlg.showModal();
   }
   function setMenuCat(id) {
     if (!id) return;
     cat = id;
+    fillCatTabs(mtabs, 'cat');
     paintCatTabs(mtabs, cat);
     const shop = $('#shopCats');
-    if (shop) { shop.dataset.cat = id; paintCatTabs(shop, id); }
+    if (shop) { shop.dataset.cat = id; fillCatTabs(shop, 'shop'); paintCatTabs(shop, id); }
     renderMenu();
     paintShop();
+    const dlgOpen = $$('dialog').some((d) => d.open && d.id !== 'mcatDlg');
+    if (!dlgOpen && mgrid) {
+      const y = mgrid.getBoundingClientRect().top + (window.scrollY || document.documentElement.scrollTop) - 120;
+      window.scrollTo({ top: Math.max(0, y), behavior: reduce ? 'auto' : 'smooth' });
+    }
   }
   fillCatTabs(mtabs, 'cat');
   if (!mtabs.dataset.bound) {
     mtabs.dataset.bound = '1';
     mtabs.addEventListener('click', (e) => {
       const b = e.target.closest('.mtab');
-      if (!b) return;
+      if (!b || b.classList.contains('mtab-more')) return;
       setMenuCat(b.dataset.cat);
     });
   }
@@ -2116,7 +2167,7 @@ const REVIEWS = [];
       cats.dataset.cat = cats.dataset.cat || 'todos';
       cats.addEventListener('click', (e) => {
         const b = e.target.closest('.mtab');
-        if (!b) return;
+        if (!b || b.classList.contains('mtab-more') || !b.dataset.shop) return;
         cats.dataset.cat = b.dataset.shop;
         paintCatTabs(cats, cats.dataset.cat);
         paintShop();
@@ -2125,7 +2176,7 @@ const REVIEWS = [];
     }
     if (!cats.children.length) fillCatTabs(cats, 'shop');
     else {
-      $$('#shopCats .mtab').forEach((b) => { const src = CATS.find((c) => c[0] === b.dataset.shop); if (src) b.textContent = src[1]; });
+      $$('#shopCats .mtab:not(.mtab-more)').forEach((b) => { const src = CATS.find((c) => c[0] === b.dataset.shop); if (src) b.textContent = src[1]; });
       paintCatTabs(cats, cats.dataset.cat || 'todos');
     }
     const shopCat = cats.dataset.cat || 'todos';
