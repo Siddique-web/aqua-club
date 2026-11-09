@@ -200,11 +200,21 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
 
   /* ---------- dados ---------- */
   async function load() {
-    const d = await api('/admin/overview');
-    const mapped = (d.recent || []).map(mapOrder);
+    try {
+      const d = await api('/admin/overview');
+      const mapped = (d.recent || []).map(mapOrder);
+      mapped.forEach((o) => { if (known.size && !known.has(o.id)) { fresh.add(o.id); beep(); document.title = '(!) Novo pedido — Painel'; } });
+      orders = mapped;
+      calls = d.calls || [];
+      known = new Set(mapped.map((o) => o.id));
+      return;
+    } catch (e) { /* Vercel estático: usa o mesmo registo local do site */ }
+    let bus = { orders: [], calls: [] };
+    try { bus = JSON.parse(localStorage.getItem('aq.os.bus') || '{}'); } catch (e) { /* */ }
+    const mapped = (bus.orders || []).map(mapOrder);
     mapped.forEach((o) => { if (known.size && !known.has(o.id)) { fresh.add(o.id); beep(); document.title = '(!) Novo pedido — Painel'; } });
     orders = mapped;
-    calls = d.calls || [];
+    calls = bus.calls || [];
     known = new Set(mapped.map((o) => o.id));
   }
   async function update(id, patch) {

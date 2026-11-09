@@ -33,16 +33,55 @@
   const loc = (obj, lang) => (obj && typeof obj === 'object' && (obj[lang] || obj.pt)) || obj || '';
   let lang = localStorage.getItem('aqua_lang') || 'pt';
   let catalog = null;
+  let live = false;
+
+  function apiOrigin() {
+    try {
+      const q = new URLSearchParams(location.search).get('api');
+      const stored = localStorage.getItem('aqua_api');
+      return String(q || stored || '').replace(/\/$/, '');
+    } catch (e) { return ''; }
+  }
+  function apiUrl(path) { return apiOrigin() + '/api' + path; }
+
+  const BUS_KEY = 'aq.os.bus';
+  function readBus() {
+    try { return JSON.parse(localStorage.getItem(BUS_KEY) || ''); } catch (e) { /* */ }
+    return { orders: [], calls: [] };
+  }
+  function writeBus(d) {
+    const next = { orders: (d.orders || []).slice(0, 80), calls: (d.calls || []).slice(0, 80) };
+    try { localStorage.setItem(BUS_KEY, JSON.stringify(next)); } catch (e) { /* */ }
+    try {
+      if (!window.__aqBc) window.__aqBc = new BroadcastChannel('aq-os');
+      window.__aqBc.postMessage('up');
+    } catch (e) { /* */ }
+  }
+  window.AquaBus = {
+    read: readBus,
+    write: writeBus,
+    pushCall(c) { const d = readBus(); d.calls = d.calls || []; d.calls.unshift(c); writeBus(d); },
+    pushOrder(o) { const d = readBus(); d.orders = d.orders || []; d.orders.unshift(o); writeBus(d); },
+    patchCall(id, patch) {
+      const d = readBus(); const c = (d.calls || []).find((x) => String(x.id) === String(id));
+      if (c) Object.assign(c, patch); writeBus(d); return c;
+    },
+    patchOrder(id, patch) {
+      const d = readBus(); const o = (d.orders || []).find((x) => String(x.id) === String(id) || String(x.code) === String(id));
+      if (o) Object.assign(o, patch); writeBus(d); return o;
+    }
+  };
 
   async function api(path, opts = {}) {
-    const res = await fetch('/api' + path, {
+    const res = await fetch(apiUrl(path), {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
       method: opts.method || 'GET',
       body: opts.body ? JSON.stringify(opts.body) : undefined
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw Object.assign(new Error(data.error || 'fail'), { code: data.error });
+    const ct = res.headers.get('content-type') || '';
+    const data = ct.includes('json') ? await res.json().catch(() => ({})) : {};
+    if (!ct.includes('json') || !res.ok) throw Object.assign(new Error((data && data.error) || 'offline'), { code: data.error || 'offline' });
     return data;
   }
 
@@ -70,7 +109,8 @@
   }
 
   window.AquaOS = {
-    async canOrder() { return true; },
+    live: () => live,
+    async canOrder() { return live; },
     async placeOrder(o) {
       const dine = o.fulfillment !== 'takeaway';
       const tableNumber = dine ? (parseInt(String(o.table).replace(/\D/g, ''), 10) || Number(o.table)) : null;
@@ -163,10 +203,21 @@
     }
   };
 
+  async function loadCatalog() {
+    try {
+      const data = await api('/catalog');
+      if (data && Array.isArray(data.menu)) { live = true; return data; }
+    } catch (e) { /* estático (Vercel) usa catalog.json */ }
+    live = false;
+    const r = await fetch('catalog.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('catalog');
+    return r.json();
+  }
+
   async function boot() {
     applyLangButtons();
     try {
-      catalog = await api('/catalog');
+      catalog = await loadCatalog();
       if (catalog.club) {
         CONTACT.address = catalog.club.address;
         CONTACT.phone = catalog.club.phoneDisplay;

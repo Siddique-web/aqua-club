@@ -532,12 +532,26 @@
     const demo = (S.calls || []).filter((c) => !c.live && !String(c.id).startsWith('os-'));
     S.calls = live.concat(demo);
   }
+  function busCalls() {
+    try {
+      const d = (window.AquaBus && AquaBus.read()) || JSON.parse(localStorage.getItem('aq.os.bus') || '{}');
+      return (d.calls || []).map(mapOsCall);
+    } catch (e) { return []; }
+  }
   async function refreshLiveCalls() {
     try {
-      const r = await fetch('/api/live/calls', { credentials: 'include' });
-      if (!r.ok) return;
-      const d = await r.json();
-      const mapped = (d.calls || []).map(mapOsCall);
+      let mapped = [];
+      try {
+        const r = await fetch('/api/live/calls', { credentials: 'include' });
+        const ct = r.headers.get('content-type') || '';
+        if (r.ok && ct.includes('json')) {
+          const d = await r.json();
+          mapped = (d.calls || []).map(mapOsCall);
+        }
+      } catch (e) { /* estático */ }
+      const local = busCalls();
+      const seen = new Set(mapped.map((c) => c.id));
+      local.forEach((c) => { if (!seen.has(c.id)) mapped.push(c); });
       const prev = sigOf(S.liveCalls || []);
       S.liveCalls = mapped;
       mergeLiveIntoCalls();
@@ -870,7 +884,14 @@
       if (String(id).startsWith('os-')) {
         const osId = id.slice(3);
         const path = a === 'complete' || a === 'release' ? '/live/calls/' + osId + '/close' : '/live/calls/' + osId + '/accept';
-        const r = await guard(() => osFetch(path, { method: 'POST', body: {} }));
+        let r = null;
+        try { r = await osFetch(path, { method: 'POST', body: {} }); } catch (e) { r = null; }
+        if (!r && window.AquaBus) {
+          const patch = a === 'accept'
+            ? { status: 'accepted', accepted_at: new Date().toISOString(), waiterName: (S.me && S.me.name) || 'Garçom' }
+            : { status: 'closed', closed_at: new Date().toISOString() };
+          r = { call: AquaBus.patchCall(osId, patch) };
+        }
         if (r) {
           toast(a === 'accept' ? 'Chamado aceite — o cliente já vê que está a caminho.' : a === 'complete' ? 'Chamado concluído. Bom trabalho!' : 'Chamado encerrado.', 'check', 'ok');
           await refreshLiveCalls(); if (S.tab === 'calls') renderTab();

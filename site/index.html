@@ -135,10 +135,11 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .cta-stack{display:grid;justify-items:center;gap:.95rem;margin-top:1.5rem;width:100%}
 .story-btn{display:flex;align-items:center;gap:.9rem;max-width:360px;width:100%;padding:.2rem .15rem;border:0;background:transparent;cursor:pointer;text-align:left;color:inherit}
 .story-btn:hover{filter:brightness(1.06)}
-.story-ring{--s:8.85rem;position:relative;width:var(--s);height:var(--s);flex:none;border-radius:50%;padding:11px;background:conic-gradient(from 210deg,#7EE0FF,#00A8FF,#0069A8,#00A8FF,#7EE0FF);box-shadow:0 14px 32px -12px rgba(0,80,140,.55);transition:transform var(--ease);animation:storyspin 7s linear infinite}
+.story-orb{--s:8.85rem;position:relative;width:var(--s);height:var(--s);flex:none}
+.story-ring{position:absolute;inset:0;border-radius:50%;padding:11px;background:conic-gradient(from 210deg,#7EE0FF,#00A8FF,#0069A8,#00A8FF,#7EE0FF);box-shadow:0 14px 32px -12px rgba(0,80,140,.55);animation:storyspin 7s linear infinite;pointer-events:none}
 .story-ring::before{content:"";position:absolute;inset:11px;border-radius:50%;background:#fff;z-index:0}
 .story-thumb{position:absolute;inset:16px;width:calc(100% - 32px);height:calc(100% - 32px);border-radius:50%;object-fit:cover;z-index:1;background:#111}
-.story-plus{position:absolute;right:-4px;bottom:-4px;z-index:2;width:2.75rem;height:2.75rem;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#7EE0FF,#00A8FF,#0069A8);color:#fff;box-shadow:0 0 0 3px #fff}
+.story-plus{position:absolute;right:-4px;bottom:-4px;z-index:2;width:2.75rem;height:2.75rem;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#7EE0FF,#00A8FF,#0069A8);color:#fff;box-shadow:0 0 0 3px #fff;transform:none}
 .story-plus svg{width:1.45rem;height:1.45rem;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .story-copy{display:grid;gap:.12rem;min-width:0}
 .story-copy b{font:800 1.05rem var(--fh);letter-spacing:.06em;text-transform:uppercase}
@@ -200,10 +201,11 @@ section{position:relative;overflow-x:clip}
 #menu,#menu .wrap{max-width:100%;overflow-x:clip}
 #menu .mtabs{grid-column:1/-1}
 #menu .wall-panel{margin:0 0 1.1rem}
-#menu .wall{height:min(78svh,580px)}
+#menu .wall{height:min(52svh,420px)}
 @media(max-width:900px){#menu .how-inline,#menu .menu-head .sh p{display:none}}
 #menu .place-chip{grid-column:1/-1;max-width:none;width:100%}
-@media(min-width:1000px){#menu .wall{height:min(70svh,640px)}#menu .mtool{grid-template-columns:1fr auto auto auto}#menu .mtabs,#menu .place-chip{grid-column:auto}#menu .place-chip{width:auto;max-width:min(100%,380px)}}
+@media(min-width:720px){#menu .wall{height:min(58svh,520px);grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1000px){#menu .wall{height:min(64svh,580px)}#menu .mtool{grid-template-columns:1fr auto auto auto}#menu .mtabs,#menu .place-chip{grid-column:auto}#menu .place-chip{width:auto;max-width:min(100%,380px)}}
 .paper{background:var(--cyan-soft)}
 .sh h2{font-size:clamp(2.2rem,6vw,3.75rem);color:var(--cyan-d)}
 .sh .bar2{width:80px;height:6px;background:#000;margin-top:1rem}
@@ -523,16 +525,17 @@ input,select,textarea{border-radius:14px}
 .band strong{font:800 1.05rem var(--fh);color:var(--cyan-d);white-space:nowrap}
 .place-banner{display:flex;justify-content:space-between;align-items:center;gap:.8rem;padding:.75rem 1rem;border-radius:16px;background:var(--cyan-soft);font-size:.92rem}
 .place-banner button{border:0;background:none;font:800 .78rem var(--fh);color:var(--cyan-d);cursor:pointer;text-decoration:underline}
-.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem;max-height:min(46vh,420px);overflow-x:hidden;overflow-y:auto;margin:.6rem 0 1rem;padding:.1rem;width:100%}
-.shop-card{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:.5rem;padding:.45rem .5rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:left;cursor:pointer;min-width:0;width:100%}
-.shop-card .shop-ph{display:block;width:64px;height:64px;border-radius:12px;overflow:hidden;background:var(--cyan-soft)}
+.shop-grid{display:grid;grid-template-columns:1fr;gap:.55rem;max-height:min(46vh,420px);overflow-x:hidden;overflow-y:auto;margin:.6rem 0 1rem;padding:.1rem;width:100%}
+.shop-card{display:grid;grid-template-columns:64px minmax(0,1fr) 2.2rem;align-items:center;gap:.65rem;padding:.55rem .6rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:left;cursor:pointer;min-width:0;width:100%}
+.shop-card .shop-ph{display:block;width:64px;height:64px;border-radius:12px;overflow:hidden;background:var(--cyan-soft);flex:none}
 .shop-card .shop-ph img,.shop-card .shop-ph svg{width:100%;height:100%;object-fit:cover}
-.shop-card b{font:800 .78rem/1.2 var(--fh);overflow-wrap:anywhere}
-.shop-card small{color:var(--muted);font-weight:700}
+.shop-card .shop-txt{display:flex;flex-direction:column;align-items:flex-start;gap:.2rem;min-width:0}
+.shop-card b{display:block;width:100%;font:800 .86rem/1.25 var(--fh);overflow-wrap:anywhere}
+.shop-card small{display:block;color:var(--cyan-d);font:800 .9rem/1.2 var(--fh);white-space:nowrap}
 .shop-card .shop-add{width:36px;height:36px;border:0;border-radius:50%;background:var(--yellow);font:800 1.3rem/1 var(--fh)}
-.shop-card .shop-qty{display:grid;place-items:center;min-width:1.4rem;font:800 .78rem var(--fh);color:var(--cyan-d)}
+.shop-card .shop-qty{display:grid;place-items:center;min-width:2rem;min-height:2rem;border-radius:999px;background:var(--yellow);font:800 .82rem var(--fh);color:#000}
 .shop-card:hover{border-color:var(--cyan);background:var(--cyan-soft)}
-@media(max-width:420px){.shop-grid{grid-template-columns:1fr}}
+@media(min-width:720px){.shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cart-sticky{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin:0 -1.4rem -1.5rem;padding:.85rem 1.4rem calc(.85rem + env(safe-area-inset-bottom,0px));background:#fff;border-top:2px solid var(--cyan-line);box-shadow:0 -12px 24px -18px rgba(0,40,80,.45)}
 .cart-sticky small{display:block;font:700 .68rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .cart-sticky b{font:800 1.15rem var(--fh);color:var(--cyan-d)}
@@ -682,15 +685,15 @@ html:has(dialog[open]){overflow:hidden}
 .wall-panel{background:#04283F;color:#fff;border-radius:26px;padding:1.5rem 1.2rem;border:1px solid rgba(0,168,255,.35);box-shadow:0 30px 70px -22px rgba(0,168,255,.55)}
 .wall-panel h3{font-size:1.7rem;color:#fff}
 .wall-panel>p{margin:.4rem 0 0;font-size:.92rem;color:rgba(255,255,255,.8)}
-.wall{position:relative;height:440px;margin-top:1.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent)}
-.wcol{animation:wall-up 240s linear infinite;will-change:transform}
-.wcol.rev{animation-name:wall-down;animation-duration:270s}
-.wcol.mid{margin-top:2.6rem}
-.wall:hover .wcol,.wall:focus-within .wcol{animation-play-state:paused}
-.wset{display:flex;flex-direction:column;gap:.7rem;padding-bottom:.7rem}
+.wall{position:relative;height:440px;margin-top:1.2rem;display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent)}
+.wcol{display:flex;flex-direction:column;min-height:0;animation:wall-up 26s linear infinite;will-change:transform}
+.wcol.rev{animation-name:wall-down;animation-duration:32s}
+.wcol:nth-child(3){animation-duration:29s}
+@media(hover:hover) and (pointer:fine){.wall:hover .wcol,.wall:focus-within .wcol{animation-play-state:paused}}
+.wset{display:flex;flex-direction:column;gap:.55rem;flex:none;padding-bottom:.55rem}
 @keyframes wall-up{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 @keyframes wall-down{from{transform:translateY(-50%)}to{transform:translateY(0)}}
-.wcard{position:relative;display:block;width:100%;aspect-ratio:2/3;padding:0;border:0;border-radius:16px;overflow:hidden;background:#0a3a58;color:#fff;cursor:pointer;box-shadow:0 12px 26px -10px rgba(0,0,0,.7);transition:transform var(--ease),box-shadow var(--ease)}
+.wcard{position:relative;display:block;width:100%;aspect-ratio:3/4;padding:0;border:0;border-radius:16px;overflow:hidden;background:#0a3a58;color:#fff;cursor:pointer;flex:none;box-shadow:0 12px 26px -10px rgba(0,0,0,.7);transition:transform var(--ease),box-shadow var(--ease)}
 .wcard:hover,.wcard:focus-visible{transform:scale(1.06);box-shadow:0 18px 34px -10px rgba(0,168,255,.6);z-index:2}
 .wcard img{width:100%;height:100%;object-fit:cover}
 .wk-t{position:absolute;inset:auto 0 0 0;display:grid;gap:.05rem;padding:1.9rem .6rem .55rem;background:linear-gradient(0deg,rgba(0,0,0,.9),transparent);text-align:left}
@@ -906,7 +909,8 @@ html:has(dialog[open]){overflow:hidden}
       <div class="cta-stack">
         <div class="cta"><a class="btn btn-cyan" href="#menu" data-i18n="hero.ctaMenu">Ver o menu</a><a class="btn btn-line" href="#bilhetes" data-i18n="bookMyDay">Reservar o meu dia</a></div>
         <button class="story-btn" id="aquaStoryBtn" type="button" data-i18n-aria="story.aria">
-          <span class="story-ring" aria-hidden="true">
+          <span class="story-orb">
+            <span class="story-ring" aria-hidden="true"></span>
             <video class="story-thumb" src="assets/prato-do-dia.mp4" poster="assets/prato-sala.jpg" muted loop playsinline autoplay preload="metadata"></video>
             <span class="story-plus" title="Ver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg></span>
           </span>
@@ -1566,17 +1570,33 @@ const REVIEWS = [];
   }
   /* chamados: com Supabase ou demonstração passam por window.AquaCalls (garcom.js); sem backend vão por WhatsApp */
   const callsLive = () => Boolean(window.AquaCalls && AquaCalls.mode() !== 'whatsapp');
+  function rememberCall(row) {
+    try {
+      const list = JSON.parse(store.get('aq.callLog') || '[]');
+      list.unshift(row);
+      store.set('aq.callLog', JSON.stringify(list.slice(0, 40)));
+    } catch (e) { /* */ }
+  }
   async function apiCall(code, reason) {
     const extra = { name: cust.name || '', phone: cust.phone || '', note: placeReady(place) ? placeLabel(place) : '' };
-    if (window.AquaOS && AquaOS.createCall) return AquaOS.createCall(code, reason, extra);
+    if (window.AquaOS && AquaOS.live && AquaOS.live()) return AquaOS.createCall(code, reason, extra);
     if (callsLive()) return AquaCalls.createCall(code, reason, extra.note, DEVICE);
-    const id = 'c-' + Math.random().toString(36).slice(2, 8);
+    const id = Date.now();
+    if (window.AquaBus) {
+      AquaBus.pushCall({
+        id, table_number: parseInt(String(code).replace(/\D/g, ''), 10) || code,
+        reason: ({ request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente' }[reason] || reason),
+        note: extra.note || '', status: 'pending', created_at: new Date().toISOString(),
+        customer_name: extra.name, customer_phone: extra.phone
+      });
+    }
     openWa('*Chamar garçom — Aqua Club*\nMesa: ' + nice(code) + '\nMotivo: ' + rmsg(reason) + (cust.name ? '\nCliente: ' + cust.name : ''));
     return id;
   }
   async function apiCancelCall(id) {
-    if (window.AquaOS && AquaOS.cancelCall) { try { await AquaOS.cancelCall(id); } catch (e) { /* */ } }
+    if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.cancelCall) { try { await AquaOS.cancelCall(id); } catch (e) { /* */ } }
     else if (callsLive()) await AquaCalls.cancelCall(id);
+    if (window.AquaBus) AquaBus.patchCall(id, { status: 'cancelled', closed_at: new Date().toISOString() });
     emit(id, { status: 'cancelled' });
   }
   const orderMsg = (o) => '*Pedido ' + o.code + ' — Aqua Club*\nLocal: ' + (o.placeLabel || nice(o.table) || '—') +
@@ -1587,7 +1607,15 @@ const REVIEWS = [];
     (o.deliveryFee ? '\nEntrega: ' + money(o.deliveryFee) : '') +
     '\n*Total: ' + money(o.total) + '*\nO cliente confirmou os termos e vai pagar a conta antes de sair.';
   async function apiOrder(o) {
-    if (window.AquaOS && AquaOS.placeOrder) return AquaOS.placeOrder(o);
+    if (window.AquaOS && AquaOS.live && AquaOS.live()) return AquaOS.placeOrder(o);
+    if (window.AquaBus) {
+      AquaBus.pushOrder({
+        id: o.id, code: o.code, table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
+        place_label: o.placeLabel, fulfillment: o.fulfillment, total: o.total, status: o.status || 'review',
+        customer_name: o.name, customer_phone: o.phone, payment_status: 'unpaid', created_at: new Date().toISOString(),
+        items: (o.lines || []).map((l) => ({ name: l.name, unit_price: l.unitPriceMzn || l.price, qty: l.quantity || l.qty }))
+      });
+    }
     if (isLive()) {
       const t = dbTables.find((x) => x.code === o.table);
       if (!t) throw new Error(tr('cart.noTable'));
@@ -1600,7 +1628,7 @@ const REVIEWS = [];
     openWa(orderMsg(o));
   }
   async function apiPay(o, status, method, ref) {
-    if (window.AquaOS && AquaOS.declarePay) {
+    if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
       const r = await AquaOS.declarePay(o, method, ref);
       if (r) {
         o.pay = r.payment_status === 'declared' ? 'paid_declared' : (r.payment_status || status);
@@ -1618,11 +1646,11 @@ const REVIEWS = [];
   function startPolling() {
     if (pollT) return;
     pollT = setInterval(async () => {
-      if (!(window.AquaOS && AquaOS.orderStatus) && !isLive()) return;
+      if (!(window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.orderStatus) && !isLive()) return;
       let changed = false;
       for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
         try {
-          if (window.AquaOS && AquaOS.orderStatus && o.code) {
+          if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.orderStatus && o.code) {
             const r = await AquaOS.orderStatus(o.code);
             if (!r) continue;
             const pay = r.payment_status === 'declared' ? 'paid_declared' : r.payment_status;
@@ -1920,7 +1948,6 @@ const REVIEWS = [];
     if (shop) { shop.dataset.cat = id; paintCatTabs(shop, id); }
     renderMenu();
     paintShop();
-    rebuildWall();
   }
   fillCatTabs(mtabs, 'cat');
   if (!mtabs.dataset.bound) {
@@ -2109,7 +2136,7 @@ const REVIEWS = [];
     list.forEach((m) => {
       const n = cart.filter((l) => l.id === m.id).reduce((s, l) => s + l.qty, 0);
       const b = document.createElement('button'); b.type = 'button'; b.className = 'shop-card';
-      b.innerHTML = `<span class="shop-ph">${media(m)}</span><span><b>${esc(m.name)}</b><small>${money(m.price)}</small></span><span class="shop-qty">${n ? n : '+'}</span>`;
+      b.innerHTML = `<span class="shop-ph">${media(m)}</span><span class="shop-txt"><b>${esc(m.name)}</b><small>${money(m.price)}</small></span><span class="shop-qty">${n ? n : '+'}</span>`;
       b.addEventListener('click', () => addToCart(m.id, 1, ''));
       grid.appendChild(b);
     });
@@ -2246,6 +2273,18 @@ const REVIEWS = [];
       : history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('pay.noneDue'))}</span></div>` : `<div class="hs"><b>${esc(tr('pay.none'))}</b><span>${esc(tr('pay.noneH'))}</span></div>`;
     $('#histPay').hidden = !od;
     const list = $('#hlist'); list.innerHTML = '';
+    let calls = [];
+    try { calls = JSON.parse(store.get('aq.callLog') || '[]'); } catch (e) { calls = []; }
+    if (calls.length) {
+      const box = document.createElement('div');
+      box.innerHTML = '<p class="hpeek" style="margin:.2rem 0 .6rem">' + esc(tr('fab.call')) + '</p>';
+      list.appendChild(box.firstChild);
+      calls.slice(0, 12).forEach((c) => {
+        const el = document.createElement('div'); el.className = 'hcard';
+        el.innerHTML = `<div class="hrow"><b>${esc(rmsg(c.reason))}</b><span>${when(c.ts)}</span></div><p class="hmeta">${esc(nice(c.table || ''))}</p><div class="chips"><span class="chip2">${esc(c.status || 'pending')}</span></div>`;
+        list.appendChild(el);
+      });
+    }
     history.slice().reverse().forEach((o) => {
       const el = document.createElement('button'); el.type = 'button'; el.className = 'hcard';
       el.setAttribute('aria-label', tr('cart.viewAria', { c: o.code }));
@@ -2349,8 +2388,12 @@ const REVIEWS = [];
       if (!call || call.id !== id) { clearInterval(callPoll); return; }
       try {
         let r = null;
-        if (window.AquaOS && AquaOS.callStatus) r = await AquaOS.callStatus(id);
+        if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.callStatus) r = await AquaOS.callStatus(id);
         else if (callsLive()) r = await AquaCalls.callStatus(id);
+        else if (window.AquaBus) {
+          const c = (AquaBus.read().calls || []).find((x) => String(x.id) === String(id));
+          if (c) r = { status: c.status === 'closed' ? 'completed' : c.status, by: c.waiterName || '' };
+        }
         if (r) { emit(id, r); if (r.status === 'completed' || r.status === 'cancelled' || r.status === 'closed') clearInterval(callPoll); }
       } catch (e) { /* tenta de novo */ }
     };
@@ -2377,6 +2420,7 @@ const REVIEWS = [];
     msg.textContent = tr('cart.sending');
     try {
       const id = await apiCall(table, reason);
+      rememberCall({ id, reason, table, ts: Date.now(), status: 'pending' });
       call = { id, reason, status: 'pending', t0: Date.now(), tAcc: 0, by: '', respMs: null, rated: false, ack: false };
       const rr0 = $('#csRate'); if (rr0) { rr0.dataset.on = ''; rr0.innerHTML = ''; rr0.hidden = true; }
       store.set('aq.call', JSON.stringify({ id, reason, t0: call.t0 }));
@@ -2419,13 +2463,22 @@ const REVIEWS = [];
   }
   function rebuildWall() {
     const box = $('#wall'); if (!box) return;
-    const withImg = MENU.filter((m) => m.img && inCat(m, cat));
-    const cols = [[], [], []];
-    withImg.forEach((m, i) => { if (cols[i % 3].length < 8) cols[i % 3].push(m); });
+    const withImg = MENU.filter((m) => m.img);
+    const nCols = matchMedia('(min-width:720px)').matches ? 3 : 2;
+    const minPer = nCols === 2 ? 7 : 6;
+    const cols = Array.from({ length: nCols }, () => []);
+    withImg.forEach((m, i) => cols[i % nCols].push(m));
     box.innerHTML = '';
+    box.style.gridTemplateColumns = 'repeat(' + nCols + ', 1fr)';
     cols.forEach((col, ci) => {
-      const list = col.length ? col : withImg.slice(0, 6);
-      const c = document.createElement('div'); c.className = 'wcol' + (ci === 1 ? ' rev mid' : '');
+      const base = (col.length ? col : withImg).slice();
+      if (!base.length) return;
+      const list = [];
+      while (list.length < minPer) {
+        list.push(base[list.length % base.length]);
+      }
+      const c = document.createElement('div');
+      c.className = 'wcol' + (ci % 2 ? ' rev' : '');
       [0, 1].forEach((k) => {
         const set = document.createElement('div'); set.className = 'wset'; if (k) set.setAttribute('aria-hidden', 'true');
         list.forEach((m) => set.appendChild(wallCard(m, k === 1)));
@@ -2435,6 +2488,12 @@ const REVIEWS = [];
     });
   }
   rebuildWall();
+  let wallW = innerWidth;
+  addEventListener('resize', () => {
+    if (Math.abs(innerWidth - wallW) < 40) return;
+    wallW = innerWidth;
+    rebuildWall();
+  });
   fillTables(); setNotes(); renderMenu(); renderCart(); renderHist(); updateFabs(); initBackend(); startPolling();
   /* experiências → escolhe no formulário e salta para a reserva */
   $$('[data-exp]').forEach((b) => b.addEventListener('click', () => {
@@ -2593,7 +2652,7 @@ const REVIEWS = [];
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="garcom.js?v=creds1"></script>
-<script src="os-bridge.js?v=pay1"></script>
+<script src="garcom.js?v=live2"></script>
+<script src="os-bridge.js?v=live2"></script>
 </body>
 </html>
