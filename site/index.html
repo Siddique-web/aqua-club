@@ -153,8 +153,8 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .slide-text .lead{margin-top:1rem;color:#1d262d;font-size:1rem}
 .cta{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:0}
 .cta-stack{display:grid;justify-items:center;gap:.95rem;margin-top:1.5rem;width:100%}
-.story-slot{display:grid;justify-items:center;align-content:center;width:100%;min-width:0;padding:.75rem .4rem 1rem;position:relative;z-index:2}
-.story-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;max-width:20rem;width:100%;margin:0;padding:.15rem;border:0;background:transparent;cursor:pointer;text-align:center;color:inherit}
+.story-slot{display:flex;justify-content:center;align-items:center;width:100%;min-width:0;padding:.85rem .4rem 1.1rem;position:relative;z-index:2;text-align:center}
+.story-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;width:auto;max-width:20rem;margin:0 auto;padding:.15rem;border:0;background:transparent;cursor:pointer;text-align:center;color:inherit}
 .story-btn:hover{filter:brightness(1.06)}
   .story-orb{--s:clamp(5rem,18vw,7.2rem);position:relative;width:var(--s);height:var(--s);flex:none}
 .story-ring{position:absolute;inset:0;border-radius:50%;padding:11px;background:conic-gradient(from 210deg,#7EE0FF,#00A8FF,#0069A8,#00A8FF,#7EE0FF);box-shadow:0 14px 32px -12px rgba(0,80,140,.55);animation:storyspin 7s linear infinite;pointer-events:none}
@@ -331,8 +331,13 @@ input:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 
 .socials a:hover{transform:translateY(-4px) scale(1.1);background:var(--cyan);border-color:var(--cyan);color:#000}
 .ci{display:flex;gap:.75rem;align-items:flex-start}
 .ci .ico{color:var(--cyan);margin-top:.2rem}
-.legal{border-top:1px solid rgba(255,255,255,.15);padding:1.4rem 0;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:rgba(255,255,255,.65)}
-@media(min-width:768px){.f-grid{grid-template-columns:1.6fr 1fr}.legal{flex-direction:row;justify-content:space-between}}
+.legal{border-top:1px solid rgba(255,255,255,.15);padding:1.1rem 0 calc(1.2rem + var(--dock));display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:rgba(255,255,255,.65)}
+@media(max-width:720px){
+  .f-grid{padding:2.2rem 0 1rem;gap:1.6rem}
+  .footer ul{gap:.55rem}
+  .wm{font-size:clamp(1.6rem,14vw,2.6rem);padding:.15rem 0 0}
+}
+@media(min-width:768px){.f-grid{grid-template-columns:1.6fr 1fr}.legal{flex-direction:row;justify-content:space-between;padding-bottom:1.4rem}}
 
 
 /* ===== padrões inspirados nas referências ===== */
@@ -432,27 +437,28 @@ textarea:hover{border-color:var(--cyan)}textarea:focus{outline:none;border-color
 @media(min-width:1000px){
   .bk-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-rows:auto auto auto;gap:.7rem 2rem;padding:calc(var(--head) + env(safe-area-inset-top,0px) + .35rem) 2rem .4rem;min-height:0;align-items:start;align-content:start}
   .cf-wrap{grid-column:1;grid-row:1}
-  .story-slot{grid-column:1;grid-row:2;padding:.35rem 0 .2rem}
-  .bk-text{grid-column:2;grid-row:1 / 3;text-align:left;margin:0;min-width:0;padding-top:.35rem}
+  .story-slot{grid-column:1 / -1;grid-row:2;padding:.65rem 0 .55rem;display:flex;justify-content:center;align-items:center}
+  .bk-text{grid-column:2;grid-row:1;text-align:left;margin:0;min-width:0;padding-top:.35rem}
   .facts{grid-column:1 / -1;grid-row:3}
   .bk-text .tags,.bk-text .cta{justify-content:flex-start}
   .bk-text .cta-stack{justify-items:start}
 }
 /* bloco "um dia inteiro" */
 .intro .lead2{margin-top:1.1rem;max-width:34rem;color:var(--muted);font-size:1.08rem}
-.facts{list-style:none;margin:.15rem 0 0;padding:0;width:100%;max-width:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#fff;border:1.5px solid var(--cyan-line);border-radius:22px;box-shadow:0 16px 32px -22px rgba(0,105,168,.6);overflow:hidden;position:relative;z-index:5}
-.facts li{display:grid;justify-items:center;align-content:center;gap:.35rem;padding:1rem .7rem;text-align:center;border-left:1px solid var(--cyan-line);min-width:0;transition:background-color var(--ease)}
+.facts{list-style:none;margin:.15rem 0 0;padding:0;width:100%;max-width:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#fff;border:1.5px solid var(--cyan-line);border-radius:18px;box-shadow:0 16px 32px -22px rgba(0,105,168,.6);overflow:hidden;position:relative;z-index:5}
+.facts li{display:grid;justify-items:center;align-content:center;gap:.18rem;padding:.45rem .55rem .5rem;text-align:center;border-left:1px solid var(--cyan-line);min-width:0;transition:background-color var(--ease)}
 .facts li:first-child{border-left:0}
 .facts li:hover{background:var(--cyan-soft)}
-.fi{width:48px;height:48px;border-radius:50%;background:var(--cyan-soft);display:grid;place-items:center;color:var(--cyan-d);transition:transform var(--ease),background-color var(--ease)}
-.facts li:hover .fi{transform:scale(1.12) rotate(-6deg);background:var(--yellow);color:#000}
-.facts b{font:800 clamp(1.45rem,3.2vw,2.15rem)/1 var(--fh);color:var(--cyan-d)}
-.facts li>span:last-child{font-size:clamp(.72rem,1.6vw,.92rem);font-weight:600;color:var(--muted);line-height:1.3;max-width:16rem}
+.fi{width:32px;height:32px;border-radius:50%;background:var(--cyan-soft);display:grid;place-items:center;color:var(--cyan-d);transition:transform var(--ease),background-color var(--ease)}
+.fi .ico{width:1.05rem;height:1.05rem}
+.facts li:hover .fi{transform:scale(1.08) rotate(-6deg);background:var(--yellow);color:#000}
+.facts b{font:800 clamp(.88rem,2vw,1.12rem)/1.1 var(--fh);color:var(--cyan-d)}
+.facts li>span:last-child{font-size:clamp(.62rem,1.3vw,.76rem);font-weight:600;color:var(--muted);line-height:1.25;max-width:16rem}
 @media(max-width:560px){
-  .facts{border-radius:18px}
-  .facts li{padding:.75rem .4rem;gap:.22rem}
-  .fi{width:36px;height:36px}
-  .fi .ico{width:1.1rem;height:1.1rem}
+  .facts{border-radius:14px}
+  .facts li{padding:.38rem .3rem .42rem;gap:.12rem}
+  .fi{width:28px;height:28px}
+  .fi .ico{width:.95rem;height:.95rem}
 }
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.4rem;max-width:34rem}
 .actions .big{grid-column:1/-1;min-height:58px;font-size:.92rem}
@@ -499,7 +505,7 @@ textarea:hover{border-color:var(--cyan)}textarea:focus{outline:none;border-color
 @media(min-width:900px){.duo{grid-template-columns:1fr 1fr}}
 @media(min-width:1000px){.where{grid-template-columns:auto 1fr;gap:1.8rem;align-items:stretch}.vlabel{writing-mode:vertical-rl;transform:rotate(180deg);justify-content:center;padding:1.6rem 1.3rem}.vlabel h2{font-size:2.5rem}}
 /* marca d'água do rodapé */
-.wm{font:800 clamp(3.5rem,15vw,11rem)/.85 var(--fh);color:rgba(255,255,255,.07);text-align:center;letter-spacing:.04em;white-space:nowrap;overflow:hidden;user-select:none;padding-bottom:.4rem}
+.wm{font:800 clamp(2rem,12vw,5.5rem)/1 var(--fh);color:rgba(255,255,255,.08);text-align:center;letter-spacing:.06em;white-space:nowrap;overflow:hidden;user-select:none;margin:0;padding:.4rem 0 0;pointer-events:none}
 
 
 /* ===== faixa de ondas (reta, animada) ===== */
@@ -718,7 +724,8 @@ input,select,textarea{border-radius:14px}
 .cart-dlg #orderView:not([hidden]){flex:1;min-height:0;overflow:auto}
 html:has(dialog[open]),html.dlg-open{overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
 html.dlg-open body{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll-behavior:none}
-html.dlg-open .fabs{visibility:hidden;pointer-events:none}
+html:has(dialog[open]) .fabs,html:has(dialog[open]) .pn,
+html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events:none!important}
 #placeDlg.place-dlg[open]{display:flex;flex-direction:column;height:100dvh;max-height:100dvh;overflow:hidden;animation:none;transform:none}
 #placeDlg > .place-pad{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;gap:.55rem;padding:1rem .9rem calc(.85rem + env(safe-area-inset-bottom,0px))}
 #placeDlg .place-scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:grid;gap:.7rem;align-content:start}
@@ -779,17 +786,19 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
 /* ===== galeria 3D (coverflow) ===== */
 .cf-wrap{position:relative;display:grid;gap:.4rem;justify-items:center;min-width:0;width:100%}
 .cf-stage{position:relative;display:grid;justify-items:center;width:100%;gap:.35rem}
-.cf{position:relative;width:100%;height:clamp(280px,calc(100svh - var(--head) - 11.5rem),52svh);perspective:1800px;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px}
-.cfi{--cw:min(96%,920px);position:absolute;left:50%;top:0;width:var(--cw);height:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;border:2px solid rgba(255,255,255,.88);border-radius:26px;overflow:hidden;background:#071824;cursor:pointer;
+.cf{position:relative;width:100%;max-width:100%;height:auto;min-height:180px;margin-inline:auto;perspective:1800px;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px;transition:height .45s ease,width .45s ease}
+.cfi{--cw:100%;position:absolute;left:50%;top:0;width:var(--cw);height:100%;display:flex;flex-direction:column;border:2px solid rgba(255,255,255,.88);border-radius:26px;overflow:hidden;background:#071824;cursor:pointer;
   transform:translateX(-50%) translateX(calc(var(--d) * 62%)) scale(calc(1 - var(--ad) * .08));
   transform-origin:top center;
   z-index:calc(10 - var(--ad));opacity:calc(1 - (var(--ad) - 1) * .36);
   box-shadow:0 28px 54px -18px rgba(0,40,80,.55);transition:transform .85s cubic-bezier(.3,.7,.2,1),opacity .6s}
 .cfi.on{cursor:default}
 .cfi.out{opacity:0;visibility:hidden;pointer-events:none}
-.cfi img{grid-row:1;width:100%;height:100%;min-height:0;object-fit:contain;object-position:center;background:#041018}
+.cfi-media{position:relative;flex:none;width:100%;height:var(--media-h,70%);overflow:hidden;background:#041018}
+.cfi-fill{position:absolute;inset:-12%;width:124%;height:124%;object-fit:cover;filter:blur(28px) saturate(1.2);transform:scale(1.08);pointer-events:none}
+.cfi-photo{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center}
 .cfi::after{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:100%;background:rgb(0 18 32 / calc(var(--ad) * .22));pointer-events:none;transition:background .6s}
-.cf-cap{position:relative;z-index:2;display:grid;gap:.18rem;padding:.65rem .9rem .75rem;color:#fff;background:#04283F;transition:opacity .5s;min-height:4.4rem}
+.cf-cap{position:relative;z-index:2;flex:none;display:grid;gap:.18rem;padding:.55rem .9rem .65rem;color:#fff;background:#04283F;transition:opacity .5s}
 .cf-row{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem}
 .cf-t{font:700 1.02rem/1.2 var(--fh)}
 .cf-tag{flex:none;font:700 .64rem var(--fh);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}
@@ -810,12 +819,11 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
 .vp{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#000;display:grid;place-items:center;cursor:pointer;transition:background-color var(--ease),transform var(--ease)}
 .vp:hover{background:var(--yellow);transform:scale(1.08)}
 .vp[aria-pressed=true]{background:#fff;box-shadow:0 0 0 2px var(--cyan)}
-@media(min-width:760px){.vpill{position:absolute;left:.3rem;top:50%;transform:translateY(-50%);flex-direction:column;margin:0}.cf{width:100%;height:clamp(320px,calc(100svh - var(--head) - 12rem),58svh)}}
-@media(min-width:1000px){.cf{height:clamp(340px,calc(100svh - var(--head) - 8.5rem),62svh)}}
+@media(min-width:760px){.vpill{position:absolute;left:.3rem;top:50%;transform:translateY(-50%);flex-direction:column;margin:0}}
 .lbdlg{width:min(980px,100%)}
 .lbdlg .dfoot{flex-wrap:nowrap}.lbdlg .dfoot .btn{padding-inline:1rem;min-height:44px}
 .lbdlg img{width:100%;max-height:68dvh;object-fit:contain;border-radius:18px;background:#0a3a58}
-@media(max-width:560px){.cfi{--cw:100%;border-radius:18px}.cf{height:clamp(300px,calc(100svh - var(--head) - 10.8rem),50svh)}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{min-height:4.1rem;padding:.55rem .75rem .65rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
+@media(max-width:560px){.cfi{--cw:100%;border-radius:18px}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{padding:.5rem .75rem .55rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
 
 
 /* ===== menu: introdução + mural de pratos e bebidas ===== */
@@ -825,9 +833,9 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
 .wall-panel h3{font-size:1.7rem;color:#fff}
 .wall-panel>p{margin:.4rem 0 0;font-size:.92rem;color:rgba(255,255,255,.8)}
 .wall{position:relative;height:440px;margin-top:1.2rem;display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent)}
-.wcol{display:flex;flex-direction:column;min-height:0;animation:wall-up 10s linear infinite;will-change:transform;backface-visibility:hidden;contain:layout style}
-.wcol.rev{animation-name:wall-down;animation-duration:14s}
-.wcol:nth-child(3){animation-duration:10s}
+.wcol{display:flex;flex-direction:column;min-height:0;animation:wall-up 7s linear infinite;will-change:transform;backface-visibility:hidden;contain:layout style}
+.wcol.rev{animation-name:wall-down;animation-duration:11s}
+.wcol:nth-child(3){animation-duration:7s}
 @media(hover:hover) and (pointer:fine){.wall:hover .wcol,.wall:focus-within .wcol{animation-play-state:paused}}
 .wset{display:flex;flex-direction:column;gap:.55rem;flex:none;padding-bottom:.55rem}
 @keyframes wall-up{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
@@ -1063,16 +1071,16 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
     </div>
     <div class="bk-text">
       <div class="tags"><span class="tag y"><span class="dot" aria-hidden="true"></span><span data-i18n="hero.welcome">Bem-vindo</span></span><span class="tag c" data-i18n="hero.tag">Beira · Complexo aquático</span></div>
-      <h1 class="display" data-i18n="hero.h1">Mergulhe no melhor dia de lazer da sua vida.</h1>
-      <p class="lead" data-i18n="hero.lead">O Aqua Club reúne piscinas de ondas, toboáguas, rio lento, área kids exclusiva, bar à beira da água e cabanas VIP. Um dia inteiro de diversão e relaxamento para famílias, amigos e grupos.</p>
+      <h1 class="display" data-i18n="hero.h1">O seu refúgio de lazer e boa gastronomia em Beira.</h1>
+      <p class="lead" data-i18n="hero.lead">O Aqua Club reúne uma piscina refrescante, esplanada acolhedora sob as estrelas, mesas de bilhar, área infantil segura (Aqua Kids) e as melhores Tábuas de Grupo da cidade. O espaço perfeito para famílias e amigos.</p>
       <div class="cta-stack">
         <div class="cta"><a class="btn btn-cyan" href="#menu" data-i18n="hero.ctaMenu">Ver o menu</a><a class="btn btn-line" href="#bilhetes" data-i18n="bookMyDay">Reservar o meu dia</a></div>
       </div>
     </div>
     <ul class="facts">
-      <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-wave"/></svg></span><b>6</b><span data-i18n="hero.f1">Zonas de lazer exclusivas</span></li>
-      <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></span><b>7/7</b><span data-i18n="hero.f2">Aberto 7 dias por semana</span></li>
-      <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-kids"/></svg></span><b>Kids</b><span data-i18n="hero.f3">Área segura e monitorizada</span></li>
+      <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-drink"/></svg></span><b data-i18n="hero.f1n">Bar</b><span data-i18n="hero.f1">Gastronomia &amp; Bar</span></li>
+      <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-kids"/></svg></span><b data-i18n="hero.f2n">Kids</b><span data-i18n="hero.f2">Área Infantil Aqua Kids</span></li>
+      <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-dice"/></svg></span><b data-i18n="hero.f3n">Bilhar</b><span data-i18n="hero.f3">Mesas de Bilhar &amp; Lazer</span></li>
     </ul>
   </div>
 </section>
@@ -1209,7 +1217,6 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
         <h3 class="display" data-i18n="ct.rateT">Como foi a sua visita?</h3>
         <p data-i18n="ct.rateP">Avalie a sua experiência. Lemos todas as mensagens e usamo-las para melhorar o Aqua Club.</p>
         <div class="stars" id="stars" role="radiogroup" data-i18n-aria="ct.stars"></div>
-        <label data-i18n-label="ct.liked">O que mais gostou?<textarea name="txt" rows="3" data-i18n-placeholder="ct.likedPh" placeholder="Escreva aqui a sua opinião"></textarea></label>
         <button class="btn btn-dark" type="submit" data-i18n="ct.rateSend">Enviar avaliação por WhatsApp</button>
         <p class="msg" id="ratemsg" role="status" aria-live="polite"></p>
         <div class="reviews" id="reviews" hidden></div>
@@ -1538,28 +1545,27 @@ const REVIEWS = [];
 
   /* galeria 3D do topo */
   const SL = [
-    { img: 'assets/hero-aerea.jpg', cat: 'espaco', t: 'Vista aérea do Aqua Club', tag: 'Visão geral', q: 'Piscinas, área kids e espaços verdes num só lugar.', m: 'Zona: todo o complexo · Aberto 7 dias por semana', pos: '50% 50%' },
-    { img: 'assets/piscina.jpg', cat: 'lazer', t: 'Piscina de Ondas & Lazer', tag: 'Favorito', q: 'Águas cristalinas e espaços amplos, com espreguiçadeiras e zonas de sombra.', m: 'Zona: Piscina · Ideal para todas as idades', pos: '50% 50%' },
-    { img: 'assets/kids.jpg', cat: 'lazer', t: 'Aqua Kids & Playground', tag: 'Famílias', q: 'Piscina rasa, mini-escorregas coloridos, trampolim e parque infantil seguro.', m: 'Zona: Aqua Kids · Área monitorizada', pos: '50% 60%' },
-    { img: 'assets/parque.jpg', cat: 'espaco', t: 'Jardim & espaço exterior', tag: 'Relax', q: 'Relvado, sombra e espaço para respirar entre mergulhos.', m: 'Zona: Espaço exterior · Ideal para relaxar', pos: '50% 50%' },
-    { img: 'assets/bar.jpg', cat: 'gastro', t: 'Bar & esplanada', tag: 'Gastronomia', q: 'Cocktails, sumos naturais e petiscos a dois passos da água.', m: 'Zona: Bar · Pedido pela mesa', pos: '55% 50%' },
-    { img: 'assets/restaurante.jpg', cat: 'gastro', t: 'Sala de refeições', tag: 'Gastronomia', q: 'Mesas elegantes numa sala ampla e luminosa.', m: 'Zona: Sala de refeições · Pedido pela mesa', pos: '50% 50%' },
-    { img: 'assets/panorama.jpg', cat: 'lazer', t: 'Piscina e espaço exterior', tag: 'Lazer', q: 'Tardes de sol, piscina e conforto para toda a família.', m: 'Zona: Piscina · Aberto 7 dias por semana', pos: '50% 55%' },
-    { img: 'assets/sobremesas.jpg', cat: 'gastro', t: 'Mousse gourmet', tag: 'Sobremesas', q: 'Mousse gourmet com frutos vermelhos, uma sobremesa requintada.', m: 'Zona: Gastronomia · Ver no menu', pos: '50% 55%' },
-    { img: 'assets/petiscos.jpg', cat: 'gastro', t: 'Bruschettas e petiscos', tag: 'Petiscos', q: 'Petiscos variados para partilhar à beira da água.', m: 'Zona: Gastronomia · Ver no menu', pos: '50% 45%' },
-    { img: 'assets/piscina-guarda-sois.jpg', cat: 'lazer', t: 'Piscina e guarda-sóis', tag: 'Piscina', q: 'Guarda-sóis de palha e relvado à volta da água.', m: 'Zona: Piscina · Sombra e descanso', pos: '50% 50%' },
-    { img: 'assets/piscina-edificio.jpg', cat: 'lazer espaco', t: 'A piscina e o edifício', tag: 'Vista geral', q: 'Terraço, esplanada e piscina lado a lado.', m: 'Zona: Piscina e esplanada', pos: '50% 55%' },
-    { img: 'assets/parque-jogos.jpg', cat: 'lazer jogos', t: 'Parque infantil e ténis de mesa', tag: 'Famílias', q: 'Baloiços, escorregas e uma mesa de ténis de mesa.', m: 'Zona: Parque e jogos · Área monitorizada', pos: '45% 60%' },
-    { img: 'assets/zona-jogos.jpg', cat: 'jogos', t: 'Zona de jogos', tag: 'Jogos', q: 'Mesas de bilhar numa esplanada coberta.', m: 'Zona: Jogos e convívio', pos: '50% 55%' },
-    { img: 'assets/bar-balcao.jpg', cat: 'gastro jogos', t: 'Balcão do bar', tag: 'Gastronomia', q: 'Bar, bilhares e mesas para ficar com amigos.', m: 'Zona: Bar · Pedido pela mesa', pos: '55% 45%' },
-    { img: 'assets/salao.jpg', cat: 'gastro', t: 'Salão do restaurante', tag: 'Restaurante', q: 'Um salão amplo e luminoso, com mesas elegantes.', m: 'Zona: Restaurante · Pedido pela mesa', pos: '50% 55%' },
-    { img: 'assets/salao-mesa.jpg', cat: 'gastro', t: 'Mesas e arte', tag: 'Ambiente', q: 'Mesas para famílias e grupos, num ambiente tranquilo.', m: 'Zona: Restaurante', pos: '50% 50%' }
+    { img: 'assets/slide-01.jpg', cat: 'lazer espaco', t: 'Piscina do Aqua Club', tag: 'Visão geral', q: 'A piscina, o edifício e os espaços verdes ao entardecer.', m: 'Zona: Piscina · Aberto 7 dias por semana', pos: '50% 50%' },
+    { img: 'assets/slide-02.jpg', cat: 'gastro', t: 'Esplanada à noite', tag: 'Convívio', q: 'Mesas ao ar livre, luzes e o ambiente da esplanada.', m: 'Zona: Esplanada · Pedido pela mesa', pos: '50% 50%' },
+    { img: 'assets/slide-03.jpg', cat: 'jogos', t: 'Zona de bilhar', tag: 'Jogos', q: 'Mesas de bilhar na esplanada coberta, para jogar com amigos.', m: 'Zona: Jogos e convívio', pos: '50% 50%' },
+    { img: 'assets/slide-04.jpg', cat: 'gastro', t: 'Cafeteria', tag: 'Café', q: 'Café, snacks e um balcão pronto para um intervalo.', m: 'Zona: Cafeteria', pos: '50% 50%' },
+    { img: 'assets/slide-05.jpg', cat: 'gastro', t: 'Sala de refeições', tag: 'Restaurante', q: 'O salão do restaurante à noite, com mesas elegantes.', m: 'Zona: Restaurante · Pedido pela mesa', pos: '50% 50%' },
+    { img: 'assets/slide-06.jpg', cat: 'gastro', t: 'Bar do Aqua Club', tag: 'Bar', q: 'Cocktails, vinhos e bebidas no balcão do bar.', m: 'Zona: Bar · Pedido pela mesa', pos: '50% 50%' },
+    { img: 'assets/slide-07.jpg', cat: 'gastro', t: 'Noite no restaurante', tag: 'Ambiente', q: 'Salão cheio, mesas para famílias e grupos.', m: 'Zona: Restaurante', pos: '50% 50%' },
+    { img: 'assets/slide-08.jpg', cat: 'lazer jogos', t: 'Parque infantil à noite', tag: 'Famílias', q: 'Baloiços, escorregas e um parque seguro para as crianças.', m: 'Zona: Parque infantil · Área monitorizada', pos: '50% 50%' },
+    { img: 'assets/slide-09.jpg', cat: 'lazer jogos', t: 'Playground e esplanada', tag: 'Famílias', q: 'O parque infantil com a esplanada iluminada ao fundo.', m: 'Zona: Parque e esplanada', pos: '50% 50%' },
+    { img: 'assets/slide-10.jpg', cat: 'lazer', t: 'Castelo insuflável', tag: 'Aqua Kids', q: 'Insuflável branco para as crianças brincarem ao ar livre.', m: 'Zona: Aqua Kids', pos: '50% 50%' },
+    { img: 'assets/slide-11.jpg', cat: 'gastro', t: 'Salão de dia', tag: 'Restaurante', q: 'Mesas longas à luz do dia, com vista para a piscina.', m: 'Zona: Restaurante · Pedido pela mesa', pos: '50% 50%' },
+    { img: 'assets/slide-12.jpg', cat: 'lazer', t: 'Aqua Kids e piscina', tag: 'Famílias', q: 'Jogos de água, pássaros coloridos e a piscina com guarda-sóis.', m: 'Zona: Aqua Kids e piscina', pos: '50% 50%' },
+    { img: 'assets/slide-13.jpg', cat: 'gastro espaco', t: 'Lounge de vime', tag: 'Relax', q: 'Sofás e cadeiras de vime junto à cafeteria, para conversar.', m: 'Zona: Lounge', pos: '50% 50%' },
+    { img: 'assets/slide-14.jpg', cat: 'jogos lazer', t: 'Jogos junto ao parque', tag: 'Jogos', q: 'Bilhar, mesas e o parque infantil a poucos passos.', m: 'Zona: Jogos e parque', pos: '50% 50%' },
+    { img: 'assets/slide-15.jpg', cat: 'lazer espaco', t: 'Piscina à noite', tag: 'Lazer', q: 'A piscina iluminada, com restaurante e esplanada ao fundo.', m: 'Zona: Piscina e esplanada', pos: '50% 50%' }
   ];
   const imgUrl = (p) => (typeof ASSETS !== 'undefined' ? ASSETS[p.replace('assets/', '')] : p);
   const cf = $('#cf'), cfwrap = $('#cfwrap'), cdots = $('#cdots');
   const bgImgs = SL.map((s) => { const im = document.createElement('img'); im.alt = ''; im.src = imgUrl(s.img); $('.hero-bg').appendChild(im); return im; });
   const safe = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  let view = SL.map((_, i) => i), cur = 0, playing = !reduce, hover = false, cfTimer = 0, filt = 'todos', dragged = false;
+  let view = SL.map((_, i) => i), cur = 0, playing = !reduce, cfTimer = 0, filt = 'todos', dragged = false;
   function applySlideLang() {
     SL.forEach((s) => { const x = window.AquaI18n && AquaI18n.slideFor(s.img); if (x) { s.t = x.t; s.tag = x.tag; s.q = x.q; s.m = x.m; } });
   }
@@ -1567,7 +1573,7 @@ const REVIEWS = [];
   const items = SL.map((s, i) => {
     const el = document.createElement('article'); el.className = 'cfi out';
     el.setAttribute('role', 'group'); el.setAttribute('aria-roledescription', 'slide'); el.setAttribute('aria-label', tr('hero.of', { a: i + 1, b: SL.length, t: s.t }));
-    el.innerHTML = `<img src="${imgUrl(s.img)}" alt="${safe(s.t)}" style="object-position:${s.pos}">
+    el.innerHTML = `<div class="cfi-media"><img class="cfi-fill" src="${imgUrl(s.img)}" alt="" aria-hidden="true"><img class="cfi-photo" src="${imgUrl(s.img)}" alt="${safe(s.t)}"></div>
       <div class="cf-top"><button class="cfb" type="button" data-act="prev" aria-label="${safe(tr('hero.prev'))}"><svg class="ico" aria-hidden="true"><use href="#i-left"/></svg></button>
         <button class="cfx" type="button" data-act="expand"><svg class="ico" aria-hidden="true"><use href="#i-expand"/></svg><span class="cfx-txt">${safe(tr('hero.expand'))}</span></button>
         <button class="cfb" type="button" data-act="play" aria-label="${safe(tr('hero.pause'))}"><svg class="ico" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
@@ -1595,6 +1601,23 @@ const REVIEWS = [];
     const idx = view[cur];
     bgImgs.forEach((b, i) => b.classList.toggle('on', i === idx));
     $$('.dot2', cdots).forEach((d, i) => d.classList.toggle('on', i === cur));
+    const onEl = items[idx];
+    const onImg = onEl && onEl.querySelector('.cfi-photo');
+    if (onImg && onImg.naturalWidth) {
+      const cap = onEl.querySelector('.cf-cap');
+      const capH = Math.ceil((cap && cap.getBoundingClientRect().height) || 72);
+      const wrapW = (cfwrap && cfwrap.clientWidth) || cf.parentElement.clientWidth;
+      const maxMedia = Math.max(160, Math.min(window.innerHeight * 0.7, window.innerHeight - 160) - capH);
+      let mediaW = wrapW;
+      let mediaH = mediaW * (onImg.naturalHeight / onImg.naturalWidth);
+      if (mediaH > maxMedia) {
+        mediaH = maxMedia;
+        mediaW = mediaH * (onImg.naturalWidth / onImg.naturalHeight);
+      }
+      cf.style.setProperty('--media-h', Math.round(mediaH) + 'px');
+      cf.style.width = Math.round(mediaW) + 'px';
+      cf.style.height = Math.round(mediaH + capH) + 'px';
+    }
   }
   function buildDots() {
     cdots.innerHTML = '';
@@ -1603,7 +1626,10 @@ const REVIEWS = [];
   function plan() {
     clearTimeout(cfTimer);
     if (!playing || reduce) return;
-    cfTimer = setTimeout(() => { if (hover || document.hidden || document.querySelector('dialog[open]')) plan(); else { go(cur + 1); } }, 5600);
+    cfTimer = setTimeout(() => {
+      if (document.hidden || document.querySelector('dialog[open]')) { plan(); return; }
+      go(cur + 1);
+    }, 5600);
   }
   function go(n) { cur = ((n % view.length) + view.length) % view.length; layout(); plan(); if (lbDlg.open && lbMode === 'gallery') paintLb(); }
   function toggle() { playing = !playing; layout(); plan(); }
@@ -1613,8 +1639,7 @@ const REVIEWS = [];
     filt = b.dataset.f; $$('.vp').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     view = SL.map((s, i) => i).filter((i) => filt === 'todos' || SL[i].cat.split(' ').includes(filt)); cur = 0; buildDots(); layout(); plan();
   }));
-  ['mouseenter', 'focusin'].forEach((ev) => cfwrap.addEventListener(ev, () => { hover = true; }));
-  ['mouseleave', 'focusout'].forEach((ev) => cfwrap.addEventListener(ev, () => { hover = false; }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && playing) plan(); });
   let sx = 0;
   cf.addEventListener('pointerdown', (e) => { sx = e.clientX; dragged = false; });
   cf.addEventListener('pointerup', (e) => { const dx = e.clientX - sx; if (Math.abs(dx) > 40) { dragged = true; go(dx < 0 ? cur + 1 : cur - 1); setTimeout(() => { dragged = false; }, 60); } });
@@ -1629,6 +1654,13 @@ const REVIEWS = [];
   $('#lbPrev').addEventListener('click', () => go(cur - 1));
   $('#lbNext').addEventListener('click', () => go(cur + 1));
   $$('[data-p-img]').forEach((b) => b.addEventListener('click', () => openPhoto({ img: b.dataset.pImg, t: b.dataset.pT, q: b.dataset.pQ })));
+  items.forEach((el) => {
+    const im = el.querySelector('.cfi-photo');
+    if (!im) return;
+    im.addEventListener('load', layout);
+    if (im.complete) layout();
+  });
+  addEventListener('resize', layout);
   buildDots(); layout(); plan();
 
   /* fade-in sempre que se desce na página */
@@ -2933,10 +2965,10 @@ const REVIEWS = [];
   }
   $('#rate').addEventListener('submit', (e) => {
     e.preventDefault();
-    const m = $('#ratemsg'), txt = String(new FormData(e.target).get('txt') || '').trim();
+    const m = $('#ratemsg');
     if (!rating) { m.textContent = tr('ct.pickStar'); return; }
     m.textContent = tr('ct.rateOpen');
-    window.open('https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent(tr('ct.rateWa', { n: rating }) + (txt ? '\n' + txt : '')), '_blank', 'noopener');
+    window.open('https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent(tr('ct.rateWa', { n: rating })), '_blank', 'noopener');
   });
   /* depoimentos reais (opcional): preencha REVIEWS no topo do script */
   if (REVIEWS.length) {
