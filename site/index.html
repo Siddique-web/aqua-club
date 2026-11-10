@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=flow2"></script>
+<script src="i18n.js?v=flow3"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -944,8 +944,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .osum li{display:flex;justify-content:space-between;gap:1rem;padding:.4rem 0;border-bottom:1px dashed var(--cyan-line);font-size:.92rem}
 .osum li.tot{border:0;font:800 1rem var(--fh)}
 .osum small{color:var(--muted)}
-.wafall{display:block;text-align:center;font-weight:700;color:var(--cyan-d)}
-.wafall[hidden]{display:none}
+.wafall{display:none!important}
 .hs{display:grid;gap:.15rem;padding:1rem 1.2rem;border-radius:20px;background:var(--cyan-soft)}
 .hs b{font:800 .8rem var(--fh);letter-spacing:.07em;text-transform:uppercase;color:var(--cyan-d)}
 .hs strong{font:800 1.9rem/1.1 var(--fh)}.hs span{font-size:.85rem;color:var(--muted)}
@@ -1480,7 +1479,7 @@ const BACKEND = { url: '', key: '' };
    'whatsapp' (por defeito): pedidos e chamadas abrem o WhatsApp do restaurante já escritos (funciona sem base de dados).
    'demo': simula tudo (só para mostrar ao cliente; também se pode usar  ...?modo=demo  no endereço).
    Com BACKEND preenchido o site liga-se ao Supabase e o restaurante gere tudo no painel.html. */
-const MODE = 'whatsapp';
+const MODE = 'desk';
 
 /* ===== PAGAMENTO (o site NÃO cobra online) =====
    Regista o pedido em nome do cliente e orienta o pagamento; o restaurante confirma.
@@ -1788,7 +1787,7 @@ const REVIEWS = [];
     window.open(url, '_blank');
   }
   function setNotes() {
-    const n = isLive() ? '' : mode === 'demo' ? tr('cart.demo') : tr('cart.waMode');
+    const n = mode === 'demo' && !isLive() ? tr('cart.demo') : '';
     $$('[data-demo]').forEach((d) => { d.hidden = !n; d.textContent = n; });
   }
   async function initBackend() {
@@ -1813,8 +1812,12 @@ const REVIEWS = [];
   }
   async function apiCall(code, reason) {
     const extra = { name: cust.name || '', phone: cust.phone || '', note: placeReady(place) ? placeLabel(place) : '' };
-    if (window.AquaOS && AquaOS.live && AquaOS.live()) return AquaOS.createCall(code, reason, extra);
-    if (callsLive()) return AquaCalls.createCall(code, reason, extra.note, DEVICE);
+    try {
+      if (window.AquaOS && AquaOS.live && AquaOS.live()) return await AquaOS.createCall(code, reason, extra);
+    } catch (e) { /* bus local */ }
+    if (callsLive()) {
+      try { return await AquaCalls.createCall(code, reason, extra.note, DEVICE); } catch (e) { /* bus */ }
+    }
     const id = Date.now();
     if (window.AquaBus) {
       AquaBus.pushCall({
@@ -1824,7 +1827,6 @@ const REVIEWS = [];
         customer_name: extra.name, customer_phone: extra.phone
       });
     }
-    openWa('*Chamar garçom — Aqua Club*\nMesa: ' + nice(code) + '\nMotivo: ' + rmsg(reason) + (cust.name ? '\nCliente: ' + cust.name : ''));
     return id;
   }
   async function apiCancelCall(id) {
@@ -1843,7 +1845,9 @@ const REVIEWS = [];
     (o.deliveryFee ? '\nEntrega: ' + money(o.deliveryFee) : '') +
     '\n*Total: ' + money(o.total) + '*\nO cliente confirmou os termos e vai pagar a conta antes de sair.';
   async function apiOrder(o) {
-    if (window.AquaOS && AquaOS.live && AquaOS.live()) return AquaOS.placeOrder(o);
+    try {
+      if (window.AquaOS && AquaOS.live && AquaOS.live()) return await AquaOS.placeOrder(o);
+    } catch (e) { /* continua no registo local */ }
     if (window.AquaBus) {
       AquaBus.pushOrder({
         id: o.id, code: o.code, table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
@@ -1862,8 +1866,7 @@ const REVIEWS = [];
       if (error) throw error;
       return;
     }
-    if (mode === 'demo') { [['preparing', 4500], ['on_the_way', 9500], ['delivered', 14500]].forEach(([s, ms]) => setTimeout(() => emit(o.id, { status: s }), ms)); return; }
-    openWa(orderMsg(o));
+    if (mode === 'demo') { [['preparing', 4500], ['on_the_way', 9500], ['delivered', 14500]].forEach(([s, ms]) => setTimeout(() => emit(o.id, { status: s }), ms)); }
   }
   async function apiPay(o, status, method, ref) {
     o.pay = status === 'paid_declared' || status === 'declared' ? 'paid_declared' : (status || o.pay);
@@ -2837,8 +2840,26 @@ const REVIEWS = [];
 
   /* pagamento */
   const payDlg = $('#payDlg'); let paySel = null;
+  function readPayResume() {
+    try { return JSON.parse(store.get('aq.payResume') || 'null'); } catch (e) { return null; }
+  }
+  function savePayResume(data) {
+    if (!data) store.set('aq.payResume', '');
+    else store.set('aq.payResume', JSON.stringify(Object.assign({ at: Date.now() }, data)));
+  }
+  function copyPayNumber(digits, el) {
+    const text = String(digits || '').replace(/\D/g, '');
+    const done = () => { if (el) el.textContent = tr('pay.copied') + ' · ' + (paySel && paySel.number || text); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => {
+        try { const i = document.createElement('textarea'); i.value = text; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); done(); } catch (e) { /* */ }
+      });
+    } else {
+      try { const i = document.createElement('textarea'); i.value = text; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); done(); } catch (e) { /* */ }
+    }
+  }
   function openPay() {
-    const open = owed(); if (!open.length) { openHist(); return; }
+    const open = owed(); if (!open.length) { savePayResume(null); openHist(); return; }
     const amount = open.reduce((s, o) => s + o.total, 0), codes = open.map((o) => o.code).join(', ');
     $('#paySum').innerHTML = `<div class="hs warn"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(codes)}</span></div>`;
     paySel = null; $('#payInfo').innerHTML = ''; $('#payMsg').textContent = ''; $('#payGo').hidden = true;
@@ -2855,40 +2876,60 @@ const REVIEWS = [];
           $('#payInfo').innerHTML = `<p class="payinfo">${tr('pay.sendTo', { m: money(amount), n: esc(m.number), l: esc(label) })}${holder}<br><small>${esc(hint)}</small></p>
             <button class="btn btn-cyan btn-block" type="button" id="payCopy">${esc(tr('pay.copyNum'))}: ${esc(m.number)}</button>`;
           $('#payCopy').addEventListener('click', () => {
-            const digits = String(m.digits || m.number).replace(/\D/g, '');
-            navigator.clipboard.writeText(digits).then(() => {
-              $('#payCopy').textContent = tr('pay.copied') + ' · ' + m.number;
-            }).catch(() => {});
+            copyPayNumber(m.digits || m.number, $('#payCopy'));
             persistSession();
-            store.set('aq.payResume', JSON.stringify({ method: m.id, at: Date.now() }));
+            savePayResume({ method: m.id, hold: true });
+            $('#payMsg').textContent = tr('pay.stay');
           });
-        } else $('#payInfo').innerHTML = `<p class="payinfo">${esc(hint)}</p>`;
+          $('#payMsg').textContent = tr('pay.stay');
+          savePayResume({ method: m.id, hold: true });
+        } else {
+          $('#payInfo').innerHTML = `<p class="payinfo">${esc(hint)}</p>`;
+          $('#payMsg').textContent = '';
+          savePayResume(null);
+        }
         $('#payGo').hidden = false; $('#payGo').textContent = m.number ? tr('pay.done') : tr('pay.ask');
-        if (m.number) store.set('aq.payResume', JSON.stringify({ method: m.id, at: Date.now() }));
       });
       box.appendChild(b);
     });
-    let resume = null;
-    try { resume = JSON.parse(store.get('aq.payResume') || 'null'); } catch (e) { resume = null; }
-    if (resume && resume.method) {
+    const resume = readPayResume();
+    if (resume && resume.method && resume.method !== 'pos') {
       const idx = PAYMENT.methods.findIndex((m) => m.id === resume.method);
       const btns = $$('.payopt', box);
       if (idx >= 0 && btns[idx]) btns[idx].click();
     }
-    payDlg.showModal();
+    if (histDlg.open) histDlg.close();
+    if (cartDlg.open) cartDlg.close();
+    if (!payDlg.open) payDlg.showModal();
+  }
+  function maybeResumePay() {
+    if (!owed().length) { savePayResume(null); return; }
+    const r = readPayResume();
+    if (!r || !r.hold || !r.method || r.method === 'pos') return;
+    if (payDlg.open) return;
+    const busy = ['cartDlg', 'placeDlg', 'itemDlg', 'callDlg', 'termsDlg'].some((id) => { const d = document.getElementById(id); return d && d.open; });
+    if (busy) return;
+    openPay();
   }
   $('#payGo').addEventListener('click', async () => {
     if (!paySel) return;
     const open = owed(), amount = open.reduce((s, o) => s + o.total, 0), msg = $('#payMsg');
     try {
-      if (!paySel.number) {                                  /* pagar no local: pede a conta ao garçom */
+      if (!paySel.number) {
         for (const o of open) { await apiPay(o, 'pay_requested', paySel.id, ''); o.pay = 'pay_requested'; o.method = paySel.id; }
+        savePayResume(null);
         saveHist(); renderHist(); updateFabs(); payDlg.close();
-        apiCall(table || String(place.tableNumber || ''), 'request_bill').catch(() => {});
+        const code = (typeof callCode === 'function' ? callCode() : '') || table || String(place.tableNumber || '');
+        if (code) apiCall(code, 'request_bill').catch(() => {});
         openHist();
+        const note = $('#hsum');
+        if (note) {
+          const extra = document.createElement('p'); extra.className = 'menu-note'; extra.textContent = tr('pay.waitWaiter');
+          extra.style.margin = '.4rem 0 0';
+          note.appendChild(extra);
+        }
         return;
       }
-      if (!window.AquaOS && !isLive() && mode !== 'demo') openWa('*Pagamento declarado — Aqua Club*\nPedidos: ' + open.map((o) => o.code).join(', ') + '\nValor: ' + money(amount) + '\nMétodo: ' + paySel.label + '\nNúmero: ' + (paySel.number || '') + '\nTitular: ' + (paySel.holder || '') + '\nCliente: ' + (cust.name || open[0].name) + ' (' + showPhone(cust.phone || open[0].phone) + ')');
       for (const o of open) {
         await apiPay(o, 'paid_declared', paySel.id, '');
         o.pay = 'paid_declared';
@@ -2896,7 +2937,7 @@ const REVIEWS = [];
         o.ref = '';
         if (!['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
       }
-      store.set('aq.payResume', '');
+      savePayResume(null);
       saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close(); openHist();
     } catch (e) { msg.textContent = tr('pay.fail', { e: e.message || e }); }
   });
@@ -3023,6 +3064,8 @@ const REVIEWS = [];
     }
   });
   window.addEventListener('load', resumeCall);   /* retoma um chamado em curso depois de recarregar a página */
+  window.addEventListener('pageshow', () => { persistSession(); maybeResumePay(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { persistSession(); maybeResumePay(); } });
   const hint = $('#fabHint');
   if (hint && !store.get('aq.hint')) {
     setTimeout(() => { if (!call && !document.querySelector('dialog[open]')) { hint.hidden = false; setTimeout(() => { hint.hidden = true; }, 9000); } }, 4500);
@@ -3300,7 +3343,7 @@ const REVIEWS = [];
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="garcom.js?v=flow2"></script>
-<script src="os-bridge.js?v=flow2"></script>
+<script src="garcom.js?v=flow3"></script>
+<script src="os-bridge.js?v=flow3"></script>
 </body>
 </html>
