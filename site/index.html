@@ -344,19 +344,19 @@ input:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 
 .btn-linew{border-color:#fff;color:#fff;background:transparent}.btn-linew:hover{background:#fff;color:#000}
 .btn-dark{background:#000;color:#fff}.btn-dark:hover{background:var(--cyan);color:#000}
 /* experiências */
-.exps{display:grid;gap:1.4rem;margin-top:2.6rem}
-.exp{position:relative;display:grid;grid-template-columns:1fr auto;gap:.6rem 1rem;align-items:center;background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;padding:1.4rem;box-shadow:0 10px 26px -16px rgba(0,168,255,.6);transition:transform var(--ease),border-color var(--ease),box-shadow var(--ease)}
-.exp:hover{transform:translateY(-5px) scale(1.02);border-color:var(--cyan);box-shadow:0 22px 40px -18px rgba(0,168,255,.65)}
-.exp h3{font:800 1.25rem var(--fh)}
-.exp ul{margin:.6rem 0 0;padding-left:1.1rem;color:var(--muted);font-size:.92rem;line-height:1.75}
-.exp .art{width:92px;height:92px;border-radius:24px;background:linear-gradient(160deg,var(--cyan-soft),#c6ecff);display:grid;place-items:center;color:var(--cyan-d)}
-.exp .art .ico{width:46px;height:46px}
-.exp .badge{position:absolute;top:-11px;right:16px;background:var(--yellow);padding:.28rem .75rem;border-radius:10px;font:800 .72rem var(--fh)}
-.exp .pick{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:.4rem}
+.exps{display:grid;gap:1rem;margin-top:1.6rem;grid-template-columns:1fr}
+.exp{position:relative;display:grid;grid-template-columns:1fr auto;gap:.55rem .8rem;align-items:center;background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;padding:1.15rem 1.1rem 1.05rem;box-shadow:0 10px 26px -16px rgba(0,168,255,.6)}
+.exp h3{font:800 1.18rem/1.15 var(--fh)}
+.exp ul{margin:.45rem 0 0;padding-left:1.1rem;color:var(--muted);font-size:.9rem;line-height:1.65}
+.exp .art{width:64px;height:64px;border-radius:18px;background:linear-gradient(160deg,var(--cyan-soft),#c6ecff);display:grid;place-items:center;color:var(--cyan-d)}
+.exp .art .ico{width:32px;height:32px}
+.exp .badge{grid-column:1/-1;justify-self:start;position:static;background:var(--yellow);padding:.28rem .75rem;border-radius:999px;font:800 .72rem var(--fh)}
+.exp .pick{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:.15rem;padding:0;border:0;background:transparent;box-shadow:none;border-radius:0;cursor:default}
 .exp .pick span{font:700 .85rem var(--fh);color:var(--cyan-d)}
-.plus{width:46px;height:46px;border-radius:50%;border:0;background:var(--yellow);color:#000;font:800 1.6rem/1 var(--fh);cursor:pointer;transition:transform var(--ease),background-color var(--ease)}
-.plus:hover{transform:scale(1.15) rotate(90deg);background:var(--cyan)}
-@media(min-width:760px){.exps{grid-template-columns:repeat(2,1fr)}}
+.plus{width:48px;height:48px;border-radius:50%;border:0;background:var(--yellow);color:#000;font:800 1.6rem/1 var(--fh);cursor:pointer;flex:none}
+.plus:active{background:var(--cyan)}
+#experiencias.band,#horarios.band{padding-bottom:calc(var(--dock) + 8.5rem)}
+@media(min-width:900px){.exps{grid-template-columns:repeat(2,1fr);gap:1.4rem}.exp{padding:1.4rem}.exp .art{width:92px;height:92px;border-radius:24px}.exp .art .ico{width:46px;height:46px}}
 @media(min-width:1100px){.exps{grid-template-columns:repeat(4,1fr)}.exp{grid-template-columns:1fr}.exp .art{order:-1}}
 /* avaliação */
 .av-grid{display:grid;gap:2.5rem;align-items:center}
@@ -574,7 +574,8 @@ input,select,textarea{border-radius:14px}
 .place-chip:hover{border-color:var(--cyan)}
 .place-chip .ico{width:1.1rem;height:1.1rem;color:var(--cyan-d)}
 .place-chip small{display:block;font:600 .68rem var(--fb);color:var(--muted);letter-spacing:0;text-transform:none}
-.picks{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.picks{display:grid;grid-template-columns:1fr;gap:.55rem}
+@media(min-width:560px){.picks{grid-template-columns:1fr 1fr;gap:.7rem}}
 .pick{display:grid;gap:.25rem;padding:1rem .9rem;border:2px solid var(--cyan-line);border-radius:18px;background:#fff;text-align:left;cursor:pointer;font:800 .95rem var(--fh)}
 .pick small{font:600 .78rem var(--fb);color:var(--muted)}
 .pick.on,.pick[aria-pressed=true]{border-color:var(--cyan);background:var(--cyan-soft);box-shadow:0 0 0 2px var(--cyan)}
@@ -654,7 +655,7 @@ input,select,textarea{border-radius:14px}
 .sort-az{min-height:46px;padding:.45rem 1rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;font:800 .78rem var(--fh);cursor:pointer}
 .sort-az[aria-pressed=true]{background:var(--yellow);border-color:var(--yellow)}
 .geo-acts{display:grid;gap:.5rem;margin:.5rem 0}
-.mapbox{height:min(42svh,280px);border-radius:16px;overflow:hidden;border:2px solid var(--cyan-line);margin:.4rem 0 0;background:#d7e8f2}
+.mapbox{height:180px;border-radius:16px;overflow:hidden;border:2px solid var(--cyan-line);margin:.4rem 0 0;background:#d7e8f2;touch-action:none}
 .place-must{margin:0;padding:.75rem .9rem;border-radius:14px;background:var(--yellow);font:700 .88rem/1.4 var(--fb);color:#000}
 .fee-auto{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;flex-wrap:wrap;padding:.85rem 1rem;margin:.7rem 0;border-radius:16px;background:var(--yellow);font:800 .9rem var(--fh)}
 .fee-auto small{font:600 .78rem var(--fb);width:100%;color:#333}
@@ -692,7 +693,7 @@ input,select,textarea{border-radius:14px}
 @media(min-width:720px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard{grid-template-columns:1fr}.mimg{aspect-ratio:5/4;min-height:180px}}
 @media(min-width:1100px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{aspect-ratio:4/3;min-height:220px}}
 /* botões flutuantes */
-.fabs{position:fixed;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));z-index:80;display:grid;gap:.6rem;justify-items:end}
+.fabs{position:fixed;right:1rem;bottom:calc(var(--dock) + .45rem);z-index:80;display:grid;gap:.6rem;justify-items:end}
 .fab{display:inline-flex;align-items:center;gap:.6rem;min-height:56px;padding:.6rem 1.25rem;border:0;border-radius:999px;font:800 .82rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:#000;cursor:pointer;box-shadow:0 16px 30px -10px rgba(0,0,0,.55);transition:transform var(--ease),background-color var(--ease)}
 .fab:hover{transform:translateY(-3px) scale(1.04)}
 .fab[hidden]{display:none}
@@ -715,7 +716,15 @@ input,select,textarea{border-radius:14px}
 @media(min-width:700px){.dlg.cart-dlg{height:min(92dvh,840px);max-height:92dvh;border-radius:28px;margin:auto}}
 .cart-dlg .dhead{flex:none}
 .cart-dlg #orderView:not([hidden]){flex:1;min-height:0;overflow:auto}
-html:has(dialog[open]){overflow:hidden}
+html:has(dialog[open]),html.dlg-open{overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
+html.dlg-open body{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll-behavior:none}
+html.dlg-open .fabs{visibility:hidden;pointer-events:none}
+#placeDlg.place-dlg[open]{display:flex;flex-direction:column;height:100dvh;max-height:100dvh;overflow:hidden;animation:none;transform:none}
+#placeDlg > .place-pad{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;gap:.55rem;padding:1rem .9rem calc(.85rem + env(safe-area-inset-bottom,0px))}
+#placeDlg .place-scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:grid;gap:.7rem;align-content:start}
+#placeDlg .dhead,#placeDlg #placeGo{flex:none}
+#placeDlg .place-must{margin:0}
+@media(min-width:700px){#placeDlg.place-dlg[open]{height:min(92dvh,840px);max-height:92dvh;margin:auto;border-radius:28px}}
 .dpad{display:grid;gap:.85rem;padding:1rem .9rem calc(1.1rem + env(safe-area-inset-bottom,0px));min-width:0;max-width:100%;width:100%;box-sizing:border-box}
 .dlg.cart-dlg > .cart-pad{display:flex;flex-direction:column;gap:.4rem;padding:1rem .9rem 0;flex:1;min-height:0}
 .dhead{display:flex;justify-content:space-between;align-items:center;gap:.7rem;position:sticky;top:0;z-index:4;background:#fff;padding:.15rem 0 .45rem;min-width:0}
@@ -912,8 +921,9 @@ html:has(dialog[open]){overflow:hidden}
 .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.4rem}
 .chip2{display:inline-block;padding:.25rem .7rem;border-radius:999px;background:#EEF3F6;font:700 .72rem var(--fh);letter-spacing:.04em}
 .chip2.st-delivered,.chip2.pay-paid{background:#CFF3DF}
-.chip2.st-sent,.chip2.st-received,.chip2.st-preparing,.chip2.st-on_the_way{background:var(--cyan-soft)}
+.chip2.st-sent,.chip2.st-received,.chip2.st-preparing,.chip2.st-on_the_way,.chip2.st-review{background:var(--cyan-soft)}
 .chip2.pay-unpaid,.chip2.pay-pay_requested{background:var(--yellow)}
+.chip2.pay-paid_declared{background:var(--cyan-soft)}
 .chip2.st-cancelled{background:#F7D4D4}
 .chip2:empty{display:none}
 .pays{display:grid;gap:.6rem}
@@ -1256,8 +1266,9 @@ html:has(dialog[open]){overflow:hidden}
   <button class="fab call" id="fabCall" type="button"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg><span id="fabCallTxt" data-i18n="fab.call">Chamar garçom</span></button>
 </div>
 
-<dialog class="dlg" id="placeDlg" aria-labelledby="placeT"><div class="dpad">
+<dialog class="dlg place-dlg" id="placeDlg" aria-labelledby="placeT"><div class="dpad place-pad">
   <div class="dhead"><h2 id="placeT" data-i18n="place.title">Onde está agora?</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
+  <div class="place-scroll">
   <p class="place-must" data-i18n="place.must">Antes de pedir, diga-nos onde está. Sem o local o pedido não segue — no recinto (mesa) ou na cidade (delivery / busca).</p>
   <p style="margin:0;color:var(--muted)" data-i18n="place.lead">Escolha se come no Aqua Club ou se leva. Depois marque o sítio exacto.</p>
   <div class="picks" id="placeKind">
@@ -1280,7 +1291,6 @@ html:has(dialog[open]){overflow:hidden}
       <p class="menu-note" style="margin:0 0 .6rem;text-align:left" data-i18n="place.pinH">Toque em «Estou aqui» (GPS) ou no mapa. Serve em toda a Beira. A taxa sai automaticamente. O motorista abre este ponto no Google Maps.</p>
       <div class="geo-acts">
         <button class="btn btn-cyan btn-block" type="button" id="placeGeo" data-i18n="place.geo">Estou aqui — usar o GPS</button>
-        <a class="btn btn-line btn-block" id="placeMap" href="#" target="_blank" rel="noopener noreferrer" hidden data-i18n="place.map">Ver este ponto no Google Maps</a>
       </div>
       <div id="placeMapBox" class="mapbox"></div>
       <p class="msg" id="placeGeoMsg" role="status"></p>
@@ -1294,6 +1304,7 @@ html:has(dialog[open]){overflow:hidden}
     </div>
   </div>
   <p class="msg" id="placeErr" role="status"></p>
+  </div>
   <button class="btn btn-cyan btn-block" type="button" id="placeGo" data-i18n="place.ok">Confirmar e pedir</button>
 </div></dialog>
 
@@ -1356,7 +1367,7 @@ html:has(dialog[open]){overflow:hidden}
     <ol class="otrack" id="otrack"><li data-i18n="st.review">Em análise</li><li data-i18n="cart.prep">Em preparação</li><li data-i18n="st.ready">Pronto</li><li data-i18n="cart.del">Entregue</li></ol>
     <a class="wafall" data-wa href="#" target="_blank" rel="noopener noreferrer" hidden data-i18n="cart.waFall">Não abriu? Toque aqui para abrir o WhatsApp</a>
     <p class="menu-note" style="margin:.2rem 0 0" data-i18n="cart.noCancel">Este pedido não pode ser cancelado. Para alterar algo, chame o garçom.</p>
-    <div class="dfoot" id="ovActs"><button class="btn btn-cyan" type="button" id="orderPay" data-i18n="cart.pay">Pagar / pedir a conta</button><button class="btn btn-line" type="button" id="orderChange" data-i18n="cart.change">Pedir alteração</button></div>
+    <div class="dfoot" id="ovActs"><button class="btn btn-cyan" type="button" id="orderPay" data-i18n="cart.pay">Pagar / pedir a conta</button><button class="btn btn-cyan" type="button" id="orderGot" hidden data-i18n="cart.got">Confirmar que recebi</button><button class="btn btn-line" type="button" id="orderChange" data-i18n="cart.change">Pedir alteração</button></div>
     <div class="dfoot"><button class="linkbtn" type="button" id="orderBack" hidden data-i18n="cart.backHist">Voltar aos pedidos</button><button class="linkbtn" type="button" id="orderHist" data-i18n="fab.my">Os meus pedidos</button><button class="linkbtn" type="button" id="orderNew" data-i18n="cart.another">Fazer outro pedido</button></div>
   </div>
 </div></dialog>
@@ -1670,6 +1681,14 @@ const REVIEWS = [];
   const rmsg = (reason) => ({ request_bill: tr('call.r_bill'), menu_question: tr('call.r_menu'), new_order: tr('call.r_new'), urgent_other: tr('call.r_urgent') }[reason] || reason);
   const STEPS = ['review', 'preparing', 'ready', 'delivered'];
   const kitchenStep = (st) => ({ review: 0, received: 0, preparing: 1, ready: 2, on_the_way: 2, delivered: 3 }[st] ?? 0);
+  const CHANGE_WAIT = 3 * 60 * 1000;
+  const changeLeft = (o) => Math.max(0, CHANGE_WAIT - (Date.now() - Number(o && o.ts || 0)));
+  function settleLocalDelivery(o) {
+    if (!o || o.status === 'cancelled') return o;
+    if (o.driver_ok && o.client_ok) o.status = 'delivered';
+    else if ((o.driver_ok || o.client_ok) && (o.status === 'ready' || o.status === 'preparing' || o.status === 'review' || o.status === 'received')) o.status = 'on_the_way';
+    return o;
+  }
   const omsgAt = (i) => [tr('cart.recMsg'), tr('cart.prepMsg'), tr('cart.wayMsg'), tr('cart.delMsg')][i] || '';
   const stTxt = (k) => tr('st.' + k);
   const payTxt = (k) => tr('pay.' + k);
@@ -1680,7 +1699,7 @@ const REVIEWS = [];
   let history = []; try { history = JSON.parse(store.get('aq.orders') || '[]'); } catch (e) { history = []; }
   let cust = {}; try { cust = JSON.parse(store.get('aq.cust') || '{}'); } catch (e) { cust = {}; }
   const saveHist = () => store.set('aq.orders', JSON.stringify(history.slice(-80)));
-  const isOpen = (o) => o.status !== 'cancelled' && o.pay !== 'paid';
+  const isOpen = (o) => o.status !== 'cancelled' && o.pay !== 'paid' && o.pay !== 'paid_declared';
   const owed = () => history.filter((o) => o.status !== 'cancelled' && (o.pay === 'unpaid' || o.pay === 'pay_requested'));
   const owedTotal = () => owed().reduce((s, o) => s + o.total, 0);
 
@@ -1773,19 +1792,25 @@ const REVIEWS = [];
     openWa(orderMsg(o));
   }
   async function apiPay(o, status, method, ref) {
-    if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
-      const r = await AquaOS.declarePay(o, method, ref);
-      if (r) {
-        o.pay = r.payment_status === 'declared' ? 'paid_declared' : (r.payment_status || status);
-        o.method = r.payment_method || method;
-        o.ref = r.payment_ref || ref;
-        o.status = r.status || o.status;
+    o.pay = status === 'paid_declared' || status === 'declared' ? 'paid_declared' : (status || o.pay);
+    o.method = method || o.method;
+    o.ref = ref || o.ref || '';
+    if (window.AquaBus) AquaBus.patchOrder(o.id || o.code, { payment_status: o.pay === 'paid_declared' ? 'declared' : o.pay, payment_method: method, pay: o.pay });
+    try {
+      if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
+        const r = await AquaOS.declarePay(o, method, ref);
+        if (r) {
+          const p = r.payment_status === 'declared' ? 'paid_declared' : (r.payment_status || o.pay);
+          if (!(o.pay === 'paid_declared' && p === 'unpaid')) o.pay = p;
+          o.method = r.payment_method || o.method;
+          o.ref = r.payment_ref || o.ref;
+          if (r.status) o.status = r.status;
+        }
+      } else if (isLive()) {
+        const { error } = await sb.rpc('set_payment', { p_code: o.code, p_status: status, p_method: method, p_ref: ref || null });
+        if (error) throw error;
       }
-      return;
-    }
-    if (!isLive()) return;
-    const { error } = await sb.rpc('set_payment', { p_code: o.code, p_status: status, p_method: method, p_ref: ref || null });
-    if (error) throw error;
+    } catch (e) { /* fica declarado neste telemóvel à espera da administração */ }
   }
   let pollT = 0, liveSock = null;
   function applyRemoteOrder(raw) {
@@ -1798,9 +1823,16 @@ const REVIEWS = [];
     const st = r.status || o.status;
     let changed = false;
     if (st && st !== o.status) { o.status = st; changed = true; }
-    if (pay && pay !== o.pay) { o.pay = pay; changed = true; }
+    if (pay && pay !== o.pay && !(o.pay === 'paid_declared' && pay === 'unpaid') && !(o.pay === 'paid' && pay !== 'paid')) { o.pay = pay; changed = true; }
     if (r.payment_method && r.payment_method !== o.method) { o.method = r.payment_method; changed = true; }
     if (r.payment_ref && r.payment_ref !== o.ref) { o.ref = r.payment_ref; changed = true; }
+    const dok = r.driver_ok === true || r.driver_ok === 1;
+    const cok = r.client_ok === true || r.client_ok === 1;
+    if (dok && !o.driver_ok) { o.driver_ok = true; changed = true; }
+    if (cok && !o.client_ok) { o.client_ok = true; changed = true; }
+    const before = o.status;
+    settleLocalDelivery(o);
+    if (o.status !== before) changed = true;
     if (!changed) return false;
     if (ov && (ov.code === o.code || String(ov.id) === String(o.id))) ov = o;
     saveHist(); renderHist(); paintOrderView(); updateFabs();
@@ -1948,12 +1980,11 @@ const REVIEWS = [];
     fillMesaSelect();
     const addr = $('#placeAddr'); if (addr) addr.value = place.address || addr.value || '';
     const bairro = $('#placeBairro'); if (bairro) bairro.value = place.bairro || bairro.value || '';
-    const map = $('#placeMap');
-    if (map) {
-      const ok = place.lat && place.lng;
-      map.hidden = !ok;
-      if (ok) map.href = mapsNav(place.lat, place.lng);
-    }
+    $('#placeErr').textContent = '';
+    paintPinBits();
+    if (place.kind === 'takeaway' && place.take === 'delivery') initPlaceMap();
+  }
+  function paintPinBits() {
     const feeBox = $('#placeFeeBox');
     if (feeBox) {
       const ok = place.take === 'delivery' && place.fee;
@@ -1963,8 +1994,6 @@ const REVIEWS = [];
         $('#placeFeeBand').textContent = tr('place.' + place.band) + ' · ' + String(place.km || '').replace('.', ',') + ' km';
       }
     }
-    $('#placeErr').textContent = '';
-    if (place.kind === 'takeaway' && place.take === 'delivery') initPlaceMap();
   }
   function openPlace() {
     const box = $('#placeZones');
@@ -1978,6 +2007,9 @@ const REVIEWS = [];
     } else $$('#placeZones button').forEach((b) => { b.textContent = zoneName(b.dataset.zone); });
     paintPlaceDlg();
     $('#placeDlg').showModal();
+    requestAnimationFrame(() => {
+      if (leafletMap) { try { leafletMap.invalidateSize({ animate: false, pan: false }); } catch (e) { /* */ } }
+    });
   }
   $$('#placeKind .pick').forEach((b) => b.addEventListener('click', () => { place.kind = b.dataset.kind; paintPlaceDlg(); }));
   $$('#placeTakeKind .pick').forEach((b) => b.addEventListener('click', () => { place.take = b.dataset.take; paintPlaceDlg(); }));
@@ -1998,6 +2030,12 @@ const REVIEWS = [];
     } catch (e) { /* */ }
     return lat.toFixed(5) + ', ' + lng.toFixed(5);
   }
+  function pinMarker(lat, lng, inside) {
+    if (!leafletMap || !window.L) return;
+    try { leafletMap.setView([lat, lng], inside ? 16 : 13, { animate: false }); } catch (e) { /* */ }
+    if (leafletMarker) leafletMarker.setLatLng([lat, lng]);
+    else leafletMarker = window.L.marker([lat, lng]).addTo(leafletMap);
+  }
   async function applyPin(lat, lng, acc) {
     place.lat = lat; place.lng = lng;
     place.acc = acc != null ? Math.round(acc) : null;
@@ -2008,22 +2046,17 @@ const REVIEWS = [];
     const inside = inBeira(lat, lng);
     place.band = inside ? bandFromKm(km) : null;
     place.fee = inside ? FEES[place.band] : null;
-    const addr = await reverseAddr(lat, lng);
-    if (!place.address || place.address.length < 8) {
-      place.address = addr;
-      const inp = $('#placeAddr'); if (inp && !inp.value.trim()) inp.value = addr;
-    }
     const msg = $('#placeGeoMsg');
     if (msg) {
       if (!inside) msg.textContent = tr('place.outBeira');
       else msg.textContent = tr('place.geoOk', { n: String(place.km).replace('.', ',') }) + (place.acc ? ' · ±' + place.acc + ' m' : '');
     }
-    paintPlaceDlg();
-    if (leafletMap && window.L) {
-      leafletMap.setView([lat, lng], inside ? 18 : 13);
-      if (leafletMarker) leafletMarker.setLatLng([lat, lng]);
-      else leafletMarker = window.L.marker([lat, lng]).addTo(leafletMap);
-      setTimeout(() => leafletMap.invalidateSize(), 180);
+    paintPinBits();
+    pinMarker(lat, lng, inside);
+    const addr = await reverseAddr(lat, lng);
+    if (!place.address || place.address.length < 8) {
+      place.address = addr;
+      const inp = $('#placeAddr'); if (inp && !inp.value.trim()) inp.value = addr;
     }
   }
   function loadLeaflet() {
@@ -2042,18 +2075,20 @@ const REVIEWS = [];
     const start = place.lat && place.lng ? [place.lat, place.lng] : [CLUB_GEO.lat, CLUB_GEO.lng];
     if (!leafletMap) {
       leafletMap = window.L.map(box, {
-        scrollWheelZoom: true,
+        scrollWheelZoom: false,
+        bounceAtZoomLimits: false,
+        fadeAnimation: false,
+        zoomAnimation: false,
+        markerZoomAnimation: false,
+        inertia: false,
         maxBounds: [[BEIRA.minLat, BEIRA.minLng], [BEIRA.maxLat, BEIRA.maxLng]],
-        maxBoundsViscosity: 0.35
-      }).setView(start, place.lat ? 17 : 12);
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(leafletMap);
+        maxBoundsViscosity: 0.8
+      }).setView(start, place.lat ? 16 : 12);
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap' }).addTo(leafletMap);
       leafletMap.on('click', (e) => applyPin(e.latlng.lat, e.latlng.lng));
+      leafletMap.whenReady(() => { try { leafletMap.invalidateSize({ animate: false, pan: false }); } catch (e) { /* */ } });
     }
-    setTimeout(() => leafletMap && leafletMap.invalidateSize(), 80);
-    if (place.lat && place.lng) {
-      if (leafletMarker) leafletMarker.setLatLng([place.lat, place.lng]);
-      else leafletMarker = window.L.marker([place.lat, place.lng]).addTo(leafletMap);
-    }
+    if (place.lat && place.lng) pinMarker(place.lat, place.lng, inBeira(place.lat, place.lng));
   }
   $('#placeGeo').addEventListener('click', () => {
     const msg = $('#placeGeoMsg');
@@ -2063,7 +2098,7 @@ const REVIEWS = [];
       applyPin(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
     }, (err) => {
       msg.textContent = err && err.code === 1 ? tr('place.geoDenied') : tr('place.geoFail');
-    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 20000 });
   });
   $('#placeGo').addEventListener('click', () => {
     const err = $('#placeErr');
@@ -2509,12 +2544,21 @@ const REVIEWS = [];
     const s = kitchenStep(ov.status), sent = ov.status === 'sent', canc = ov.status === 'cancelled';
     $('#otrack').hidden = sent || canc;
     $$('#otrack li').forEach((li, i) => { li.classList.toggle('done', i < s || s === 3); li.classList.toggle('now', i === s && s < 3); });
-    $('#omsg').textContent = orderReadonly ? tr('cart.viewOnly') : (ov.status === 'no_confirm' ? tr('st.no_confirm') : canc ? tr('cart.cancelled') : sent ? tr('cart.sentWa') : omsgAt(s));
+    const waitDel = !canc && ov.status !== 'delivered' && (ov.status === 'ready' || ov.status === 'on_the_way' || ov.driver_ok);
+    $('#omsg').textContent = orderReadonly ? tr('cart.viewOnly') : (ov.status === 'no_confirm' ? tr('st.no_confirm') : canc ? tr('cart.cancelled') : sent ? tr('cart.sentWa') : ov.client_ok && !ov.driver_ok ? tr('cart.waitDriver') : ov.driver_ok && !ov.client_ok ? tr('cart.waitYou') : omsgAt(s));
     $('#opay').textContent = payTxt(ov.pay);
     const acts = $('#ovActs');
-    if (acts) acts.hidden = orderReadonly;
+    if (acts) acts.hidden = orderReadonly && !waitDel;
     $('#orderPay').hidden = orderReadonly || ov.pay === 'paid' || ov.pay === 'paid_declared' || canc;
-    $('#orderChange').hidden = orderReadonly;
+    const left = changeLeft(ov);
+    const canChange = !orderReadonly && !canc && ov.status !== 'delivered' && left <= 0;
+    $('#orderChange').hidden = orderReadonly || canc || ov.status === 'delivered';
+    $('#orderChange').disabled = !canChange;
+    $('#orderChange').textContent = canChange ? tr('cart.change') : tr('cart.changeSoon', { n: Math.max(1, Math.ceil(left / 60000)) });
+    if (window.__chgT) clearTimeout(window.__chgT);
+    if (left > 0 && cartDlg.open) window.__chgT = setTimeout(() => { if (ov) paintOrderView(); }, 15000);
+    const got = $('#orderGot');
+    if (got) got.hidden = !waitDel || ov.client_ok || canc;
     const back = $('#orderBack');
     if (back) back.hidden = !orderReadonly;
     $('#orderHist').hidden = orderReadonly;
@@ -2531,7 +2575,20 @@ const REVIEWS = [];
   $('#orderPay').addEventListener('click', () => { cartDlg.close(); openPay(); });
   $('#orderHist').addEventListener('click', () => { cartDlg.close(); openHist(); });
   $('#orderBack')?.addEventListener('click', () => { cartDlg.close(); openHist(); });
-  $('#orderChange').addEventListener('click', () => { cartDlg.close(); openCall('new_order'); });
+  $('#orderChange').addEventListener('click', () => {
+    if (!ov || changeLeft(ov) > 0) { paintOrderView(); return; }
+    cartDlg.close(); openCall('new_order');
+  });
+  $('#orderGot')?.addEventListener('click', async () => {
+    if (!ov) return;
+    ov.client_ok = true;
+    settleLocalDelivery(ov);
+    saveHist();
+    if (window.AquaBus) AquaBus.patchOrder(ov.id || ov.code, { client_ok: 1, status: ov.status });
+    try { if (window.AquaOS && AquaOS.confirmDelivery) await AquaOS.confirmDelivery(ov); } catch (e) { /* local */ }
+    orderReadonly = ov.status === 'delivered' || ov.status === 'cancelled';
+    paintOrderView(); renderHist(); updateFabs();
+  });
   $('#orderNew').addEventListener('click', () => { cartDlg.close(); $('#menu').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
   $('#toHist').addEventListener('click', () => { cartDlg.close(); openHist(); });
 
@@ -2544,18 +2601,6 @@ const REVIEWS = [];
       : history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('pay.noneDue'))}</span></div>` : `<div class="hs"><b>${esc(tr('pay.none'))}</b><span>${esc(tr('pay.noneH'))}</span></div>`;
     $('#histPay').hidden = !od;
     const list = $('#hlist'); list.innerHTML = '';
-    let calls = [];
-    try { calls = JSON.parse(store.get('aq.callLog') || '[]'); } catch (e) { calls = []; }
-    if (calls.length) {
-      const box = document.createElement('div');
-      box.innerHTML = '<p class="hpeek" style="margin:.2rem 0 .6rem">' + esc(tr('fab.call')) + '</p>';
-      list.appendChild(box.firstChild);
-      calls.slice(0, 12).forEach((c) => {
-        const el = document.createElement('div'); el.className = 'hcard';
-        el.innerHTML = `<div class="hrow"><b>${esc(rmsg(c.reason))}</b><span>${when(c.ts)}</span></div><p class="hmeta">${esc(nice(c.table || ''))}</p><div class="chips"><span class="chip2">${esc(c.status || 'pending')}</span></div>`;
-        list.appendChild(el);
-      });
-    }
     history.slice().reverse().forEach((o) => {
       const el = document.createElement('button'); el.type = 'button'; el.className = 'hcard';
       el.setAttribute('aria-label', tr('cart.viewAria', { c: o.code }));
@@ -2627,7 +2672,10 @@ const REVIEWS = [];
     try {
       if (!paySel.number) {                                  /* pagar no local: pede a conta ao garçom */
         for (const o of open) { await apiPay(o, 'pay_requested', paySel.id, ''); o.pay = 'pay_requested'; o.method = paySel.id; }
-        saveHist(); renderHist(); updateFabs(); payDlg.close(); openCall('request_bill'); return;
+        saveHist(); renderHist(); updateFabs(); payDlg.close();
+        apiCall(table || String(place.tableNumber || ''), 'request_bill').catch(() => {});
+        openHist();
+        return;
       }
       if (!window.AquaOS && !isLive() && mode !== 'demo') openWa('*Pagamento declarado — Aqua Club*\nPedidos: ' + open.map((o) => o.code).join(', ') + '\nValor: ' + money(amount) + '\nMétodo: ' + paySel.label + '\nNúmero: ' + (paySel.number || '') + '\nTitular: ' + (paySel.holder || '') + '\nCliente: ' + (cust.name || open[0].name) + ' (' + showPhone(cust.phone || open[0].phone) + ')');
       for (const o of open) { await apiPay(o, 'paid_declared', paySel.id, ''); o.pay = 'paid_declared'; o.method = paySel.id; o.ref = ''; }
@@ -2750,8 +2798,40 @@ const REVIEWS = [];
     const dismiss = () => { hint.hidden = true; store.set('aq.hint', '1'); };
     hint.addEventListener('click', dismiss); $('#fabCall').addEventListener('click', dismiss);
   }
-  /* fechar janelas */
-  $$('dialog').forEach((d) => { d.addEventListener('click', (e) => { if (e.target === d) d.close(); }); $$('[data-close]', d).forEach((b) => b.addEventListener('click', () => d.close())); });
+  /* fechar janelas + travar o scroll da página por baixo */
+  let lockY = 0;
+  const anyDlg = () => Boolean(document.querySelector('dialog[open]'));
+  function lockPage() {
+    if (document.documentElement.classList.contains('dlg-open')) return;
+    lockY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.documentElement.classList.add('dlg-open');
+    document.body.style.position = 'fixed';
+    document.body.style.top = '-' + lockY + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+  function unlockPage() {
+    if (anyDlg()) return;
+    document.documentElement.classList.remove('dlg-open');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, lockY);
+  }
+  const origShowModal = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function () {
+    lockPage();
+    try { return origShowModal.call(this); }
+    catch (err) { unlockPage(); throw err; }
+  };
+  $$('dialog').forEach((d) => {
+    d.addEventListener('click', (e) => { if (e.target === d) d.close(); });
+    $$('[data-close]', d).forEach((b) => b.addEventListener('click', () => d.close()));
+    d.addEventListener('close', () => { requestAnimationFrame(unlockPage); });
+  });
 
   function wallCard(m, dup, eager) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'wcard'; if (dup) b.tabIndex = -1;

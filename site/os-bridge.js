@@ -68,7 +68,12 @@
     },
     patchOrder(id, patch) {
       const d = readBus(); const o = (d.orders || []).find((x) => String(x.id) === String(id) || String(x.code) === String(id));
-      if (o) Object.assign(o, patch); writeBus(d); return o;
+      if (o) {
+        Object.assign(o, patch);
+        if (o.driver_ok && o.client_ok) o.status = 'delivered';
+        else if ((o.driver_ok || o.client_ok) && (o.status === 'ready' || o.status === 'preparing' || o.status === 'review' || o.status === 'received')) o.status = 'on_the_way';
+      }
+      writeBus(d); return o;
     }
   };
 
@@ -157,6 +162,15 @@
     async orderStatus(code) {
       const r = await api('/orders/status?code=' + encodeURIComponent(code));
       return r.order;
+    },
+    async confirmDelivery(o) {
+      try {
+        const r = await api('/orders/confirm-delivery', { method: 'POST', body: { code: o.code } });
+        return r.order;
+      } catch (e) {
+        if (window.AquaBus) return AquaBus.patchOrder(o.id || o.code, { client_ok: 1, status: o.status });
+        return null;
+      }
     },
     async createCall(code, reason, extra) {
       const map = { request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente' };

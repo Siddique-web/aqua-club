@@ -161,7 +161,9 @@ for (const sql of [
   'ALTER TABLE orders ADD COLUMN delivery_km REAL',
   'ALTER TABLE calls ADD COLUMN customer_name TEXT',
   'ALTER TABLE calls ADD COLUMN customer_phone TEXT',
-  'ALTER TABLE orders ADD COLUMN payment_ref TEXT'
+  'ALTER TABLE orders ADD COLUMN payment_ref TEXT',
+  'ALTER TABLE orders ADD COLUMN driver_ok INTEGER DEFAULT 0',
+  'ALTER TABLE orders ADD COLUMN client_ok INTEGER DEFAULT 0'
 ]) {
   try { db.exec(sql); } catch { /* column already exists */ }
 }

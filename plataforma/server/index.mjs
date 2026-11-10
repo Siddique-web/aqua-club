@@ -420,9 +420,32 @@ app.get('/api/orders/mine', requireAuth, (req, res) => {
 app.get('/api/orders/status', (req, res) => {
   const code = String(req.query.code || '').trim();
   if (!code) return res.status(400).json({ error: 'code' });
-  const o = db.prepare('SELECT id, code, status, payment_status, payment_method, payment_ref, total FROM orders WHERE code=?').get(code);
+  const o = db.prepare('SELECT id, code, status, payment_status, payment_method, payment_ref, total, driver_ok, client_ok FROM orders WHERE code=?').get(code);
   if (!o) return res.status(404).json({ error: 'missing' });
   res.json({ order: o });
+});
+
+function settleDelivery(id) {
+  const o = db.prepare('SELECT * FROM orders WHERE id=?').get(id);
+  if (!o || o.status === 'cancelled') return o;
+  if (o.driver_ok && o.client_ok && o.status !== 'delivered') {
+    db.prepare("UPDATE orders SET status='delivered' WHERE id=?").run(id);
+  } else if ((o.driver_ok || o.client_ok) && (o.status === 'ready' || o.status === 'preparing')) {
+    db.prepare("UPDATE orders SET status='on_the_way' WHERE id=?").run(id);
+  }
+  return db.prepare('SELECT * FROM orders WHERE id=?').get(id);
+}
+
+app.post('/api/orders/confirm-delivery', (req, res) => {
+  const code = String((req.body || {}).code || '').trim();
+  if (!code) return res.status(400).json({ error: 'code' });
+  const o = db.prepare('SELECT * FROM orders WHERE code=?').get(code);
+  if (!o) return res.status(404).json({ error: 'missing' });
+  db.prepare('UPDATE orders SET client_ok=1 WHERE id=?').run(o.id);
+  settleDelivery(o.id);
+  const full = orderFull(o.id);
+  emitAll('order:updated', full);
+  res.json({ order: full });
 });
 
 app.post('/api/orders/:id/pay', (req, res) => {
@@ -699,9 +722,22 @@ app.get('/api/admin/orders', requireAdmin, (req, res) => {
 function applyOrderPatch(id, body = {}) {
   const o = db.prepare('SELECT * FROM orders WHERE id=?').get(id);
   if (!o) return null;
-  const { status, payment_status, payment_method, payment_ref } = body;
-  const allowed = ['review', 'received', 'preparing', 'ready', 'delivered', 'cancelled', 'no_confirm'];
-  if (status && allowed.includes(status)) db.prepare('UPDATE orders SET status=? WHERE id=?').run(status, id);
+  const { status, payment_status, payment_method, payment_ref, driver_ok, client_ok } = body;
+  const allowed = ['review', 'received', 'preparing', 'ready', 'on_the_way', 'delivered', 'cancelled', 'no_confirm'];
+  if (driver_ok) db.prepare('UPDATE orders SET driver_ok=1 WHERE id=?').run(id);
+  if (client_ok) db.prepare('UPDATE orders SET client_ok=1 WHERE id=?').run(id);
+  if (status === 'delivered') {
+    db.prepare('UPDATE orders SET driver_ok=1 WHERE id=?').run(id);
+    const cur = db.prepare('SELECT client_ok FROM orders WHERE id=?').get(id);
+    if (!cur.client_ok) {
+      db.prepare("UPDATE orders SET status='on_the_way' WHERE id=? AND status NOT IN ('delivered','cancelled')").run(id);
+    } else {
+      db.prepare("UPDATE orders SET status='delivered' WHERE id=?").run(id);
+    }
+  } else if (status && allowed.includes(status) && status !== 'delivered') {
+    db.prepare('UPDATE orders SET status=? WHERE id=?').run(status, id);
+  }
+  settleDelivery(id);
   if (payment_ref) db.prepare('UPDATE orders SET payment_ref=? WHERE id=?').run(String(payment_ref).slice(0, 80), id);
   if (payment_status === 'paid') {
     const pc = o.paid_code || paidCode(o.code);

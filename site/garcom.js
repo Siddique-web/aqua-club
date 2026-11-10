@@ -393,7 +393,11 @@
       }, 4000);
     } catch (e) {
       if (e.status === 401) S.osDesk = null;
-      else S.osMsg = e.message || 'Sem ligação ao sistema de pedidos.';
+      else if (window.AquaBus) {
+        const d = AquaBus.read();
+        S.osDesk = { orders: d.orders || [], calls: d.calls || [], role: 'bus' };
+        S.osMsg = '';
+      } else S.osMsg = e.message || 'Sem ligação ao sistema de pedidos.';
     }
   }
   let root = null, pn = null, toasts = null, deb = 0;
@@ -690,8 +694,8 @@
   }
 
   /* ====================================================================== TAB: PEDIDOS (sistema em tempo real) */
-  const ST_OS = { review: 'Em análise', received: 'Em análise', preparing: 'Em preparação', ready: 'Pronto', delivered: 'Entregue', cancelled: 'Cancelado', no_confirm: 'Sem confirmação' };
-  const PAY_OS = { unpaid: 'Por pagar', declared: 'Transferência a confirmar', paid: 'Pago', rejected: 'Rejeitado' };
+  const ST_OS = { review: 'Em análise', received: 'Em análise', preparing: 'Em preparação', ready: 'Pronto', on_the_way: 'A caminho', delivered: 'Entregue', cancelled: 'Cancelado', no_confirm: 'Sem confirmação' };
+  const PAY_OS = { unpaid: 'Por pagar', declared: 'Transferência a confirmar', paid_declared: 'Transferência a confirmar', paid: 'Pago', rejected: 'Rejeitado', pay_requested: 'Conta pedida' };
   function tabOrders() {
     if (!S.osDesk) {
       return '<div class="gp-card"><h3>Gestão de pedidos</h3><p class="gp-muted">Os pedidos do site (menu, carrinho e pagamento) aparecem aqui em tempo real. Entre com a conta da administração ou com o PIN do garçom.</p>' +
@@ -711,8 +715,10 @@
       (o.payment_status !== 'unpaid' ? '<br>' + esc(payLine(o)) + (o.payment_ref ? ' · SMS ' + esc(o.payment_ref) : '') : '') + '</p>' +
       '<div class="gc-actions">' +
       (o.payment_status === 'declared' ? '<button class="gb ok" type="button" data-act="osord" data-id="' + o.id + '" data-do="paid">Confirmar → A preparar</button>' : '') +
-      (o.status !== 'preparing' && o.status !== 'ready' && o.status !== 'delivered' ? '<button class="gb" type="button" data-act="osord" data-id="' + o.id + '" data-do="preparing">A preparar</button>' : '') +
-      (o.status !== 'ready' && o.status !== 'delivered' ? '<button class="gb line" type="button" data-act="osord" data-id="' + o.id + '" data-do="ready">Pedido pronto</button>' : '') +
+      (o.status !== 'preparing' && o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' ? '<button class="gb" type="button" data-act="osord" data-id="' + o.id + '" data-do="preparing">A preparar</button>' : '') +
+      (o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' ? '<button class="gb line" type="button" data-act="osord" data-id="' + o.id + '" data-do="ready">Pedido pronto</button>' : '') +
+      ((o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok ? '<button class="gb ok" type="button" data-act="osord" data-id="' + o.id + '" data-do="driver">Saiu para entrega</button>' : '') +
+      (o.driver_ok && !o.client_ok && o.status !== 'delivered' ? '<span class="gp-muted">À espera da confirmação do cliente</span>' : '') +
       '</div></article>';
     return '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + wait.length + '</b><span>Transferências a confirmar</span></div>' +
       '<div class="gp-kpi"><b>' + live.length + '</b><span>Pedidos ativos</span></div>' +
@@ -865,10 +871,12 @@
     if (a === 'retry' || a === 'recheck') return boot();
     if (a === 'logout') { await guard(() => be.signOut()); S.me = null; S.mine = null; S.team = null; S.calls = []; stopWork(); S.authTab = 'in'; S.view = 'auth'; S.msg = ''; return render(); }
     if (a === 'osord') {
-      const doWhat = b.dataset.do, id = b.dataset.id, body = doWhat === 'paid' ? { payment_status: 'paid' } : { status: doWhat };
+      const doWhat = b.dataset.do, id = b.dataset.id;
+      const body = doWhat === 'paid' ? { payment_status: 'paid' } : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' } : { status: doWhat };
       b.disabled = true;
-      const r = await guard(() => osFetch('/desk/orders/' + id, { method: 'PATCH', body }));
-      if (r) { toast(doWhat === 'paid' ? 'Transferência confirmada — pedido em preparação.' : doWhat === 'ready' ? 'Pedido marcado como pronto.' : 'Pedido em preparação.', 'check', 'ok'); await loadOsDesk(); renderTab(); }
+      let r = await guard(() => osFetch('/desk/orders/' + id, { method: 'PATCH', body }));
+      if (!r && window.AquaBus) { r = AquaBus.patchOrder(id, body); }
+      if (r) { toast(doWhat === 'paid' ? 'Transferência confirmada — pedido em preparação.' : doWhat === 'driver' ? 'Motorista confirmou a saída. A espera do cliente.' : doWhat === 'ready' ? 'Pedido marcado como pronto.' : 'Pedido em preparação.', 'check', 'ok'); await loadOsDesk(); renderTab(); }
       return;
     }
     if (a === 'tab') return enterTab(b.dataset.t);

@@ -158,8 +158,8 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
   const ST = { review: 'Em análise', received: 'Em análise', preparing: 'Em preparação', ready: 'Pronto', on_the_way: 'Pronto', delivered: 'Entregue', cancelled: 'Cancelado', no_confirm: 'Sem confirmação' };
   const PAY = { unpaid: 'Por pagar', pay_requested: 'Conta pedida', paid_declared: 'Pagamento a confirmar', declared: 'Pagamento a confirmar', paid: 'Pago', rejected: 'Rejeitado' };
   const METHOD = { cash: 'Dinheiro', card: 'Cartão', mpesa: 'M-Pesa', emola: 'e-Mola', local: 'No local', other: 'Outro' };
-  const NEXT = { review: 'preparing', received: 'preparing', preparing: 'ready', ready: 'delivered', on_the_way: 'delivered' };
-  const NEXT_TXT = { review: 'Aceitar → A preparar', received: 'Aceitar → A preparar', preparing: 'Marcar pronto', ready: 'Entregue', on_the_way: 'Entregue na mesa' };
+  const NEXT = { review: 'preparing', received: 'preparing', preparing: 'ready', ready: 'on_the_way' };
+  const NEXT_TXT = { review: 'Aceitar → A preparar', received: 'Aceitar → A preparar', preparing: 'Marcar pronto', ready: 'Saiu para entrega (motorista)' };
 
   let orders = [], calls = [], events = {}, tab = 'active', current = null, user = '', known = new Set(), fresh = new Set();
 
@@ -194,7 +194,9 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
       updated_at: o.created_at,
       rawId: o.id,
       mapsUrl: o.navUrl || o.mapsUrl || '',
-      lat: o.lat, lng: o.lng
+      lat: o.lat, lng: o.lng,
+      driver_ok: o.driver_ok === true || o.driver_ok === 1,
+      client_ok: o.client_ok === true || o.client_ok === 1
     };
   }
 
@@ -221,6 +223,8 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const o = orders.find((x) => x.id === id);
     const body = {};
     if (patch.status) body.status = patch.status;
+    if (patch.driver_ok) body.driver_ok = true;
+    if (patch.client_ok) body.client_ok = true;
     if (patch.payment_status === 'paid') body.payment_status = 'paid';
     if (patch.payment_status === 'paid_declared') body.payment_status = 'declared';
     try { await api('/admin/orders/' + (o.rawId || id), { method: 'PATCH', body }); }
@@ -269,7 +273,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
       <ul class="items">${items(o)}</ul>
       <div class="row"><b>${money(o.total_mzn)}</b><span class="chips">${payChip(o)}</span></div>
       ${late ? '<small style="color:#B42318;font-weight:700">Conta em aberto há mais de ' + LATE_MIN + ' min — falar com o cliente</small>' : ''}
-      <div class="acts">${o.payment_status === 'paid_declared' ? `<button class="btn sm" data-confpay="${o.id}">Confirmar transferência → A preparar</button>` : ''}${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${unpaidOf(o) || o.payment_status === 'paid_declared' ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}<button class="btn sm line" data-open="${o.id}">Detalhes</button></div>`;
+      <div class="acts">${o.payment_status === 'paid_declared' ? `<button class="btn sm" data-confpay="${o.id}">Confirmar transferência → A preparar</button>` : ''}${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${o.status === 'on_the_way' && !o.client_ok ? '<small>À espera da confirmação do cliente</small>' : ''}${unpaidOf(o) || o.payment_status === 'paid_declared' ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}<button class="btn sm line" data-open="${o.id}">Detalhes</button></div>`;
     return el;
   }
   function renderActive() {
@@ -368,7 +372,11 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
   document.addEventListener('click', async (e) => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.close !== undefined) { b.closest('dialog').close(); return; }
-    if (b.dataset.next) { const o = orders.find((x) => x.id === b.dataset.next); await update(o.id, { status: NEXT[o.status] }); }
+    if (b.dataset.next) {
+      const o = orders.find((x) => x.id === b.dataset.next);
+      const next = NEXT[o.status];
+      await update(o.id, next === 'on_the_way' ? { status: 'on_the_way', driver_ok: true } : { status: next });
+    }
     else if (b.dataset.confpay) { await update(b.dataset.confpay, { payment_status: 'paid' }); }
     else if (b.dataset.pay) { const o = orders.find((x) => x.id === b.dataset.pay); askPay([o.id], o.code + ' · ' + o.customer_name + ' · ' + money(o.total_mzn)); }
     else if (b.dataset.closetable) { const list = orders.filter((o) => o.table_code === b.dataset.closetable && o.status !== 'cancelled' && o.payment_status !== 'paid'); askPay(list.map((o) => o.id), nice(b.dataset.closetable) + ' · ' + list.length + ' pedido(s) · ' + money(list.reduce((s, o) => s + o.total_mzn, 0))); }

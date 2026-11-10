@@ -628,8 +628,9 @@ async function loadStaff() {
       <td>${money(o.total)}</td>
       <td class="ops">
         ${o.payment_status==='declared'?`<button class="btn btn-ok" data-sconf="${o.id}">Confirmar → A preparar</button>`:''}
-        ${o.status!=='preparing' && o.status!=='ready' && o.status!=='delivered'?`<button class="btn btn-cyan" data-sprep="${o.id}">A preparar</button>`:''}
-        ${o.status!=='ready' && o.status!=='delivered'?`<button class="btn btn-line" data-sready="${o.id}">Pedido pronto</button>`:''}
+        ${o.status!=='preparing' && o.status!=='ready' && o.status!=='on_the_way' && o.status!=='delivered'?`<button class="btn btn-cyan" data-sprep="${o.id}">A preparar</button>`:''}
+        ${o.status!=='ready' && o.status!=='on_the_way' && o.status!=='delivered'?`<button class="btn btn-line" data-sready="${o.id}">Pedido pronto</button>`:''}
+        ${(o.status==='ready'||o.status==='on_the_way')&&!o.driver_ok?`<button class="btn btn-ok" data-sdrv="${o.id}">Saiu para entrega</button>`:''}
       </td></tr>`).join('') || '<tr><td colspan="5">Sem pedidos ainda.</td></tr>'}
     </tbody></table>
     <h3>${tr('cart')}</h3>
@@ -647,6 +648,7 @@ async function loadStaff() {
   $$('[data-sconf]').forEach((b) => b.onclick = async () => { await fetch('/api/staff/orders/'+b.dataset.sconf, { method:'PATCH', headers: staffHead, body: JSON.stringify({ payment_status:'paid' }) }); loadStaff(); });
   $$('[data-sprep]').forEach((b) => b.onclick = async () => { await fetch('/api/staff/orders/'+b.dataset.sprep, { method:'PATCH', headers: staffHead, body: JSON.stringify({ status:'preparing' }) }); loadStaff(); });
   $$('[data-sready]').forEach((b) => b.onclick = async () => { await fetch('/api/staff/orders/'+b.dataset.sready, { method:'PATCH', headers: staffHead, body: JSON.stringify({ status:'ready' }) }); loadStaff(); });
+  $$('[data-sdrv]').forEach((b) => b.onclick = async () => { await fetch('/api/staff/orders/'+b.dataset.sdrv, { method:'PATCH', headers: staffHead, body: JSON.stringify({ driver_ok:true, status:'on_the_way' }) }); loadStaff(); });
   const staffCart = [];
   const box = $('#staffCart');
   box.innerHTML = (state.catalog.menu.filter((m)=>m.quick).slice(0,12).map((m)=>`<button type="button" class="chip" data-sadd="${m.id}">${loc(m,state.lang)}</button>`).join(''));
@@ -729,9 +731,10 @@ async function loadAdmin() {
       <td class="ops">
         ${o.payment_status==='declared'?`<button class="btn btn-ok" data-conf="${o.id}">Confirmar transferência</button>`:''}
         ${o.payment_status==='unpaid'?`<button class="btn btn-ok" data-conf="${o.id}">Marcar pago</button>`:''}
-        ${o.status!=='preparing' && o.status!=='ready' && o.status!=='delivered'?`<button class="btn btn-cyan" data-prep="${o.id}">A preparar</button>`:''}
+        ${o.status!=='preparing' && o.status!=='ready' && o.status!=='on_the_way' && o.status!=='delivered'?`<button class="btn btn-cyan" data-prep="${o.id}">A preparar</button>`:''}
         <button class="btn btn-yellow" data-noconf="${o.id}">Sem confirmação</button>
-        ${o.status!=='ready' && o.status!=='delivered'?`<button class="btn btn-line" data-ready="${o.id}">Pedido pronto</button>`:''}
+        ${o.status!=='ready' && o.status!=='on_the_way' && o.status!=='delivered'?`<button class="btn btn-line" data-ready="${o.id}">Pedido pronto</button>`:''}
+        ${(o.status==='ready'||o.status==='on_the_way')&&!o.driver_ok?`<button class="btn btn-ok" data-drv="${o.id}">Saiu para entrega</button>`:''}
       </td></tr>`).join('')}
     </tbody></table>
     <h3>${tr('assign')}</h3>
@@ -758,6 +761,7 @@ async function loadAdmin() {
   $$('[data-noconf]').forEach((b) => b.onclick = async () => { await api('/admin/orders/'+b.dataset.noconf, { method:'PATCH', body:{ payment_status:'no_confirm' }}); loadAdmin(); });
   $$('[data-prep]').forEach((b) => b.onclick = async () => { await api('/admin/orders/'+b.dataset.prep, { method:'PATCH', body:{ status:'preparing' }}); loadAdmin(); });
   $$('[data-ready]').forEach((b) => b.onclick = async () => { await api('/admin/orders/'+b.dataset.ready, { method:'PATCH', body:{ status:'ready' }}); loadAdmin(); });
+  $$('[data-drv]').forEach((b) => b.onclick = async () => { await api('/admin/orders/'+b.dataset.drv, { method:'PATCH', body:{ driver_ok:true, status:'on_the_way' }}); loadAdmin(); });
   $$('[data-shift]').forEach((f) => f.onsubmit = async (e) => {
     e.preventDefault();
     await api('/admin/shifts', { method:'POST', body:{ waiterId: Number(f.dataset.shift), tableFrom: Number(f.from.value), tableTo: Number(f.to.value) }});
