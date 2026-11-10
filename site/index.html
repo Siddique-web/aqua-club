@@ -779,7 +779,7 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
 /* ===== galeria 3D (coverflow) ===== */
 .cf-wrap{position:relative;display:grid;gap:.4rem;justify-items:center;min-width:0;width:100%}
 .cf-stage{position:relative;display:grid;justify-items:center;width:100%;gap:.35rem}
-.cf{position:relative;width:100%;height:clamp(210px,calc(100svh - var(--head) - var(--dock) - 13.5rem),340px);perspective:1800px;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px}
+.cf{position:relative;width:100%;height:clamp(280px,calc(100svh - var(--head) - 11.5rem),52svh);perspective:1800px;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px}
 .cfi{--cw:min(96%,920px);position:absolute;left:50%;top:0;width:var(--cw);height:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;border:2px solid rgba(255,255,255,.88);border-radius:26px;overflow:hidden;background:#071824;cursor:pointer;
   transform:translateX(-50%) translateX(calc(var(--d) * 62%)) scale(calc(1 - var(--ad) * .08));
   transform-origin:top center;
@@ -787,7 +787,7 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
   box-shadow:0 28px 54px -18px rgba(0,40,80,.55);transition:transform .85s cubic-bezier(.3,.7,.2,1),opacity .6s}
 .cfi.on{cursor:default}
 .cfi.out{opacity:0;visibility:hidden;pointer-events:none}
-.cfi img{grid-row:1;width:100%;height:100%;min-height:0;object-fit:cover;object-position:center;background:#041018}
+.cfi img{grid-row:1;width:100%;height:100%;min-height:0;object-fit:contain;object-position:center;background:#041018}
 .cfi::after{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:100%;background:rgb(0 18 32 / calc(var(--ad) * .22));pointer-events:none;transition:background .6s}
 .cf-cap{position:relative;z-index:2;display:grid;gap:.18rem;padding:.65rem .9rem .75rem;color:#fff;background:#04283F;transition:opacity .5s;min-height:4.4rem}
 .cf-row{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem}
@@ -810,12 +810,12 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
 .vp{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#000;display:grid;place-items:center;cursor:pointer;transition:background-color var(--ease),transform var(--ease)}
 .vp:hover{background:var(--yellow);transform:scale(1.08)}
 .vp[aria-pressed=true]{background:#fff;box-shadow:0 0 0 2px var(--cyan)}
-@media(min-width:760px){.vpill{position:absolute;left:.3rem;top:50%;transform:translateY(-50%);flex-direction:column;margin:0}.cf{width:100%;height:clamp(250px,calc(100svh - var(--head) - var(--dock) - 16rem),400px)}}
-@media(min-width:1000px){.cf{height:clamp(260px,calc(100svh - var(--head) - var(--dock) - 15.5rem),360px)}}
+@media(min-width:760px){.vpill{position:absolute;left:.3rem;top:50%;transform:translateY(-50%);flex-direction:column;margin:0}.cf{width:100%;height:clamp(320px,calc(100svh - var(--head) - 12rem),58svh)}}
+@media(min-width:1000px){.cf{height:clamp(340px,calc(100svh - var(--head) - 8.5rem),62svh)}}
 .lbdlg{width:min(980px,100%)}
 .lbdlg .dfoot{flex-wrap:nowrap}.lbdlg .dfoot .btn{padding-inline:1rem;min-height:44px}
 .lbdlg img{width:100%;max-height:68dvh;object-fit:contain;border-radius:18px;background:#0a3a58}
-@media(max-width:560px){.cfi{--cw:97%;border-radius:20px}.cf{height:clamp(200px,calc(100svh - var(--head) - var(--dock) - 12.5rem),290px)}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{min-height:4.1rem;padding:.55rem .75rem .65rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
+@media(max-width:560px){.cfi{--cw:100%;border-radius:18px}.cf{height:clamp(300px,calc(100svh - var(--head) - 10.8rem),50svh)}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{min-height:4.1rem;padding:.55rem .75rem .65rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
 
 
 /* ===== menu: introdução + mural de pratos e bebidas ===== */
@@ -1287,8 +1287,8 @@ html.dlg-open .fabs{visibility:hidden;pointer-events:none}
       <button type="button" class="pick" data-take="delivery" aria-pressed="false"><span data-i18n="place.delivery">Delivery</span><small data-i18n="place.deliveryH">Levamos até si</small></button>
     </div>
     <div id="placeDeliv" hidden>
-      <p style="margin:1rem 0 .5rem;font:800 .85rem var(--fh)" data-i18n="place.pinT">Marque o sítio exacto da entrega</p>
-      <p class="menu-note" style="margin:0 0 .6rem;text-align:left" data-i18n="place.pinH">Toque em «Estou aqui» (GPS) ou no mapa. Serve em toda a Beira. A taxa sai automaticamente. O motorista abre este ponto no Google Maps.</p>
+      <p style="margin:1rem 0 .5rem;font:800 .85rem var(--fh)" data-i18n="place.pinT">Entrega só na sua localização actual</p>
+      <p class="menu-note" style="margin:0 0 .6rem;text-align:left" data-i18n="place.pinH">Toque em «Estou aqui» (GPS). A entrega é só neste ponto — não se escolhe outro sítio no mapa. Serve em toda a Beira. A taxa sai automaticamente.</p>
       <div class="geo-acts">
         <button class="btn btn-cyan btn-block" type="button" id="placeGeo" data-i18n="place.geo">Estou aqui — usar o GPS</button>
       </div>
@@ -2034,7 +2034,7 @@ const REVIEWS = [];
     if (!leafletMap || !window.L) return;
     try { leafletMap.setView([lat, lng], inside ? 16 : 13, { animate: false }); } catch (e) { /* */ }
     if (leafletMarker) leafletMarker.setLatLng([lat, lng]);
-    else leafletMarker = window.L.marker([lat, lng]).addTo(leafletMap);
+    else leafletMarker = window.L.marker([lat, lng], { draggable: false, keyboard: false }).addTo(leafletMap);
   }
   async function applyPin(lat, lng, acc) {
     place.lat = lat; place.lng = lng;
@@ -2076,6 +2076,8 @@ const REVIEWS = [];
     if (!leafletMap) {
       leafletMap = window.L.map(box, {
         scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
         bounceAtZoomLimits: false,
         fadeAnimation: false,
         zoomAnimation: false,
@@ -2085,7 +2087,7 @@ const REVIEWS = [];
         maxBoundsViscosity: 0.8
       }).setView(start, place.lat ? 16 : 12);
       window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap' }).addTo(leafletMap);
-      leafletMap.on('click', (e) => applyPin(e.latlng.lat, e.latlng.lng));
+      leafletMap.off('click');
       leafletMap.whenReady(() => { try { leafletMap.invalidateSize({ animate: false, pan: false }); } catch (e) { /* */ } });
     }
     if (place.lat && place.lng) pinMarker(place.lat, place.lng, inBeira(place.lat, place.lng));
