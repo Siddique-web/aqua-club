@@ -377,7 +377,7 @@ app.post('/api/orders', (req, res) => {
   const waiter = tableNumber ? waiterForTable(tableNumber) : null;
   const code = nextOrderCode();
   const placeLabel = String(body.placeLabel || '').slice(0, 200);
-  const note = [name, phone, placeLabel, body.address, hasPin ? ('GPS ' + lat + ',' + lng) : '', body.note]
+  const note = [name, phone, placeLabel, body.address, hasPin ? ('GPS ' + lat + ',' + lng) : '', body.waGroupOpt ? 'Grupo WA: sim' : '', body.note]
     .filter(Boolean).join(' · ').slice(0, 800);
   const info = db.prepare(`INSERT INTO orders (code, customer_id, waiter_id, placed_by, table_number, fulfillment, status, currency, total, note, customer_name, customer_phone, place_label, delivery_band, delivery_fee, delivery_lat, delivery_lng, delivery_km)
     VALUES (?,?,?,?,?,?, 'review', 'MT', ?,?,?,?,?,?,?,?,?,?)`).run(

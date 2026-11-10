@@ -133,7 +133,8 @@
         placeLabel: o.placeLabel || '',
         name: o.name || '',
         phone: o.phone || '',
-        note: [o.note, o.bairro, o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
+        waGroupOpt: !!o.waGroupOpt,
+        note: [o.note, o.bairro, o.waGroupOpt ? 'Grupo WA: sim' : '', o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
         lines: (o.lines || []).map((l) => ({
           itemId: l.itemId || l.menuItemId,
           qty: l.qty || l.quantity,
@@ -146,7 +147,7 @@
       o.code = r.order.code;
       o.id = r.order.id;
       o.status = r.order.status || 'review';
-      o.pay = r.order.payment_status === 'paid' ? 'paid' : 'unpaid';
+      o.pay = r.order.payment_status === 'declared' ? 'paid_declared' : (r.order.payment_status === 'paid' ? 'paid' : 'unpaid');
       o.deliveryFee = r.order.delivery_fee || o.deliveryFee;
       o.deliveryBand = r.order.delivery_band || o.deliveryBand;
       o.total = r.order.total || o.total;
@@ -236,6 +237,7 @@
         CONTACT.address = catalog.club.address;
         CONTACT.phone = catalog.club.phoneDisplay;
         CONTACT.whatsapp = catalog.club.whatsapp;
+        if (catalog.club.whatsappGroup) CONTACT.whatsappGroup = catalog.club.whatsappGroup;
         CONTACT.email = catalog.club.email;
         const pay = catalog.club.payments || {};
         if (typeof PAYMENT !== 'undefined' && PAYMENT.methods) {

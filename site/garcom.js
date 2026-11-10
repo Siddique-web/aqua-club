@@ -573,6 +573,15 @@
     if (S.livePoll) return;
     refreshLiveCalls();
     S.livePoll = setInterval(refreshLiveCalls, 3000);
+    try {
+      if (!window.__aqStaffBc) {
+        window.__aqStaffBc = new BroadcastChannel('aq-os');
+        window.__aqStaffBc.onmessage = () => {
+          refreshLiveCalls();
+          if (S.open && S.view === 'app' && S.tab === 'orders') loadOsDesk().then(() => { if (S.tab === 'orders') renderTab(); }).catch(() => {});
+        };
+      }
+    } catch (e) { /* */ }
     if (window.io && !S.osSock) {
       S.osSock = window.io({ transports: ['websocket', 'polling'] });
       S.osSock.on('call:new', () => refreshLiveCalls());
@@ -706,15 +715,15 @@
         '<p class="gp-muted">Ou abra o <a href="/painel.html"><b>painel completo</b></a> / <a href="/os/#/admin">administração</a>.</p></div>';
     }
     const orders = S.osDesk.orders || [];
-    const wait = orders.filter((o) => o.payment_status === 'declared');
+    const wait = orders.filter((o) => o.payment_status === 'declared' || o.payment_status === 'paid_declared');
     const live = orders.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered');
     const payLine = (o) => o.payment_method === 'emola' ? 'e-Mola 87 452 1897 · Siddique Faizy Rego' : o.payment_method === 'mpesa' ? 'M-Pesa 84 596 1528 · Siddique Faizy Rego' : (o.payment_method || '—');
-    const cardO = (o) => '<article class="gc' + (o.payment_status === 'declared' ? ' u1' : '') + '"><div class="gc-top"><span class="gc-table">' + esc(o.code) + '</span><span class="gc-zone">' + esc(o.place_label || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || '')) + '</span></div>' +
-      '<div class="gc-reason"><b>' + esc(o.customer_name || 'Cliente') + '</b> · ' + esc(o.customer_phone || '') + '</div>' +
+    const cardO = (o) => '<article class="gc' + (o.payment_status === 'declared' || o.payment_status === 'paid_declared' ? ' u1' : '') + '"><div class="gc-top"><span class="gc-table">' + esc(o.code) + '</span><span class="gc-zone">' + esc(o.place_label || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || '')) + '</span></div>' +
+      '<div class="gc-reason"><b>' + esc(o.customer_name || 'Cliente') + '</b> · ' + esc(o.customer_phone || '') + (o.waGroupOpt ? ' · <b>Grupo WA</b>' : '') + '</div>' +
       '<p class="gc-note">' + esc((o.items || []).map((i) => i.qty + '× ' + i.name).join(', ')) + '<br><b>' + mt(o.total) + '</b> · ' + esc(ST_OS[o.status] || o.status) + ' · ' + esc(PAY_OS[o.payment_status] || o.payment_status) +
       (o.payment_status !== 'unpaid' ? '<br>' + esc(payLine(o)) + (o.payment_ref ? ' · SMS ' + esc(o.payment_ref) : '') : '') + '</p>' +
       '<div class="gc-actions">' +
-      (o.payment_status === 'declared' ? '<button class="gb ok" type="button" data-act="osord" data-id="' + o.id + '" data-do="paid">Confirmar → A preparar</button>' : '') +
+      (o.payment_status === 'declared' || o.payment_status === 'paid_declared' ? '<button class="gb ok" type="button" data-act="osord" data-id="' + o.id + '" data-do="paid">Confirmar → A preparar</button>' : '') +
       (o.status !== 'preparing' && o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' ? '<button class="gb" type="button" data-act="osord" data-id="' + o.id + '" data-do="preparing">A preparar</button>' : '') +
       (o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' ? '<button class="gb line" type="button" data-act="osord" data-id="' + o.id + '" data-do="ready">Pedido pronto</button>' : '') +
       ((o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok ? '<button class="gb ok" type="button" data-act="osord" data-id="' + o.id + '" data-do="driver">Saiu para entrega</button>' : '') +
@@ -872,7 +881,7 @@
     if (a === 'logout') { await guard(() => be.signOut()); S.me = null; S.mine = null; S.team = null; S.calls = []; stopWork(); S.authTab = 'in'; S.view = 'auth'; S.msg = ''; return render(); }
     if (a === 'osord') {
       const doWhat = b.dataset.do, id = b.dataset.id;
-      const body = doWhat === 'paid' ? { payment_status: 'paid' } : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' } : { status: doWhat };
+      const body = doWhat === 'paid' ? { payment_status: 'paid', status: 'preparing' } : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' } : { status: doWhat };
       b.disabled = true;
       let r = await guard(() => osFetch('/desk/orders/' + id, { method: 'PATCH', body }));
       if (!r && window.AquaBus) { r = AquaBus.patchOrder(id, body); }

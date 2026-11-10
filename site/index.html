@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=cats1"></script>
+<script src="i18n.js?v=flow2"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -615,49 +615,57 @@ input,select,textarea{border-radius:14px}
   .shop-card .shop-ph{width:5.5rem;height:5.5rem}
 }
 .shop-card:hover{border-color:var(--cyan);background:var(--cyan-soft)}
-#shopWrap{flex:1 1 0;min-height:8.5rem;min-width:0;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
+#shopWrap{flex:1 1 auto;min-height:0;min-width:0;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 #shopCats.mtabs,#cartDlg .mtabs{width:100%;max-width:100%;min-width:0;padding-inline:0;overflow-x:auto}
 #cartBody{min-width:0;min-height:0}
-#cartBody .mempty{margin:.15rem 0 .2rem;padding:.45rem .65rem;text-align:left;font-size:.82rem}
-.cart-dlg[open]{display:flex;flex-direction:column;width:min(560px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden}
-.cart-pad{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;padding:.85rem .9rem 0;gap:.4rem;max-width:100%;overflow:hidden}
-.cart-edit{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;max-width:100%;gap:.35rem;overflow:hidden}
-.cart-picked{flex:0 0 auto;min-width:0;max-height:6.1rem;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:.05rem 0 .15rem;border-top:2px solid var(--cyan-line)}
-.cart-picked .dtotal{margin:.25rem 0 0;font-size:.88rem}
-.cart-picked .dtotal b{font-size:1.05rem}
-.cart-picked .cline{padding:.35rem 0}
-.cart-picked .cline h3{font-size:.9rem}
-.cart-picked .qtyb{gap:.45rem;padding:.1rem}
-.cart-picked .qtyb button{width:30px;height:30px}
-.cart-id{flex:0 0 auto;min-width:0;overflow:hidden}
-.cart-id .idbox{margin:.1rem 0 0;padding:.45rem .65rem .5rem;gap:.3rem .45rem;display:grid;grid-template-columns:1fr 1fr}
-.cart-id .idbox > label{font-size:.72rem;gap:.18rem}
+#cartBody .mempty{margin:.2rem 0;padding:.55rem .7rem;text-align:left;font-size:.88rem}
+.cart-dlg[open]{display:flex;flex-direction:column;width:min(640px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden}
+.cart-pad{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;padding:.75rem .9rem 0;gap:.45rem;max-width:100%;overflow:hidden}
+.cart-edit{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;max-width:100%;gap:.45rem;overflow:hidden}
+.cart-dock{flex:none;display:flex;flex-direction:column;min-width:0;margin:0 -.9rem 0;background:#fff}
+.cart-picked{flex:none;min-width:0;max-height:min(28dvh,14rem);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:.35rem .9rem .2rem;border-top:2px solid var(--cyan-line)}
+.cart-picked .dtotal{margin:.35rem 0 .15rem;font-size:.92rem}
+.cart-picked .dtotal b{font-size:1.15rem}
+.cart-picked .cline{padding:.45rem 0}
+.cart-picked .cline h3{font-size:.95rem}
+.cart-picked .qtyb{gap:.5rem;padding:.12rem}
+.cart-picked .qtyb button{width:36px;height:36px}
+.cart-id{flex:none;min-width:0;max-height:min(28dvh,14rem);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 .9rem .35rem}
+.cart-id .idbox{margin:.15rem 0 0;padding:.65rem .75rem .7rem;gap:.4rem .55rem;display:grid;grid-template-columns:1fr 1fr}
+.cart-id .idbox > label{font-size:.8rem;gap:.22rem}
 .cart-id .idbox legend{grid-column:1/-1}
 .cart-id .idbox .chk{grid-column:1/-1}
-.cart-id .idbox input{min-height:38px;padding:.3rem .55rem}
-.cart-id .chk{font-size:.72rem!important;line-height:1.25!important;align-items:flex-start}
-.cart-id .chk span[data-i18n="cart.terms"]{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cart-id .idbox input{min-height:44px;padding:.4rem .65rem}
+.cart-id .chk{font-size:.8rem!important;line-height:1.4!important;align-items:flex-start}
 .cart-id .cs-time,.cart-id .demo,.cart-id .msg:empty{display:none}
+.cart-edit.checkout .cart-id p.cs-time:has(#cartBackMenu){display:block}
+.cart-edit.checkout .cart-id .msg{display:block;min-height:1.2em}
 .cart-id .linkbtn{padding:.25rem}
-.cart-dlg .shop-card{grid-template-columns:3.7rem minmax(0,1fr) auto;gap:.45rem .5rem;padding:.35rem .4rem}
-.cart-dlg .shop-card .shop-ph{width:3.7rem;height:3.7rem}
+.cart-dlg .shop-card{grid-template-columns:5rem minmax(0,1fr) auto;gap:.55rem .65rem;padding:.55rem .5rem;border-radius:18px}
+.cart-dlg .shop-card .shop-ph{width:5rem;height:5rem;border-radius:14px}
+.cart-dlg .shop-card b{font-size:.95rem;line-height:1.25}
+.cart-dlg .shop-card small{font-size:1rem}
+.cart-dlg .shop-add,.cart-dlg .shop-step button{width:44px;height:44px}
 .cart-dlg .shop-lead{display:none}
+.cart-dlg .shop-grid{gap:.7rem;padding:.2rem .05rem .55rem;flex:1 1 auto}
+.cart-edit:not(.checkout) .cart-picked,
+.cart-edit:not(.checkout) .cart-id,
+.cart-edit:not(.has-items) .cart-id{display:none}
+.cart-edit.checkout #shopWrap{display:none}
+.cart-edit.checkout .cart-dock{flex:1 1 auto;min-height:0}
+.cart-edit.checkout .cart-picked{display:block;max-height:min(38dvh,16rem);flex:0 1 auto}
+.cart-edit.checkout .cart-id{display:block;flex:1 1 auto;min-height:0;max-height:none}
 @media(min-width:480px){
-  .cart-dlg .shop-card{grid-template-columns:4.6rem minmax(0,1fr) auto}
-  .cart-dlg .shop-card .shop-ph{width:4.6rem;height:4.6rem}
+  .cart-dlg .shop-card{grid-template-columns:5.5rem minmax(0,1fr) auto}
+  .cart-dlg .shop-card .shop-ph{width:5.5rem;height:5.5rem}
 }
-@media(min-height:800px){
-  #shopWrap{min-height:12rem}
-  .cart-picked{max-height:6.8rem}
-}
-@media(max-height:720px){
-  .cart-id .cs-time{display:none}
-  .cart-picked{max-height:4.8rem}
-}
-.cart-sticky{position:relative;bottom:auto;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex:none;margin:0 -.9rem 0;padding:.55rem .9rem calc(.65rem + env(safe-area-inset-bottom,0px));background:#fff;border-top:2px solid var(--cyan-line);box-shadow:0 -12px 24px -18px rgba(0,40,80,.45);min-width:0}
-.cart-sticky small{display:block;font:700 .68rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.cart-sticky b{font:800 1.15rem var(--fh);color:var(--cyan-d)}
-.cart-sticky .btn{flex:none}
+.cart-sticky{position:relative;bottom:auto;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:.55rem;flex:none;padding:.55rem .9rem calc(.7rem + env(safe-area-inset-bottom,0px));background:#fff;border-top:2px solid var(--cyan-line);box-shadow:0 -12px 24px -18px rgba(0,40,80,.45);min-width:0}
+.cart-sum{flex:1;min-width:0;border:0;background:transparent;padding:.15rem .2rem;text-align:left;cursor:pointer;color:inherit}
+.cart-sum small{display:block;font:700 .68rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.cart-sum b{display:block;font:800 1.15rem var(--fh);color:var(--cyan-d)}
+.cart-sum span{font:700 .82rem var(--fb);color:var(--muted)}
+.cart-sticky .btn{flex:1 1 11rem;min-height:48px;padding-inline:.85rem;white-space:normal;line-height:1.15;text-align:center}
+.cart-edit.checkout .cart-sum small{color:var(--cyan-d)}
 .sort-az{min-height:46px;padding:.45rem 1rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;font:800 .78rem var(--fh);cursor:pointer}
 .sort-az[aria-pressed=true]{background:var(--yellow);border-color:var(--yellow)}
 .geo-acts{display:grid;gap:.5rem;margin:.5rem 0}
@@ -719,8 +727,8 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 @keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
 @media(min-width:700px){.dlg{margin:auto;border-radius:28px;max-height:92dvh}}
 dialog:not([open]){display:none!important}
-.dlg.cart-dlg[open]{display:flex;flex-direction:column;width:min(560px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden;min-width:0}
-@media(min-width:700px){.dlg.cart-dlg[open]{height:min(92dvh,840px);max-height:92dvh;border-radius:28px;margin:auto}}
+.dlg.cart-dlg[open]{display:flex;flex-direction:column;width:min(640px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden;min-width:0}
+@media(min-width:700px){.dlg.cart-dlg[open]{height:min(92dvh,860px);max-height:92dvh;border-radius:28px;margin:auto;width:min(680px,96vw)}}
 .cart-dlg .dhead{flex:none}
 .cart-dlg #orderView:not([hidden]){flex:1;min-height:0;overflow:auto}
 html:has(dialog[open]),html.dlg-open{overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
@@ -1371,24 +1379,29 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       </div>
       <div class="shop-grid" id="shopGrid"></div>
     </div>
+    <div class="cart-dock">
     <div class="cart-picked" id="cartCheckout">
       <div id="cartBody"></div>
       <p class="dtotal"><span data-i18n="cart.total">Total</span> <b id="cartTotal"></b></p>
     </div>
-    <div class="cart-id">
+    <div class="cart-id" id="cartId">
     <fieldset class="idbox"><legend data-i18n="cart.who">Quem faz o pedido</legend>
       <label data-i18n-label="cart.name">Nome<input type="text" id="custName" autocomplete="name" maxlength="60" data-i18n-placeholder="cart.namePh" placeholder="O seu nome"></label>
       <label data-i18n-label="cart.phone">Telemóvel (WhatsApp)<input type="tel" id="custPhone" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="84 000 0000"></label>
       <label class="chk"><input type="checkbox" id="custTerms"><span><span data-i18n="cart.terms">Confirmo que fui eu que fiz este pedido, que não pode ser cancelado depois de enviado, e que vou pagá-lo antes de sair.</span> <a href="#" id="termsLink" data-i18n="cart.termsLink">Ver termos</a></span></label>
+      <label class="chk"><input type="checkbox" id="custWaGroup"><span data-i18n="cart.waGroup">Quero ser adicionado ao grupo WhatsApp do Aqua Club (avisos e novidades).</span></label>
     </fieldset>
     <p class="demo" data-demo hidden></p>
     <p class="msg" id="cartMsg" role="status" aria-live="polite"></p>
+    <p class="cs-time"><button class="linkbtn" type="button" id="cartBackMenu" data-i18n="cart.backMenu">Voltar ao menu</button></p>
     <p class="cs-time"><button class="linkbtn" type="button" id="toHist" data-i18n="cart.my">Ver os meus pedidos</button></p>
     <p class="cs-time"><button class="linkbtn" type="button" id="cancelCart" hidden data-i18n="cart.cancelDraft">Cancelar este pedido</button></p>
+    <p class="cs-time"><button class="linkbtn" type="button" id="draftNew" hidden data-i18n="cart.newDraft">Guardar rascunho e começar outro</button></p>
     </div>
     <div class="cart-sticky" id="cartSticky">
-      <div><small data-i18n="cart.total">Total</small><b id="cartStickyT"></b><span id="cartStickyN"></span></div>
-      <button class="btn btn-cyan" type="button" id="sendOrder" data-i18n="cart.send">Enviar pedido</button>
+      <button class="cart-sum" type="button" id="cartSumBtn" aria-expanded="false" data-i18n-aria="cart.seeCart"><small data-i18n="cart.total">Total</small><b id="cartStickyT"></b><span id="cartStickyN"></span></button>
+      <button class="btn btn-cyan" type="button" id="sendOrder" data-i18n="cart.donePick">Já acabei de escolher</button>
+    </div>
     </div>
   </div>
   <div id="orderView" hidden>
@@ -1496,6 +1509,7 @@ const CONTACT = {
   address: 'Palmeiras 2, Beira, Sofala, Moçambique',
   phone: '+258 87 950 1491',
   whatsapp: '258879501491',
+  whatsappGroup: 'https://chat.whatsapp.com/AquaClubBeiraCRBM',
   email: 'info@aquaclub.co.mz',
   social: { instagram: 'https://instagram.com/', facebook: 'https://facebook.com/' }
 };
@@ -1823,7 +1837,8 @@ const REVIEWS = [];
     (o.address ? '\nMorada: ' + o.address : '') +
     (o.lat && o.lng ? '\nGPS: ' + Number(o.lat).toFixed(6) + ', ' + Number(o.lng).toFixed(6) : '') +
     (o.navUrl ? '\nGoogle Maps (motorista): ' + o.navUrl : '') +
-    '\nCliente: ' + o.name + ' (' + showPhone(o.phone) + ')\n' +
+    '\nCliente: ' + o.name + ' (' + showPhone(o.phone) + ')' +
+    (o.waGroupOpt ? '\nGrupo WhatsApp: sim' : '') + '\n' +
     o.lines.map((l) => '• ' + l.quantity + '× ' + l.name + ' (' + money(l.unitPriceMzn) + ')' + (l.notes ? ' — “' + l.notes + '”' : '')).join('\n') +
     (o.deliveryFee ? '\nEntrega: ' + money(o.deliveryFee) : '') +
     '\n*Total: ' + money(o.total) + '*\nO cliente confirmou os termos e vai pagar a conta antes de sair.';
@@ -1834,6 +1849,7 @@ const REVIEWS = [];
         id: o.id, code: o.code, table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
         place_label: o.placeLabel, fulfillment: o.fulfillment, total: o.total, status: o.status || 'review',
         customer_name: o.name, customer_phone: o.phone, payment_status: 'unpaid', created_at: new Date().toISOString(),
+        waGroupOpt: !!o.waGroupOpt,
         lat: o.lat, lng: o.lng, mapsUrl: o.mapsUrl, navUrl: o.navUrl, address: o.address,
         items: (o.lines || []).map((l) => ({ name: l.name, unit_price: l.unitPriceMzn || l.price, qty: l.quantity || l.qty }))
       });
@@ -1853,7 +1869,8 @@ const REVIEWS = [];
     o.pay = status === 'paid_declared' || status === 'declared' ? 'paid_declared' : (status || o.pay);
     o.method = method || o.method;
     o.ref = ref || o.ref || '';
-    if (window.AquaBus) AquaBus.patchOrder(o.id || o.code, { payment_status: o.pay === 'paid_declared' ? 'declared' : o.pay, payment_method: method, pay: o.pay });
+    if (o.pay === 'paid_declared' && !['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
+    if (window.AquaBus) AquaBus.patchOrder(o.id || o.code, { payment_status: o.pay === 'paid_declared' ? 'declared' : o.pay, payment_method: method, pay: o.pay, status: o.status });
     try {
       if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
         const r = await AquaOS.declarePay(o, method, ref);
@@ -1958,11 +1975,30 @@ const REVIEWS = [];
   ];
   let place = {};
   try { place = JSON.parse(store.get('aq.place') || '{}') || {}; } catch (e) { place = {}; }
-  if (!place.kind && table) {
-    const n = parseInt(String(table).replace(/\D/g, ''), 10);
+  function clubDay() {
+    try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Maputo' }).format(new Date()); }
+    catch (e) { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  }
+  function applyPlaceFromTable(code) {
+    const n = parseInt(String(code).replace(/\D/g, ''), 10);
+    if (!n) return;
     const z = VENUE.find((v) => n >= v.from && n <= v.from + v.n - 1);
     if (z) place = { kind: 'dine', zone: z.id, mesa: String(n - z.from + 1), tableNumber: n };
   }
+  (function resetPlaceIfNewDay() {
+    const day = clubDay();
+    const prev = store.get('aq.placeDay');
+    const qr = new URLSearchParams(location.search).get('mesa');
+    if (prev !== day) {
+      place = {};
+      table = qr || '';
+      store.set('aq.place', '');
+      store.set('aq.mesa', qr || '');
+      if (qr) applyPlaceFromTable(qr);
+    }
+    store.set('aq.placeDay', day);
+  })();
+  if (!place.kind && table) applyPlaceFromTable(table);
   let pendingAdd = null;
   function savePending(data) {
     if (data) store.set('aq.pending', JSON.stringify(data));
@@ -1998,6 +2034,7 @@ const REVIEWS = [];
     return false;
   }
   function savePlace() {
+    store.set('aq.placeDay', clubDay());
     store.set('aq.place', JSON.stringify(place));
     if (place.kind === 'dine' && place.tableNumber) {
       table = String(place.tableNumber);
@@ -2396,8 +2433,47 @@ const REVIEWS = [];
     const p = JSON.parse(store.get('aq.pending') || 'null');
     if (p && p.kind === 'item' && p.id) pendingAdd = () => addToCart(p.id, p.qty || 1, p.note || '', p.extras, p.doneness);
     else if (p && p.kind === 'cart') pendingAdd = () => openCart();
+    else if (p && p.kind === 'call') pendingAdd = () => openCall(p.reason || '');
   } catch (e) { /* */ }
   const saveCart = () => store.set('aq.cart', JSON.stringify(cart));
+  function loadDrafts() {
+    try {
+      const d = JSON.parse(store.get('aq.drafts') || '[]');
+      return Array.isArray(d) ? d : [];
+    } catch (e) { return []; }
+  }
+  function saveDrafts(list) { store.set('aq.drafts', JSON.stringify((list || []).slice(-20))); }
+  function cartLinesForDraft() {
+    return cart.map((l) => {
+      const m = lineMenu(l);
+      return { menuItemId: l.id, itemId: l.id, name: m.name, unitPriceMzn: m.price, quantity: l.qty, qty: l.qty, extras: l.extras || [], doneness: l.doneness, notes: l.note || undefined };
+    });
+  }
+  function parkDraft() {
+    if (!cart.length) return null;
+    const drafts = loadDrafts();
+    const d = {
+      id: 'draft-' + uid(), ts: Date.now(), code: tr('st.draft'), status: 'draft', pay: 'unpaid',
+      lines: cartLinesForDraft(), total: grandTotal(),
+      placeLabel: placeReady(place) ? placeLabel(place) : '',
+      name: ($('#custName') && $('#custName').value.trim()) || cust.name || '',
+      phone: cust.phone || '',
+      cart: cart.map((l) => Object.assign({}, l, { extras: (l.extras || []).slice() })),
+      place: Object.assign({}, place)
+    };
+    drafts.push(d);
+    saveDrafts(drafts);
+    clearCart();
+    return d;
+  }
+  function restoreDraft(d) {
+    cart = Array.isArray(d.cart) ? d.cart.map((l) => Object.assign({}, l)) : [];
+    saveCart();
+    saveDrafts(loadDrafts().filter((x) => x.id !== d.id));
+    if (d.place && d.place.kind) { place = d.place; savePlace(); }
+    if (histDlg && histDlg.open) histDlg.close();
+    openCart();
+  }
   const lineMenu = (l) => byId(l.id) || { id: l.id, name: l.name || l.id, price: l.price || 0 };
   const linePrice = (l) => (lineMenu(l).price || 0) * l.qty;
   const total = () => cart.reduce((s, l) => s + linePrice(l), 0);
@@ -2444,6 +2520,8 @@ const REVIEWS = [];
     paintPlaceChip();
     const cancelBtn = $('#cancelCart');
     if (cancelBtn) cancelBtn.hidden = !cart.length;
+    const draftBtn = $('#draftNew');
+    if (draftBtn) draftBtn.hidden = !cart.length;
     if (!cart.length) cartBody.innerHTML = '<p class="mempty">' + esc(tr('cart.empty')) + '</p>';
     cart.forEach((l, i) => {
       const m = lineMenu(l), row = document.createElement('div'); row.className = 'cline';
@@ -2463,9 +2541,41 @@ const REVIEWS = [];
     $('#cartTotal').textContent = money(grandTotal());
     const st = $('#cartStickyT'), sn = $('#cartStickyN');
     if (st) st.textContent = money(grandTotal());
-    if (sn) sn.textContent = cartCount() ? ' · ' + cartCount() : '';
-    $('#sendOrder').disabled = !cart.length;
+    if (sn) sn.textContent = cartCount() ? tr('cart.nItems', { n: cartCount() }) : '';
+    syncCartDock();
     paintShop();
+  }
+  function syncCartDock() {
+    const edit = $('#cartEdit');
+    if (!edit) return;
+    const has = cart.length > 0;
+    edit.classList.toggle('has-items', has);
+    if (!has) edit.classList.remove('checkout');
+    const checkout = has && edit.classList.contains('checkout');
+    const sum = $('#cartSumBtn');
+    if (sum) {
+      sum.disabled = !has;
+      sum.setAttribute('aria-expanded', String(checkout));
+      const lab = $('small', sum);
+      if (lab) lab.textContent = checkout ? tr('cart.backMenu') : tr('cart.total');
+    }
+    const send = $('#sendOrder');
+    if (send) {
+      send.disabled = !has;
+      send.dataset.i18n = checkout ? 'cart.send' : 'cart.donePick';
+      send.textContent = checkout ? tr('cart.send') : tr('cart.donePick');
+    }
+  }
+  function enterCheckout() {
+    if (!cart.length) return;
+    $('#cartEdit').classList.add('checkout');
+    syncCartDock();
+    const name = $('#custName');
+    if (name) name.focus({ preventScroll: true });
+  }
+  function leaveCheckout() {
+    $('#cartEdit').classList.remove('checkout');
+    syncCartDock();
   }
   function paintShop() {
     const cats = $('#shopCats'), grid = $('#shopGrid'), qel = $('#shopQ');
@@ -2514,10 +2624,18 @@ const REVIEWS = [];
     }
     savePending(null);
     $('#cartEdit').hidden = false; $('#orderView').hidden = true; $('#cartMsg').textContent = '';
+    $('#cartEdit').classList.remove('checkout');
     $('#custName').value = cust.name || ''; $('#custPhone').value = cust.phone ? showPhone(cust.phone) : ''; $('#custTerms').checked = false;
+    if ($('#custWaGroup')) $('#custWaGroup').checked = !!cust.waGroup;
     orderReadonly = false;
     paintShop(); renderCart(); cartDlg.showModal();
   }
+  $('#cartSumBtn')?.addEventListener('click', () => {
+    if (!cart.length) return;
+    if ($('#cartEdit').classList.contains('checkout')) leaveCheckout();
+    else enterCheckout();
+  });
+  $('#cartBackMenu')?.addEventListener('click', () => leaveCheckout());
   $('#termsLink').addEventListener('click', (e) => { e.preventDefault(); $('#termsDlg').showModal(); });
   $('#cancelCart')?.addEventListener('click', () => {
     if (!cart.length) return;
@@ -2525,14 +2643,34 @@ const REVIEWS = [];
     clearCart();
     cartDlg.close();
   });
+  $('#draftNew')?.addEventListener('click', () => {
+    if (!cart.length) return;
+    parkDraft();
+    $('#cartMsg').textContent = tr('cart.savedDraft');
+    place = {};
+    table = new URLSearchParams(location.search).get('mesa') || '';
+    store.set('aq.place', '');
+    store.set('aq.mesa', table);
+    if (table) applyPlaceFromTable(table);
+    paintPlaceChip();
+    cartDlg.close();
+    if (placeReady(place)) openCart();
+    else openPlace();
+  });
   $('#sendOrder').addEventListener('click', async () => {
     const msg = $('#cartMsg'); msg.textContent = '';
     if (!placeReady(place)) { msg.textContent = tr('place.set'); openPlace(); return; }
+    if (!$('#cartEdit').classList.contains('checkout')) { enterCheckout(); return; }
     if (place.kind === 'dine') table = String(place.tableNumber);
     const name = $('#custName').value.trim().replace(/\s+/g, ' '), phone = normPhone($('#custPhone').value);
+    const needId = name.length < 2 || !phone || !$('#custTerms').checked;
+    if (needId) {
+      enterCheckout();
+    }
     if (name.length < 2) { msg.textContent = tr('cart.needName'); $('#custName').focus({ preventScroll: false }); $('#custName').scrollIntoView({ block: 'nearest' }); return; }
     if (!phone) { msg.textContent = tr('cart.needPhone'); $('#custPhone').focus({ preventScroll: false }); $('#custPhone').scrollIntoView({ block: 'nearest' }); return; }
     if (!$('#custTerms').checked) { msg.textContent = tr('cart.needTerms'); $('#custTerms').scrollIntoView({ block: 'nearest' }); return; }
+    const waGroupOpt = Boolean($('#custWaGroup') && $('#custWaGroup').checked);
     const btn = $('#sendOrder'); btn.disabled = true; msg.textContent = tr('cart.sending');
     const lines = cart.map((l) => ({ menuItemId: l.id, itemId: l.id, name: byId(l.id).name, unitPriceMzn: byId(l.id).price, quantity: l.qty, qty: l.qty, extras: l.extras || [], doneness: l.doneness, notes: l.note || undefined }));
     const o = {
@@ -2546,11 +2684,11 @@ const REVIEWS = [];
       mapsUrl: place.lat && place.lng ? mapsSearch(place.lat, place.lng) : '',
       navUrl: place.lat && place.lng ? mapsNav(place.lat, place.lng) : '',
       placeLabel: placeLabel(place),
-      lines, total: grandTotal(), name, phone,
+      lines, total: grandTotal(), name, phone, waGroupOpt,
       status: 'review', pay: 'unpaid', method: '', ref: ''
     };
     try { await apiOrder(o); } catch (e) { msg.textContent = tr('cart.fail', { e: e.message || e }); btn.disabled = false; return; }
-    cust = { name, phone }; store.set('aq.cust', JSON.stringify(cust));
+    cust = { name, phone, waGroup: waGroupOpt }; store.set('aq.cust', JSON.stringify(cust));
     history.push(o); saveHist(); clearCart(); msg.textContent = '';
     if (mode === 'demo' && !isLive()) watch(o.id, (d) => { o.status = d.status; saveHist(); paintOrderView(); renderHist(); updateFabs(); });
     orderReadonly = false; ov = o; $('#cartEdit').hidden = true; $('#orderView').hidden = false; paintOrderView(); renderHist(); updateFabs(); startPolling();
@@ -2597,6 +2735,7 @@ const REVIEWS = [];
     if (ov.fulfillment === 'takeaway') bits.push('<div><b>' + esc(tr('place.take')) + '</b> ' + esc(ov.take === 'delivery' ? tr('place.delivery') : tr('place.pickup')) + '</div>');
     if (ov.address) bits.push('<div><b>' + esc(tr('place.addr')) + '</b> ' + esc(ov.address) + '</div>');
     if (ov.lat && ov.lng) bits.push('<div><b>GPS</b> ' + Number(ov.lat).toFixed(5) + ', ' + Number(ov.lng).toFixed(5) + (ov.km ? ' · ' + Number(ov.km).toFixed(1) + ' km' : '') + (ov.navUrl ? ' · <a href="' + esc(ov.navUrl) + '" target="_blank" rel="noopener noreferrer">Google Maps</a>' : '') + '</div>');
+    if (ov.waGroupOpt && CONTACT.whatsappGroup) bits.push('<div><a href="' + esc(CONTACT.whatsappGroup) + '" target="_blank" rel="noopener noreferrer">' + esc(tr('cart.waJoin')) + '</a></div>');
     if (ov.method) bits.push('<div><b>' + esc(tr('pay.how')) + '</b> ' + esc(payMethodLabel(ov.method)) + '</div>');
     if (ov.ref) bits.push('<div><b>' + esc(tr('pay.refShort')) + '</b> ' + esc(ov.ref) + '</div>');
     const box = $('#odetail');
@@ -2656,11 +2795,23 @@ const REVIEWS = [];
   const histDlg = $('#histDlg');
   function renderHist() {
     const od = owedTotal(), pend = history.filter((o) => o.status !== 'cancelled' && o.pay === 'paid_declared').reduce((s, o) => s + o.total, 0);
+    const draftsN = loadDrafts().length;
     $('#hsum').innerHTML = od ? `<div class="hs warn"><b>${esc(tr('pay.unpaid'))}</b><strong>${money(od)}</strong><span>${esc(tr('pay.open', { n: owed().length }))}</span></div>`
       : pend ? `<div class="hs"><b>${esc(tr('pay.confirming'))}</b><strong>${money(pend)}</strong><span>${esc(tr('pay.confirm'))}</span></div>`
-      : history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('pay.noneDue'))}</span></div>` : `<div class="hs"><b>${esc(tr('pay.none'))}</b><span>${esc(tr('pay.noneH'))}</span></div>`;
+      : history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('pay.noneDue'))}</span></div>` : `<div class="hs"><b>${esc(draftsN ? tr('st.draft') : tr('pay.none'))}</b><span>${esc(draftsN ? tr('cart.resumeDraft') : tr('pay.noneH'))}</span></div>`;
     $('#histPay').hidden = !od;
     const list = $('#hlist'); list.innerHTML = '';
+    loadDrafts().slice().reverse().forEach((d) => {
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'hcard';
+      el.setAttribute('aria-label', tr('cart.resumeDraft'));
+      const qty = (l) => l.quantity || l.qty || 1;
+      el.innerHTML = `<div class="hrow"><b>${esc(tr('st.draft'))}</b><span>${when(d.ts)}</span></div><p class="hmeta">${esc(d.placeLabel || tr('place.set'))}${d.name ? ' · ' + esc(d.name) : ''}</p>
+        <div class="chips"><span class="chip2 st-review">${esc(tr('st.draft'))}</span></div>
+        <ul class="osum">${(d.lines || []).map((l) => `<li><span>${qty(l)}× ${esc(l.name)}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('')}<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(d.total)}</b></li></ul>
+        <p class="hpeek">${esc(tr('cart.resumeDraft'))}</p>`;
+      el.addEventListener('click', () => restoreDraft(d));
+      list.appendChild(el);
+    });
     history.slice().reverse().forEach((o) => {
       const el = document.createElement('button'); el.type = 'button'; el.className = 'hcard';
       el.setAttribute('aria-label', tr('cart.viewAria', { c: o.code }));
@@ -2738,7 +2889,13 @@ const REVIEWS = [];
         return;
       }
       if (!window.AquaOS && !isLive() && mode !== 'demo') openWa('*Pagamento declarado — Aqua Club*\nPedidos: ' + open.map((o) => o.code).join(', ') + '\nValor: ' + money(amount) + '\nMétodo: ' + paySel.label + '\nNúmero: ' + (paySel.number || '') + '\nTitular: ' + (paySel.holder || '') + '\nCliente: ' + (cust.name || open[0].name) + ' (' + showPhone(cust.phone || open[0].phone) + ')');
-      for (const o of open) { await apiPay(o, 'paid_declared', paySel.id, ''); o.pay = 'paid_declared'; o.method = paySel.id; o.ref = ''; }
+      for (const o of open) {
+        await apiPay(o, 'paid_declared', paySel.id, '');
+        o.pay = 'paid_declared';
+        o.method = paySel.id;
+        o.ref = '';
+        if (!['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
+      }
       store.set('aq.payResume', '');
       saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close(); openHist();
     } catch (e) { msg.textContent = tr('pay.fail', { e: e.message || e }); }
@@ -2800,22 +2957,36 @@ const REVIEWS = [];
     call = { id: sv.id, reason: sv.reason, status: 'pending', t0: sv.t0, tAcc: 0, by: '', respMs: null, rated: false, ack: false };
     armCall(sv.id); updateFabs();
   }
+  function callCode() {
+    if (place.kind === 'dine' && place.tableNumber) return String(place.tableNumber);
+    if (place.take === 'pickup') return 'levantamento';
+    if (place.take === 'delivery') return 'entrega';
+    return table || '';
+  }
   function openCall(reason) {
+    if (!placeReady(place)) {
+      pendingAdd = () => openCall(reason);
+      savePending({ kind: 'call', reason: reason || '' });
+      openPlace();
+      return;
+    }
     if (call && (call.status === 'pending' || call.status === 'accepted' || call.status === 'sent')) { $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall(); callDlg.showModal(); return; }
     $('#callForm').hidden = false; $('#callStatus').hidden = true; $('#callMsg').textContent = ''; callDlg.showModal();
     if (reason) startCall(reason);
   }
   async function startCall(reason) {
     const msg = $('#callMsg');
+    if (!placeReady(place)) { msg.textContent = tr('call.needPlace'); openPlace(); return; }
+    const code = callCode();
     if (place.kind === 'dine' && place.tableNumber) {
       table = String(place.tableNumber);
       const sel = $('#callTable'); if (sel) sel.value = table;
     }
-    if (!table) { msg.textContent = tr('cart.needTable'); return; }
+    if (!code) { msg.textContent = tr('call.needPlace'); return; }
     msg.textContent = tr('cart.sending');
     try {
-      const id = await apiCall(table, reason);
-      rememberCall({ id, reason, table, ts: Date.now(), status: 'pending' });
+      const id = await apiCall(code, reason);
+      rememberCall({ id, reason, table: code, ts: Date.now(), status: 'pending' });
       call = { id, reason, status: 'pending', t0: Date.now(), tAcc: 0, by: '', respMs: null, rated: false, ack: false };
       const rr0 = $('#csRate'); if (rr0) { rr0.dataset.on = ''; rr0.innerHTML = ''; rr0.hidden = true; }
       store.set('aq.call', JSON.stringify({ id, reason, t0: call.t0 }));
@@ -3129,7 +3300,7 @@ const REVIEWS = [];
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="garcom.js?v=live2"></script>
-<script src="os-bridge.js?v=live2"></script>
+<script src="garcom.js?v=flow2"></script>
+<script src="os-bridge.js?v=flow2"></script>
 </body>
 </html>

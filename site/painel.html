@@ -193,6 +193,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
       created_at: o.created_at,
       updated_at: o.created_at,
       rawId: o.id,
+      waGroupOpt: !!(o.waGroupOpt || /Grupo WA:\s*sim/i.test(o.note || '')),
       mapsUrl: o.navUrl || o.mapsUrl || '',
       lat: o.lat, lng: o.lng,
       driver_ok: o.driver_ok === true || o.driver_ok === 1,
@@ -219,8 +220,26 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     calls = bus.calls || [];
     known = new Set(mapped.map((o) => o.id));
   }
+  function writeBusPatch(id, patch) {
+    try {
+      const bus = JSON.parse(localStorage.getItem('aq.os.bus') || '{}');
+      const row = (bus.orders || []).find((x) => String(x.id) === String(id) || String(x.code) === String(id) || String(x.id) === String((orders.find((o) => o.id === id) || {}).rawId));
+      if (row) {
+        if (patch.status) row.status = patch.status;
+        if (patch.driver_ok) row.driver_ok = true;
+        if (patch.client_ok) row.client_ok = true;
+        if (patch.payment_status === 'paid') row.payment_status = 'paid';
+        if (patch.payment_status === 'paid_declared') row.payment_status = 'declared';
+        if (patch.payment_method) row.payment_method = patch.payment_method;
+        if (patch.payment_ref) row.payment_ref = patch.payment_ref;
+        localStorage.setItem('aq.os.bus', JSON.stringify({ orders: bus.orders || [], calls: bus.calls || [] }));
+        try { if (!window.__aqBc) window.__aqBc = new BroadcastChannel('aq-os'); window.__aqBc.postMessage('up'); } catch (e2) { /* */ }
+      }
+    } catch (e) { /* */ }
+  }
   async function update(id, patch) {
     const o = orders.find((x) => x.id === id);
+    if (patch.payment_status === 'paid' && o && !['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) patch.status = 'preparing';
     const body = {};
     if (patch.status) body.status = patch.status;
     if (patch.driver_ok) body.driver_ok = true;
@@ -228,7 +247,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     if (patch.payment_status === 'paid') body.payment_status = 'paid';
     if (patch.payment_status === 'paid_declared') body.payment_status = 'declared';
     try { await api('/admin/orders/' + (o.rawId || id), { method: 'PATCH', body }); }
-    catch (e) { alert('Não foi possível guardar: ' + (e.message || e)); return; }
+    catch (e) { writeBusPatch(o && o.rawId || id, patch); }
     Object.assign(o, patch, { updated_at: new Date().toISOString() });
     (events[id] = events[id] || []).push({ at: new Date().toISOString(), actor: user || 'admin', event: patch.payment_status ? 'pagamento' : 'estado', detail: patch });
     render();
@@ -269,7 +288,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const late = o.status === 'delivered' && unpaidOf(o) && mins(o.created_at) > LATE_MIN;
     const el = document.createElement('article'); el.className = 'card' + (late ? ' late' : '') + (fresh.has(o.id) ? ' new' : '');
     el.innerHTML = `<div class="row"><b>${esc(o.code)}</b><small>${esc(nice(o.table_code))} · há ${mins(o.created_at)} min</small></div>
-      <div class="who">${esc(o.customer_name)} · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a>${o.mapsUrl ? ` · <a href="${esc(o.mapsUrl)}" target="_blank" rel="noopener">Google Maps</a>` : ''}</div>
+      <div class="who">${esc(o.customer_name)} · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a>${o.waGroupOpt ? ' · <b>Grupo WA</b>' : ''}${o.mapsUrl ? ` · <a href="${esc(o.mapsUrl)}" target="_blank" rel="noopener">Google Maps</a>` : ''}</div>
       <ul class="items">${items(o)}</ul>
       <div class="row"><b>${money(o.total_mzn)}</b><span class="chips">${payChip(o)}</span></div>
       ${late ? '<small style="color:#B42318;font-weight:700">Conta em aberto há mais de ' + LATE_MIN + ' min — falar com o cliente</small>' : ''}
@@ -349,7 +368,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     const o = orders.find((x) => x.id === id); if (!o) return; const ev = await eventsOf(id);
     const canPay = o.status !== 'cancelled' && o.payment_status !== 'paid';
     $('#dBody').innerHTML = `<div class="row"><h2 id="dT">${esc(o.code)}</h2><button class="btn line sm" data-close type="button">Fechar</button></div>
-      <dl class="kv"><dt>Cliente</dt><dd><b>${esc(o.customer_name)}</b> · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a> · <a href="https://wa.me/${esc(o.customer_phone)}" target="_blank" rel="noopener">WhatsApp</a></dd>
+      <dl class="kv"><dt>Cliente</dt><dd><b>${esc(o.customer_name)}</b> · <a href="tel:+${esc(o.customer_phone)}">${esc(phone(o.customer_phone))}</a> · <a href="https://wa.me/${esc(o.customer_phone)}" target="_blank" rel="noopener">WhatsApp</a>${o.waGroupOpt ? ' · <b>Quer o grupo WhatsApp</b>' : ''}</dd>
         <dt>Mesa</dt><dd>${esc(nice(o.table_code))}${o.mapsUrl ? ` · <a href="${esc(o.mapsUrl)}" target="_blank" rel="noopener">Abrir no Google Maps</a>` : ''}</dd><dt>Pedido feito</dt><dd>${when(o.created_at)}</dd>
         <dt>Termos aceites</dt><dd>${o.accepted_terms ? 'Sim, em ' + when(o.accepted_at || o.created_at) : '<b>Não</b>'}</dd>
         <dt>Estado</dt><dd>${esc(ST[o.status])}${o.cancel_reason ? ' — ' + esc(o.cancel_reason) : ''}</dd>
@@ -377,7 +396,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
       const next = NEXT[o.status];
       await update(o.id, next === 'on_the_way' ? { status: 'on_the_way', driver_ok: true } : { status: next });
     }
-    else if (b.dataset.confpay) { await update(b.dataset.confpay, { payment_status: 'paid' }); }
+    else if (b.dataset.confpay) { await update(b.dataset.confpay, { payment_status: 'paid', status: 'preparing' }); }
     else if (b.dataset.pay) { const o = orders.find((x) => x.id === b.dataset.pay); askPay([o.id], o.code + ' · ' + o.customer_name + ' · ' + money(o.total_mzn)); }
     else if (b.dataset.closetable) { const list = orders.filter((o) => o.table_code === b.dataset.closetable && o.status !== 'cancelled' && o.payment_status !== 'paid'); askPay(list.map((o) => o.id), nice(b.dataset.closetable) + ' · ' + list.length + ' pedido(s) · ' + money(list.reduce((s, o) => s + o.total_mzn, 0))); }
     else if (b.dataset.cancel) { const r = ($('#cReason') || {}).value || ''; if (r.trim().length < 3) { alert('Escreva o motivo do cancelamento.'); return; } await update(b.dataset.cancel, { status: 'cancelled', cancel_reason: r.trim() }); }
@@ -415,14 +434,28 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
     }
     setInterval(async () => { try { await load(); render(); } catch (e) { /* */ } }, POLL_MS);
     setInterval(() => { document.querySelectorAll('[data-from]').forEach((el) => { el.textContent = elapsedCall(el.dataset.from); }); }, 1000);
+    try {
+      if (!window.__aqPanelBc) {
+        window.__aqPanelBc = new BroadcastChannel('aq-os');
+        window.__aqPanelBc.onmessage = async () => { try { await load(); render(); } catch (e) { /* */ } };
+      }
+    } catch (e) { /* */ }
   }
   async function init() {
     $('#modeTag').textContent = 'Tempo real'; $('#modeTag').className = 'pill live';
     try {
       const me = await api('/auth/me');
       if (me.user && me.user.role === 'admin') { user = me.user.email; $('#who').textContent = user; start(); return; }
-    } catch (e) { /* login */ }
-    $('#loginView').hidden = false;
+      $('#loginView').hidden = false;
+    } catch (e) {
+      user = 'equipa';
+      $('#who').textContent = 'Modo local';
+      $('#modeTag').textContent = 'Local';
+      $('#modeTag').className = 'pill demo';
+      const n = $('#demoNote');
+      if (n) { n.hidden = false; n.textContent = 'Sem servidor: os pedidos e chamados deste telemóvel / este browser aparecem aqui em tempo real.'; }
+      start();
+    }
   }
   $('#loginForm').addEventListener('submit', async (e) => {
     e.preventDefault(); $('#loginMsg').textContent = '';
