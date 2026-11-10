@@ -619,7 +619,7 @@ input,select,textarea{border-radius:14px}
 #shopCats.mtabs,#cartDlg .mtabs{width:100%;max-width:100%;min-width:0;padding-inline:0;overflow-x:auto}
 #cartBody{min-width:0;min-height:0}
 #cartBody .mempty{margin:.15rem 0 .2rem;padding:.45rem .65rem;text-align:left;font-size:.82rem}
-.cart-dlg{display:flex;flex-direction:column;width:min(560px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden}
+.cart-dlg[open]{display:flex;flex-direction:column;width:min(560px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden}
 .cart-pad{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;padding:.85rem .9rem 0;gap:.4rem;max-width:100%;overflow:hidden}
 .cart-edit{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;max-width:100%;gap:.35rem;overflow:hidden}
 .cart-picked{flex:0 0 auto;min-width:0;max-height:6.1rem;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:.05rem 0 .15rem;border-top:2px solid var(--cyan-line)}
@@ -718,8 +718,9 @@ input,select,textarea{border-radius:14px}
 .dlg[open]{animation:sheet .35s ease}
 @keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
 @media(min-width:700px){.dlg{margin:auto;border-radius:28px;max-height:92dvh}}
-.dlg.cart-dlg{display:flex;flex-direction:column;width:min(560px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden;min-width:0}
-@media(min-width:700px){.dlg.cart-dlg{height:min(92dvh,840px);max-height:92dvh;border-radius:28px;margin:auto}}
+dialog:not([open]){display:none!important}
+.dlg.cart-dlg[open]{display:flex;flex-direction:column;width:min(560px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden;min-width:0}
+@media(min-width:700px){.dlg.cart-dlg[open]{height:min(92dvh,840px);max-height:92dvh;border-radius:28px;margin:auto}}
 .cart-dlg .dhead{flex:none}
 .cart-dlg #orderView:not([hidden]){flex:1;min-height:0;overflow:auto}
 html:has(dialog[open]),html.dlg-open{overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
