@@ -128,7 +128,7 @@
         placeLabel: o.placeLabel || '',
         name: o.name || '',
         phone: o.phone || '',
-        note: o.note || '',
+        note: [o.note, o.bairro, o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
         lines: (o.lines || []).map((l) => ({
           itemId: l.itemId || l.menuItemId,
           qty: l.qty || l.quantity,
@@ -256,6 +256,7 @@
       paintMenuLang();
       AquaUI.fillTables();
       if (AquaUI.rebuildWall) AquaUI.rebuildWall();
+      if (AquaUI.liveOrders) AquaUI.liveOrders();
     } catch (e) { console.warn('Catálogo em linha indisponível; menu local.', e); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
