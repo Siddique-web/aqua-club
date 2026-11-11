@@ -468,7 +468,7 @@
     if (root) return;
     root = document.createElement('div'); root.id = 'gp'; root.className = 'gp'; root.hidden = true;
     root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-label', 'Área do garçom');
-    root.innerHTML = '<header class="gp-top"><div class="gp-brand"><img src="assets/logo.png" alt="" width="38" height="38"><span>Aqua <b>Club</b> · Garçom</span></div><span class="sp"></span><span class="gp-mode" id="gpMode"></span>' +
+    root.innerHTML = '<header class="gp-top"><div class="gp-brand"><img src="assets/logo.webp" alt="" width="38" height="38" onerror="this.onerror=null;this.src=&quot;assets/logo.png&quot;"><span>Aqua <b>Club</b> · Garçom</span></div><span class="sp"></span><span class="gp-mode" id="gpMode"></span>' +
       '<button class="gp-x" type="button" data-act="close" aria-label="Fechar área do garçom">' + ic('x') + '</button></header><div class="gp-scroll" id="gpScroll"><div class="gp-wrap" id="gpMain"></div></div>';
     document.body.appendChild(root);
     root.addEventListener('click', onClick); root.addEventListener('submit', onSubmit);

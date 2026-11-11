@@ -8,6 +8,7 @@
 <title>Aqua Club — Complexo de Lazer Aquático</title>
 <script src="i18n.js?v=flow3"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -47,6 +48,7 @@ h1,h2,h3,p{margin:0}
 
 /* splash */
 .splash{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:var(--cyan);animation:splash-out 2.6s ease-in-out forwards}
+picture.aq-pic{display:contents}
 .splash img{width:min(46vw,190px);height:auto;border-radius:50%;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:splash-logo 1.6s ease-out both}
 @keyframes splash-out{0%,65%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden}}
 @keyframes splash-logo{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
@@ -989,7 +991,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <link rel="stylesheet" href="garcom.css">
 </head>
 <body>
-<div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.png" alt="Aqua Club"></div>
+<div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
 <a class="skip" href="#conteudo" data-i18n="skip">Saltar para o conteúdo</a>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -1030,7 +1032,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <header class="header" id="header">
   <div class="wrap bar">
     <a class="brand" href="#inicio" data-i18n-aria="brand">
-      <img src="assets/logo.png" alt="" width="48" height="48">
+      <img src="assets/logo.webp" alt="" width="48" height="48" onerror="this.onerror=null;this.src='assets/logo.png'">
       <span><b>Aqua Club</b><small data-i18n="brandSub">Complexo Aquático</small></span>
     </a>
     <nav class="nav" data-i18n-aria="nav.main">
@@ -1121,7 +1123,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <div class="waveband under-story" aria-hidden="true">
   <div class="wv top"><i class="w w1 wvc"></i><i class="w w2 wvc"></i><i class="w w3 wvc"></i></div>
   <i class="bub" style="left:6%;width:14px;height:14px;animation-duration:9s;animation-delay:0s"></i><i class="bub" style="left:15%;width:9px;height:9px;animation-duration:7s;animation-delay:2s"></i><i class="bub" style="left:27%;width:18px;height:18px;animation-duration:11s;animation-delay:1s"></i><i class="bub" style="left:38%;width:10px;height:10px;animation-duration:8s;animation-delay:4s"></i><i class="bub" style="left:52%;width:16px;height:16px;animation-duration:10s;animation-delay:3s"></i><i class="bub" style="left:63%;width:8px;height:8px;animation-duration:7s;animation-delay:1s"></i><i class="bub" style="left:74%;width:20px;height:20px;animation-duration:12s;animation-delay:5s"></i><i class="bub" style="left:86%;width:12px;height:12px;animation-duration:9s;animation-delay:2s"></i><i class="bub" style="left:93%;width:9px;height:9px;animation-duration:8s;animation-delay:6s"></i>
-  <div class="wb-in"><div class="mrow"><div class="mtrack rev"><span class="pill"><span class="pi"><img src="assets/piscina.jpg" alt=""></span>Piscina</span><span class="pill"><span class="pi"><img src="assets/piscina-guarda-sois.jpg" alt=""></span>Guarda-sóis</span><span class="pill"><span class="pi"><img src="assets/kids.jpg" alt=""></span>Aqua Kids</span><span class="pill"><span class="pi"><img src="assets/parque-jogos.jpg" alt=""></span>Parque e jogos</span><span class="pill"><span class="pi"><img src="assets/zona-jogos.jpg" alt=""></span>Zona de jogos</span><span class="pill"><span class="pi"><img src="assets/bar.jpg" alt=""></span>Bar &amp; esplanada</span><span class="pill"><span class="pi"><img src="assets/bar-balcao.jpg" alt=""></span>Balcão do bar</span><span class="pill"><span class="pi"><img src="assets/prato-mousse.jpg" alt=""></span>Sobremesas</span><span class="pill"><span class="pi"><img src="assets/prato-petiscos-d1.jpg" alt=""></span>Petiscos</span><span class="pill"><span class="pi"><img src="assets/salao.jpg" alt=""></span>Salão</span><span class="pill"><span class="pi"><img src="assets/salao-mesa.jpg" alt=""></span>Mesas e arte</span><span class="pill"><span class="pi"><img src="assets/panorama.jpg" alt=""></span>Espaço exterior</span><span class="pill"><span class="pi"><img src="assets/hero-aerea.jpg" alt=""></span>Vista aérea</span><span class="pill"><span class="pi"><img src="assets/piscina.jpg" alt=""></span>Piscina</span><span class="pill"><span class="pi"><img src="assets/piscina-guarda-sois.jpg" alt=""></span>Guarda-sóis</span><span class="pill"><span class="pi"><img src="assets/kids.jpg" alt=""></span>Aqua Kids</span><span class="pill"><span class="pi"><img src="assets/parque-jogos.jpg" alt=""></span>Parque e jogos</span><span class="pill"><span class="pi"><img src="assets/zona-jogos.jpg" alt=""></span>Zona de jogos</span><span class="pill"><span class="pi"><img src="assets/bar.jpg" alt=""></span>Bar &amp; esplanada</span><span class="pill"><span class="pi"><img src="assets/bar-balcao.jpg" alt=""></span>Balcão do bar</span><span class="pill"><span class="pi"><img src="assets/prato-mousse.jpg" alt=""></span>Sobremesas</span><span class="pill"><span class="pi"><img src="assets/prato-petiscos-d1.jpg" alt=""></span>Petiscos</span><span class="pill"><span class="pi"><img src="assets/salao.jpg" alt=""></span>Salão</span><span class="pill"><span class="pi"><img src="assets/salao-mesa.jpg" alt=""></span>Mesas e arte</span><span class="pill"><span class="pi"><img src="assets/panorama.jpg" alt=""></span>Espaço exterior</span><span class="pill"><span class="pi"><img src="assets/hero-aerea.jpg" alt=""></span>Vista aérea</span></div></div></div>
+  <div class="wb-in"><div class="mrow"><div class="mtrack rev"><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/piscina.jpg" alt=""></span>Piscina</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/piscina-guarda-sois.jpg" alt=""></span>Guarda-sóis</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/kids.jpg" alt=""></span>Aqua Kids</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/parque-jogos.jpg" alt=""></span>Parque e jogos</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/zona-jogos.jpg" alt=""></span>Zona de jogos</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/bar.jpg" alt=""></span>Bar &amp; esplanada</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/bar-balcao.jpg" alt=""></span>Balcão do bar</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/prato-mousse.jpg" alt=""></span>Sobremesas</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/prato-petiscos-d1.jpg" alt=""></span>Petiscos</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/salao.jpg" alt=""></span>Salão</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/salao-mesa.jpg" alt=""></span>Mesas e arte</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/panorama.jpg" alt=""></span>Espaço exterior</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/hero-aerea.jpg" alt=""></span>Vista aérea</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/piscina.jpg" alt=""></span>Piscina</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/piscina-guarda-sois.jpg" alt=""></span>Guarda-sóis</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/kids.jpg" alt=""></span>Aqua Kids</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/parque-jogos.jpg" alt=""></span>Parque e jogos</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/zona-jogos.jpg" alt=""></span>Zona de jogos</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/bar.jpg" alt=""></span>Bar &amp; esplanada</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/bar-balcao.jpg" alt=""></span>Balcão do bar</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/prato-mousse.jpg" alt=""></span>Sobremesas</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/prato-petiscos-d1.jpg" alt=""></span>Petiscos</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/salao.jpg" alt=""></span>Salão</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/salao-mesa.jpg" alt=""></span>Mesas e arte</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/panorama.jpg" alt=""></span>Espaço exterior</span><span class="pill"><span class="pi"><img loading="lazy" decoding="async" src="assets/hero-aerea.jpg" alt=""></span>Vista aérea</span></div></div></div>
   <div class="wv bot"><i class="w w1 wvh"></i><i class="w w2 wvh"></i><i class="w w3 wvh"></i></div>
 </div>
 
@@ -1263,7 +1265,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <footer class="footer" id="contacto">
   <div class="wrap f-grid">
     <div class="reveal">
-      <a class="brand" href="#inicio" data-i18n-aria="brand"><img src="assets/logo.png" alt="" width="48" height="48"><span><b>Aqua Club</b><small data-i18n="brandSub">Complexo Aquático</small></span></a>
+      <a class="brand" href="#inicio" data-i18n-aria="brand"><img src="assets/logo.webp" alt="" width="48" height="48" onerror="this.onerror=null;this.src='assets/logo.png'"><span><b>Aqua Club</b><small data-i18n="brandSub">Complexo Aquático</small></span></a>
       <p data-i18n="foot.blurb">O seu complexo de lazer aquático de referência. Diversão, boa disposição e momentos inesquecíveis.</p>
       <div class="socials" data-i18n-aria="foot.social">
         <a href="#" data-social="instagram" aria-label="Instagram"><svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg></a>
@@ -1521,6 +1523,41 @@ const REVIEWS = [];
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const imgUrl = (p) => {
+    if (typeof ASSETS === 'undefined') return p;
+    return ASSETS[String(p || '').replace(/^.*assets\//, '')] || p;
+  };
+  const webpOf = (p) => String(p || '').replace(/\.(jpe?g|png)$/i, '.webp');
+  let webpOk = null;
+  const canWebp = () => {
+    if (webpOk != null) return webpOk;
+    try { webpOk = document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0; }
+    catch (e) { webpOk = false; }
+    return webpOk;
+  };
+  const pickSrc = (p) => {
+    const jpg = imgUrl(p);
+    if (!jpg || !/\.(jpe?g|png)$/i.test(jpg)) return jpg;
+    return canWebp() ? webpOf(jpg) : jpg;
+  };
+  const setImg = (im, p) => {
+    if (!im) return;
+    const jpg = imgUrl(p);
+    const next = pickSrc(jpg);
+    if (jpg) im.setAttribute('data-fb', jpg);
+    if ((im.getAttribute('src') || '') !== next) im.src = next;
+  };
+  document.addEventListener('error', (e) => {
+    const im = e.target;
+    if (!im || im.tagName !== 'IMG') return;
+    const fb = im.getAttribute('data-fb');
+    if (!fb || (im.getAttribute('src') || '') === fb) return;
+    im.src = fb;
+  }, true);
+  $$('img').forEach((im) => {
+    const src = im.getAttribute('src') || '';
+    if (/assets\/.+\.(jpe?g|png)$/i.test(src)) setImg(im, src);
+  });
   if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
   function pinHero() {
     const html = document.documentElement;
@@ -1600,9 +1637,11 @@ const REVIEWS = [];
     { img: 'assets/slide-14.jpg', cat: 'jogos lazer', t: 'Jogos junto ao parque', tag: 'Jogos', q: 'Bilhar, mesas e o parque infantil a poucos passos.', m: 'Zona: Jogos e parque', pos: '50% 50%' },
     { img: 'assets/slide-15.jpg', cat: 'lazer espaco', t: 'Piscina à noite', tag: 'Lazer', q: 'A piscina iluminada, com restaurante e esplanada ao fundo.', m: 'Zona: Piscina e esplanada', pos: '50% 50%' }
   ];
-  const imgUrl = (p) => (typeof ASSETS !== 'undefined' ? ASSETS[p.replace('assets/', '')] : p);
   const cf = $('#cf'), cfwrap = $('#cfwrap'), cdots = $('#cdots');
-  const bgImgs = SL.map((s) => { const im = document.createElement('img'); im.alt = ''; im.src = imgUrl(s.img); $('.hero-bg').appendChild(im); return im; });
+  const bgIm = document.createElement('img');
+  bgIm.alt = '';
+  bgIm.decoding = 'async';
+  $('.hero-bg').appendChild(bgIm);
   const safe = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   let view = SL.map((_, i) => i), cur = 0, playing = !reduce, cfTimer = 0, filt = 'todos', dragged = false;
   function applySlideLang() {
@@ -1612,7 +1651,7 @@ const REVIEWS = [];
   const items = SL.map((s, i) => {
     const el = document.createElement('article'); el.className = 'cfi out';
     el.setAttribute('role', 'group'); el.setAttribute('aria-roledescription', 'slide'); el.setAttribute('aria-label', tr('hero.of', { a: i + 1, b: SL.length, t: s.t }));
-    el.innerHTML = `<div class="cfi-media"><img class="cfi-fill" src="${imgUrl(s.img)}" alt="" aria-hidden="true"><img class="cfi-photo" src="${imgUrl(s.img)}" alt="${safe(s.t)}"></div>
+    el.innerHTML = `<div class="cfi-media"><img class="cfi-fill" alt="" aria-hidden="true" decoding="async"><img class="cfi-photo" alt="${safe(s.t)}" decoding="async"></div>
       <div class="cf-top"><button class="cfb" type="button" data-act="play" aria-label="${safe(tr('hero.pause'))}"><svg class="ico" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
       <div class="cf-cap"><div class="cf-row"><b class="cf-t">${safe(s.t)}</b><span class="cf-tag">${safe(s.tag)}</span></div><p class="cf-q">“${safe(s.q)}”</p><p class="cf-m">${safe(s.m)}</p></div>`;
     el.addEventListener('click', (e) => {
@@ -1625,6 +1664,29 @@ const REVIEWS = [];
     });
     cf.appendChild(el); return el;
   });
+  function fillNear() {
+    const n = view.length;
+    items.forEach((el, i) => {
+      const pos = view.indexOf(i);
+      let near = false;
+      if (pos >= 0 && n) {
+        let d = (((pos - cur) % n) + n) % n; if (d > n / 2) d -= n;
+        near = Math.abs(d) <= 1;
+      }
+      if (!near) return;
+      el.querySelectorAll('.cfi-fill, .cfi-photo').forEach((im) => {
+        setImg(im, SL[i].img);
+        if (im.classList.contains('cfi-photo') && !im.dataset.lay) {
+          im.dataset.lay = '1';
+          im.addEventListener('load', () => { if (view[cur] === i) layout(); });
+        }
+      });
+    });
+    const idx = view[cur];
+    if (idx == null) return;
+    setImg(bgIm, SL[idx].img);
+    bgIm.classList.add('on');
+  }
   function layout() {
     const n = view.length;
     items.forEach((el, i) => {
@@ -1637,8 +1699,8 @@ const REVIEWS = [];
       $$('button', el).forEach((b) => { b.tabIndex = d === 0 ? 0 : -1; });
       const pb = $('[data-act=play]', el); pb.setAttribute('aria-label', playing ? tr('hero.pause') : tr('hero.play')); pb.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${playing ? 'i-pause' : 'i-play'}"/></svg>`;
     });
+    fillNear();
     const idx = view[cur];
-    bgImgs.forEach((b, i) => b.classList.toggle('on', i === idx));
     $$('.dot2', cdots).forEach((d, i) => d.classList.toggle('on', i === cur));
     const onEl = items[idx];
     const onImg = onEl && onEl.querySelector('.cfi-photo');
@@ -1687,9 +1749,9 @@ const REVIEWS = [];
   const lbDlg = $('#lbDlg');
   let lbMode = 'gallery';
   const lbNav = (show) => ['#lbPrev', '#lbNext', '#lbCount'].forEach((s) => { $(s).hidden = !show; });
-  function paintLb() { const s = SL[view[cur]]; $('#lbT').textContent = s.t; $('#lbImg').src = imgUrl(s.img); $('#lbImg').alt = s.t; $('#lbQ').textContent = '“' + s.q + '”'; $('#lbCount').textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(view.length).padStart(2, '0'); }
+  function paintLb() { const s = SL[view[cur]]; $('#lbT').textContent = s.t; setImg($('#lbImg'), s.img); $('#lbImg').alt = s.t; $('#lbQ').textContent = '“' + s.q + '”'; $('#lbCount').textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(view.length).padStart(2, '0'); }
   function openLb() { lbMode = 'gallery'; lbNav(true); paintLb(); lbDlg.showModal(); }
-  function openPhoto(p) { lbMode = 'photo'; lbNav(false); $('#lbT').textContent = p.t; $('#lbImg').src = imgUrl(p.img); $('#lbImg').alt = p.t; $('#lbQ').textContent = p.q ? '“' + p.q + '”' : ''; lbDlg.showModal(); }
+  function openPhoto(p) { lbMode = 'photo'; lbNav(false); $('#lbT').textContent = p.t; setImg($('#lbImg'), p.img); $('#lbImg').alt = p.t; $('#lbQ').textContent = p.q ? '“' + p.q + '”' : ''; lbDlg.showModal(); }
   $('#lbPrev').addEventListener('click', () => go(cur - 1));
   $('#lbNext').addEventListener('click', () => go(cur + 1));
   $$('[data-p-img]').forEach((b) => b.addEventListener('click', () => openPhoto({ img: b.dataset.pImg, t: b.dataset.pT, q: b.dataset.pQ })));
@@ -1735,7 +1797,7 @@ const REVIEWS = [];
   });
 
   /* ===== menu, pedido, conta e chamada de garçom ===== */
-  const asset = (p) => (typeof ASSETS !== 'undefined' ? ASSETS[p.replace('assets/', '')] : p);
+  const asset = imgUrl;
   const money = (n) => n.toLocaleString(window.AquaI18n ? AquaI18n.locale() : 'pt-PT') + ' MT';
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const nice = (c) => String(c).replace(/-/g, ' ');
@@ -2351,7 +2413,11 @@ const REVIEWS = [];
     $('#msort').setAttribute('aria-pressed', String(sortAz));
     renderMenu(); paintShop();
   });
-  function media(m) { return m.img ? `<img src="${asset(m.img)}" alt="${esc(m.name)}" width="88" height="88" loading="lazy">` : `<svg class="ico" aria-hidden="true"><use href="#${m.icon || 'i-drink'}"/></svg>`; }
+  function media(m) {
+    if (!m.img) return `<svg class="ico" aria-hidden="true"><use href="#${m.icon || 'i-drink'}"/></svg>`;
+    const jpg = asset(m.img);
+    return `<img src="${pickSrc(jpg)}" data-fb="${esc(jpg)}" alt="${esc(m.name)}" width="88" height="88" loading="lazy" decoding="async">`;
+  }
   function listedMenu(which, q) {
     const id = which || cat;
     const needle = (q == null ? query : q).trim().toLowerCase();
@@ -3111,7 +3177,7 @@ const REVIEWS = [];
     const b = document.createElement('button'); b.type = 'button'; b.className = 'wcard'; if (dup) b.tabIndex = -1;
     if (!m.img) b.classList.add('ill');
     b.setAttribute('aria-label', tr('menu.seeDish', { n: m.name, p: money(m.price) }));
-    b.innerHTML = (m.img ? `<img src="${asset(m.img)}" alt="${esc(m.name)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">` : `<svg class="ico" aria-hidden="true"><use href="#${m.icon || 'i-drink'}"/></svg>`) + `<span class="wk-t"><b>${esc(m.name)}</b><i>${money(m.price)}</i></span>`;
+    b.innerHTML = (m.img ? `<img src="${pickSrc(asset(m.img))}" data-fb="${esc(asset(m.img))}" alt="${esc(m.name)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">` : `<svg class="ico" aria-hidden="true"><use href="#${m.icon || 'i-drink'}"/></svg>`) + `<span class="wk-t"><b>${esc(m.name)}</b><i>${money(m.price)}</i></span>`;
     b.addEventListener('click', () => openItem(m)); return b;
   }
   let wallIO;
@@ -3140,10 +3206,21 @@ const REVIEWS = [];
     wallIO.disconnect();
     wallIO.observe(box);
   }
+  function wallPool() {
+    const seen = new Set();
+    const uniq = [];
+    MENU.forEach((m) => {
+      const key = m.img || m.icon || m.id;
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      uniq.push(m);
+    });
+    return uniq.length ? uniq : MENU.slice(0, 12);
+  }
   function rebuildWall() {
     const box = $('#wall'); if (!box) return;
     const lang = document.documentElement.lang || 'pt';
-    const sorted = MENU.slice().sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), lang, { sensitivity: 'base', numeric: true }));
+    const sorted = wallPool().slice().sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), lang, { sensitivity: 'base', numeric: true }));
     const nCols = matchMedia('(min-width:720px)').matches ? 3 : 2;
     const cols = Array.from({ length: nCols }, () => []);
     sorted.forEach((m, i) => cols[i % nCols].push(m));
@@ -3289,7 +3366,7 @@ const REVIEWS = [];
     if (!btn || !dlg || !img || !bar) return;
     const dishes = ['assets/prato-petiscos.jpg', 'assets/prato-mousse.jpg', 'assets/prato-bar.jpg'];
     const dish = dishes[new Date().getDate() % dishes.length];
-    img.src = dish;
+    setImg(img, dish);
     const day = () => new Date().toISOString().slice(0, 10);
     if (store.get('aq.story') === day()) btn.classList.add('seen');
     let paused = false;

@@ -2462,7 +2462,8 @@
   }
   function slideFor(img) {
     const key = String(img || '').replace(/^.*\//, '');
-    const s = SLIDES[key];
+    const base = key.replace(/\.(webp|avif|jpe?g|png)$/i, '');
+    const s = SLIDES[key] || SLIDES[base + '.jpg'] || SLIDES[base + '.webp'];
     if (!s) return null;
     return { t: s.t[lang] || s.t.pt, tag: s.tag[lang] || s.tag.pt, q: s.q[lang] || s.q.pt, m: s.m[lang] || s.m.pt };
   }
