@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops5"></script>
+<script src="i18n.js?v=ops8"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -428,20 +428,23 @@ textarea:hover{border-color:var(--cyan)}textarea:focus{outline:none;border-color
 .capn{font:800 1.35rem var(--fh);text-transform:uppercase;color:#000;margin:0}
 .capd{margin:0;color:var(--muted);font-size:.95rem}
 .bctl{display:flex;align-items:center;justify-content:center;gap:.7rem;width:100%;margin:.15rem 0 .35rem;position:relative;z-index:2}
-.bk-text{max-width:34rem;margin-inline:auto;text-align:center}
+.bk-text{max-width:36rem;margin-inline:auto;text-align:center}
 .bk-text .tags,.bk-text .cta,.bk-text .cta-stack{justify-content:center;justify-items:center}
-.bk-text h1{margin-top:1rem;font-size:clamp(2rem,6vw,3.4rem);width:100%}
-.bk-text .lead{margin-top:1rem;color:#1d262d;width:100%;max-width:none}
+.bk-text h1{margin-top:.85rem;font-size:clamp(2rem,6vw,3.4rem);width:100%}
+.bk-text .lead{margin:.75rem auto 0;color:#1d262d;width:100%;max-width:32rem;line-height:1.55}
+.bk-text .lead-b{margin-top:.55rem}
 @media(max-width:999px){
   .book-stage{padding:.35rem 10px .5rem}
-  .bk-text{max-width:none;width:100%;padding:0 max(10.6rem, 42vw) 1.15rem .1rem;box-sizing:border-box}
-  .bk-text h1{margin-top:.5rem;font-size:clamp(1.72rem,7.2vw,2.55rem);line-height:.98;letter-spacing:-.03em}
-  .bk-text .lead{display:block;margin-top:.7rem;font-size:clamp(.95rem,3.6vw,1.1rem);line-height:1.5;overflow:visible;-webkit-line-clamp:unset}
-  .cta-stack{margin-top:1.15rem;width:100%;justify-items:start}
-  .cta{width:100%;justify-content:flex-start}
-  .story-slot{padding:.7rem 0 1.15rem}
+  .bk-text{max-width:none;width:100%;padding:0 1rem 0;box-sizing:border-box;text-align:left}
+  .bk-text .tags{justify-content:flex-start}
+  .bk-text h1{margin-top:.55rem;font-size:clamp(1.7rem,7vw,2.45rem);line-height:1.05;letter-spacing:-.03em}
+  .bk-text .lead{display:block;margin-top:.7rem;font-size:clamp(.95rem,3.6vw,1.08rem);line-height:1.55;overflow:visible;-webkit-line-clamp:unset;max-width:none}
+  .cta-stack{margin-top:1.05rem;width:calc(100% - 7.2rem);max-width:20rem;justify-items:stretch}
+  .cta{width:100%;flex-direction:column;align-items:stretch;gap:.55rem}
+  .cta .btn{width:100%;justify-content:center}
+  .story-slot{padding:.7rem 0 1rem}
   .cap{min-height:3.6rem}
-  .bk-grid{padding-bottom:calc(var(--dock) + .4rem)}
+  .bk-grid{padding-bottom:calc(var(--dock) + 8.2rem)}
 }
 @media(min-width:1000px){
   .bk-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-rows:auto auto auto;gap:.7rem 2rem;padding:calc(var(--head-bar) + .9rem) 2rem .8rem;min-height:0;align-items:start;align-content:start}
@@ -568,15 +571,15 @@ input,select,textarea{border-radius:14px}
 .how li::before{content:counter(h);flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--yellow);font:800 .9rem var(--fh)}
 @media(min-width:900px){.how{grid-template-columns:repeat(3,1fr)}}
 .mtool{display:grid;gap:.8rem;margin-top:.8rem}
-.mtabs-row{display:flex;align-items:center;gap:.4rem;min-width:0;width:100%;max-width:100%}
-.mtabs{display:flex;flex-wrap:nowrap;gap:.4rem;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;padding:.1rem .15rem .35rem;max-width:100%;min-width:0;flex:1;touch-action:pan-x;scroll-padding-inline:12px}
+.mtabs-row{display:flex;align-items:center;gap:.35rem;min-width:0;width:100%;max-width:100%}
+.mtabs{display:flex;flex-wrap:nowrap;gap:.32rem;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;padding:.1rem .1rem .3rem;max-width:100%;min-width:0;flex:1 1 auto;touch-action:pan-x;scroll-padding-inline:10px}
 .mtabs::-webkit-scrollbar{display:none}
-.mtab{flex:none;padding:.5rem .85rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;color:#000;font:800 .72rem var(--fh);cursor:pointer;transition:transform var(--ease),border-color var(--ease),background-color var(--ease)}
+.mtab{flex:none;padding:.42rem .68rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);white-space:nowrap;cursor:pointer;transition:transform var(--ease),border-color var(--ease),background-color var(--ease)}
 .mtab:hover{border-color:var(--cyan);transform:translateY(-2px)}
 .mtab[aria-selected=true]{background:var(--cyan);border-color:var(--cyan)}
-.mtab-more{flex:none;background:#04283F;color:#fff;border-color:#04283F;position:static;z-index:2;box-shadow:none}
+.mtab-more{display:none!important}
 .mtab-more[aria-expanded=true]{background:var(--yellow);color:#000;border-color:var(--yellow)}
-.mtab-cart{flex:none;position:relative;width:46px;height:46px;border-radius:50%;border:2px solid #000;background:var(--yellow);color:#000;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 16px -10px rgba(0,0,0,.4)}
+.mtab-cart{flex:none;position:relative;width:40px;height:40px;border-radius:50%;border:2px solid #000;background:var(--yellow);color:#000;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 16px -10px rgba(0,0,0,.4)}
 .mtab-cart .ico{width:1.2rem;height:1.2rem}
 .mtab-cart .n{position:absolute;top:-6px;right:-6px;min-width:1.2rem;height:1.2rem;padding:0 .28rem;border-radius:999px;background:#000;color:#fff;font:800 .62rem/1.2rem var(--fh);display:none}
 .mtab-cart .n.on{display:grid;place-items:center}
@@ -726,18 +729,19 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 @media(min-width:720px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard{grid-template-columns:1fr;grid-template-rows:auto auto}.mimg{width:100%;height:188px;min-height:188px;max-height:188px;min-width:0}}
 @media(min-width:1100px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{height:220px;min-height:220px;max-height:220px}}
 /* botões flutuantes */
-.fabs{position:fixed;left:auto;right:.7rem;bottom:calc(.85rem + env(safe-area-inset-bottom,0px));z-index:80;display:grid;gap:.42rem;justify-items:end;width:max-content;max-width:min(calc(100vw - 1.15rem), 16.5rem);pointer-events:none}
+.fabs{position:fixed;left:auto;right:.65rem;bottom:calc(var(--dock) + .25rem);z-index:125;display:grid;gap:.4rem;justify-items:end;width:auto;max-width:7.6rem;pointer-events:none}
 .fabs .fab,.fabs .fab-hint{pointer-events:auto}
 html.staff-chrome .fabs{bottom:calc(var(--dock) + .4rem)}
 .pn[hidden],html:not(.staff-chrome) .pn{display:none!important}
-.fab{display:inline-flex;align-items:center;justify-content:flex-start;gap:.45rem;min-height:48px;padding:.48rem .95rem;border:0;border-radius:999px;font:800 .72rem var(--fh);letter-spacing:.05em;text-transform:uppercase;color:#000;cursor:pointer;max-width:100%;box-shadow:0 12px 26px -10px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.7);transition:transform var(--ease),background-color var(--ease)}
-.fab .ico{width:18px;height:18px;flex:none}
+.fab{display:inline-flex;align-items:center;justify-content:flex-start;gap:.4rem;min-height:44px;padding:.4rem .72rem;border:0;border-radius:999px;font:800 .66rem var(--fh);letter-spacing:.04em;text-transform:uppercase;color:#000;cursor:pointer;max-width:100%;overflow:hidden;box-shadow:0 12px 26px -10px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.7);transition:transform var(--ease),background-color var(--ease)}
+.fab .ico{width:16px;height:16px;flex:none}
 .fab span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fab:hover{transform:translateY(-3px) scale(1.04)}
 @media(min-width:720px){
-  .fabs{right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));max-width:18rem}
-  .fab{min-height:52px;padding:.55rem 1.15rem;font-size:.8rem}
+  .fabs{right:1.1rem;bottom:calc(1.1rem + env(safe-area-inset-bottom,0px));max-width:9.2rem}
+  .fab{min-height:46px;padding:.45rem .8rem;font-size:.7rem}
 }
+html:not(.staff-chrome) .fabs{bottom:calc(.9rem + env(safe-area-inset-bottom,0px))}
 .fab[hidden]{display:none}
 .fab.cart{background:var(--cyan)}
 .fab.cart.live{animation:fabp 1.8s ease-in-out infinite}
@@ -1015,7 +1019,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops5">
+<link rel="stylesheet" href="garcom.css?v=ops8">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1130,7 +1134,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <div class="bk-text">
       <div class="tags"><span class="tag y"><span class="dot" aria-hidden="true"></span><span data-i18n="hero.welcome">Bem-vindo</span></span><span class="tag c" data-i18n="hero.tag">Beira · Complexo aquático</span></div>
       <h1 class="display" data-i18n="hero.h1">O seu refúgio de lazer e boa gastronomia em Beira.</h1>
-      <p class="lead" data-i18n="hero.lead">O Aqua Club reúne uma piscina refrescante, esplanada acolhedora sob as estrelas, mesas de bilhar, área infantil segura (Aqua Kids) e as melhores Tábuas de Grupo da cidade. O espaço perfeito para famílias e amigos.</p>
+      <p class="lead" data-i18n="hero.lead">O Aqua Club reúne uma piscina refrescante, esplanada acolhedora sob as estrelas, mesas de bilhar e área infantil segura (Aqua Kids).</p>
+      <p class="lead lead-b" data-i18n="hero.lead2">Aqui estão as melhores Tábuas de Grupo da cidade — o espaço certo para famílias e amigos.</p>
       <div class="cta-stack">
         <div class="cta"><a class="btn btn-cyan" href="#menu" data-i18n="hero.ctaMenu">Ver o menu</a><a class="btn btn-line" href="#bilhetes" data-i18n="bookMyDay">Reservar o meu dia</a></div>
       </div>
@@ -1853,6 +1858,8 @@ const REVIEWS = [];
   const rmsg = (reason) => ({ request_bill: tr('call.r_bill'), menu_question: tr('call.r_menu'), new_order: tr('call.r_new'), urgent_other: tr('call.r_urgent') }[reason] || reason);
   const STEPS = ['review', 'preparing', 'ready', 'delivered'];
   const kitchenStep = (st) => ({ review: 0, received: 0, no_confirm: 0, sent: 0, preparing: 1, ready: 2, on_the_way: 2, delivered: 3 }[st] ?? 0);
+  const isArchived = (o) => !!(o && o.status === 'delivered' && o.pay === 'paid');
+  const liveStatus = (st) => (st === 'sent' ? 'review' : st);
   const CHANGE_WAIT = 3 * 60 * 1000;
   const PAY_CHANGE_MS = 10 * 60 * 60 * 1000;
   const VENUE_KM = 0.55;
@@ -1879,7 +1886,10 @@ const REVIEWS = [];
   /* identidade do aparelho, dados do cliente e histórico (ficam neste telemóvel) */
   const DEVICE = (() => { let d = store.get('aq.dev'); if (!d) { d = uid(); store.set('aq.dev', d); } return d; })();
   let history = []; try { history = JSON.parse(store.get('aq.orders') || '[]'); } catch (e) { history = []; }
-  history.forEach((o) => { if (o && o.method === 'pos' && o.pay !== 'paid') o.pay = 'unpaid'; });
+  history.forEach((o) => {
+    if (o && o.method === 'pos' && o.pay !== 'paid') o.pay = 'unpaid';
+    if (o && o.status === 'sent') o.status = 'review';
+  });
   let cust = {}; try { cust = JSON.parse(store.get('aq.cust') || '{}'); } catch (e) { cust = {}; }
   const saveHist = () => store.set('aq.orders', JSON.stringify(history.slice(-80)));
   const isOpen = (o) => o.status !== 'cancelled' && o.pay !== 'paid' && o.pay !== 'paid_declared';
@@ -1956,27 +1966,34 @@ const REVIEWS = [];
     o.lines.map((l) => '• ' + l.quantity + '× ' + l.name + ' (' + money(l.unitPriceMzn) + ')' + (l.notes ? ' — “' + l.notes + '”' : '')).join('\n') +
     (o.deliveryFee ? '\nEntrega: ' + money(o.deliveryFee) : '') +
     '\n*Total: ' + money(o.total) + '*\nO cliente confirmou os termos e vai pagar a conta antes de sair.';
+  function orderToBus(o) {
+    const st = liveStatus(o.status || 'review');
+    const pay = o.pay === 'paid_declared' ? 'declared' : (o.pay || 'unpaid');
+    return {
+      id: o.id, code: o.code, nConta: o.nConta, nPedido: o.nPedido || o.nConta,
+      table_number: parseInt(String(o.table || '').replace(/\D/g, ''), 10) || null,
+      place_label: o.placeLabel, fulfillment: o.fulfillment, take: o.take || '',
+      total: o.total, delivery_fee: o.deliveryFee || 0, deliveryFee: o.deliveryFee || 0,
+      status: st, payment_status: pay, payment_method: o.method || '', pay: o.pay,
+      customer_name: o.name, customer_phone: o.phone, created_at: o.ts ? new Date(o.ts).toISOString() : new Date().toISOString(),
+      waGroupOpt: !!o.waGroupOpt, ts: o.ts, payment_ref: o.ref || '',
+      lat: o.lat, lng: o.lng, mapsUrl: o.mapsUrl, navUrl: o.navUrl, address: o.address, bairro: o.bairro || '',
+      items: (o.lines || []).map((l) => ({
+        name: l.name, unit_price: l.unitPriceMzn || l.price, qty: l.quantity || l.qty,
+        extras: extraNames(l.extras || []) ? extraNames(l.extras || []).split(', ') : (l.extras || []),
+        doneness: l.doneness, notes: l.notes || l.note || ''
+      }))
+    };
+  }
+  function syncHistToBus() {
+    if (!window.AquaBus) return;
+    history.filter((o) => o && o.status !== 'cancelled').forEach((o) => AquaBus.upsertOrder(orderToBus(o)));
+  }
   async function apiOrder(o) {
     try {
       if (window.AquaOS && AquaOS.live && AquaOS.live()) return await AquaOS.placeOrder(o);
     } catch (e) { /* continua no registo local */ }
-    if (window.AquaBus) {
-      AquaBus.pushOrder({
-        id: o.id, code: o.code, nConta: o.nConta, nPedido: o.nPedido || o.nConta,
-        table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
-        place_label: o.placeLabel, fulfillment: o.fulfillment, take: o.take || '',
-        total: o.total, delivery_fee: o.deliveryFee || 0, deliveryFee: o.deliveryFee || 0,
-        status: o.status || 'review',
-        customer_name: o.name, customer_phone: o.phone, payment_status: 'unpaid', created_at: new Date().toISOString(),
-        waGroupOpt: !!o.waGroupOpt, ts: o.ts,
-        lat: o.lat, lng: o.lng, mapsUrl: o.mapsUrl, navUrl: o.navUrl, address: o.address, bairro: o.bairro || '',
-        items: (o.lines || []).map((l) => ({
-          name: l.name, unit_price: l.unitPriceMzn || l.price, qty: l.quantity || l.qty,
-          extras: extraNames(l.extras || []) ? extraNames(l.extras || []).split(', ') : (l.extras || []),
-          doneness: l.doneness, notes: l.notes || l.note || ''
-        }))
-      });
-    }
+    if (window.AquaBus) AquaBus.upsertOrder(orderToBus(o));
     if (isLive()) {
       const t = dbTables.find((x) => x.code === o.table);
       if (!t) throw new Error(tr('cart.noTable'));
@@ -2112,6 +2129,7 @@ const REVIEWS = [];
   }
   function startPolling() {
     bindLiveOrders();
+    syncHistToBus();
     if (pollT) return;
     pollT = setInterval(() => {
       refreshFromBus();
@@ -2507,16 +2525,11 @@ const REVIEWS = [];
   }
   function fillCatTabs(root, key) {
     if (!root) return;
-    const compact = root.id === 'mtabs' || root.id === 'shopCats';
     const selected = key === 'cat' ? cat : (root.dataset.cat || 'todos');
     root.innerHTML = '';
-    const list = compact ? pinCats() : CATS;
-    list.forEach(([id, label]) => addCatBtn(root, key, id, label, selected));
+    CATS.forEach(([id, label]) => addCatBtn(root, key, id, label, selected));
     const more = root.id === 'mtabs' ? $('#mtabsMore') : null;
-    if (more) {
-      more.hidden = !(compact && CATS.length > list.length);
-      more.textContent = '+ ' + tr('menu.more');
-    }
+    if (more) more.hidden = true;
   }
   function openCatSheet() {
     const dlg = $('#mcatDlg'), box = $('#mcatAll');
@@ -3009,16 +3022,18 @@ const REVIEWS = [];
   }
   function paintOrderView() {
     if (!ov) return;
+    const archived = isArchived(ov);
     const title = $('#ovTitle');
-    if (title) title.textContent = orderReadonly ? tr('cart.detail') : tr('cart.ok');
+    if (title) title.textContent = archived ? tr('cart.record') : (orderReadonly ? tr('cart.detail') : tr('cart.ok'));
     $('#ocode').textContent = contaLabel(ov);
     $('#ometa').textContent = (ov.code ? ov.code + ' · ' : '') + ov.name + ' · ' + showPhone(ov.phone) + ' · ' + (ov.placeLabel || nice(ov.table) || '') + ' · ' + when(ov.ts);
     const qty = (l) => l.quantity || l.qty || 1;
-    $('#osum').innerHTML = ov.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${lineNote(l)}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('') +
-      (ov.deliveryFee ? `<li><span>${esc(tr('place.feeLine', { b: tr('place.' + (ov.deliveryBand || 'city')) }))}</span><b>${money(ov.deliveryFee)}</b></li>` : '') +
-      `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(ov.total)}</b></li>`;
+    const priceCell = (n) => archived ? '' : '<b>' + money(n) + '</b>';
+    $('#osum').innerHTML = ov.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${lineNote(l)}</span>${priceCell((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('') +
+      (!archived && ov.deliveryFee ? `<li><span>${esc(tr('place.feeLine', { b: tr('place.' + (ov.deliveryBand || 'city')) }))}</span>${priceCell(ov.deliveryFee)}</li>` : '') +
+      (archived ? '' : `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(ov.total)}</b></li>`);
     const bits = [];
-    bits.push('<div><b>' + esc(stTxt(ov.status)) + '</b> · ' + esc(payTxt(ov.pay, ov)) + '</div>');
+    bits.push('<div><b>' + esc(stTxt(liveStatus(ov.status))) + '</b>' + (archived ? '' : ' · ' + esc(payTxt(ov.pay, ov))) + '</div>');
     if (ov.fulfillment === 'takeaway') bits.push('<div><b>' + esc(tr('place.take')) + '</b> ' + esc(ov.take === 'delivery' ? tr('place.delivery') : tr('place.pickup')) + '</div>');
     if (ov.address) bits.push('<div><b>' + esc(tr('place.addr')) + '</b> ' + esc(ov.address) + '</div>');
     if (ov.lat && ov.lng) bits.push('<div><b>GPS</b> ' + Number(ov.lat).toFixed(5) + ', ' + Number(ov.lng).toFixed(5) + (ov.km ? ' · ' + Number(ov.km).toFixed(1) + ' km' : '') + (ov.navUrl ? ' · <a href="' + esc(ov.navUrl) + '" target="_blank" rel="noopener noreferrer">Google Maps</a>' : '') + '</div>');
@@ -3027,18 +3042,18 @@ const REVIEWS = [];
     if (ov.ref) bits.push('<div><b>' + esc(tr('pay.refShort')) + '</b> ' + esc(ov.ref) + '</div>');
     const box = $('#odetail');
     if (box) { box.innerHTML = bits.join(''); box.hidden = bits.length < 2 && !orderReadonly; }
-    const s = kitchenStep(ov.status), sent = ov.status === 'sent', canc = ov.status === 'cancelled';
+    const s = kitchenStep(liveStatus(ov.status)), canc = ov.status === 'cancelled';
     $('#otrack').hidden = canc;
     const steps = $$('#otrack li');
     if (steps[2]) steps[2].textContent = ov.status === 'on_the_way' ? tr('st.on_the_way') : tr('st.ready');
     steps.forEach((li, i) => {
-      li.classList.toggle('done', i < s);
-      li.classList.toggle('now', i === s);
-      li.setAttribute('aria-current', i === s ? 'step' : 'false');
+      li.classList.toggle('done', i < s || archived);
+      li.classList.toggle('now', !archived && i === s);
+      li.setAttribute('aria-current', !archived && i === s ? 'step' : 'false');
     });
     const waitDel = !canc && ov.status !== 'delivered' && (ov.status === 'ready' || ov.status === 'on_the_way' || ov.driver_ok);
-    $('#omsg').textContent = orderReadonly ? tr('cart.viewOnly') : (ov.status === 'no_confirm' ? tr('st.no_confirm') : canc ? tr('cart.cancelled') : sent ? tr('cart.sentWa') : ov.client_ok && !ov.driver_ok ? tr('cart.waitDriver') : ov.driver_ok && !ov.client_ok ? tr('cart.waitYou') : omsgAt(s));
-    $('#opay').textContent = payTxt(ov.pay, ov);
+    $('#omsg').textContent = archived ? tr('cart.recordMsg') : (orderReadonly ? tr('cart.viewOnly') : (ov.status === 'no_confirm' ? tr('st.no_confirm') : canc ? tr('cart.cancelled') : ov.client_ok && !ov.driver_ok ? tr('cart.waitDriver') : ov.driver_ok && !ov.client_ok ? tr('cart.waitYou') : omsgAt(s)));
+    $('#opay').textContent = archived ? tr('cart.record') : payTxt(ov.pay, ov);
     const payBtn = $('#orderPay');
     const needFirst = !ov.method && ov.pay !== 'paid' && !canc;
     const canSwap = !needFirst && ov.method && ov.pay !== 'paid' && !canc && payChangeLeft(ov) > 0;
@@ -3106,7 +3121,7 @@ const REVIEWS = [];
     if (od) parts.push(`<div class="hs warn"><b>${esc(tr('pay.unpaid'))}</b><strong>${money(od)}</strong><span>${esc(tr('pay.open', { n: owed().length }))}</span></div>`);
     if (pend) parts.push(`<div class="hs"><b>${esc(tr('pay.confirming'))}</b><strong>${money(pend)}</strong><span>${esc(tr('pay.confirm'))}</span></div>`);
     if (!parts.length) {
-      parts.push(history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('pay.noneDue'))}</span></div>` : `<div class="hs"><b>${esc(draftsN ? tr('st.draft') : tr('pay.none'))}</b><span>${esc(draftsN ? tr('cart.resumeDraft') : tr('pay.noneH'))}</span></div>`);
+      parts.push(history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('cart.recordHint'))}</span></div>` : `<div class="hs"><b>${esc(draftsN ? tr('st.draft') : tr('pay.none'))}</b><span>${esc(draftsN ? tr('cart.resumeDraft') : tr('pay.noneH'))}</span></div>`);
     }
     $('#hsum').innerHTML = parts.join('');
     const histPay = $('#histPay');
@@ -3127,11 +3142,12 @@ const REVIEWS = [];
       const el = document.createElement('button'); el.type = 'button'; el.className = 'hcard';
       el.setAttribute('aria-label', contaLabel(o) + ' · ' + tr('cart.viewAria', { c: o.code }));
       const qty = (l) => l.quantity || l.qty || 1;
+      const done = isArchived(o);
+      const prices = (amount) => done ? '' : `<b>${money(amount)}</b>`;
       el.innerHTML = `<div class="hrow"><b>${esc(contaLabel(o))}</b><span>${when(o.ts)}</span></div><p class="hmeta">${esc(o.code)} · ${esc(o.placeLabel || nice(o.table))} · ${esc(o.name)} · ${esc(showPhone(o.phone))}</p>
-        <div class="chips"><span class="chip2 st-${o.status}">${esc(stTxt(o.status))}</span><span class="chip2 pay-${o.method === 'pos' && o.pay !== 'paid' ? 'unpaid' : o.pay}">${esc(payTxt(o.pay, o))}</span>${o.method ? `<span class="chip2">${esc(payMethodLabel(o.method))}</span>` : ''}</div>
-        <ul class="osum">${o.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('')}<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(o.total)}</b></li></ul>
-        <p class="hpeek">${esc(tr('cart.viewHintShort'))}</p>
-        ${o.status === 'sent' ? `<span class="linkbtn" data-recv>${esc(tr('pay.got'))}</span>` : ''}`;
+        <div class="chips"><span class="chip2 st-${liveStatus(o.status)}">${esc(stTxt(liveStatus(o.status)))}</span>${done ? `<span class="chip2 pay-paid">${esc(tr('cart.record'))}</span>` : `<span class="chip2 pay-${o.method === 'pos' && o.pay !== 'paid' ? 'unpaid' : o.pay}">${esc(payTxt(o.pay, o))}</span>`}${!done && o.method ? `<span class="chip2">${esc(payMethodLabel(o.method))}</span>` : ''}</div>
+        <ul class="osum">${o.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span>${prices((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('')}${done ? '' : `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(o.total)}</b></li>`}</ul>
+        <p class="hpeek">${esc(tr('cart.viewHintShort'))}</p>`;
       el.addEventListener('click', (e) => {
         if (e.target.closest('[data-recv]')) {
           o.status = 'delivered'; saveHist(); renderHist(); updateFabs();
@@ -3401,21 +3417,26 @@ const REVIEWS = [];
 
   /* botões flutuantes */
   function latestLiveOrder() {
-    const live = history.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered');
+    const live = history.filter((o) => o.status !== 'cancelled' && !isArchived(o) && o.status !== 'delivered');
     return live.length ? live[live.length - 1] : null;
   }
   function fabStatusTxt(o) {
-    if (!o) return tr('fab.my');
-    const st = tr('st.' + o.status);
-    const pay = o.pay === 'paid' ? '' : (o.pay === 'paid_declared' ? ' · ' + tr('pay.paid_declared') : '');
-    return st + pay;
+    if (!o) return '';
+    const st = liveStatus(o.status);
+    if (st === 'review' || st === 'received' || st === 'sent') return tr('st.review');
+    if (st === 'preparing') return tr('st.preparing');
+    if (st === 'ready') return tr('st.ready');
+    if (st === 'on_the_way') return tr('st.on_the_way');
+    return tr('st.' + st);
   }
   function updateFabs() {
-    const fc = $('#fabCart'), n = cartCount(), od = owedTotal(), liveO = latestLiveOrder();
-    fc.hidden = !(n || history.length);
-    $('#fabCartTxt').textContent = n ? tr('fab.cartN', { n, m: money(grandTotal()) }) : liveO ? fabStatusTxt(liveO) : od ? tr('fab.bill', { m: money(od) }) : tr('fab.my');
-    fc.classList.toggle('owe', !n && od > 0);
-    fc.classList.toggle('live', !n && !!liveO);
+    const fc = $('#fabCart'), n = cartCount(), liveO = latestLiveOrder();
+    const showStatus = !n && !!liveO;
+    fc.hidden = !(n || showStatus);
+    $('#fabCartTxt').textContent = n ? tr('fab.cartN', { n, m: '' }).replace(/\s·\s*$/, '').replace(/\s{2,}/g, ' ') : fabStatusTxt(liveO);
+    if (n) $('#fabCartTxt').textContent = n + (n === 1 ? ' item' : ' itens');
+    fc.classList.toggle('owe', false);
+    fc.classList.toggle('live', showStatus);
     const f = $('#fabCall'), txt = $('#fabCallTxt');
     f.classList.toggle('pending', Boolean(call && (call.status === 'pending' || call.status === 'sent'))); f.classList.toggle('accepted', Boolean(call && call.status === 'accepted'));
     txt.textContent = !call ? tr('fab.call') : call.status === 'pending' ? tr('fab.wait') : call.status === 'sent' ? tr('fab.sent') : call.status === 'accepted' ? tr('fab.coming', { n: call.by || tr('nav.staff') }) : tr('fab.call');
@@ -3617,7 +3638,7 @@ const REVIEWS = [];
     renderMenu,
     fillTables,
     rebuildWall,
-    liveOrders: bindLiveOrders,
+    liveOrders() { bindLiveOrders(); syncHistToBus(); },
     rebuildCats(list) {
       CATS.length = 0;
       list.forEach((c) => CATS.push(c));
@@ -3740,7 +3761,7 @@ const REVIEWS = [];
 })();
 </script>
 <script src="os-config.js?v=ops3"></script>
-<script src="garcom.js?v=ops6"></script>
-<script src="os-bridge.js?v=ops6"></script>
+<script src="garcom.js?v=ops8"></script>
+<script src="os-bridge.js?v=ops8"></script>
 </body>
 </html>

@@ -137,6 +137,14 @@
     write: writeBus,
     pushCall(c) { const d = readBus(); d.calls = d.calls || []; d.calls.unshift(c); writeBus(d); },
     pushOrder(o) { const d = readBus(); d.orders = d.orders || []; d.orders.unshift(o); writeBus(d); },
+    upsertOrder(o) {
+      const d = readBus();
+      d.orders = d.orders || [];
+      const i = d.orders.findIndex((x) => String(x.id) === String(o.id) || (o.code && x.code === o.code));
+      if (i < 0) d.orders.unshift(o);
+      writeBus(d);
+      return d.orders[i < 0 ? 0 : i];
+    },
     patchCall(id, patch) {
       const d = readBus(); const c = (d.calls || []).find((x) => String(x.id) === String(id));
       if (c) Object.assign(c, patch); writeBus(d); return c;
