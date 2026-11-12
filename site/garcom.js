@@ -815,10 +815,18 @@
   function startWork() {
     stopWork(); const be = backend(); if (!be) return;
     S.unsub = be.subscribe(() => { clearTimeout(deb); deb = setTimeout(refreshCalls, 250); });
-    S.pollT = setInterval(refreshCalls, 4000); S.tickT = setInterval(tick, 1000); refreshCalls();
+    S.pollT = setInterval(refreshCalls, 4000); S.tickT = setInterval(tick, 1000);
+    S.alarmT = setInterval(nagPending, 3500); refreshCalls();
     startLiveCalls();
   }
-  function stopWork() { if (S.unsub) { try { S.unsub(); } catch (e) { /* */ } } S.unsub = null; clearInterval(S.pollT); clearInterval(S.tickT); S.lastPend = null; setBadge(0); }
+  function nagPending() {
+    if (!S.soundOn || !S.me || !S.me.active) return;
+    const pend = [].concat(S.calls || [], S.liveCalls || []).filter((c) => c && c.status === 'pending');
+    if (!pend.length) return;
+    beep();
+    try { if (navigator.vibrate) navigator.vibrate([160, 70, 160]); } catch (e) { /* */ }
+  }
+  function stopWork() { if (S.unsub) { try { S.unsub(); } catch (e) { /* */ } } S.unsub = null; clearInterval(S.pollT); clearInterval(S.tickT); clearInterval(S.alarmT); S.lastPend = null; setBadge(0); }
   const sigOf = (l) => l.map((c) => c.id + c.status + c.by + c.released).join('|');
   async function refreshCalls() {
     if (!S.me || !S.me.active) return;

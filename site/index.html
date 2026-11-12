@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops15"></script>
+<script src="i18n.js?v=ops16"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1028,7 +1028,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops15">
+<link rel="stylesheet" href="garcom.css?v=ops16">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1361,7 +1361,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div id="placeDine" hidden>
     <p style="margin:1rem 0 .5rem;font:800 .85rem var(--fh)" data-i18n="place.where">Em que parte do recinto está?</p>
     <div class="zones" id="placeZones"></div>
-    <label style="margin-top:1rem" data-i18n-label="place.mesa">Número da mesa<select id="placeMesa"></select></label>
+    <label style="margin-top:1rem" data-i18n-label="place.mesa">Número da mesa (1 a 200)<input id="placeMesa" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="ex. 8"></label>
   </div>
   <div id="placeTake" hidden>
     <p style="margin:1rem 0 .5rem;font:800 .85rem var(--fh)" data-i18n="place.howTake">Como prefere receber?</p>
@@ -1556,7 +1556,8 @@ const CATS = [
   ['espirituosas', 'Whiskys, gins e espirituosas'], ['cafetaria', 'Cafetaria, águas e sumos'],
   ['grupos', 'Pratos especiais de grupos']
 ];
-const TABLES = Array.from({ length: 40 }, (_, i) => ({ code: String(i + 1), zone: 'mesa' }));
+const MAX_TABLE = 200;
+const TABLES = Array.from({ length: MAX_TABLE }, (_, i) => ({ code: String(i + 1), zone: 'mesa' }));
 
 /* ===== CONFIGURAÇÃO — altere aqui os dados reais do Aqua Club ===== */
 const CONTACT = {
@@ -2215,9 +2216,9 @@ const REVIEWS = [];
   saveHist();
   function applyPlaceFromTable(code) {
     const n = parseInt(String(code).replace(/\D/g, ''), 10);
-    if (!n) return;
+    if (!n || n < 1 || n > MAX_TABLE) return;
     const z = VENUE.find((v) => n >= v.from && n <= v.from + v.n - 1);
-    if (z) place = { kind: 'dine', zone: z.id, mesa: String(n - z.from + 1), tableNumber: n };
+    place = { kind: 'dine', zone: (z && z.id) || place.zone || 'sala', mesa: String(n), tableNumber: n };
   }
   (function resetPlaceIfNewDay() {
     const day = clubDay();
@@ -2259,7 +2260,10 @@ const REVIEWS = [];
   }
   function placeReady(p) {
     if (!p || !p.kind) return false;
-    if (p.kind === 'dine') return Boolean(p.zone && p.mesa && p.tableNumber);
+    if (p.kind === 'dine') {
+      const n = Number(p.tableNumber || p.mesa);
+      return Boolean(p.zone && n >= 1 && n <= MAX_TABLE);
+    }
     if (p.take === 'pickup') return true;
     if (p.take === 'delivery') {
       const addr = String(p.address || '').trim();
@@ -2292,12 +2296,10 @@ const REVIEWS = [];
     }
   }
   function fillMesaSelect() {
-    const z = VENUE.find((v) => v.id === place.zone);
     const sel = $('#placeMesa');
     if (!sel) return;
-    sel.innerHTML = '<option value="">' + esc(tr('place.pickMesa')) + '</option>' +
-      (z ? Array.from({ length: z.n }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('') : '');
-    sel.value = place.mesa || '';
+    const n = Number(place.tableNumber || place.mesa) || '';
+    sel.value = n || '';
   }
   function paintPlaceDlg() {
     $$('#placeKind .pick').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kind === place.kind)));
@@ -2342,10 +2344,10 @@ const REVIEWS = [];
   }
   $$('#placeKind .pick').forEach((b) => b.addEventListener('click', () => { place.kind = b.dataset.kind; paintPlaceDlg(); }));
   $$('#placeTakeKind .pick').forEach((b) => b.addEventListener('click', () => { place.take = b.dataset.take; paintPlaceDlg(); }));
-  $('#placeMesa').addEventListener('change', () => {
-    place.mesa = $('#placeMesa').value;
-    const z = VENUE.find((v) => v.id === place.zone);
-    place.tableNumber = z && place.mesa ? z.from + Number(place.mesa) - 1 : null;
+  $('#placeMesa').addEventListener('input', () => {
+    const n = parseInt($('#placeMesa').value, 10);
+    if (n >= 1 && n <= MAX_TABLE) { place.mesa = String(n); place.tableNumber = n; }
+    else { place.mesa = ''; place.tableNumber = null; }
   });
   $('#placeAddr').addEventListener('input', () => { place.address = $('#placeAddr').value.trim(); });
   $('#placeBairro')?.addEventListener('input', () => { place.bairro = $('#placeBairro').value.trim(); });
@@ -2435,8 +2437,11 @@ const REVIEWS = [];
     const err = $('#placeErr');
     if (!place.kind) { err.textContent = tr('place.needKind'); return; }
     if (place.kind === 'dine') {
-      const z = VENUE.find((v) => v.id === place.zone);
-      place.tableNumber = z && place.mesa ? z.from + Number(place.mesa) - 1 : null;
+      const n = parseInt($('#placeMesa').value, 10);
+      place.mesa = (n >= 1 && n <= MAX_TABLE) ? String(n) : '';
+      place.tableNumber = (n >= 1 && n <= MAX_TABLE) ? n : null;
+      if (!place.zone) { err.textContent = tr('place.needZone'); return; }
+      if (!place.tableNumber) { err.textContent = tr('place.needZone'); return; }
       if (!placeReady(place)) { err.textContent = tr('place.needZone'); return; }
     } else if (place.take === 'delivery') {
       place.bairro = ($('#placeBairro') && $('#placeBairro').value.trim()) || place.bairro || '';
@@ -3413,7 +3418,7 @@ const REVIEWS = [];
       const sel = $('#callTable'); if (sel) sel.value = table;
     }
     const sel = $('#callTable');
-    const code = (sel && sel.value) || callCode();
+    const code = (place.kind === 'dine' && place.tableNumber) ? String(place.tableNumber) : ((sel && sel.value) || callCode());
     if (!code) { if (msg) msg.textContent = tr('call.needPlace'); return; }
     call = { id: null, reason, status: 'pending', t0: Date.now(), tAcc: 0, by: '', respMs: null, rated: false, ack: false };
     $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall();
@@ -3785,7 +3790,7 @@ const REVIEWS = [];
 })();
 </script>
 <script src="os-config.js?v=ops3"></script>
-<script src="garcom.js?v=ops15"></script>
-<script src="os-bridge.js?v=ops15"></script>
+<script src="garcom.js?v=ops16"></script>
+<script src="os-bridge.js?v=ops16"></script>
 </body>
 </html>

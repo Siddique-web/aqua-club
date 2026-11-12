@@ -343,7 +343,7 @@ app.post('/api/orders', (req, res) => {
   const takeMode = String(body.take || body.takeawayMode || '');
   let tableNumber = body.tableNumber != null ? Number(body.tableNumber) : null;
   if (fulfillment === 'dine_in') {
-    if (!tableNumber || tableNumber < 1 || tableNumber > 40) return res.status(400).json({ error: 'table' });
+    if (!tableNumber || tableNumber < 1 || tableNumber > 200) return res.status(400).json({ error: 'table' });
   } else {
     tableNumber = tableNumber || null;
   }
@@ -534,7 +534,7 @@ app.post('/api/calls', (req, res) => {
   const body = req.body || {};
   let tableNumber = Number(body.tableNumber);
   const reason = String(body.reason || '');
-  if (!Number.isFinite(tableNumber) || tableNumber < 0 || tableNumber > 40) return res.status(400).json({ error: 'table' });
+  if (!Number.isFinite(tableNumber) || tableNumber < 0 || tableNumber > 200) return res.status(400).json({ error: 'table' });
   if (tableNumber < 1) tableNumber = 0;
   if (!CALL_REASONS.some((r) => r.id === reason)) return res.status(400).json({ error: 'reason' });
   const name = guestName(body, user);
@@ -830,7 +830,7 @@ app.post('/api/admin/shifts', requireAdmin, (req, res) => {
   const { waiterId, workDate, tableFrom, tableTo } = req.body || {};
   const date = workDate || todayISO();
   const tf = Number(tableFrom), tt = Number(tableTo);
-  if (!waiterId || tf < 1 || tt > 40 || tf > tt) return res.status(400).json({ error: 'range' });
+  if (!waiterId || tf < 1 || tt > 200 || tf > tt) return res.status(400).json({ error: 'range' });
   db.prepare(`INSERT INTO shifts (waiter_id, work_date, table_from, table_to) VALUES (?,?,?,?)
     ON CONFLICT(waiter_id, work_date) DO UPDATE SET table_from=excluded.table_from, table_to=excluded.table_to`)
     .run(Number(waiterId), date, tf, tt);
