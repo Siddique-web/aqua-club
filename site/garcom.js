@@ -40,7 +40,11 @@
 
   const REASONS = { request_bill: 'Pedir a conta', menu_question: 'Dúvida sobre o menu', new_order: 'Novo pedido / alterar pedido', urgent_other: 'Urgente / outro', conta: 'Pedir a conta', duvida: 'Dúvida sobre o menu', pedido: 'Novo pedido / alterar pedido', urgente: 'Urgente / outro' };
   const REASON_IC = { request_bill: 'card', menu_question: 'book', new_order: 'plus', urgent_other: 'alert', conta: 'card', duvida: 'book', pedido: 'plus', urgente: 'alert' };
-  const ZONES = { rooftop: 'Rooftop', piscina: 'Piscina', 'sala-principal': 'Sala principal' };
+  const ZONES = {
+    sala: 'Sala', esplanada: 'Esplanada', snack: 'Snack Bar', cafeteria: 'Cafeteria', rooftop: 'Rooftop',
+    piscina: 'Piscina', ginasio: 'Ginásio', bar: 'Bar', kids: 'Aqua Kids', bilhar: 'Bilhar',
+    lounge: 'Lounge', parque: 'Parque', recepcao: 'Recepção', wc: 'WC', all: 'Recinto', 'sala-principal': 'Sala'
+  };
   const tableName = (c) => { const m = /^Mesa-(\d+)/i.exec(c || ''); return m ? 'Mesa ' + m[1] : String(c || '').replace(/-/g, ' '); };
   const GOAL = 15;   // meta diária de atendimentos (apenas motivacional)
   const PERIODS = [[1, 'Hoje'], [7, '7 dias'], [30, '30 dias']];
@@ -363,9 +367,9 @@
           AquaBus.pushCall({
             id,
             table_number: Number.isFinite(n) && n > 0 ? n : 0,
-            place: table || '',
+            place: String(table || note || ''),
             reason: mapped,
-            note: String(note || '').slice(0, 140),
+            note: String(note || table || '').slice(0, 180),
             status: 'pending',
             created_at: new Date().toISOString(),
             device_id: device || null
@@ -729,14 +733,18 @@
   function mapOsCall(c) {
     const reasonMap = { conta: 'request_bill', duvida: 'menu_question', pedido: 'new_order', urgente: 'urgent_other' };
     const st = c.status === 'closed' ? 'completed' : c.status;
+    const sid = c.serverId || c.id;
+    const numeric = /^\d+$/.test(String(sid));
+    const loc = String(c.place || c.note || (Number(c.table_number) > 0 ? ('Mesa ' + c.table_number) : '') || 'Cliente');
+    const zoneKey = Object.keys(ZONES).find((z) => z !== 'all' && loc.toLowerCase().indexOf(ZONES[z].toLowerCase()) >= 0) || 'all';
     return {
-      id: 'os-' + c.id, osId: c.id, live: true,
-      tableCode: (c.place && String(c.place).replace(/\d/g, '').trim().length > 1)
-        ? String(c.place)
-        : (Number(c.table_number) > 0 ? ('Mesa-' + String(c.table_number).padStart(2, '0')) : (c.place || c.note || 'Cliente')),
-      zone: 'all',
+      id: numeric ? ('os-' + sid) : String(c.id),
+      osId: sid,
+      live: true,
+      tableCode: loc,
+      zone: zoneKey,
       reason: reasonMap[c.reason] || c.reason,
-      note: [c.customer_name, c.customer_phone, c.note].filter(Boolean).join(' · '),
+      note: [c.customer_name, c.customer_phone].filter(Boolean).join(' · '),
       status: st,
       createdAt: isoCall(c.created_at || c.ts || Date.now()),
       acceptedAt: isoCall(c.accepted_at),
@@ -759,8 +767,9 @@
   async function refreshLiveCalls() {
     try {
       let mapped = [];
+      const root = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
       try {
-        const r = await fetch('/api/live/calls', { credentials: 'include' });
+        const r = await fetch((root || '') + '/api/live/calls', { credentials: 'include' });
         const ct = r.headers.get('content-type') || '';
         if (r.ok && ct.includes('json')) {
           const d = await r.json();
@@ -786,7 +795,7 @@
   function startLiveCalls() {
     if (S.livePoll) return;
     refreshLiveCalls();
-    S.livePoll = setInterval(refreshLiveCalls, 3000);
+    S.livePoll = setInterval(refreshLiveCalls, 2000);
     if (!window.__aqStaffUp) {
       window.__aqStaffUp = true;
       const bump = () => {
@@ -794,23 +803,29 @@
         if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) loadOsDesk().then(() => { if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) renderTab(); }).catch(() => {});
       };
       window.addEventListener('aq-os-up', bump);
+      window.addEventListener('aq-os-live', () => bindStaffSock());
+      window.addEventListener('aq-call', bump);
       try {
         window.__aqStaffBc = new BroadcastChannel('aq-os');
         window.__aqStaffBc.onmessage = bump;
       } catch (e) { /* */ }
     }
+    bindStaffSock();
+  }
+  function bindStaffSock() {
+    const origin = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
     if (window.io && !S.osSock) {
-      S.osSock = window.io({ transports: ['websocket', 'polling'] });
+      S.osSock = window.io(origin || undefined, { transports: ['websocket', 'polling'], withCredentials: true });
       S.osSock.on('call:new', () => refreshLiveCalls());
       S.osSock.on('call:updated', () => refreshLiveCalls());
       S.osSock.on('order:new', () => { if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) loadOsDesk().then(() => renderTab()); });
-    } else if (!window.io && !document.querySelector('script[data-aq-io]')) {
-      const origin = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
-      if (!origin) return;
+      return;
+    }
+    if (!window.io && origin && !document.querySelector('script[data-aq-io]')) {
       const s = document.createElement('script');
       s.src = origin + '/socket.io/socket.io.js';
       s.dataset.aqIo = '1';
-      s.onload = () => { if (!S.osSock) { S.osSock = window.io({ transports: ['websocket', 'polling'] }); S.osSock.on('call:new', () => refreshLiveCalls()); S.osSock.on('call:updated', () => refreshLiveCalls()); } };
+      s.onload = () => bindStaffSock();
       document.head.appendChild(s);
     }
   }

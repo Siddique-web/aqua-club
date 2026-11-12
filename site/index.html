@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops18"></script>
+<script src="i18n.js?v=ops19"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1028,7 +1028,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops18">
+<link rel="stylesheet" href="garcom.css?v=ops19">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1497,31 +1497,24 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div class="dhead"><h2 id="callT" data-i18n="call.title">Chamar garçom</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
   <div id="callForm">
     <div id="callPlace">
-      <p class="place-must" style="margin:0 0 .7rem">Diga onde está — mesa ou outro sítio — para o garçom o localizar.</p>
-      <div class="picks" id="callWhere">
-        <button type="button" class="pick" data-where="mesa" aria-pressed="true"><span>À mesa</span><small>Zona e número 1 a 200</small></button>
-        <button type="button" class="pick" data-where="outro" aria-pressed="false"><span>Outro sítio</span><small>Bar, kids, bilhar, lounge…</small></button>
-      </div>
-      <div id="callMesaBox">
-        <p style="margin:1rem 0 .45rem;font:800 .85rem var(--fh)">Zona e número da mesa</p>
-        <div class="zones" id="callZones"></div>
-        <label style="margin-top:.85rem">Número da mesa (1 a 200)<input id="callMesa" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="ex. 12"></label>
-      </div>
-      <div id="callSpotBox" hidden>
-        <p style="margin:1rem 0 .45rem;font:800 .85rem var(--fh)">Onde está agora?</p>
-        <div class="zones" id="callSpots"></div>
-        <label style="margin-top:.85rem">Ponto exacto (opcional)<input id="callSpotNote" maxlength="80" placeholder="ex. balcão do bar, junto ao escorrega"></label>
-      </div>
-      <button class="btn btn-cyan btn-block" type="button" id="callSend" style="margin-top:.9rem">Chamar agora</button>
+      <p class="place-must" style="margin:0 0 .55rem">1. Onde está? Escolha a zona e, se tiver mesa, o número — o garçom precisa disto para o encontrar.</p>
+      <p style="margin:0 0 .45rem;font:800 .85rem var(--fh)">Zona no recinto</p>
+      <div class="zones" id="callZones"></div>
+      <label style="margin-top:.85rem">Número da mesa (1 a 200)<input id="callMesa" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="ex. 12 — deixe vazio se não tiver mesa"></label>
+      <label style="margin-top:.65rem">Ponto exacto (se não tiver mesa, descreva)<input id="callSpotNote" maxlength="80" placeholder="ex. balcão do bar, canto da esplanada"></label>
+      <button class="btn btn-cyan btn-block" type="button" id="callNext" style="margin-top:.9rem">Seguinte — motivo</button>
     </div>
     <label data-i18n-label="call.table" hidden>Mesa<select id="callTable"></select></label>
-    <div class="reasons" style="margin-top:.9rem" hidden>
+    <div class="reasons" id="callReasons" hidden>
+      <p class="place-must" style="margin:0 0 .55rem">2. Porque chama o garçom?</p>
       <button type="button" data-reason="request_bill" data-i18n="call.bill">Pedir a conta</button>
       <button type="button" data-reason="menu_question" data-i18n="call.q">Dúvida sobre o menu</button>
       <button type="button" data-reason="new_order" data-i18n="call.new">Fazer um novo pedido</button>
       <button type="button" data-reason="urgent_other" data-i18n="call.urgent">Urgente / outro assunto</button>
+      <button class="btn btn-line btn-block" type="button" id="callBackPlace" style="margin-top:.4rem">Voltar ao sítio</button>
     </div>
     <p class="demo" data-demo hidden style="margin-top:.9rem"></p>
+    <p class="msg" id="callLiveHint" style="margin-top:.7rem;font-size:.82rem"></p>
     <p class="msg" id="callMsg" role="status" aria-live="polite"></p>
   </div>
   <div id="callStatus" hidden>
@@ -1961,10 +1954,10 @@ const REVIEWS = [];
     } catch (e) { /* */ }
   }
   async function apiCall(code, reason) {
-    const loc = (callWhere === 'outro' ? String(code || '') : (placeLabel(place) || ('Mesa ' + code))) || String(code || '');
-    const extra = { name: cust.name || '', phone: cust.phone || '', note: loc };
+    const loc = callLocLabel();
+    const extra = { name: cust.name || '', phone: cust.phone || '', note: loc, place: loc };
     const mapped = ({ request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente', waiter: 'urgente' }[reason] || reason || 'urgente');
-    const n = callWhere === 'mesa' ? parseInt(String(code).replace(/\D/g, ''), 10) : 0;
+    const n = parseInt(String(place.tableNumber || code).replace(/\D/g, ''), 10);
     const localId = 'c' + Date.now();
     const row = {
       id: localId,
@@ -3400,7 +3393,20 @@ const REVIEWS = [];
         if (r) { emit(id, r); if (r.status === 'completed' || r.status === 'cancelled' || r.status === 'closed') clearInterval(callPoll); }
       } catch (e) { /* tenta de novo */ }
     };
-    tick(); callPoll = setInterval(tick, 3000);
+    tick(); callPoll = setInterval(tick, 2000);
+    const onLive = (ev) => {
+      const c = ev && ev.detail;
+      if (!c || !call || String(c.id) !== String(id) && String(c.serverId) !== String(id)) return;
+      const st = c.status === 'closed' ? 'completed' : c.status;
+      emit(id, { status: st, by: c.waiterName || c.by || '' });
+    };
+    window.addEventListener('aq-call', onLive);
+    const wrap = setInterval(() => {
+      if (!call || call.id !== id) {
+        clearInterval(wrap);
+        window.removeEventListener('aq-call', onLive);
+      }
+    }, 4000);
   }
   function resumeCall() {
     let sv = null; try { sv = JSON.parse(store.get('aq.call') || 'null'); } catch (e) { /* */ }
@@ -3408,99 +3414,94 @@ const REVIEWS = [];
     call = { id: sv.id, reason: sv.reason, status: 'pending', t0: sv.t0, tAcc: 0, by: '', respMs: null, rated: false, ack: false };
     armCall(sv.id); updateFabs();
   }
-  const CALL_SPOTS = [
-    { id: 'bar', label: 'Bar' }, { id: 'kids', label: 'Aqua Kids' }, { id: 'bilhar', label: 'Bilhar / jogos' },
-    { id: 'lounge', label: 'Lounge' }, { id: 'piscina-livre', label: 'Piscina' }, { id: 'parque', label: 'Parque' },
-    { id: 'recepcao', label: 'Recepção' }, { id: 'wc', label: 'WC' }, { id: 'outro', label: 'Outro' }
-  ];
-  let callWhere = 'mesa';
-  let callSpot = '';
-  function callCode() {
-    if (callWhere === 'outro') {
-      const spot = CALL_SPOTS.find((s) => s.id === callSpot);
-      const extra = ($('#callSpotNote') && $('#callSpotNote').value.trim()) || '';
-      return [spot ? spot.label : '', extra].filter(Boolean).join(' · ') || 'outro sítio';
-    }
-    if (place.kind === 'dine' && place.tableNumber) return String(place.tableNumber);
-    if (place.take === 'pickup') return 'levantamento';
-    if (place.take === 'delivery') return 'entrega';
-    return table || '';
+  const CALL_ZONES = VENUE.map((v) => v.id).concat(['bar', 'kids', 'bilhar', 'lounge', 'parque', 'recepcao', 'wc']);
+  const CALL_ZONE_FALLBACK = {
+    bar: 'Bar', kids: 'Aqua Kids', bilhar: 'Bilhar / jogos', lounge: 'Lounge',
+    parque: 'Parque', recepcao: 'Recepção', wc: 'WC'
+  };
+  function callZoneName(id) {
+    const t = zoneName(id);
+    if (t && t !== ('place.' + id)) return t;
+    return CALL_ZONE_FALLBACK[id] || id;
   }
-  function paintCallWhere() {
-    $$('#callWhere .pick').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.where === callWhere)));
-    const mesaBox = $('#callMesaBox'), spotBox = $('#callSpotBox');
-    if (mesaBox) mesaBox.hidden = callWhere !== 'mesa';
-    if (spotBox) spotBox.hidden = callWhere !== 'outro';
+  function callLocLabel() {
+    const z = place.zone ? callZoneName(place.zone) : '';
+    const n = Number(place.tableNumber);
+    const mesa = n >= 1 && n <= MAX_TABLE ? ('Mesa ' + n) : '';
+    const extra = ($('#callSpotNote') && $('#callSpotNote').value.trim()) || '';
+    return [z, mesa, extra].filter(Boolean).join(' · ') || '';
+  }
+  function callCode() {
+    const n = Number(place.tableNumber);
+    if (n >= 1 && n <= MAX_TABLE) return String(n);
+    return callLocLabel();
+  }
+  function paintCallLiveHint() {
+    const el = $('#callLiveHint');
+    if (!el) return;
+    const ok = !!(window.AquaOS && AquaOS.live && AquaOS.live());
+    el.textContent = ok
+      ? 'A administração e os garçons recebem este chamado ao vivo.'
+      : 'Para o chamado chegar a outro telemóvel, abra o site pelo sistema (npm start na pasta plataforma, porta 5173). Sem isso, só funciona neste aparelho.';
+  }
+  function showCallStep(step) {
+    const placeBox = $('#callPlace'), reasons = $('#callReasons');
+    if (placeBox) placeBox.hidden = step !== 1;
+    if (reasons) reasons.hidden = step !== 2;
   }
   function fillCallPlace() {
     const box = $('#callZones');
     if (box && !box.dataset.ready) {
       box.dataset.ready = '1';
-      VENUE.forEach((v) => {
+      CALL_ZONES.forEach((id) => {
         const b = document.createElement('button');
-        b.type = 'button'; b.dataset.zone = v.id; b.textContent = zoneName(v.id);
+        b.type = 'button'; b.dataset.zone = id; b.textContent = callZoneName(id);
         b.addEventListener('click', () => {
           place.kind = 'dine';
-          place.zone = v.id;
-          $$('#callZones button').forEach((x) => x.classList.toggle('on', x.dataset.zone === v.id));
+          place.zone = id;
+          $$('#callZones button').forEach((x) => x.classList.toggle('on', x.dataset.zone === id));
         });
         box.appendChild(b);
       });
     } else if (box) {
-      $$('#callZones button').forEach((b) => { b.textContent = zoneName(b.dataset.zone); b.classList.toggle('on', b.dataset.zone === place.zone); });
-    }
-    const spots = $('#callSpots');
-    if (spots && !spots.dataset.ready) {
-      spots.dataset.ready = '1';
-      CALL_SPOTS.forEach((s) => {
-        const b = document.createElement('button');
-        b.type = 'button'; b.dataset.spot = s.id; b.textContent = s.label;
-        b.addEventListener('click', () => {
-          callSpot = s.id;
-          $$('#callSpots button').forEach((x) => x.classList.toggle('on', x.dataset.spot === s.id));
-        });
-        spots.appendChild(b);
+      $$('#callZones button').forEach((b) => {
+        b.textContent = callZoneName(b.dataset.zone);
+        b.classList.toggle('on', b.dataset.zone === place.zone);
       });
-    } else if (spots) {
-      $$('#callSpots button').forEach((b) => b.classList.toggle('on', b.dataset.spot === callSpot));
     }
     const inp = $('#callMesa');
     if (inp) {
       const n = Number(place.tableNumber || place.mesa) || '';
       inp.value = n || '';
     }
-    paintCallWhere();
+    paintCallLiveHint();
   }
   function readCallPlace() {
-    if (callWhere === 'outro') {
-      const spot = CALL_SPOTS.find((s) => s.id === callSpot);
-      const extra = ($('#callSpotNote') && $('#callSpotNote').value.trim()) || '';
-      if (!spot && extra.length < 3) return 'Escolha o sítio ou descreva onde está.';
-      place.kind = 'dine';
+    const n = parseInt(($('#callMesa') && $('#callMesa').value) || '', 10);
+    const extra = ($('#callSpotNote') && $('#callSpotNote').value.trim()) || '';
+    if (!place.zone) return 'Escolha a zona (esplanada, sala, piscina, bar…).';
+    const hasMesa = n >= 1 && n <= MAX_TABLE;
+    if (!hasMesa && extra.length < 3) return 'Indique o número da mesa ou descreva o sítio exacto.';
+    place.kind = 'dine';
+    if (hasMesa) {
+      place.mesa = String(n);
+      place.tableNumber = n;
+      table = String(n);
+      const sel = $('#callTable'); if (sel) sel.value = table;
+    } else {
       place.mesa = '';
       place.tableNumber = null;
-      table = callCode();
-      savePlace();
-      return '';
     }
-    const n = parseInt(($('#callMesa') && $('#callMesa').value) || '', 10);
-    if (!place.zone) return 'Escolha a zona onde está.';
-    if (!(n >= 1 && n <= MAX_TABLE)) return 'Indique o número da mesa (1 a 200).';
-    place.kind = 'dine';
-    place.mesa = String(n);
-    place.tableNumber = n;
-    table = String(n);
     savePlace();
-    const sel = $('#callTable'); if (sel) sel.value = table;
     return '';
   }
   function openCall(reason) {
-    const why = reason || 'urgent_other';
-    SCallReason = why;
+    SCallReason = reason || 'urgent_other';
     if (call && (call.status === 'pending' || call.status === 'accepted' || call.status === 'sent')) {
       $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall(); callDlg.showModal(); return;
     }
     fillCallPlace();
+    showCallStep(1);
     $('#callForm').hidden = false; $('#callStatus').hidden = true;
     $('#callMsg').textContent = '';
     callDlg.showModal();
@@ -3509,13 +3510,18 @@ const REVIEWS = [];
   async function startCall(reason) {
     const msg = $('#callMsg');
     const need = readCallPlace();
-    if (need) { if (msg) msg.textContent = need; $('#callForm').hidden = false; $('#callStatus').hidden = true; return; }
-    if (callWhere === 'mesa' && place.tableNumber) {
+    if (need) {
+      if (msg) msg.textContent = need;
+      $('#callForm').hidden = false; $('#callStatus').hidden = true;
+      showCallStep(1);
+      return;
+    }
+    if (place.tableNumber) {
       table = String(place.tableNumber);
       const sel = $('#callTable'); if (sel) sel.value = table;
     }
     const code = callCode();
-    if (!code) { if (msg) msg.textContent = tr('call.needPlace'); return; }
+    if (!code) { if (msg) msg.textContent = tr('call.needPlace'); showCallStep(1); return; }
     call = { id: null, reason, status: 'pending', t0: Date.now(), tAcc: 0, by: '', respMs: null, rated: false, ack: false };
     $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall();
     if (msg) msg.textContent = tr('cart.sending');
@@ -3534,18 +3540,19 @@ const REVIEWS = [];
       call = null;
     }
   }
-  $$('[data-reason]').forEach((b) => b.addEventListener('click', () => startCall(b.dataset.reason)));
+  $$('#callReasons [data-reason]').forEach((b) => b.addEventListener('click', () => startCall(b.dataset.reason)));
   $('#callCancel').addEventListener('click', async () => { await apiCancelCall(call.id); call.status = 'cancelled'; paintCall(); });
   $('#callDone').addEventListener('click', () => { clearInterval(callPoll); call.ack = true; emit(call.id, { status: 'completed' }); });
   $('#callClose').addEventListener('click', () => { callDlg.close(); clearInterval(callPoll); call = null; store.set('aq.call', ''); updateFabs(); });
-  $('#callSend').addEventListener('click', () => startCall(SCallReason || 'urgent_other'));
-  $('#callWhere').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-where]');
-    if (!b) return;
-    callWhere = b.dataset.where;
-    paintCallWhere();
+  $('#callNext').addEventListener('click', () => {
+    const msg = $('#callMsg');
+    const need = readCallPlace();
+    if (need) { if (msg) msg.textContent = need; return; }
+    if (msg) msg.textContent = '';
+    showCallStep(2);
   });
-  $('#callMesa').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); startCall(SCallReason || 'urgent_other'); } });
+  $('#callBackPlace').addEventListener('click', () => { showCallStep(1); $('#callMsg').textContent = ''; });
+  $('#callMesa').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('#callNext').click(); } });
   $('#fabCall').addEventListener('click', (e) => { e.preventDefault(); openCall('urgent_other'); });
 
   /* botões flutuantes */
@@ -3893,8 +3900,8 @@ const REVIEWS = [];
   });
 })();
 </script>
-<script src="os-config.js?v=ops3"></script>
-<script src="garcom.js?v=ops18"></script>
-<script src="os-bridge.js?v=ops18"></script>
+<script src="os-config.js?v=ops19"></script>
+<script src="garcom.js?v=ops19"></script>
+<script src="os-bridge.js?v=ops19"></script>
 </body>
 </html>

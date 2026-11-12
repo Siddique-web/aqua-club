@@ -497,7 +497,7 @@ app.post('/api/orders/:id/pay', (req, res) => {
 app.get('/api/live/calls', (_req, res) => {
   const calls = db.prepare(`SELECT id, table_number, reason, note, status, created_at, accepted_at, closed_at, customer_name, customer_phone, waiter_id
     FROM calls WHERE status IN ('pending','accepted') OR datetime(COALESCE(closed_at, created_at)) >= datetime('now','-1 day')
-    ORDER BY id DESC LIMIT 120`).all();
+    ORDER BY id DESC LIMIT 120`).all().map((c) => ({ ...c, place: c.note || (c.table_number ? ('Mesa ' + c.table_number) : '') }));
   res.json({ calls });
 });
 
@@ -540,11 +540,12 @@ app.post('/api/calls', (req, res) => {
   const name = guestName(body, user);
   const phone = guestPhone(body, user);
   const waiter = waiterForTable(tableNumber);
-  const note = [body.note, name, phone].filter(Boolean).join(' · ').slice(0, 240);
+  const loc = String(body.place || body.note || (tableNumber ? ('Mesa ' + tableNumber) : '')).slice(0, 160);
+  const note = loc;
   const info = db.prepare(`INSERT INTO calls (customer_id, waiter_id, table_number, reason, note, status, customer_name, customer_phone)
     VALUES (?,?,?,?,?,'pending',?,?)`).run(user?.id || null, waiter?.id || null, tableNumber, reason, note, name || null, phone || null);
   const call = db.prepare('SELECT * FROM calls WHERE id=?').get(Number(info.lastInsertRowid));
-  const payload = { ...call, waiterName: waiter?.name, customerName: name || user?.name || '' };
+  const payload = { ...call, waiterName: waiter?.name, customerName: name || user?.name || '', place: loc };
   emitAll('call:new', payload);
   emitAll('call:updated', payload);
   if (waiter) emitAll('waiter:notify', { waiterId: waiter.id, type: 'call', tableNumber, reason, call: payload });
@@ -552,10 +553,10 @@ app.post('/api/calls', (req, res) => {
 });
 
 app.get('/api/calls/:id', (req, res) => {
-  const call = db.prepare('SELECT id, status, table_number, reason, waiter_id, created_at, accepted_at, closed_at FROM calls WHERE id=?').get(Number(req.params.id));
+  const call = db.prepare('SELECT id, status, table_number, reason, note, waiter_id, created_at, accepted_at, closed_at FROM calls WHERE id=?').get(Number(req.params.id));
   if (!call) return res.status(404).json({ error: 'missing' });
   const waiter = call.waiter_id ? db.prepare('SELECT id, name FROM waiters WHERE id=?').get(call.waiter_id) : null;
-  res.json({ call: { ...call, waiterName: waiter?.name || null } });
+  res.json({ call: { ...call, waiterName: waiter?.name || null, place: call.note || '' } });
 });
 
 app.post('/api/calls/:id/cancel', (req, res) => {

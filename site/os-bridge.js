@@ -69,13 +69,29 @@
   }
 
   async function resolveOrigin() {
+    const guesses = [];
     const preferred = apiOrigin();
-    if (preferred) {
-      const ok = await probeOrigin(preferred);
-      if (ok) return ok;
+    if (preferred) guesses.push(preferred);
+    guesses.push(location.origin);
+    try {
+      const h = location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') {
+        guesses.push('http://127.0.0.1:5173', 'http://localhost:5173');
+      } else if (h && !/\.vercel\.app$/i.test(h) && h !== 'aquaclub.co.mz') {
+        guesses.push('http://' + h + ':5173');
+      }
+    } catch (e) { /* */ }
+    const seen = new Set();
+    for (let i = 0; i < guesses.length; i++) {
+      const g = String(guesses[i] || '').replace(/\/$/, '');
+      if (!g || seen.has(g)) continue;
+      seen.add(g);
+      const ok = await probeOrigin(g);
+      if (ok) {
+        try { localStorage.setItem('aqua_api', ok); } catch (e) { /* */ }
+        return ok;
+      }
     }
-    const same = await probeOrigin(location.origin);
-    if (same) return same;
     return '';
   }
 
@@ -100,6 +116,8 @@
         sock = io(origin || undefined, { transports: ['websocket', 'polling'], withCredentials: true });
         sock.on('connect', () => { sockUp = true; });
         sock.on('disconnect', () => { sockUp = false; });
+        sock.on('call:new', (c) => { try { window.dispatchEvent(new CustomEvent('aq-call', { detail: c })); } catch (e) { /* */ } });
+        sock.on('call:updated', (c) => { try { window.dispatchEvent(new CustomEvent('aq-call', { detail: c })); } catch (e) { /* */ } });
         bindSock(handlers || {});
       } catch (e) { sock = null; sockUp = false; }
     });
@@ -296,12 +314,14 @@
       const map = { request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente', waiter: 'urgente' };
       const parsed = parseInt(String(code).replace(/\D/g, ''), 10);
       const tableNumber = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+      const loc = (extra && (extra.place || extra.note)) || String(code || '');
       const r = await api('/calls', {
         method: 'POST',
         body: {
           tableNumber,
           reason: map[reason] || reason || 'urgente',
-          note: (extra && extra.note) || String(code || ''),
+          place: loc,
+          note: loc,
           name: (extra && extra.name) || '',
           phone: (extra && extra.phone) || ''
         }
@@ -394,7 +414,10 @@
       paintMenuLang();
       AquaUI.fillTables();
       if (AquaUI.rebuildWall) AquaUI.rebuildWall();
-      if (live) connectSock({});
+      if (live) {
+        connectSock({});
+        try { window.dispatchEvent(new CustomEvent('aq-os-live', { detail: { origin } })); } catch (e) { /* */ }
+      }
       if (AquaUI.liveOrders) AquaUI.liveOrders();
     } catch (e) { console.warn('Catálogo em linha indisponível; menu local.', e); }
   }
