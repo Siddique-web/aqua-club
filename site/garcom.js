@@ -731,7 +731,9 @@
     const st = c.status === 'closed' ? 'completed' : c.status;
     return {
       id: 'os-' + c.id, osId: c.id, live: true,
-      tableCode: (Number(c.table_number) > 0 ? ('Mesa-' + String(c.table_number).padStart(2, '0')) : (c.place || c.note || 'Cliente')),
+      tableCode: (c.place && String(c.place).replace(/\d/g, '').trim().length > 1)
+        ? String(c.place)
+        : (Number(c.table_number) > 0 ? ('Mesa-' + String(c.table_number).padStart(2, '0')) : (c.place || c.note || 'Cliente')),
       zone: 'all',
       reason: reasonMap[c.reason] || c.reason,
       note: [c.customer_name, c.customer_phone, c.note].filter(Boolean).join(' · '),
