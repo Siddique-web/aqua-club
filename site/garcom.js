@@ -43,6 +43,7 @@
   const ZONES = { rooftop: 'Rooftop', piscina: 'Piscina', 'sala-principal': 'Sala principal' };
   const tableName = (c) => { const m = /^Mesa-(\d+)/i.exec(c || ''); return m ? 'Mesa ' + m[1] : String(c || '').replace(/-/g, ' '); };
   const GOAL = 15;   // meta diária de atendimentos (apenas motivacional)
+  const PERIODS = [[1, 'Hoje'], [7, '7 dias'], [30, '30 dias']];
 
   const siteTables = () => (typeof TABLES !== 'undefined' && Array.isArray(TABLES) && TABLES.length ? TABLES
     : [{ code: 'Mesa-01-Rooftop', zone: 'rooftop' }, { code: 'Mesa-04-Rooftop', zone: 'rooftop' }, { code: 'Mesa-08-Piscina', zone: 'piscina' },
@@ -534,8 +535,10 @@
   const avatar = (m, big) => '<span class="gp-av' + (big ? ' lg' : '') + '" style="background:' + safeColor(m.color) + '" aria-hidden="true">' + esc(initials(m.name)) + '</span>';
 
   /* ====================================================================== ESTADO */
+  const emptyOf = () => ({ q: '', from: '', to: '', hour: '', wday: '', cat: '', pay: '', kind: '', st: '', place: '' });
+  const emptyCf = () => ({ q: '', from: '', to: '', hour: '', wday: '', reason: '', zone: 'all', st: '', waiter: '' });
   const S = { open: false, view: 'boot', authTab: 'in', tab: 'orders', me: null, calls: [], mine: null, mineAt: 0, team: null,
-    period: 7, hper: 7, zone: 'all', msg: '', msgType: '', unsub: null, pollT: 0, tickT: 0, lastPend: null, pendingN: 0, soundOn: store.get('aq.gp.sound') !== '0', recovery: false,
+    period: 7, hper: 7, zone: 'all', of: emptyOf(), cf: emptyCf(), msg: '', msgType: '', unsub: null, pollT: 0, tickT: 0, lastPend: null, pendingN: 0, soundOn: store.get('aq.gp.sound') !== '0', recovery: false,
     osDesk: null, osStaff: store.get('aq.os.staff') || '', osMsg: '', osN: 0, osPoll: 0, livePoll: 0, liveCalls: [], lastLive: null };
   const mt = (n) => Number(n || 0).toLocaleString('pt-PT') + ' MT';
   function hasOsApi() {
@@ -679,7 +682,7 @@
     root.innerHTML = '<header class="gp-top"><div class="gp-brand"><img src="assets/logo.webp" alt="" width="38" height="38" onerror="this.onerror=null;this.src=&quot;assets/logo.png&quot;"><span>Aqua <b>Club</b> · Garçom</span></div><span class="sp"></span><span class="gp-mode" id="gpMode"></span>' +
       '<button class="gp-x" type="button" data-act="close" aria-label="Fechar área do garçom">' + ic('x') + '</button></header><div class="gp-scroll" id="gpScroll"><div class="gp-wrap" id="gpMain"></div></div>';
     document.body.appendChild(root);
-    root.addEventListener('click', onClick); root.addEventListener('submit', onSubmit);
+    root.addEventListener('click', onClick); root.addEventListener('submit', onSubmit); root.addEventListener('change', onFilterChange);
   }
   function setInert(on) { Array.from(document.body.children).forEach((el) => { if (el === root || el === pn || el === toasts || /^(SCRIPT|STYLE|LINK|DIALOG)$/.test(el.tagName)) return; if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert'); }); }
   async function openPortal(tab) {
@@ -851,7 +854,7 @@
     else if (v === 'recover') m.innerHTML = viewRecover();
     else if (v === 'error') m.innerHTML = viewSimple('alert', 'Não foi possível carregar', esc(S.msg || 'Verifique a ligação à internet.'), false, true);
     else if (v === 'app') { m.innerHTML = appFrame(); renderTab(); }
-    document.documentElement.classList.toggle('gp-admin', !!(S.open && S.me && S.me.role === 'admin' && v === 'app'));
+    document.documentElement.classList.toggle('gp-admin', !!(S.open && S.me && v === 'app'));
     const brand = root && $('.gp-brand span', root);
     if (brand) brand.innerHTML = 'Aqua <b>Club</b> · ' + (S.me && S.me.role === 'admin' && v === 'app' ? 'Admin' : 'Garçom');
     syncNav();
@@ -907,8 +910,8 @@
       ['team', 'Equipa', 'users'], ['stats', 'Relatórios', 'chart'], ['profile', 'Casa', 'user']
     ];
     return [
-      ['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'], ['hist', 'Histórico', 'list'],
-      ['stats', 'Estatísticas', 'chart'], ['profile', 'Perfil', 'user']
+      ['dash', 'Painel', 'home'], ['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'],
+      ['hist', 'Histórico', 'list'], ['stats', 'Relatórios', 'chart'], ['profile', 'Perfil', 'user']
     ];
   }
   function tabSelected(id) {
@@ -924,25 +927,22 @@
   function appFrame() {
     const me = S.me, admin = me.role === 'admin', tabs = staffTabs();
     const who = '<div class="gp-card"><div class="gp-who">' + avatar(me) + '<div><h2>' + esc(me.name) + '<span class="gp-role">' + (admin ? 'Admin' : 'Garçom') + '</span></h2><small>' + esc(me.email || me.phone || 'PIN da casa') + '</small></div></div></div>';
-    if (admin) {
-      const side = '<nav class="gp-side" aria-label="Secções">' + tabs.map((t) =>
-        '<button class="gp-side-btn" type="button" data-act="tab" data-t="' + t[0] + '" aria-selected="' + tabSelected(t[0]) + '" title="' + t[1] + '">' + ic(t[2]) + '<span class="gp-side-lab">' + t[1] + '</span>' + tabBadge(t[0]) + '</button>'
-      ).join('') + '</nav>';
-      return '<div class="gp-shell is-admin">' + side + '<div class="gp-maincol">' + who + '<div id="gpc" aria-live="polite"></div></div></div>';
-    }
-    return who +
-      '<div class="gp-tabs" role="tablist" aria-label="Secções">' + tabs.map((t) => '<button class="gp-tab" type="button" role="tab" data-act="tab" data-t="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + ic(t[2]) + t[1] + tabBadge(t[0]) + '</button>').join('') + '</div><div id="gpc" aria-live="polite"></div>';
+    const side = '<nav class="gp-side" aria-label="Secções">' + tabs.map((t) =>
+      '<button class="gp-side-btn" type="button" data-act="tab" data-t="' + t[0] + '" aria-selected="' + tabSelected(t[0]) + '" title="' + t[1] + '">' + ic(t[2]) + '<span class="gp-side-lab">' + t[1] + '</span>' + tabBadge(t[0]) + '</button>'
+    ).join('') + '</nav>';
+    return '<div class="gp-shell is-admin">' + side + '<div class="gp-maincol">' + who + '<div id="gpc" aria-live="polite"></div></div></div>';
   }
   async function enterTab(t) {
-    if (t === 'admin') t = (S.me && S.me.role === 'admin') ? 'dash' : 'orders';
-    if ((t === 'team' || t === 'dash' || t === 'member') && !(S.me && S.me.role === 'admin')) t = 'calls';
+    const admin = !!(S.me && S.me.role === 'admin');
+    if (t === 'admin') t = 'dash';
+    if ((t === 'team' || t === 'member') && !admin) t = 'dash';
     S.tab = t; if (S.view !== 'app') { syncNav(); return; }
     $$('.gp-tab, .gp-side-btn', root).forEach((b) => { const on = tabSelected(b.dataset.t); b.setAttribute('aria-selected', String(on)); if (on && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) { /* */ } } }); syncNav();
     const c = $('#gpc'); if (!c) return;
     try {
       if (t === 'orders' || t === 'team' || t === 'dash' || t === 'member' || t === 'stats') { c.innerHTML = loadingHTML; await loadOsDesk(); }
       if (['hist', 'stats', 'profile', 'dash', 'member'].includes(t) && (!S.mine || Date.now() - S.mineAt > 15000)) { if (!S.mine) c.innerHTML = loadingHTML; await loadMine(); }
-      if (t === 'team' || t === 'dash' || t === 'member') { c.innerHTML = loadingHTML; await loadTeam(); }
+      if (admin && (t === 'team' || t === 'dash' || t === 'member' || t === 'stats')) { c.innerHTML = loadingHTML; await loadTeam(); }
     } catch (e) { toast(esc(e.message), 'alert', 'err'); if (!S.mine) S.mine = []; }
     if (S.tab === t) renderTab();
   }
@@ -1024,6 +1024,190 @@
     }
     return '<div class="gp-cal"><div class="gp-cal-head"><span>' + MONN[m] + ' ' + y + '</span><span class="gp-muted">movimento</span></div><div class="gp-cal-grid">' + cells.join('') + '</div></div>';
   }
+  function pct(a, b) { return !b ? '—' : Math.round((a / b) * 100) + '%'; }
+  function spark(vals, color) {
+    const arr = (vals && vals.length) ? vals : [0];
+    const n = arr.length, max = Math.max(1, ...arr);
+    const pts = arr.map((v, i) => ((n === 1 ? 50 : (i / (n - 1)) * 100).toFixed(1) + ',' + (30 - (v / max) * 26).toFixed(1))).join(' ');
+    return '<svg class="gp-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="' + (color || '#00A8FF') + '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" points="' + pts + '"/></svg>';
+  }
+  function donutHtml(parts) {
+    const tot = parts.reduce((s, p) => s + p.n, 0);
+    if (!tot) return '<p class="gp-muted">Sem dados neste período.</p>';
+    const C = 2 * Math.PI * 38;
+    let acc = 0;
+    const segs = parts.filter((p) => p.n > 0).map((p) => {
+      const dash = (p.n / tot) * C, gap = C - dash, off = acc;
+      acc += dash;
+      return '<circle r="38" cx="50" cy="50" fill="none" stroke="' + p.color + '" stroke-width="12" stroke-dasharray="' + dash.toFixed(2) + ' ' + gap.toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '"/>';
+    }).join('');
+    return '<div class="gp-donut"><svg viewBox="0 0 100 100" aria-hidden="true"><circle r="38" cx="50" cy="50" fill="none" stroke="#E8F6FF" stroke-width="12"/>' + segs + '</svg><ul>' +
+      parts.map((p) => '<li><i style="background:' + p.color + '"></i>' + esc(p.label) + ' <b>' + p.n + '</b> · ' + pct(p.n, tot) + '</li>').join('') + '</ul></div>';
+  }
+  function selOpts(cur, list) {
+    return list.map((x) => '<option value="' + esc(x[0]) + '"' + (String(cur) === String(x[0]) ? ' selected' : '') + '>' + esc(x[1]) + '</option>').join('');
+  }
+  function inDateRange(ms, from, to) {
+    if (!ms) return !from && !to;
+    if (from) { const a = Date.parse(from + 'T00:00:00'); if (Number.isFinite(a) && ms < a) return false; }
+    if (to) { const b = Date.parse(to + 'T23:59:59'); if (Number.isFinite(b) && ms > b) return false; }
+    return true;
+  }
+  function matchHourDay(ms, hour, wday) {
+    if (!ms && (hour || wday)) return false;
+    if (!ms) return true;
+    const d = new Date(ms);
+    if (hour !== '' && hour != null && String(hour) !== '' && d.getHours() !== Number(hour)) return false;
+    if (wday !== '' && wday != null && String(wday) !== '' && d.getDay() !== Number(wday)) return false;
+    return true;
+  }
+  function orderCats(o) {
+    return (o.items || o.lines || []).map((i) => String(i.cat || i.category || '').trim()).filter(Boolean);
+  }
+  function orderText(o) {
+    const items = (o.items || o.lines || []).map((i) => i.name || '').join(' ');
+    return [o.customer_name, o.customer && o.customer.name, o.customer_phone, o.phone, o.code, orderPlace(o), o.address, items, o.note].join(' ').toLowerCase();
+  }
+  function knownCats(orders) {
+    const set = new Set();
+    (orders || []).forEach((o) => orderCats(o).forEach((c) => set.add(c)));
+    return Array.from(set).sort();
+  }
+  function filterOrders(list) {
+    const f = S.of || emptyOf();
+    const q = String(f.q || '').trim().toLowerCase();
+    return (list || []).filter((o) => {
+      if (!o) return false;
+      if (f.st === 'paid') { if (!isPaid(o) || o.status === 'cancelled') return false; }
+      else if (f.st === 'unpaid') { if (isPaid(o) || o.status === 'cancelled') return false; }
+      else if (f.st === 'cancelled') { if (o.status !== 'cancelled') return false; }
+      else {
+        if (o.status === 'cancelled') return false;
+        if (f.st && o.status !== f.st) return false;
+      }
+      if (f.pay && payMethodOf(o) !== f.pay) return false;
+      if (f.kind === 'dine' && o.fulfillment !== 'dine_in' && o.take !== 'table') return false;
+      if (f.kind === 'delivery' && !isDelivery(o)) return false;
+      if (f.kind === 'pickup' && o.take !== 'pickup' && o.fulfillment === 'dine_in') return false;
+      if (f.cat && !orderCats(o).includes(f.cat)) return false;
+      if (f.place && String(orderPlace(o) || '').toLowerCase().indexOf(String(f.place).toLowerCase()) < 0) return false;
+      const ms = orderMs(o);
+      if (!inDateRange(ms, f.from, f.to) || !matchHourDay(ms, f.hour, f.wday)) return false;
+      if (q && orderText(o).indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+  function filterCalls(list) {
+    const f = S.cf || emptyCf();
+    const q = String(f.q || '').trim().toLowerCase();
+    const zone = f.zone || S.zone || 'all';
+    return (list || []).filter((c) => {
+      if (!c) return false;
+      const st = c.status === 'closed' ? 'completed' : c.status;
+      if (f.st && st !== f.st) return false;
+      if (zone !== 'all' && c.zone !== 'all' && c.zone !== zone) return false;
+      if (f.reason && c.reason !== f.reason) return false;
+      if (f.waiter) {
+        const by = String(c.by || c.waiterName || '').toLowerCase();
+        if (by.indexOf(String(f.waiter).toLowerCase()) < 0) return false;
+      }
+      const ms = ts(c.createdAt);
+      if (!inDateRange(ms, f.from, f.to) || !matchHourDay(ms, f.hour, f.wday)) return false;
+      if (q) {
+        const blob = [tableName(c.tableCode), c.place, c.note, c.by, REASONS[c.reason], c.reason].join(' ').toLowerCase();
+        if (blob.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+  function csvCell(v) {
+    const s = String(v == null ? '' : v);
+    if (/[;"\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function downloadCsv(name, rows) {
+    const blob = new Blob(['\uFEFF' + rows.map((r) => r.map(csvCell).join(';')).join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('Exportado: ' + name, 'check', 'ok');
+  }
+  function waiterBoard(calls, since) {
+    const map = {};
+    (calls || []).forEach((c) => {
+      const ms = ts(c.createdAt); if (since && ms && ms < since) return;
+      const name = String(c.by || c.waiterName || '').trim();
+      if (!name) return;
+      const row = map[name] || { name, n: 0, pend: 0, resp: [], hours: 0 };
+      const st = c.status === 'closed' ? 'completed' : c.status;
+      if (st === 'pending') row.pend++;
+      if (st === 'accepted' || st === 'completed') {
+        row.n++;
+        if (c.acceptedAt && c.createdAt) { const r = ts(c.acceptedAt) - ts(c.createdAt); if (r >= 0 && r < 12 * 36e5) row.resp.push(r); }
+        if (c.completedAt && c.acceptedAt) { const s = ts(c.completedAt) - ts(c.acceptedAt); if (s >= 0 && s < 12 * 36e5) row.hours += s; }
+      }
+      map[name] = row;
+    });
+    return Object.values(map).sort((a, b) => b.n - a.n || b.hours - a.hours);
+  }
+  function avgArr(a) { return a && a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
+  function insightPeriodMs() { return startOfDay(Date.now()) - ((S.period || 7) - 1) * 864e5; }
+  function insightHtml(admin) {
+    const ordersAll = deskOrders();
+    const since = insightPeriodMs(), t0 = startOfDay(Date.now());
+    const orders = ordersAll.filter((o) => orderMs(o) >= since);
+    const calls = mergedCalls().filter((c) => ts(c.createdAt) >= since);
+    const paid = orders.filter(isPaid);
+    const rev = revenueOf(paid);
+    const ticket = paid.length ? rev / paid.length : 0;
+    const weekR = moneySeries(ordersAll, 7);
+    const weekC = computeStats(mergedCalls(), t0 - 6 * 864e5, 7);
+    const payMix = [
+      { n: paid.filter((o) => payMethodOf(o) === 'mpesa').length, color: '#00A8FF', label: 'M-Pesa' },
+      { n: paid.filter((o) => payMethodOf(o) === 'emola').length, color: '#FFD700', label: 'e-Mola' },
+      { n: paid.filter((o) => payMethodOf(o) === 'pos').length, color: '#0A0A0A', label: 'POS' },
+      { n: orders.filter((o) => !isPaid(o)).length, color: '#C4B59A', label: 'Por pagar' }
+    ];
+    const board = waiterBoard(mergedCalls(), since);
+    const top = board[0];
+    const work = board.slice().sort((a, b) => b.hours - a.hours)[0];
+    const fastest = board.filter((x) => x.resp.length).sort((a, b) => avgArr(a.resp) - avgArr(b.resp))[0];
+    const meName = (S.me && S.me.name) || '';
+    const mineRow = board.find((x) => x.name === meName);
+    const hrs = Array(24).fill(0);
+    orders.forEach((o) => { const ms = orderMs(o); if (ms) hrs[new Date(ms).getHours()]++; });
+    calls.forEach((c) => { const ms = ts(c.createdAt); if (ms) hrs[new Date(ms).getHours()]++; });
+    const peakH = hrs.indexOf(Math.max(...hrs));
+    const maxH = Math.max(1, ...hrs.slice(8, 24));
+    const hbars = hrs.slice(8, 24).map((n, i) => '<div class="col' + ((i + 8) === peakH ? ' today' : '') + '" title="' + (i + 8) + 'h"><u>' + (n || '') + '</u><i style="height:' + Math.round((n / maxH) * 100) + '%"></i><em>' + (i + 8) + '</em></div>').join('');
+    const rank = board.slice(0, 8).map((w, i) => {
+      const avg = avgArr(w.resp);
+      return '<div class="gp-rank' + (w.name === meName ? ' me' : '') + '"><b>' + (i + 1) + '</b>' + avatar({ name: w.name, color: i ? '#00A8FF' : '#FFD700' }) +
+        '<div><strong>' + esc(w.name) + '</strong><small>' + w.n + ' chamados · ' + (avg == null ? '—' : hm(avg)) + ' resp. · ' + human(w.hours) + ' em atendimento</small></div></div>';
+    }).join('');
+    const pLabel = S.period === 1 ? 'hoje' : (S.period === 30 ? '30 dias' : '7 dias');
+    return segPeriod('period', S.period, PERIODS) +
+      '<div class="gp-insight">' +
+      '<div class="gp-stat ink"><b>' + mt(rev) + '</b><span>Receita · ' + pLabel + '</span>' + spark(weekR.map((x) => x.n), '#FFD700') + '</div>' +
+      '<div class="gp-stat cyan"><b>' + orders.length + '</b><span>Pedidos · ' + pLabel + '</span>' + spark(weekC.series.map((x) => x.n), '#0A0A0A') + '</div>' +
+      '<div class="gp-stat"><b>' + (ticket ? mt(Math.round(ticket)) : '—') + '</b><span>Ticket médio</span>' + spark(weekR.map((x) => x.n), '#00A8FF') + '</div>' +
+      '<div class="gp-stat sand"><b>' + pct(paid.length, orders.length) + '</b><span>Pedidos pagos</span>' + spark(weekR.map((x) => x.n ? 1 : 0), '#0069A8') + '</div></div>' +
+      '<div class="gp-bento">' +
+      '<div class="gp-glass"><h3 class="gp-h">Receita · 7 dias</h3>' + dayBars(weekR, true) + '</div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Como pagam</h3>' + donutHtml(payMix) + '</div>' +
+      '<div class="gp-glass span2"><h3 class="gp-h">Horas de maior movimento</h3><p class="gp-muted" style="margin:0 0 .5rem">Pico às <b>' + (peakH >= 0 ? peakH + 'h' : '—') + '</b> — bom momento para reforçar o piso.</p><div class="gp-bars">' + hbars + '</div></div>' +
+      '<div class="gp-glass span2"><h3 class="gp-h">Quem trabalha mais</h3>' +
+      '<div class="gp-stat-grid" style="margin-bottom:1rem">' +
+      '<div class="gp-stat ink"><b>' + esc(top ? top.name : '—') + '</b><span>Mais chamados' + (top ? ' · ' + top.n : '') + '</span></div>' +
+      '<div class="gp-stat cyan"><b>' + esc(work ? work.name : '—') + '</b><span>Mais tempo em atendimento</span></div>' +
+      '<div class="gp-stat"><b>' + esc(fastest ? fastest.name : '—') + '</b><span>Resposta mais rápida</span></div>' +
+      '<div class="gp-stat sand"><b>' + (admin ? String(board.length) : (mineRow ? String(mineRow.n) : '0')) + '</b><span>' + (admin ? 'Garçons com actividade' : 'Os seus atendimentos') + '</span></div></div>' +
+      (rank || '<p class="gp-muted">Ainda sem atendimentos atribuídos neste período.</p>') +
+      '<div class="gp-quick" style="margin-top:.8rem"><button class="gb sm" type="button" data-act="export" data-kind="stats">Exportar relatório</button>' +
+      '<button class="gb sm line" type="button" data-act="export" data-kind="team">Exportar ranking</button></div></div></div>';
+  }
   function tabDash() {
     const orders = deskOrders();
     assignPedidoNumbers(orders);
@@ -1043,21 +1227,19 @@
     const faces = waiters.slice(0, 10).map((m) =>
       '<button class="gp-face" type="button" data-act="memberview" data-id="' + esc(m.id) + '" title="' + esc(m.name) + '" style="background:' + esc(m.color || '#00A8FF') + '">' + esc((m.name || '?').split(' ').map((p) => p[0]).slice(0, 2).join('')) + '</button>'
     ).join('');
-    const weekO = moneySeries(orders, 7);
-    const weekC = computeStats(calls, t0 - 6 * 864e5, 7);
-    return '<section class="gp-hero-ban"><span class="gp-chip">Aqua Club · casa ao vivo</span><h2>A casa trabalha melhor junta.</h2><p>Pedidos, chamados, pagamentos e a equipa — o pulso do complexo, em tempo real.</p></section>' +
+    const admin = S.me && S.me.role === 'admin';
+    return '<section class="gp-hero-ban"><span class="gp-chip">Aqua Club · ' + (admin ? 'administração' : 'garçom') + '</span><h2>' + (admin ? 'A casa trabalha melhor junta.' : 'O seu turno, com números claros.') + '</h2><p>Pedidos, chamados, pagamentos e a equipa — o pulso do complexo, em tempo real.</p></section>' +
+      insightHtml(admin) +
       '<div class="gp-bento">' +
       '<div class="gp-glass"><h3 class="gp-h">Equipa no piso</h3><div class="gp-faces">' + faces +
-      '<button class="gp-face add" type="button" data-act="tab" data-t="team" title="Gerir equipa">+</button></div>' +
-      '<p class="gp-muted" style="margin:.75rem 0 0">' + waiters.length + ' garçons activos. Toque num perfil para ver gráficos e PIN.</p></div>' +
+      (admin ? '<button class="gp-face add" type="button" data-act="tab" data-t="team" title="Gerir equipa">+</button>' : '') + '</div>' +
+      '<p class="gp-muted" style="margin:.75rem 0 0">' + (admin ? (waiters.length + ' garçons activos. Toque num perfil para ver gráficos e PIN.') : 'Acompanhe a casa e o seu desempenho neste painel.') + '</p></div>' +
       '<div class="gp-glass">' + miniCal(hot) + '</div>' +
       '<div class="gp-stat-grid span2">' +
       '<div class="gp-stat ink"><b>' + mt(revenueOf(paidToday)) + '</b><span>Receita hoje</span></div>' +
       '<div class="gp-stat cyan"><b>' + todayO.length + '</b><span>Pedidos hoje</span></div>' +
       '<div class="gp-stat"><b>' + pend + '</b><span>Chamados à espera</span></div>' +
       '<div class="gp-stat sand"><b>' + due + '</b><span>Por cobrar</span></div></div>' +
-      '<div class="gp-glass"><h3 class="gp-h">Receita · 7 dias</h3>' + dayBars(weekO, true) + '</div>' +
-      '<div class="gp-glass"><h3 class="gp-h">Atendimentos · 7 dias</h3>' + dayBars(weekC.series) + '</div>' +
       '<div class="gp-glass"><h3 class="gp-h">Últimos pedidos</h3><div class="gp-feed">' +
       (feed.length ? feed.map((o) => '<div class="gp-feed-row">' + avatar({ name: o.customer_name || 'Cliente', color: '#00A8FF' }) +
         '<div><b>' + esc(pedidoNo(o) ? ('Pedido ' + pedidoNo(o)) : (o.code || 'Pedido')) + '</b><small>' + esc(o.customer_name || 'Cliente') + ' · ' + esc(orderPlace(o) || '') + '</small></div>' +
@@ -1071,8 +1253,10 @@
       '<div class="gp-glass span2"><h3 class="gp-h">Gestão da casa</h3><div class="gp-quick">' +
       '<button class="gb" type="button" data-act="tab" data-t="orders">Pedidos e pagamentos</button>' +
       '<button class="gb line" type="button" data-act="tab" data-t="calls">Chamados</button>' +
-      '<button class="gb line" type="button" data-act="tab" data-t="team">Equipa e PINs</button>' +
-      '<button class="gb dark" type="button" data-act="tab" data-t="stats">Relatórios</button></div></div></div>';
+      (admin ? '<button class="gb line" type="button" data-act="tab" data-t="team">Equipa e PINs</button>' : '') +
+      '<button class="gb dark" type="button" data-act="tab" data-t="stats">Relatórios</button>' +
+      '<button class="gb sm line" type="button" data-act="export" data-kind="orders">Exportar pedidos</button>' +
+      '<button class="gb sm line" type="button" data-act="export" data-kind="calls">Exportar chamados</button></div></div></div>';
   }
   function tabMember() {
     const staff = (S.team && S.team.staff) || [];
@@ -1227,9 +1411,52 @@
       (acts.length ? '<div class="gc-actions">' + acts.join('') + '</div>' : (done ? '<p class="gp-muted" style="margin:0">Pedido cumprido: pago e recebido.</p>' : '')) +
       '</article>';
   }
+  function hourOpts(cur) {
+    const list = [['', 'Qualquer hora']];
+    for (let h = 8; h <= 23; h++) list.push([String(h), pad(h) + ':00']);
+    return selOpts(cur, list);
+  }
+  function dayOpts(cur) {
+    return selOpts(cur, [['', 'Qualquer dia']].concat(DAYN.map((n, i) => [String(i), n])));
+  }
+  function orderFilterBar(source) {
+    const f = S.of || emptyOf();
+    const cats = knownCats(source);
+    return '<form class="gp-filters" data-form="ofilter"><h3 class="gp-h">Filtrar pedidos</h3><div class="gp-fg">' +
+      '<label>Cliente, telemóvel, código<input name="q" value="' + esc(f.q) + '" placeholder="Nome ou mesa"></label>' +
+      '<label>De<input name="from" type="date" value="' + esc(f.from) + '"></label>' +
+      '<label>Até<input name="to" type="date" value="' + esc(f.to) + '"></label>' +
+      '<label>Hora<select name="hour">' + hourOpts(f.hour) + '</select></label>' +
+      '<label>Dia da semana<select name="wday">' + dayOpts(f.wday) + '</select></label>' +
+      '<label>Categoria<select name="cat">' + selOpts(f.cat, [['', 'Todas']].concat(cats.map((c) => [c, c]))) + '</select></label>' +
+      '<label>Pagamento<select name="pay">' + selOpts(f.pay, [['', 'Todos'], ['mpesa', 'M-Pesa'], ['emola', 'e-Mola'], ['pos', 'POS']]) + '</select></label>' +
+      '<label>Tipo<select name="kind">' + selOpts(f.kind, [['', 'Todos'], ['dine', 'No local'], ['pickup', 'Para levar'], ['delivery', 'Delivery']]) + '</select></label>' +
+      '<label>Estado<select name="st">' + selOpts(f.st, [['', 'Activos'], ['review', 'Em análise'], ['preparing', 'A preparar'], ['ready', 'Pronto'], ['on_the_way', 'A caminho'], ['delivered', 'Entregue'], ['paid', 'Pagos'], ['unpaid', 'Por pagar'], ['cancelled', 'Cancelados']]) + '</select></label>' +
+      '<label>Local<input name="place" value="' + esc(f.place) + '" placeholder="Mesa, zona…"></label></div>' +
+      '<div class="gp-quick"><button class="gb sm" type="submit">Aplicar</button><button class="gb sm line" type="button" data-act="freset" data-k="of">Limpar</button>' +
+      '<button class="gb sm dark" type="button" data-act="export" data-kind="orders">Exportar CSV</button></div></form>';
+  }
+  function callFilterBar(all) {
+    const f = S.cf || emptyCf();
+    const waiters = Array.from(new Set((all || []).map((c) => c.by || c.waiterName).filter(Boolean))).sort();
+    const zones = ['all'].concat(Array.from(new Set(siteTables().map((x) => x.zone).concat((all || []).map((c) => c.zone)).filter(Boolean))));
+    return '<form class="gp-filters" data-form="cfilter"><h3 class="gp-h">Filtrar chamados</h3><div class="gp-fg">' +
+      '<label>Mesa, nota, garçom<input name="q" value="' + esc(f.q) + '" placeholder="Pesquisar"></label>' +
+      '<label>De<input name="from" type="date" value="' + esc(f.from) + '"></label>' +
+      '<label>Até<input name="to" type="date" value="' + esc(f.to) + '"></label>' +
+      '<label>Hora<select name="hour">' + hourOpts(f.hour) + '</select></label>' +
+      '<label>Dia da semana<select name="wday">' + dayOpts(f.wday) + '</select></label>' +
+      '<label>Motivo<select name="reason">' + selOpts(f.reason, [['', 'Todos']].concat(Object.keys(REASONS).filter((k, i, a) => a.indexOf(k) === i && ['request_bill', 'menu_question', 'new_order', 'urgent_other', 'conta', 'duvida', 'pedido', 'urgente'].includes(k)).map((k) => [k, REASONS[k]]))) + '</select></label>' +
+      '<label>Zona<select name="zone">' + selOpts(f.zone || 'all', zones.map((z) => [z, z === 'all' ? 'Todas' : (ZONES[z] || z)])) + '</select></label>' +
+      '<label>Estado<select name="st">' + selOpts(f.st, [['', 'Todos'], ['pending', 'Por atender'], ['accepted', 'A caminho'], ['completed', 'Concluídos']]) + '</select></label>' +
+      '<label>Garçom<select name="waiter">' + selOpts(f.waiter, [['', 'Todos']].concat(waiters.map((w) => [w, w]))) + '</select></label></div>' +
+      '<div class="gp-quick"><button class="gb sm" type="submit">Aplicar</button><button class="gb sm line" type="button" data-act="freset" data-k="cf">Limpar</button>' +
+      '<button class="gb sm dark" type="button" data-act="export" data-kind="calls">Exportar CSV</button></div></form>';
+  }
   function tabOrders() {
-    const orders = (S.osDesk && S.osDesk.orders) || [];
-    assignPedidoNumbers(orders);
+    const source = (S.osDesk && S.osDesk.orders) || [];
+    assignPedidoNumbers(source);
+    const orders = filterOrders(source);
     const seen = new Set();
     const take = (pred) => orders.filter((o) => { if (seen.has(o.id) || o.status === 'cancelled') return false; if (!pred(o)) return false; seen.add(o.id); return true; });
     const wait = take((o) => { const s = payStatusOf(o); return s === 'declared' || s === 'paid_declared'; });
@@ -1253,7 +1480,7 @@
     const attended = Array.from(cmap.values()).filter((c) => (c.status === 'completed' || c.status === 'accepted') && (ts(c.completedAt) >= t0 || ts(c.createdAt) >= t0 || ts(c.acceptedAt || c.accepted_at) >= t0)).length;
     const block = (title, list, empty) => '<div class="gp-sec"><span>' + title + '</span><span class="n">' + list.length + '</span></div>' +
       (list.length ? '<div class="gp-list">' + list.map(cardO).join('') + '</div>' : (empty || ''));
-    return '<div class="gp-kpis"><div class="gp-kpi"><b>' + attended + '</b><span>Chamados atendidos</span></div>' +
+    return orderFilterBar(source) + '<div class="gp-kpis"><div class="gp-kpi"><b>' + attended + '</b><span>Chamados atendidos</span></div>' +
       '<div class="gp-kpi"><b>' + doneN + '</b><span>Pedidos concluídos</span></div>' +
       '<div class="gp-kpi"><b>' + paidN + '</b><span>Pagos</span></div>' +
       '<div class="gp-kpi hot"><b>' + done.length + '</b><span>Entregues</span></div>' +
@@ -1286,18 +1513,17 @@
       ((mine || admin) ? '<div class="gc-actions"><button class="gb ok" type="button" data-act="complete" data-id="' + esc(c.id) + '">' + ic('check') + 'Concluir</button><button class="gb line" type="button" data-act="release" data-id="' + esc(c.id) + '">' + ic('undo') + 'Devolver</button></div>' : '') + '</div></article>';
   }
   function tabCalls() {
-    const me = S.me, t0 = startOfDay(Date.now()), all = S.calls, admin = me.role === 'admin';
-    const isMine = (c) => c.byUser === me.user_id || !!c.live;
-    const zf = (c) => S.zone === 'all' || c.zone === 'all' || c.zone === S.zone;
+    const me = S.me, t0 = startOfDay(Date.now()), raw = mergedCalls(), admin = me.role === 'admin';
+    const all = filterCalls(raw);
+    const isMine = (c) => c.byUser === me.user_id || !!c.live || c.by === me.name;
+    const zf = () => true;
     const pendAll = all.filter((c) => c.status === 'pending'), pend = pendAll.filter(zf).sort((a, b) => ts(a.createdAt) - ts(b.createdAt));
     const mine = all.filter((c) => c.status === 'accepted' && isMine(c)).sort((a, b) => ts(a.acceptedAt) - ts(b.acceptedAt));
     const others = all.filter((c) => c.status === 'accepted' && !isMine(c) && zf(c));
     const doneT = all.filter((c) => c.status === 'completed' && isMine(c) && ts(c.completedAt) >= t0).sort((a, b) => ts(b.completedAt) - ts(a.completedAt));
     const st = computeStats(all.filter(isMine), t0, 1);
-    const zones = ['all'].concat(Array.from(new Set(siteTables().map((x) => x.zone).concat(all.map((c) => c.zone)))));
-    return '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + pendAll.length + '</b><span>Por atender</span></div><div class="gp-kpi"><b>' + mine.length + '</b><span>Comigo agora</span></div>' +
+    return callFilterBar(raw) + '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + pendAll.length + '</b><span>Por atender</span></div><div class="gp-kpi"><b>' + mine.length + '</b><span>Comigo agora</span></div>' +
       '<div class="gp-kpi"><b>' + st.count + '</b><span>Concluídos hoje</span></div><div class="gp-kpi"><b>' + esc(st.resp == null ? '—' : hm(st.resp)) + '</b><span>Resposta média hoje</span></div></div>' +
-      '<div class="gp-zones" role="group" aria-label="Filtrar por zona">' + zones.map((z) => '<button type="button" data-act="zone" data-v="' + esc(z) + '" aria-pressed="' + (S.zone === z) + '">' + (z === 'all' ? 'Todas' : esc(ZONES[z] || z)) + '</button>').join('') + '</div>' +
       '<div class="gp-sec"><span>Por atender</span><span class="n">' + pend.length + '</span></div>' +
       (pend.length ? '<div class="gp-list">' + pend.map(cardPending).join('') + '</div>'
         : '<div class="gp-card gp-empty">' + ic('spark') + '<b>Tudo calmo</b>Nenhum chamado à espera' + (S.zone !== 'all' ? ' nesta zona' : '') + '. Avisamos assim que alguém chamar.</div>') +
@@ -1311,7 +1537,6 @@
 
   /* ====================================================================== TAB: HISTÓRICO */
   const segPeriod = (act, cur, opts) => '<div class="gp-seg" role="group" aria-label="Período">' + opts.map((o) => '<button type="button" data-act="' + act + '" data-v="' + o[0] + '" aria-selected="' + (cur === o[0]) + '">' + o[1] + '</button>').join('') + '</div>';
-  const PERIODS = [[1, 'Hoje'], [7, '7 dias'], [30, '30 dias']];
   function tabHist() {
     const since = startOfDay(Date.now()) - (S.hper - 1) * 864e5, rows = (S.mine || []).filter((c) => ts(c.createdAt) >= since && c.status !== 'cancelled').sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
     let h = segPeriod('hper', S.hper, PERIODS);
@@ -1341,7 +1566,9 @@
     const maxZ = Math.max(1, ...Object.values(s.byZone), 1);
     const zbars = Object.keys(ZONES).map((k) => '<div class="r"><span>' + esc(ZONES[k]) + '</span><span class="t"><i style="width:' + Math.round(((s.byZone[k] || 0) / maxZ) * 100) + '%"></i></span><span class="v">' + (s.byZone[k] || 0) + '</span></div>').join('');
     const comments = mine.filter((c) => c.comment).slice(0, 4);
-    return segPeriod('period', p, PERIODS) +
+    const admin = S.me && S.me.role === 'admin';
+    return insightHtml(admin) +
+      '<div class="gp-glass"><h3 class="gp-h">O seu desempenho neste período</h3></div>' +
       '<div class="gp-card gp-goal"><div class="gp-ring" role="img" aria-label="' + today.count + ' de ' + GOAL + ' atendimentos hoje"><svg viewBox="0 0 112 112"><circle class="bg" cx="56" cy="56" r="48"/><circle class="fg" cx="56" cy="56" r="48" stroke-dasharray="' + dash.toFixed(1) + ' ' + C.toFixed(1) + '"/></svg><b>' + today.count + '</b></div>' +
       '<div><h3 style="margin-bottom:.3rem">Meta de hoje</h3><p class="gp-muted" style="margin:0">' + today.count + ' de ' + GOAL + ' atendimentos.<br>' + (today.count >= GOAL ? '<b>Meta cumprida — excelente trabalho!</b>' : 'Faltam ' + (GOAL - today.count) + ' para a meta.') + '</p></div></div>' +
       '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + s.count + '</b><span>Atendimentos</span></div><div class="gp-kpi"><b>' + esc(s.resp == null ? '—' : hm(s.resp)) + '</b><span>Resposta média</span></div>' +
@@ -1414,6 +1641,47 @@
   }
 
   /* ====================================================================== EVENTOS */
+  function applyNamedFilter(form) {
+    const v = Object.fromEntries(new FormData(form).entries());
+    if (form.dataset.form === 'ofilter') S.of = Object.assign(emptyOf(), v);
+    if (form.dataset.form === 'cfilter') { S.cf = Object.assign(emptyCf(), v); S.zone = S.cf.zone || 'all'; }
+  }
+  function onFilterChange(e) {
+    const f = e.target.closest('form[data-form="ofilter"],form[data-form="cfilter"]');
+    if (!f) return;
+    if (e.target.matches('select, input[type="date"]')) { applyNamedFilter(f); renderTab(); }
+  }
+  function doExport(kind) {
+    const stamp = dayKey(Date.now());
+    if (kind === 'orders') {
+      const src = (S.osDesk && S.osDesk.orders) || [];
+      assignPedidoNumbers(src);
+      const rows = filterOrders(src);
+      downloadCsv('aqua-pedidos-' + stamp + '.csv', [['Pedido', 'Codigo', 'Quando', 'Cliente', 'Telefone', 'Local', 'Tipo', 'Categoria', 'Estado', 'Pagamento', 'Metodo', 'Total MT']].concat(rows.map((o) => {
+        const ms = orderMs(o), d = ms ? new Date(ms) : null;
+        return [pedidoNo(o) || '', o.code || '', d ? d.toLocaleString('pt-PT') : '', o.customer_name || '', o.customer_phone || o.phone || '', orderPlace(o) || '', o.fulfillment || o.take || '', orderCats(o).join(' | '), ST_OS[o.status] || o.status, payLabel(o), payMethodOf(o), Number(o.total || 0)];
+      })));
+      return;
+    }
+    if (kind === 'calls') {
+      const rows = filterCalls(mergedCalls());
+      downloadCsv('aqua-chamados-' + stamp + '.csv', [['Quando', 'Mesa', 'Zona', 'Motivo', 'Estado', 'Garcom', 'Resposta', 'Atendimento', 'Nota']].concat(rows.map((c) => {
+        const cr = ts(c.createdAt);
+        return [cr ? new Date(cr).toLocaleString('pt-PT') : '', tableName(c.tableCode) || c.place || '', ZONES[c.zone] || c.zone || '', REASONS[c.reason] || c.reason, c.status, c.by || '', (c.acceptedAt && c.createdAt) ? human(ts(c.acceptedAt) - ts(c.createdAt)) : '', (c.completedAt && c.acceptedAt) ? human(ts(c.completedAt) - ts(c.acceptedAt)) : '', c.note || ''];
+      })));
+      return;
+    }
+    const since = insightPeriodMs(), board = waiterBoard(mergedCalls(), since), orders = deskOrders().filter((o) => orderMs(o) >= since), paid = orders.filter(isPaid);
+    if (kind === 'team') {
+      downloadCsv('aqua-ranking-' + stamp + '.csv', [['Garcom', 'Chamados', 'Resposta media', 'Tempo em atendimento']].concat(board.map((w) => [w.name, w.n, avgArr(w.resp) == null ? '' : hm(avgArr(w.resp)), human(w.hours)])));
+      return;
+    }
+    downloadCsv('aqua-relatorio-' + stamp + '.csv', [
+      ['Indicador', 'Valor'], ['Periodo (dias)', S.period], ['Pedidos', orders.length], ['Pagos', paid.length],
+      ['Receita MT', revenueOf(paid)], ['Ticket medio MT', paid.length ? Math.round(revenueOf(paid) / paid.length) : 0],
+      ['Chamados', mergedCalls().filter((c) => ts(c.createdAt) >= since).length], ['Top garcom', (board[0] && board[0].name) || '']
+    ].concat(board.map((w) => ['Ranking · ' + w.name, w.n + ' chamados'])));
+  }
   const say = (form, text, type) => { const p = $('.gp-msg', form); if (p) { p.textContent = text || ''; p.className = 'gp-msg ' + (type || ''); } };
   const busy = (form, on) => { const b = $('button[type=submit]', form); if (b) b.disabled = !!on; };
   async function guard(fn) {
@@ -1492,6 +1760,11 @@
     }
     if (a === 'tab') return enterTab(b.dataset.t);
     if (a === 'memberview') { S.viewMember = b.dataset.id; return enterTab('member'); }
+    if (a === 'export') { doExport(b.dataset.kind); return; }
+    if (a === 'freset') {
+      if (b.dataset.k === 'cf') { S.cf = emptyCf(); S.zone = 'all'; } else S.of = emptyOf();
+      return renderTab();
+    }
     if (a === 'zone') { S.zone = b.dataset.v; return renderTab(); }
     if (a === 'hper') { S.hper = +b.dataset.v; return renderTab(); }
     if (a === 'period') { S.period = +b.dataset.v; return renderTab(); }
@@ -1540,6 +1813,7 @@
   async function onSubmit(e) {
     e.preventDefault(); const f = e.target, kind = f.dataset.form, be = backend(), v = Object.fromEntries(new FormData(f).entries());
     if (!kind) return;
+    if (kind === 'ofilter' || kind === 'cfilter') { applyNamedFilter(f); renderTab(); return; }
     if (!be && kind !== 'osadmin') return;
     say(f, '');
     const email = String(v.email || '').trim();
