@@ -570,6 +570,11 @@ input,select,textarea{border-radius:14px}
 .mtab[aria-selected=true]{background:var(--cyan);border-color:var(--cyan)}
 .mtab-more{flex:none;background:#04283F;color:#fff;border-color:#04283F;position:static;z-index:2;box-shadow:none}
 .mtab-more[aria-expanded=true]{background:var(--yellow);color:#000;border-color:var(--yellow)}
+.mtab-cart{flex:none;position:relative;width:46px;height:46px;border-radius:50%;border:2px solid #000;background:var(--yellow);color:#000;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 16px -10px rgba(0,0,0,.4)}
+.mtab-cart .ico{width:1.2rem;height:1.2rem}
+.mtab-cart .n{position:absolute;top:-6px;right:-6px;min-width:1.2rem;height:1.2rem;padding:0 .28rem;border-radius:999px;background:#000;color:#fff;font:800 .62rem/1.2rem var(--fh);display:none}
+.mtab-cart .n.on{display:grid;place-items:center}
+.mtab-cart:hover{transform:translateY(-2px)}
 .mcat-dlg{width:min(540px,100%);max-height:min(86dvh,720px);border:0;padding:0;margin:auto auto 0;border-radius:28px 28px 0 0;background:#fff}
 .mcat-dlg .dhead{padding:1.1rem 1.2rem .4rem}
 .mcat-all{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;padding:.4rem 1.15rem 1.5rem}
@@ -1152,6 +1157,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <div class="mtabs-row">
       <div class="mtabs" id="mtabs" role="tablist" data-i18n-aria="menu.cats"></div>
       <button type="button" class="mtab mtab-more" id="mtabsMore" hidden aria-expanded="false" aria-controls="mcatDlg">+ Mais</button>
+      <button type="button" class="mtab-cart" id="menuCartBtn" aria-label="Ver o que já escolheu"><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span class="n" id="menuCartN">0</span></button>
     </div>
     <button type="button" class="place-chip" id="placeChip"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span><b id="placeChipT" data-i18n="place.set">Definir onde está</b><small id="placeChipS"></small></span></button>
     <label class="mtable" hidden>Mesa<select id="menuTable"></select></label>
@@ -1385,7 +1391,10 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <div class="shop-tools">
         <p class="shop-lead" data-i18n="cart.pickMenu">Escolha no menu e junte ao pedido</p>
         <label class="msearch"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="shopQ" data-i18n-placeholder="menu.search" placeholder="Procurar no menu" autocomplete="off"></label>
-        <div class="mtabs" id="shopCats" role="tablist"></div>
+        <div class="mtabs-row">
+          <div class="mtabs" id="shopCats" role="tablist"></div>
+          <button type="button" class="mtab-cart" id="shopCartBtn" aria-label="Ver o que já escolheu"><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span class="n" id="shopCartN">0</span></button>
+        </div>
       </div>
       <div class="shop-grid" id="shopGrid"></div>
     </div>
@@ -1416,7 +1425,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   </div>
   <div id="orderView" hidden>
     <div class="ok-box"><span class="ok-ic" aria-hidden="true">✓</span><div><b id="ovTitle" data-i18n="cart.ok">Pedido registado em seu nome</b><p id="omsg" role="status" aria-live="polite"></p></div></div>
-    <div class="ocode"><small data-i18n="cart.code">Código do pedido</small><b id="ocode"></b><span class="chip2" id="opay"></span></div>
+    <div class="ocode"><small data-i18n="cart.bill">N.º da conta</small><b id="ocode"></b><span class="chip2" id="opay"></span></div>
     <p class="ometa" id="ometa"></p>
     <ul class="osum" id="osum"></ul>
     <div class="odetail" id="odetail"></div>
@@ -1937,7 +1946,7 @@ const REVIEWS = [];
     } catch (e) { /* continua no registo local */ }
     if (window.AquaBus) {
       AquaBus.pushOrder({
-        id: o.id, code: o.code, table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
+        id: o.id, code: o.code, nConta: o.nConta, table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
         place_label: o.placeLabel, fulfillment: o.fulfillment, total: o.total, status: o.status || 'review',
         customer_name: o.name, customer_phone: o.phone, payment_status: 'unpaid', created_at: new Date().toISOString(),
         waGroupOpt: !!o.waGroupOpt,
@@ -2043,33 +2052,44 @@ const REVIEWS = [];
     }
     if (ov && cartDlg.open && $('#orderView') && !$('#orderView').hidden) paintOrderView();
   }
+  function applyRemoteCall(raw) {
+    const r = raw && raw.call ? raw.call : raw;
+    if (!r || !call) return;
+    if (String(r.id) !== String(call.id) && String(r.id) !== String(call.osId || '')) return;
+    const st = r.status === 'closed' ? 'completed' : r.status;
+    emit(call.id, { status: st, by: r.waiterName || r.by || r.waiter_id || '' });
+  }
+  function refreshCallsFromBus() {
+    if (!window.AquaBus || !call) return;
+    const c = (AquaBus.read().calls || []).find((x) => String(x.id) === String(call.id));
+    if (c) applyRemoteCall(c);
+  }
   function bindLiveOrders() {
     if (window.AquaOS && AquaOS.connectLive) {
       AquaOS.connectLive({
         onOrder: applyRemoteOrder,
-        onCall: (raw) => {
-          const r = raw && raw.call ? raw.call : raw;
-          if (!r || !call) return;
-          if (String(r.id) !== String(call.id)) return;
-          emit(call.id, { status: r.status === 'closed' ? 'completed' : r.status, by: r.waiterName || r.by || '' });
-        }
+        onCall: applyRemoteCall
       });
     }
+    if (window.__aqLiveBound) return;
+    window.__aqLiveBound = true;
+    const bump = () => { refreshFromBus(); refreshCallsFromBus(); };
+    window.addEventListener('aq-os-up', bump);
     try {
-      if (!window.__aqOrdBc) {
-        window.__aqOrdBc = new BroadcastChannel('aq-os');
-        window.__aqOrdBc.onmessage = () => refreshFromBus();
-      }
+      window.__aqOrdBc = new BroadcastChannel('aq-os');
+      window.__aqOrdBc.onmessage = bump;
     } catch (e) { /* */ }
   }
   function startPolling() {
     bindLiveOrders();
     if (pollT) return;
     pollT = setInterval(() => {
+      refreshFromBus();
+      refreshCallsFromBus();
       const viewing = cartDlg.open && $('#orderView') && !$('#orderView').hidden;
       if (window.AquaOS && AquaOS.socketUp && AquaOS.socketUp() && !viewing) return;
       refreshOrdersNow();
-    }, POLL_MS);
+    }, 3000);
     refreshOrdersNow();
   }
 
@@ -2091,10 +2111,38 @@ const REVIEWS = [];
   ];
   let place = {};
   try { place = JSON.parse(store.get('aq.place') || '{}') || {}; } catch (e) { place = {}; }
-  function clubDay() {
-    try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Maputo' }).format(new Date()); }
-    catch (e) { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function clubDay(ts) {
+    try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Maputo' }).format(ts ? new Date(ts) : new Date()); }
+    catch (e) { const d = ts ? new Date(ts) : new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   }
+  function contaScope(o) {
+    return clubDay(o && o.ts) + '|' + String((o && o.phone) || '') + '|' + String((o && o.table) || '') + '|' + String((o && o.fulfillment) || '');
+  }
+  function ensureContas() {
+    const groups = {};
+    history.filter((o) => o && o.status !== 'cancelled').slice().sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0) || String(a.code || '').localeCompare(String(b.code || ''))).forEach((o) => {
+      const k = contaScope(o);
+      groups[k] = (groups[k] || 0) + 1;
+      o.nConta = groups[k];
+    });
+  }
+  function contaNo(o) {
+    if (!o) return 0;
+    if (o.nConta) return Number(o.nConta) || 0;
+    ensureContas();
+    return Number(o.nConta) || 0;
+  }
+  function contaLabel(o) {
+    const n = contaNo(o);
+    return n ? tr('cart.billN', { n }) : tr('cart.bill');
+  }
+  function nextConta(o) {
+    ensureContas();
+    const k = contaScope(o);
+    return history.filter((x) => x && x.status !== 'cancelled' && contaScope(x) === k).reduce((m, x) => Math.max(m, Number(x.nConta) || 0), 0) + 1;
+  }
+  ensureContas();
+  saveHist();
   function applyPlaceFromTable(code) {
     const n = parseInt(String(code).replace(/\D/g, ''), 10);
     if (!n) return;
@@ -2688,7 +2736,7 @@ const REVIEWS = [];
     const l = cart.find((x) => x.id === id && x.note === (note || '') && JSON.stringify(x.extras || []) === exKey && x.doneness === doneness);
     if (l) l.qty = Math.min(20, l.qty + qty);
     else cart.push({ id, qty, note: note || '', extras: extras || [], doneness, name: m ? m.name : id, price: m ? m.price : 0 });
-    renderCart(); updateFabs(); toast((m && m.name) || id);
+    renderCart(); updateFabs(); paintMenuCart(); toast((m && m.name) || id);
   }
   function takeFromCart(id) {
     const i = cart.findIndex((x) => x.id === id);
@@ -2796,6 +2844,8 @@ const REVIEWS = [];
     const shopCat = cats.dataset.cat || 'todos';
     const q = (qel && qel.value || '').trim().toLowerCase();
     const keepY = grid.scrollTop;
+    const resetTop = cats.dataset.shown !== shopCat;
+    cats.dataset.shown = shopCat;
     grid.innerHTML = '';
     const list = listedMenu(shopCat, q);
     list.forEach((m) => {
@@ -2808,7 +2858,7 @@ const REVIEWS = [];
       b.querySelector('.shop-minus')?.addEventListener('click', () => takeFromCart(m.id));
       grid.appendChild(b);
     });
-    grid.scrollTop = keepY;
+    grid.scrollTop = resetTop ? 0 : keepY;
   }
   function openCart() {
     cart = loadCart();
@@ -2886,6 +2936,7 @@ const REVIEWS = [];
       lines, total: grandTotal(), name, phone, waGroupOpt,
       status: 'review', pay: 'unpaid', method: '', ref: ''
     };
+    o.nConta = nextConta(o);
     try { await apiOrder(o); } catch (e) { msg.textContent = tr('cart.fail', { e: e.message || e }); btn.disabled = false; return; }
     if (window.AquaOS && AquaOS.joinOrder && o.code) AquaOS.joinOrder(o.code);
     cust = { name, phone, waGroup: waGroupOpt }; store.set('aq.cust', JSON.stringify(cust));
@@ -2924,8 +2975,8 @@ const REVIEWS = [];
     if (!ov) return;
     const title = $('#ovTitle');
     if (title) title.textContent = orderReadonly ? tr('cart.detail') : tr('cart.ok');
-    $('#ocode').textContent = ov.code;
-    $('#ometa').textContent = ov.name + ' · ' + showPhone(ov.phone) + ' · ' + (ov.placeLabel || nice(ov.table) || '') + ' · ' + when(ov.ts);
+    $('#ocode').textContent = contaLabel(ov);
+    $('#ometa').textContent = (ov.code ? ov.code + ' · ' : '') + ov.name + ' · ' + showPhone(ov.phone) + ' · ' + (ov.placeLabel || nice(ov.table) || '') + ' · ' + when(ov.ts);
     const qty = (l) => l.quantity || l.qty || 1;
     $('#osum').innerHTML = ov.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${lineNote(l)}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('') +
       (ov.deliveryFee ? `<li><span>${esc(tr('place.feeLine', { b: tr('place.' + (ov.deliveryBand || 'city')) }))}</span><b>${money(ov.deliveryFee)}</b></li>` : '') +
@@ -3009,6 +3060,7 @@ const REVIEWS = [];
   /* os meus pedidos (lista + histórico + conta) */
   const histDlg = $('#histDlg');
   function renderHist() {
+    ensureContas();
     const od = owedTotal(), pend = history.filter((o) => o.status !== 'cancelled' && o.pay === 'paid_declared').reduce((s, o) => s + o.total, 0);
     const draftsN = loadDrafts().length;
     const parts = [];
@@ -3034,9 +3086,9 @@ const REVIEWS = [];
     });
     history.slice().reverse().forEach((o) => {
       const el = document.createElement('button'); el.type = 'button'; el.className = 'hcard';
-      el.setAttribute('aria-label', tr('cart.viewAria', { c: o.code }));
+      el.setAttribute('aria-label', contaLabel(o) + ' · ' + tr('cart.viewAria', { c: o.code }));
       const qty = (l) => l.quantity || l.qty || 1;
-      el.innerHTML = `<div class="hrow"><b>${esc(o.code)}</b><span>${when(o.ts)}</span></div><p class="hmeta">${esc(o.placeLabel || nice(o.table))} · ${esc(o.name)} · ${esc(showPhone(o.phone))}</p>
+      el.innerHTML = `<div class="hrow"><b>${esc(contaLabel(o))}</b><span>${when(o.ts)}</span></div><p class="hmeta">${esc(o.code)} · ${esc(o.placeLabel || nice(o.table))} · ${esc(o.name)} · ${esc(showPhone(o.phone))}</p>
         <div class="chips"><span class="chip2 st-${o.status}">${esc(stTxt(o.status))}</span><span class="chip2 pay-${o.method === 'pos' && o.pay !== 'paid' ? 'unpaid' : o.pay}">${esc(payTxt(o.pay, o))}</span>${o.method ? `<span class="chip2">${esc(payMethodLabel(o.method))}</span>` : ''}</div>
         <ul class="osum">${o.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('')}<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(o.total)}</b></li></ul>
         <p class="hpeek">${esc(tr('cart.viewHintShort'))}</p>
@@ -3114,7 +3166,7 @@ const REVIEWS = [];
     payIntent = change ? 'change' : 'first';
     payTarget = o;
     const amount = o.total;
-    $('#paySum').innerHTML = `<div class="hs warn"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(o.code)} · ${esc(tr('pay.thisOrder'))}</span></div>`;
+    $('#paySum').innerHTML = `<div class="hs warn"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(contaLabel(o))} · ${esc(o.code)} · ${esc(tr('pay.thisOrder'))}</span></div>`;
     paySel = null; $('#payInfo').innerHTML = ''; $('#payMsg').textContent = ''; $('#payGo').hidden = true;
     const box = $('#payMethods'); box.innerHTML = '';
     PAYMENT.methods.forEach((m) => {
@@ -3321,14 +3373,34 @@ const REVIEWS = [];
     const f = $('#fabCall'), txt = $('#fabCallTxt');
     f.classList.toggle('pending', Boolean(call && (call.status === 'pending' || call.status === 'sent'))); f.classList.toggle('accepted', Boolean(call && call.status === 'accepted'));
     txt.textContent = !call ? tr('fab.call') : call.status === 'pending' ? tr('fab.wait') : call.status === 'sent' ? tr('fab.sent') : call.status === 'accepted' ? tr('fab.coming', { n: call.by || tr('nav.staff') }) : tr('fab.call');
+    paintMenuCart();
+  }
+  function paintMenuCart() {
+    const n = cartCount();
+    [['menuCartN', 'menuCartBtn'], ['shopCartN', 'shopCartBtn']].forEach(([nid, bid]) => {
+      const badge = $('#' + nid), btn = $('#' + bid);
+      if (badge) { badge.textContent = String(n); badge.classList.toggle('on', n > 0); }
+      if (btn) btn.setAttribute('aria-label', n ? tr('fab.cartN', { n, m: money(grandTotal()) }) : tr('cart.title'));
+    });
+  }
+  function openCartView() {
+    openCart();
+    if (cartCount()) enterCheckout();
   }
   $('#fabCart').addEventListener('click', () => {
-    if (cartCount()) openCart();
+    if (cartCount()) openCartView();
     else {
       const liveO = latestLiveOrder();
       if (liveO) openOrderDetail(liveO);
       else openHist();
     }
+  });
+  $('#menuCartBtn')?.addEventListener('click', () => openCartView());
+  $('#shopCartBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (cartCount()) enterCheckout();
+    else openCartView();
   });
   window.addEventListener('load', resumeCall);   /* retoma um chamado em curso depois de recarregar a página */
   window.addEventListener('pageshow', () => { persistSession(); maybeResumePay(); });

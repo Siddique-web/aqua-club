@@ -126,6 +126,7 @@
   function writeBus(d) {
     const next = { orders: (d.orders || []).slice(0, 80), calls: (d.calls || []).slice(0, 80) };
     try { localStorage.setItem(BUS_KEY, JSON.stringify(next)); } catch (e) { /* */ }
+    try { window.dispatchEvent(new CustomEvent('aq-os-up', { detail: next })); } catch (e) { /* */ }
     try {
       if (!window.__aqBc) window.__aqBc = new BroadcastChannel('aq-os');
       window.__aqBc.postMessage('up');
@@ -228,7 +229,8 @@
         name: o.name || '',
         phone: o.phone || '',
         waGroupOpt: !!o.waGroupOpt,
-        note: [o.note, o.bairro, o.waGroupOpt ? 'Grupo WA: sim' : '', o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
+        nConta: o.nConta || 0,
+        note: [o.nConta ? ('Conta ' + o.nConta) : '', o.note, o.bairro, o.waGroupOpt ? 'Grupo WA: sim' : '', o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
         lines: (o.lines || []).map((l) => ({
           itemId: l.itemId || l.menuItemId,
           qty: l.qty || l.quantity,

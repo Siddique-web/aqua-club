@@ -20,7 +20,7 @@
   const iso = (ms) => new Date(ms).toISOString();
   const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return pad(Math.floor(s / 60)) + ':' + pad(s % 60); };
   const human = (ms) => {
-    if (ms == null || isNaN(ms)) return '—';
+    if (ms == null || !Number.isFinite(ms) || ms < 0 || ms > 12 * 36e5) return '—';
     const s = Math.round(ms / 1000); if (s < 60) return s + ' s';
     const m = Math.floor(s / 60); if (m < 60) return m + ' min' + (s % 60 ? ' ' + (s % 60) + ' s' : '');
     return Math.floor(m / 60) + ' h ' + (m % 60) + ' min';
@@ -495,11 +495,14 @@
     period: 7, hper: 7, zone: 'all', msg: '', msgType: '', unsub: null, pollT: 0, tickT: 0, lastPend: null, pendingN: 0, soundOn: store.get('aq.gp.sound') !== '0', recovery: false,
     osDesk: null, osStaff: store.get('aq.os.staff') || '', osMsg: '', osN: 0, osPoll: 0, livePoll: 0, liveCalls: [], lastLive: null };
   const mt = (n) => Number(n || 0).toLocaleString('pt-PT') + ' MT';
+  function hasOsApi() {
+    return !!(window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.origin && AquaOS.origin());
+  }
   async function osFetch(path, opts = {}) {
     const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
     if (S.osStaff) headers.Authorization = 'Bearer ' + S.osStaff;
-    const root = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
-    if (!root) throw Object.assign(new Error('offline'), { status: 0, code: 'offline' });
+    const root = hasOsApi() ? AquaOS.origin() : '';
+    if (!root) throw Object.assign(new Error('offline'), { status: 0, code: 'offline', silent: true });
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 4000);
     try {
@@ -687,7 +690,7 @@
       reason: reasonMap[c.reason] || c.reason,
       note: [c.customer_name, c.customer_phone, c.note].filter(Boolean).join(' · '),
       status: st,
-      createdAt: isoCall(c.created_at),
+      createdAt: isoCall(c.created_at || c.ts || Date.now()),
       acceptedAt: isoCall(c.accepted_at),
       completedAt: isoCall(c.closed_at),
       by: c.waiterName || '',
@@ -736,15 +739,18 @@
     if (S.livePoll) return;
     refreshLiveCalls();
     S.livePoll = setInterval(refreshLiveCalls, 3000);
-    try {
-      if (!window.__aqStaffBc) {
+    if (!window.__aqStaffUp) {
+      window.__aqStaffUp = true;
+      const bump = () => {
+        refreshLiveCalls();
+        if (S.open && S.view === 'app' && S.tab === 'orders') loadOsDesk().then(() => { if (S.tab === 'orders') renderTab(); }).catch(() => {});
+      };
+      window.addEventListener('aq-os-up', bump);
+      try {
         window.__aqStaffBc = new BroadcastChannel('aq-os');
-        window.__aqStaffBc.onmessage = () => {
-          refreshLiveCalls();
-          if (S.open && S.view === 'app' && S.tab === 'orders') loadOsDesk().then(() => { if (S.tab === 'orders') renderTab(); }).catch(() => {});
-        };
-      }
-    } catch (e) { /* */ }
+        window.__aqStaffBc.onmessage = bump;
+      } catch (e) { /* */ }
+    }
     if (window.io && !S.osSock) {
       S.osSock = window.io({ transports: ['websocket', 'polling'] });
       S.osSock.on('call:new', () => refreshLiveCalls());
@@ -926,7 +932,8 @@
     const admin = S.me && S.me.role === 'admin';
     const xfer = pst === 'declared' || pst === 'paid_declared';
     const posDue = mth === 'pos' && pst !== 'paid' && o.status !== 'cancelled';
-    return '<article class="gc' + (xfer || posDue ? ' u1' : '') + '"><div class="gc-top"><span class="gc-table">' + esc(o.code) + '</span><span class="gc-zone">' + esc(orderPlace(o)) + '</span></div>' +
+    const bill = o.nConta ? ('Conta ' + o.nConta) : '';
+    return '<article class="gc' + (xfer || posDue ? ' u1' : '') + '"><div class="gc-top"><span class="gc-table">' + esc(bill || o.code) + '</span><span class="gc-zone">' + esc(orderPlace(o)) + (bill && o.code ? ' · ' + esc(o.code) : '') + '</span></div>' +
       '<div class="gc-reason"><b>' + esc(o.customer_name || (o.customer && o.customer.name) || 'Cliente') + '</b>' +
       (phone ? ' · <a href="tel:+' + esc(String(phone).replace(/\D/g, '')) + '">' + esc(phone) + '</a>' : '') +
       (o.waGroupOpt ? ' · <b>Grupo WA</b>' : '') +
@@ -1111,7 +1118,24 @@
   /* ====================================================================== EVENTOS */
   const say = (form, text, type) => { const p = $('.gp-msg', form); if (p) { p.textContent = text || ''; p.className = 'gp-msg ' + (type || ''); } };
   const busy = (form, on) => { const b = $('button[type=submit]', form); if (b) b.disabled = !!on; };
-  async function guard(fn) { try { return await fn(); } catch (e) { toast(esc(e.message || e), 'alert', 'err'); return undefined; } }
+  async function guard(fn) {
+    try { return await fn(); }
+    catch (e) {
+      if (!(e && (e.silent || e.code === 'offline'))) toast(esc(e.message || e), 'alert', 'err');
+      return undefined;
+    }
+  }
+  async function patchDeskOrder(id, body) {
+    let r = null;
+    if (hasOsApi()) {
+      try { r = await osFetch('/desk/orders/' + id, { method: 'PATCH', body }); } catch (e) { r = null; }
+    }
+    if (window.AquaBus) {
+      const row = AquaBus.patchOrder(id, body);
+      if (!r) r = row;
+    }
+    return r;
+  }
   async function onClick(e) {
     unlockAudio();
     const b = e.target.closest('[data-act]'); if (!b || !root.contains(b)) return; const a = b.dataset.act, be = backend();
@@ -1137,8 +1161,7 @@
       const list = ((S.osDesk && S.osDesk.orders) || []).filter((o) => orderPlace(o) === k && o.status !== 'cancelled' && o.payment_status !== 'paid');
       for (const o of list) {
         const body = { payment_status: 'paid' };
-        let r = await guard(() => osFetch('/desk/orders/' + o.id, { method: 'PATCH', body }));
-        if (!r && window.AquaBus) r = AquaBus.patchOrder(o.id, body);
+        await patchDeskOrder(o.id, body);
       }
       toast('Conta fechada como paga.', 'check', 'ok'); await loadOsDesk(); renderTab(); return;
     }
@@ -1146,9 +1169,13 @@
       const doWhat = b.dataset.do, id = b.dataset.id;
       const body = doWhat === 'paid' ? { payment_status: 'paid', status: 'preparing' } : doWhat === 'pospaid' ? { payment_status: 'paid', payment_method: 'pos' } : doWhat === 'markpaid' ? { payment_status: 'paid' } : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' } : { status: doWhat };
       b.disabled = true;
-      let r = await guard(() => osFetch('/desk/orders/' + id, { method: 'PATCH', body }));
-      if (!r && window.AquaBus) { r = AquaBus.patchOrder(id, body); }
-      if (r) { toast(doWhat === 'paid' ? 'Transferência confirmada — pedido em preparação.' : doWhat === 'pospaid' ? 'POS cobrado — este pedido está Pago.' : doWhat === 'markpaid' ? 'Pedido marcado como pago.' : doWhat === 'driver' ? 'Motorista confirmou a saída. A espera do cliente.' : doWhat === 'ready' ? 'Pedido marcado como pronto.' : 'Pedido em preparação.', 'check', 'ok'); await loadOsDesk(); renderTab(); }
+      const r = await patchDeskOrder(id, body);
+      b.disabled = false;
+      if (r) {
+        toast(doWhat === 'paid' ? 'Transferência confirmada — pedido em preparação.' : doWhat === 'pospaid' ? 'POS cobrado — este pedido está Pago.' : doWhat === 'markpaid' ? 'Pedido marcado como pago.' : doWhat === 'driver' ? 'Motorista confirmou a saída. A espera do cliente.' : doWhat === 'ready' ? 'Pedido marcado como pronto.' : 'Pedido em preparação.', 'check', 'ok');
+        await loadOsDesk();
+        renderTab();
+      } else toast('Não foi possível atualizar este pedido.', 'alert', 'err');
       return;
     }
     if (a === 'tab') return enterTab(b.dataset.t);
@@ -1165,12 +1192,15 @@
         const osId = id.slice(3);
         const path = a === 'complete' || a === 'release' ? '/live/calls/' + osId + '/close' : '/live/calls/' + osId + '/accept';
         let r = null;
-        try { r = await osFetch(path, { method: 'POST', body: {} }); } catch (e) { r = null; }
-        if (!r && window.AquaBus) {
+        if (hasOsApi()) {
+          try { r = await osFetch(path, { method: 'POST', body: {} }); } catch (e) { r = null; }
+        }
+        if (window.AquaBus) {
           const patch = a === 'accept'
             ? { status: 'accepted', accepted_at: new Date().toISOString(), waiterName: (S.me && S.me.name) || 'Garçom' }
             : { status: 'closed', closed_at: new Date().toISOString() };
-          r = { call: AquaBus.patchCall(osId, patch) };
+          const row = AquaBus.patchCall(osId, patch);
+          if (!r) r = { call: row };
         }
         if (r) {
           toast(a === 'accept' ? 'Chamado aceite — o cliente já vê que está a caminho.' : a === 'complete' ? 'Chamado concluído. Bom trabalho!' : 'Chamado encerrado.', 'check', 'ok');
