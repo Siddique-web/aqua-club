@@ -466,8 +466,25 @@ app.post('/api/orders/:id/pay', (req, res) => {
     return res.status(400).json({ error: 'pay_to' });
   }
   const ref = String(body.ref || body.payment_ref || '').trim().slice(0, 80);
-  db.prepare("UPDATE orders SET payment_method=?, payment_status='declared', payment_ref=? WHERE id=? AND payment_status IN ('unpaid','declared')")
-    .run(method, ref || o.payment_ref || null, o.id);
+  if (o.payment_status === 'paid') {
+    return res.json({ order: orderFull(o.id), payTo: payMeta });
+  }
+  const created = Date.parse(String(o.created_at || '').replace(' ', 'T'));
+  const ageMs = Number.isFinite(created) ? Date.now() - created : 0;
+  if (ageMs > 10 * 60 * 60 * 1000) return res.status(403).json({ error: 'pay_window' });
+  const changing = !!(o.payment_method && (body.change || o.payment_method !== method));
+  if (changing) {
+    const lat = Number(body.lat), lng = Number(body.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return res.status(403).json({ error: 'need_site' });
+    if (kmBetween(lat, lng, CLUB_GEO.lat, CLUB_GEO.lng) > 0.55) return res.status(403).json({ error: 'not_on_site' });
+  }
+  if (method === 'pos') {
+    db.prepare("UPDATE orders SET payment_method='pos', payment_status='unpaid' WHERE id=? AND payment_status!='paid'")
+      .run(o.id);
+  } else {
+    db.prepare("UPDATE orders SET payment_method=?, payment_status='declared', payment_ref=? WHERE id=? AND payment_status IN ('unpaid','declared','pay_requested')")
+      .run(method, ref || o.payment_ref || null, o.id);
+  }
   const full = orderFull(o.id);
   emitAll('order:updated', full);
   res.json({ order: full, payTo: payMeta });
@@ -549,9 +566,21 @@ app.post('/api/calls/:id/cancel', (req, res) => {
 });
 
 /* ---------- staff kiosk (PIN, not a personal account) ---------- */
+app.get('/api/staff/kiosk', (_req, res) => {
+  const waiters = db.prepare('SELECT id, name FROM waiters WHERE active=1 ORDER BY name').all();
+  res.json({ waiters });
+});
+
 app.post('/api/staff/open', (req, res) => {
   const { waiterId, pin } = req.body || {};
-  const w = db.prepare('SELECT * FROM waiters WHERE id=? AND active=1').get(Number(waiterId));
+  let w = null;
+  if (waiterId) {
+    w = db.prepare('SELECT * FROM waiters WHERE id=? AND active=1').get(Number(waiterId));
+  } else if (pin) {
+    const list = db.prepare('SELECT * FROM waiters WHERE pin=? AND active=1').all(String(pin));
+    if (list.length > 1) return res.status(400).json({ error: 'ambiguous' });
+    w = list[0] || null;
+  }
   if (!w || String(w.pin) !== String(pin)) return res.status(401).json({ error: 'pin' });
   const shift = db.prepare('SELECT * FROM shifts WHERE waiter_id=? AND work_date=?').get(w.id, todayISO());
   const token = jwt.sign({ wid: w.id, kind: 'staff' }, JWT_SECRET, { expiresIn: '14h' });

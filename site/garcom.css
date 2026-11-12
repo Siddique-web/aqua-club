@@ -157,6 +157,11 @@ html.gp-open, html.gp-open body { overflow: hidden; }
 .gc-reason { display: flex; align-items: center; gap: .55rem; font: 700 1rem var(--fh, system-ui); }
 .gc-reason .gi { color: var(--cyan, #00A8FF); }
 .gc-note { margin: 0; padding: .55rem .8rem; background: #F0F7FC; border-radius: 12px; font-size: .92rem; color: #1b2630; }
+.gc-items { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.gc-items li { display: grid; grid-template-columns: 1fr auto; gap: .15rem .7rem; padding: .45rem .7rem; background: #F0F7FC; border-radius: 12px; font-size: .9rem; }
+.gc-items b { font: 800 .92rem var(--fh, system-ui); }
+.gc-items small { display: block; grid-column: 1; color: #3D4852; font-weight: 600; }
+.gc-items span { font: 800 .85rem var(--fh, system-ui); }
 .gc-foot { display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
 .gc-timer { display: inline-flex; align-items: center; gap: .4rem; font: 800 1.15rem var(--fh, system-ui); font-variant-numeric: tabular-nums; }
 .gc-timer .gi { width: 18px; height: 18px; }

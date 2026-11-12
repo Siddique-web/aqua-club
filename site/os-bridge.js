@@ -144,6 +144,9 @@
       const d = readBus(); const o = (d.orders || []).find((x) => String(x.id) === String(id) || String(x.code) === String(id));
       if (o) {
         Object.assign(o, patch);
+        if (patch.payment_status === 'paid') o.pay = 'paid';
+        if (patch.payment_status === 'declared') o.pay = 'paid_declared';
+        if (patch.payment_status === 'unpaid') o.pay = 'unpaid';
         if (o.driver_ok && o.client_ok) o.status = 'delivered';
         else if ((o.driver_ok || o.client_ok) && (o.status === 'ready' || o.status === 'preparing' || o.status === 'review' || o.status === 'received')) o.status = 'on_the_way';
       }
@@ -244,10 +247,14 @@
       o.total = r.order.total || o.total;
       return r.order;
     },
-    async declarePay(o, method, ref) {
+    async declarePay(o, method, ref, geo) {
       const r = await api('/orders/' + o.id + '/pay', {
         method: 'POST',
-        body: { method, ref: ref || '', code: o.code, currency: 'MT', payTo: (typeof PAYMENT !== 'undefined' && PAYMENT.methods.find((m) => m.id === method)?.digits) || undefined }
+        body: {
+          method, ref: ref || '', code: o.code, currency: 'MT',
+          payTo: (typeof PAYMENT !== 'undefined' && PAYMENT.methods.find((m) => m.id === method)?.digits) || undefined,
+          lat: geo && geo.lat, lng: geo && geo.lng, change: !!(o && o.method)
+        }
       });
       return r.order;
     },

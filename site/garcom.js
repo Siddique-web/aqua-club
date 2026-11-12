@@ -53,7 +53,9 @@
   function mode() {
     const c = cfg(); if (c.url && c.key) return 'live';
     let m = ''; try { m = new URLSearchParams(location.search).get('modo') || (typeof MODE !== 'undefined' ? MODE : ''); } catch (e) { /* */ }
-    return m === 'demo' ? 'demo' : 'whatsapp';
+    if (m === 'demo') return 'demo';
+    if (m === 'desk' || m === 'live' || (window.AquaOS && AquaOS.live && AquaOS.live())) return 'desk';
+    return 'whatsapp';
   }
 
   /* ------------------------------------------------------------------ normalização */
@@ -316,10 +318,128 @@
     return api;
   }
 
+  /* ================================================================== BACKEND DESK (PIN local + API se existir) */
+  function makeDesk() {
+    const ROSTER = 'aq.os.roster';
+    const SESS = 'aq.os.staff.me';
+    const COLORS = ['#00A8FF', '#FFB400', '#16A34A', '#E11D48', '#7C3AED', '#0891B2', '#EA580C', '#DB2777', '#0EA5E9', '#CA8A04'];
+    const NAMES = ['Amélia Nhampossa', 'João Mucavele', 'Nádia Cossa', 'Carlos Tembe', 'Sónia Machava', 'Pedro Mondlane', 'Lucrécia Dava', 'Miguel Chissano', 'Beatriz Langa', 'Samuel Matola'];
+    const seedRoster = () => NAMES.map((name, i) => ({
+      id: 'w-' + (i + 1), user_id: 'w-' + (i + 1), name, email: '', phone: '',
+      role: 'waiter', active: true, color: COLORS[i % COLORS.length], pin: String(1001 + i),
+      created_at: iso(Date.now() - (30 - i) * 864e5)
+    })).concat([{
+      id: 's-admin', user_id: 's-admin', name: 'Administração', email: '', phone: '',
+      role: 'admin', active: true, color: '#0A0A0A', pin: '2468', created_at: iso(Date.now() - 40 * 864e5)
+    }]);
+    const readRoster = () => {
+      try { const d = JSON.parse(store.get(ROSTER) || ''); if (Array.isArray(d) && d.length) return d; } catch (e) { /* */ }
+      const d = seedRoster(); store.set(ROSTER, JSON.stringify(d)); return d;
+    };
+    const writeRoster = (d) => store.set(ROSTER, JSON.stringify(d));
+    const readMe = () => { try { return JSON.parse(store.get(SESS) || ''); } catch (e) { return null; } };
+    const writeMe = (m) => { if (m) store.set(SESS, JSON.stringify(m)); else store.del(SESS); };
+    const listeners = new Set();
+    const ping = () => { listeners.forEach((f) => { try { f(); } catch (e) { /* */ } }); };
+    try {
+      if (!window.__aqDeskBc) {
+        window.__aqDeskBc = new BroadcastChannel('aq-os');
+        window.__aqDeskBc.onmessage = ping;
+      } else {
+        const prev = window.__aqDeskBc.onmessage;
+        window.__aqDeskBc.onmessage = (ev) => { if (typeof prev === 'function') prev(ev); ping(); };
+      }
+    } catch (e) { /* */ }
+    window.addEventListener('storage', (e) => { if (e.key === 'aq.os.bus' || e.key === ROSTER) ping(); });
+    const pub = (s) => { const o = Object.assign({}, s); delete o.pin; return o; };
+    const api = {
+      mode: 'desk', onRecovery: null,
+      createCall: async () => { throw new Error('Use o botão do cliente para chamar.'); },
+      callStatus: async () => null,
+      cancelCall: async () => false,
+      rateCall: async () => false,
+      hasStoredSession: () => !!readMe() || !!store.get('aq.os.staff'),
+      async session() { const m = readMe(); return m ? { id: m.user_id, email: m.email || '' } : null; },
+      async signIn() { throw new Error('Entre com o PIN da equipa.'); },
+      async signUp() { throw new Error('Peça à administração para criar o seu PIN.'); },
+      async signOut() { writeMe(null); store.del('aq.os.staff'); ping(); },
+      async resetPassword() { throw new Error('Peça à administração para repor o PIN.'); },
+      async changePassword(pw) {
+        const me = readMe(); if (!me) throw new Error('Sem sessão.');
+        if (String(pw).length < 4) throw new Error('O PIN precisa de pelo menos 4 dígitos.');
+        const d = readRoster(); const row = d.find((s) => s.user_id === me.user_id); if (!row) throw new Error('Sem permissão.');
+        row.pin = String(pw); me.pin = String(pw); writeRoster(d); writeMe(me);
+      },
+      async profile() { const m = readMe(); return m ? pub(m) : null; },
+      async updateProfile({ name, phone }) {
+        const d = readRoster(); const me = readMe(); if (!me) throw new Error('Sem sessão.');
+        const row = d.find((s) => s.user_id === me.user_id); if (!row) throw new Error('Sem permissão.');
+        const n = String(name || '').trim().slice(0, 60); if (n.length < 2) throw new Error('Indique o seu nome.');
+        row.name = n; row.phone = String(phone || '').trim().slice(0, 20);
+        Object.assign(me, { name: row.name, phone: row.phone }); writeRoster(d); writeMe(me); return true;
+      },
+      roster: () => readRoster().map(pub),
+      openPin(pin, waiterId) {
+        const d = readRoster();
+        let row = null;
+        if (waiterId) row = d.find((s) => String(s.id) === String(waiterId) || String(s.user_id) === String(waiterId));
+        else {
+          const hits = d.filter((s) => String(s.pin) === String(pin) && s.active);
+          if (hits.length > 1) throw new Error('Há mais do que uma pessoa com este PIN. Escolha o nome.');
+          row = hits[0] || null;
+        }
+        if (!row || !row.active || String(row.pin) !== String(pin)) throw new Error('PIN incorrecto.');
+        writeMe(row); ping(); return pub(row);
+      },
+      setPin(id, pin) {
+        const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.');
+        if (String(pin).length < 4) throw new Error('O PIN precisa de pelo menos 4 dígitos.');
+        const d = readRoster(); const t = d.find((s) => s.id === id); if (!t) return false;
+        t.pin = String(pin); writeRoster(d); ping(); return true;
+      },
+      async listCalls() {
+        const bus = (window.AquaBus && AquaBus.read()) || { calls: [] };
+        return (bus.calls || []).map(mapOsCall);
+      },
+      async myCalls() {
+        const me = readMe(); const all = await api.listCalls();
+        return all.filter((c) => !me || c.byUser === me.user_id || c.by === me.name);
+      },
+      async acceptCall(id) {
+        const me = readMe(); if (!me) throw new Error('Sem sessão.');
+        const osId = String(id).replace(/^os-/, '');
+        if (window.AquaBus) AquaBus.patchCall(osId, { status: 'accepted', accepted_at: new Date().toISOString(), waiterName: me.name, waiter_id: me.id });
+        ping(); return true;
+      },
+      async completeCall(id) {
+        const osId = String(id).replace(/^os-/, '');
+        if (window.AquaBus) AquaBus.patchCall(osId, { status: 'closed', closed_at: new Date().toISOString() });
+        ping(); return true;
+      },
+      async releaseCall(id) {
+        const osId = String(id).replace(/^os-/, '');
+        if (window.AquaBus) AquaBus.patchCall(osId, { status: 'pending', accepted_at: null, waiterName: '', waiter_id: null });
+        ping(); return true;
+      },
+      async team() { const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.'); return readRoster().map(pub); },
+      async setStaff(id, active, role) {
+        const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.');
+        const d = readRoster(); const t = d.find((s) => s.id === id); if (!t) return false;
+        if (t.user_id === me.user_id && (!active || role !== 'admin')) throw new Error('Não pode retirar o seu próprio acesso de administrador.');
+        t.active = !!active; t.role = role === 'admin' ? 'admin' : 'waiter'; writeRoster(d); ping(); return true;
+      },
+      subscribe(cb) { listeners.add(cb); return () => listeners.delete(cb); }
+    };
+    return api;
+  }
+
   let _be = null, _bm = '';
   const backend = () => {
     const m = mode(); if (m === 'whatsapp') return null;
-    if (!_be || _bm !== m) { _be = m === 'live' ? makeLive() : makeDemo(); _bm = m; }
+    if (!_be || _bm !== m) {
+      _be = m === 'live' ? makeLive() : m === 'demo' ? makeDemo() : makeDesk();
+      _bm = m;
+    }
     return _be;
   };
 
@@ -379,27 +499,36 @@
     const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
     if (S.osStaff) headers.Authorization = 'Bearer ' + S.osStaff;
     const root = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
-    const res = await fetch(root + '/api' + path, { credentials: 'include', method: opts.method || 'GET', headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw Object.assign(new Error(data.error || 'fail'), { status: res.status, code: data.error });
-    return data;
+    if (!root) throw Object.assign(new Error('offline'), { status: 0, code: 'offline' });
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    try {
+      const res = await fetch(root + '/api' + path, { credentials: 'include', method: opts.method || 'GET', headers, body: opts.body ? JSON.stringify(opts.body) : undefined, signal: ctrl.signal });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw Object.assign(new Error(data.error || 'fail'), { status: res.status, code: data.error });
+      return data;
+    } catch (e) {
+      if (e && (e.name === 'AbortError' || e.code === 'offline')) throw Object.assign(new Error('offline'), { status: 0, code: 'offline' });
+      throw e;
+    } finally { clearTimeout(t); }
   }
   async function loadOsDesk() {
+    const countOpen = (orders) => (orders || []).filter((o) => o.status !== 'cancelled' && o.status !== 'delivered').length;
     try {
       S.osDesk = await osFetch('/desk/board');
-      S.osN = (S.osDesk.orders || []).filter((o) => o.payment_status === 'declared' || o.status === 'review' || o.status === 'received').length;
       S.osMsg = '';
       if (!S.osPoll) S.osPoll = setInterval(() => {
-        if (S.open && S.view === 'app' && S.tab === 'orders') loadOsDesk().then(() => { if (S.tab === 'orders') renderTab(); }).catch(() => {});
+        if (staffLogged()) loadOsDesk().then(() => { if (S.open && S.view === 'app' && (S.tab === 'orders' || S.tab === 'team')) renderTab(); }).catch(() => {});
       }, 4000);
     } catch (e) {
-      if (e.status === 401) S.osDesk = null;
-      else if (window.AquaBus) {
+      if (window.AquaBus) {
         const d = AquaBus.read();
-        S.osDesk = { orders: d.orders || [], calls: d.calls || [], role: 'bus' };
+        S.osDesk = { orders: d.orders || [], calls: d.calls || [], role: (S.me && S.me.role) || 'bus' };
         S.osMsg = '';
-      } else S.osMsg = e.message || 'Sem ligação ao sistema de pedidos.';
+      } else if (e.status === 401) { S.osDesk = null; S.osMsg = ''; }
+      else S.osMsg = e.message || 'Sem ligação ao sistema de pedidos.';
     }
+    setOrderBadge(countOpen(S.osDesk && S.osDesk.orders));
   }
   let root = null, pn = null, toasts = null, deb = 0;
 
@@ -435,12 +564,13 @@
   }
 
   /* ====================================================================== BARRA INFERIOR */
+  function staffLogged() { return !!(S.me && S.me.active) || !!store.get('aq.os.staff') || !!store.get('aq.os.staff.me'); }
   function staffChrome() {
     try {
       const q = new URLSearchParams(location.search);
       if (q.get('equipa') === '1' || q.get('staff') === '1') return true;
-      if (/^#garcom/.test(location.hash || '')) return true;
-      if (store.get('aq.os.staff')) return true;
+      if (/^#(garcom|equipa|admin)/.test(location.hash || '')) return true;
+      if (staffLogged()) return true;
     } catch (e) { /* */ }
     return false;
   }
@@ -448,33 +578,50 @@
     document.documentElement.classList.toggle('staff-chrome', !!on);
     if (pn) pn.hidden = !on;
   }
+  function dockItems() {
+    const admin = S.me && S.me.role === 'admin';
+    const items = [['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell']];
+    if (admin) items.push(['admin', 'Admin', 'users']);
+    else items.push(['profile', 'Perfil', 'user']);
+    return items;
+  }
+  function paintNav() {
+    if (!pn) return;
+    pn.innerHTML = dockItems().map((x) =>
+      '<button type="button" data-k="' + x[0] + '" aria-label="' + x[1] + '" title="' + x[1] + '">' + ic(x[2]) + '<span class="lbl">' + x[1] + '</span>' +
+      (x[0] === 'orders' ? '<span class="bd" id="pnBdOrd" hidden>0</span>' : '') +
+      (x[0] === 'calls' ? '<span class="bd" id="pnBd" hidden>0</span>' : '') + '</button>').join('');
+    syncNav(); setBadge(S.pendingN); setOrderBadge(S.osN);
+  }
   function buildNav() {
-    pn = document.createElement('nav'); pn.className = 'pn'; pn.id = 'pn'; pn.setAttribute('aria-label', 'Navegação da equipa'); pn.hidden = !staffChrome();
-    showStaffBar(staffChrome());
-    pn.innerHTML = [['home', 'Início', 'home'], ['garcom', 'Garçom', 'user'], ['stats', 'Estatísticas', 'chart'], ['theme', 'Tema', 'moon']].map((x) =>
-      '<button type="button" data-k="' + x[0] + '" aria-label="' + x[1] + '" title="' + x[1] + '">' + ic(x[2]) + '<span class="lbl">' + x[1] + '</span>' + (x[0] === 'garcom' ? '<span class="bd" id="pnBd" hidden>0</span>' : '') + '</button>').join('');
+    pn = document.createElement('nav'); pn.className = 'pn'; pn.id = 'pn'; pn.setAttribute('aria-label', 'Navegação da equipa'); pn.hidden = !staffLogged();
+    showStaffBar(staffLogged());
+    paintNav();
     document.body.appendChild(pn);
     pn.addEventListener('click', (e) => { const b = e.target.closest('button[data-k]'); if (!b) return; navGo(b.dataset.k); });
-    syncNav();
   }
   function navGo(k) {
-    if (k === 'home') { closePortal(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    else if (k === 'garcom') { if (S.open && S.view === 'app') enterTab('orders'); else openPortal('orders'); }
-    else if (k === 'stats') { if (S.open && S.view === 'app') enterTab('stats'); else openPortal('stats'); }
-    else toggleTheme();
+    if (k === 'admin') { if (S.open && S.view === 'app') enterTab('team'); else openPortal('team'); }
+    else if (S.open && S.view === 'app') enterTab(k);
+    else openPortal(k);
     syncNav();
   }
   function syncNav() {
     if (!pn) return;
-    const cur = !S.open ? 'home' : S.tab === 'stats' ? 'stats' : 'garcom';
+    if (!S.me && staffLogged()) { /* keep */ }
+    const cur = !S.open ? '' : (S.tab === 'team' ? 'admin' : S.tab);
     $$('button[data-k]', pn).forEach((b) => { if (b.dataset.k === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-    const dark = document.documentElement.dataset.theme === 'dark', th = $('button[data-k="theme"]', pn);
-    th.innerHTML = ic(dark ? 'sun' : 'moon') + '<span class="lbl">Tema</span>'; th.setAttribute('aria-pressed', String(dark)); th.setAttribute('aria-label', dark ? 'Mudar para tema claro' : 'Mudar para tema escuro'); th.title = th.getAttribute('aria-label');
   }
-  function toggleTheme() { const d = document.documentElement; if (d.dataset.theme === 'dark') { delete d.dataset.theme; store.set('aq.theme', 'light'); } else { d.dataset.theme = 'dark'; store.set('aq.theme', 'dark'); } syncNav(); }
+  function toggleTheme() { const d = document.documentElement; if (d.dataset.theme === 'dark') { delete d.dataset.theme; store.set('aq.theme', 'light'); } else { d.dataset.theme = 'dark'; store.set('aq.theme', 'dark'); } }
+  function setOrderBadge(n) {
+    S.osN = n || 0;
+    const bd = $('#pnBdOrd'); if (bd) { bd.hidden = !S.osN || !staffLogged(); bd.textContent = S.osN > 99 ? '99+' : String(S.osN); }
+    const tn = $('#tabNOrd'); if (tn) { tn.hidden = !S.osN; tn.textContent = String(S.osN); }
+  }
   function setBadge(n) {
     const prev = S.pendingN; S.pendingN = n;
-    const bd = $('#pnBd'); if (bd) { bd.hidden = !n || !(S.me && S.me.active); bd.textContent = n > 99 ? '99+' : String(n); if (n > prev) { bd.classList.remove('ping'); void bd.offsetWidth; bd.classList.add('ping'); } }
+    const on = staffLogged();
+    const bd = $('#pnBd'); if (bd) { bd.hidden = !n || !on; bd.textContent = n > 99 ? '99+' : String(n); if (n > prev) { bd.classList.remove('ping'); void bd.offsetWidth; bd.classList.add('ping'); } }
     const tn = $('#tabN'); if (tn) { tn.hidden = !n; tn.textContent = String(n); }
   }
 
@@ -491,14 +638,15 @@
   function setInert(on) { Array.from(document.body.children).forEach((el) => { if (el === root || el === pn || el === toasts || /^(SCRIPT|STYLE|LINK|DIALOG)$/.test(el.tagName)) return; if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert'); }); }
   async function openPortal(tab) {
     build(); S.tab = tab || 'orders'; S.open = true; root.hidden = false;
-    document.documentElement.classList.add('gp-open'); showStaffBar(true); setInert(true); syncNav();
+    document.documentElement.classList.add('gp-open'); showStaffBar(staffLogged()); setInert(true); syncNav();
     await boot();
+    showStaffBar(staffLogged()); paintNav();
     const f = $('.gp-x', root); if (f && S.view !== 'auth') f.focus({ preventScroll: true });
   }
   function closePortal() {
     if (!S.open) return; S.open = false; if (root) root.hidden = true;
-    document.documentElement.classList.remove('gp-open'); showStaffBar(staffChrome()); setInert(false); syncNav();
-    if (/^#garcom/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* */ } }
+    document.documentElement.classList.remove('gp-open'); showStaffBar(staffLogged()); setInert(false); paintNav();
+    if (/^#(garcom|equipa|admin)/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* */ } }
   }
 
   /* ====================================================================== arranque: sessão → perfil → vista */
@@ -514,7 +662,7 @@
       const p = await be.profile(); S.me = p;
       if (!p) { stopWork(); S.view = 'noprofile'; render(); return; }
       if (!p.active) { stopWork(); S.view = 'pending'; S.pollT = setInterval(async () => { try { const q = await be.profile(); if (q && q.active) { clearInterval(S.pollT); boot(); } } catch (e) { /* */ } }, 6000); render(); return; }
-      S.view = 'app'; render(); startWork(); await enterTab(S.tab);
+      S.view = 'app'; showStaffBar(true); paintNav(); render(); startWork(); await loadOsDesk(); await enterTab(S.tab);
     } catch (e) { S.view = 'error'; S.msg = e.message; render(); }
   }
   async function silentBoot() {
@@ -603,8 +751,10 @@
       S.osSock.on('call:updated', () => refreshLiveCalls());
       S.osSock.on('order:new', () => { if (S.tab === 'orders') loadOsDesk().then(() => { if (S.tab === 'orders') renderTab(); }); });
     } else if (!window.io && !document.querySelector('script[data-aq-io]')) {
+      const origin = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
+      if (!origin) return;
       const s = document.createElement('script');
-      s.src = '/socket.io/socket.io.js';
+      s.src = origin + '/socket.io/socket.io.js';
       s.dataset.aqIo = '1';
       s.onload = () => { if (!S.osSock) { S.osSock = window.io({ transports: ['websocket', 'polling'] }); S.osSock.on('call:new', () => refreshLiveCalls()); S.osSock.on('call:updated', () => refreshLiveCalls()); } };
       document.head.appendChild(s);
@@ -642,7 +792,7 @@
   const loadingHTML = '<div class="gp-empty">' + ic('clock') + '<b>A carregar…</b></div>';
   function render() {
     const m = $('#gpMain'); if (!m) return; const v = S.view, md = mode();
-    const badge = $('#gpMode'); badge.textContent = md === 'demo' ? 'Demonstração' : md === 'live' ? 'Ao vivo' : 'Sem ligação'; badge.className = 'gp-mode' + (md === 'demo' ? ' demo' : '');
+    const badge = $('#gpMode'); badge.textContent = md === 'demo' ? 'Demonstração' : (md === 'live' || md === 'desk') ? 'Ao vivo' : 'Sem ligação'; badge.className = 'gp-mode' + (md === 'demo' ? ' demo' : '');
     if (v === 'boot') m.innerHTML = loadingHTML;
     else if (v === 'nobackend') m.innerHTML = viewNoBackend();
     else if (v === 'auth') m.innerHTML = viewAuth();
@@ -665,8 +815,20 @@
       '<a class="gb block" style="margin-top:.8rem;text-decoration:none" href="?modo=demo#garcom">Abrir a demonstração</a></div></div>';
   }
   function viewAuth() {
-    const up = S.authTab === 'up', demo = mode() === 'demo';
-    const pw = (id, label, ac) => '<label>' + label + '<span class="gp-pw"><input id="' + id + '" name="' + id + '" type="password" autocomplete="' + ac + '" required minlength="8"><button type="button" data-act="pw" aria-label="Mostrar ou esconder a palavra-passe">' + ic('eye') + '</button></span></label>';
+    const up = S.authTab === 'up';
+    const desk = mode() === 'desk';
+    const pw = (id, label, ac, min) => '<label>' + label + '<span class="gp-pw"><input id="' + id + '" name="' + id + '" type="password" autocomplete="' + ac + '" required minlength="' + (min || 8) + '" inputmode="' + (min === 4 ? 'numeric' : 'text') + '"><button type="button" data-act="pw" aria-label="Mostrar ou esconder a palavra-passe">' + ic('eye') + '</button></span></label>';
+    if (desk) {
+      return '<div class="gp-auth"><div class="gp-hero"><div class="ico">' + ic('shield') + '</div><h2>Área da equipa</h2><p>Garçons entram com o PIN. A administração entra com PIN de admin ou e-mail da casa.</p></div>' +
+        '<div class="gp-seg" role="tablist" aria-label="Como entrar"><button type="button" role="tab" data-act="authtab" data-v="in" aria-selected="' + !up + '">PIN da equipa</button><button type="button" role="tab" data-act="authtab" data-v="up" aria-selected="' + up + '">E-mail admin</button></div>' +
+        '<div class="gp-card">' + (up
+          ? '<form class="gp-form" data-form="osadmin" novalidate><label>E-mail da administração<input name="email" type="email" autocomplete="username" required></label>' +
+            pw('password', 'Palavra-passe', 'current-password') +
+            '<button class="gb block" type="submit">Entrar como administração</button><p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg || S.osMsg) + '</p></form>'
+          : '<form class="gp-form" data-form="pin" novalidate>' + pw('pin', 'PIN (4 ou mais dígitos)', 'one-time-code', 4) +
+            '<button class="gb block" type="submit">Entrar</button><p class="gp-muted" style="margin:0">O PIN é o da sua ficha. Peça-o à administração se ainda não o tiver.</p><p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg) + '</p></form>') + '</div>' +
+        (!(window.AquaOS && AquaOS.live && AquaOS.live()) ? '<div class="gp-demo"><b>Neste telemóvel (sem servidor)</b> — garçom <b>1001</b> a <b>1010</b> (Amélia… Samuel). Administração <b>2468</b>. Altere os PINs no Admin depois de entrar.</div>' : '') + '</div>';
+    }
     return '<div class="gp-auth"><div class="gp-hero"><div class="ico">' + ic('user') + '</div><h2>Área do garçom</h2><p>Aceite chamados das mesas, acompanhe o seu desempenho e a sua equipa.</p></div>' +
       '<div class="gp-seg" role="tablist" aria-label="Entrar ou criar conta"><button type="button" role="tab" data-act="authtab" data-v="in" aria-selected="' + !up + '">Entrar</button><button type="button" role="tab" data-act="authtab" data-v="up" aria-selected="' + up + '">Criar conta</button></div>' +
       '<div class="gp-card">' + (up
@@ -676,8 +838,7 @@
           '<label>Repetir palavra-passe<input name="password2" type="password" autocomplete="new-password" required minlength="8"></label>' +
           '<button class="gb block" type="submit">Pedir acesso</button><p class="gp-muted" style="margin:0">A conta fica <b>pendente</b> até um administrador a aprovar.</p><p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg) + '</p></form>'
         : '<form class="gp-form" data-form="in" novalidate><label>E-mail<input name="email" id="gpEmail" type="email" autocomplete="username" required></label>' + pw('password', 'Palavra-passe', 'current-password') +
-          '<button class="gb block" type="submit">Entrar</button><button type="button" class="gp-link" data-act="forgot">Esqueci a palavra-passe</button><p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg) + '</p></form>') + '</div>' +
-      (demo ? '<div class="gp-demo"><b>Demonstração</b> — use a conta da administração ou o PIN do garçom no sistema. Não há contas publicadas nesta página.</div>' : '') + '</div>';
+          '<button class="gb block" type="submit">Entrar</button><button type="button" class="gp-link" data-act="forgot">Esqueci a palavra-passe</button><p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg) + '</p></form>') + '</div></div>';
   }
   function viewConfirm() { return viewSimple('mail', 'Conta criada!', 'Enviámos um e-mail de confirmação. Confirme o endereço e depois <b>aguarde a aprovação</b> do administrador. Pode entrar assim que for aprovado.', false) + '<div class="gp-auth"><button class="gb line block" data-act="authtab" data-v="in">Ir para Entrar</button></div>'; }
   function viewPending() {
@@ -690,20 +851,20 @@
   }
   function appFrame() {
     const me = S.me, tabs = [['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'], ['hist', 'Histórico', 'list'], ['stats', 'Estatísticas', 'chart'], ['profile', 'Perfil', 'user']];
-    if (me.role === 'admin') tabs.push(['team', 'Equipa', 'users']);
-    return '<div class="gp-card"><div class="gp-who">' + avatar(me) + '<div><h2>' + esc(me.name) + '<span class="gp-role">' + (me.role === 'admin' ? 'Admin' : 'Garçom') + '</span></h2><small>' + esc(me.email || '') + '</small></div></div></div>' +
-      '<p style="margin:.4rem 1rem 0;font-size:.85rem"><a href="/painel.html" style="color:#0069A8;font-weight:800">Abrir painel completo de pedidos</a></p>' +
+    if (me.role === 'admin') tabs.push(['team', 'Admin', 'users']);
+    return '<div class="gp-card"><div class="gp-who">' + avatar(me) + '<div><h2>' + esc(me.name) + '<span class="gp-role">' + (me.role === 'admin' ? 'Admin' : 'Garçom') + '</span></h2><small>' + esc(me.email || me.phone || 'PIN da casa') + '</small></div></div></div>' +
       '<div class="gp-tabs" role="tablist" aria-label="Secções">' + tabs.map((t) => '<button class="gp-tab" type="button" role="tab" data-act="tab" data-t="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + ic(t[2]) + t[1] +
         (t[0] === 'calls' ? '<span class="n" id="tabN"' + (S.pendingN ? '' : ' hidden') + '>' + S.pendingN + '</span>' : '') +
-        (t[0] === 'orders' && S.osN ? '<span class="n">' + S.osN + '</span>' : '') + '</button>').join('') + '</div><div id="gpc" aria-live="polite"></div>';
+        (t[0] === 'orders' ? '<span class="n" id="tabNOrd"' + (S.osN ? '' : ' hidden') + '>' + S.osN + '</span>' : '') + '</button>').join('') + '</div><div id="gpc" aria-live="polite"></div>';
   }
   async function enterTab(t) {
+    if (t === 'admin') t = 'team';
     if (t === 'team' && !(S.me && S.me.role === 'admin')) t = 'calls';
     S.tab = t; if (S.view !== 'app') { syncNav(); return; }
     $$('.gp-tab', root).forEach((b) => { const on = b.dataset.t === S.tab; b.setAttribute('aria-selected', String(on)); if (on && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) { /* */ } } }); syncNav();
     const c = $('#gpc'); if (!c) return;
     try {
-      if (t === 'orders') { c.innerHTML = loadingHTML; await loadOsDesk(); }
+      if (t === 'orders' || t === 'team') { c.innerHTML = loadingHTML; await loadOsDesk(); }
       if (['hist', 'stats', 'profile'].includes(t) && (!S.mine || Date.now() - S.mineAt > 15000)) { if (!S.mine) c.innerHTML = loadingHTML; await loadMine(); }
       if (t === 'team') { c.innerHTML = loadingHTML; await loadTeam(); }
     } catch (e) { toast(esc(e.message), 'alert', 'err'); if (!S.mine) S.mine = []; }
@@ -719,37 +880,90 @@
 
   /* ====================================================================== TAB: PEDIDOS (sistema em tempo real) */
   const ST_OS = { review: 'Em análise', received: 'Em análise', preparing: 'Em preparação', ready: 'Pronto', on_the_way: 'A caminho', delivered: 'Entregue', cancelled: 'Cancelado', no_confirm: 'Sem confirmação' };
-  const PAY_OS = { unpaid: 'Por pagar', declared: 'Transferência a confirmar', paid_declared: 'Transferência a confirmar', paid: 'Pago', rejected: 'Rejeitado', pay_requested: 'Conta pedida' };
-  function tabOrders() {
-    if (!S.osDesk) {
-      return '<div class="gp-card"><h3>Gestão de pedidos</h3><p class="gp-muted">Os pedidos do site (menu, carrinho e pagamento) aparecem aqui em tempo real. Entre com a conta da administração ou com o PIN do garçom.</p>' +
-        '<form class="gp-form" data-form="osadmin"><label>E-mail da administração<input name="email" type="email" autocomplete="username" required></label>' +
-        '<label>Palavra-passe<input name="password" type="password" required></label>' +
-        '<button class="gb block" type="submit">Entrar na gestão</button>' +
-        '<p class="gp-msg ' + (S.osMsg ? 'err' : '') + '">' + esc(S.osMsg) + '</p></form>' +
-        '<p class="gp-muted">Ou abra o <a href="/painel.html"><b>painel completo</b></a> / <a href="/os/#/admin">administração</a>.</p></div>';
-    }
-    const orders = S.osDesk.orders || [];
-    const wait = orders.filter((o) => o.payment_status === 'declared' || o.payment_status === 'paid_declared');
-    const live = orders.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered');
-    const payLine = (o) => o.payment_method === 'emola' ? 'e-Mola 87 452 1897 · Siddique Faizy Rego' : o.payment_method === 'mpesa' ? 'M-Pesa 84 596 1528 · Siddique Faizy Rego' : (o.payment_method || '—');
-    const cardO = (o) => '<article class="gc' + (o.payment_status === 'declared' || o.payment_status === 'paid_declared' ? ' u1' : '') + '"><div class="gc-top"><span class="gc-table">' + esc(o.code) + '</span><span class="gc-zone">' + esc(o.place_label || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || '')) + '</span></div>' +
-      '<div class="gc-reason"><b>' + esc(o.customer_name || 'Cliente') + '</b> · ' + esc(o.customer_phone || '') + (o.waGroupOpt ? ' · <b>Grupo WA</b>' : '') + '</div>' +
-      '<p class="gc-note">' + esc((o.items || []).map((i) => i.qty + '× ' + i.name).join(', ')) + '<br><b>' + mt(o.total) + '</b> · ' + esc(ST_OS[o.status] || o.status) + ' · ' + esc(PAY_OS[o.payment_status] || o.payment_status) +
-      (o.payment_status !== 'unpaid' ? '<br>' + esc(payLine(o)) + (o.payment_ref ? ' · SMS ' + esc(o.payment_ref) : '') : '') + '</p>' +
+  const PAY_OS = { unpaid: 'Por pagar', declared: 'Transferência a confirmar', paid_declared: 'Transferência a confirmar', paid: 'Pago', rejected: 'Rejeitado', pay_requested: 'Por pagar' };
+  function payMethodOf(o) { return o.payment_method || o.method || ''; }
+  function payStatusOf(o) {
+    const st = o.payment_status || o.pay;
+    if (payMethodOf(o) === 'pos' && st !== 'paid') return 'unpaid';
+    return st;
+  }
+  function payLabel(o) {
+    const st = payStatusOf(o), m = payMethodOf(o);
+    if (st === 'paid') return 'Pago' + (m === 'pos' ? ' · POS no local' : m === 'mpesa' ? ' · M-Pesa' : m === 'emola' ? ' · e-Mola' : '');
+    if (m === 'pos') return 'Por pagar · POS no local';
+    return PAY_OS[st] || st;
+  }
+  function extraLabel(x) { return typeof x === 'string' ? x : ((x && (x.name || x.id)) || ''); }
+  function lineBits(i) {
+    const bits = [];
+    if (i.doneness != null && i.doneness !== '') bits.push('Ponto ' + i.doneness + '%');
+    const ex = i.extras;
+    if (Array.isArray(ex) && ex.length) bits.push(ex.map(extraLabel).filter(Boolean).join(', '));
+    else if (typeof ex === 'string' && ex) bits.push(ex);
+    if (i.notes || i.note) bits.push(i.notes || i.note);
+    return bits.join(' · ');
+  }
+  function itemsHtml(o) {
+    const rows = o.items || o.lines || [];
+    if (!rows.length) return '<p class="gc-note">Sem linhas neste pedido.</p>';
+    return '<ul class="gc-items">' + rows.map((i) => {
+      const qty = i.qty || i.quantity || 1;
+      const name = i.name || i.item_id || 'Item';
+      const extra = lineBits(i);
+      const price = i.line_total != null ? i.line_total : (i.unit_price || i.unitPriceMzn || 0) * qty;
+      return '<li><b>' + esc(qty) + '× ' + esc(name) + '</b>' + (extra ? '<small>' + esc(extra) + '</small>' : '') + '<span>' + mt(price) + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  function orderPlace(o) {
+    return o.place_label || o.placeLabel || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || o.address || '');
+  }
+  function cardO(o) {
+    const mth = payMethodOf(o);
+    const pst = payStatusOf(o);
+    const payLine = mth === 'emola' ? 'e-Mola 87 452 1897 · Siddique Faizy Rego' : mth === 'mpesa' ? 'M-Pesa 84 596 1528 · Siddique Faizy Rego' : mth === 'pos' ? 'POS no local — o garçom passa o cartão à mesa' : (mth || '');
+    const maps = o.navUrl || o.mapsUrl || (o.lat && o.lng ? 'https://www.google.com/maps?q=' + o.lat + ',' + o.lng : '');
+    const phone = o.customer_phone || (o.customer && o.customer.phone) || '';
+    const admin = S.me && S.me.role === 'admin';
+    const xfer = pst === 'declared' || pst === 'paid_declared';
+    const posDue = mth === 'pos' && pst !== 'paid' && o.status !== 'cancelled';
+    return '<article class="gc' + (xfer || posDue ? ' u1' : '') + '"><div class="gc-top"><span class="gc-table">' + esc(o.code) + '</span><span class="gc-zone">' + esc(orderPlace(o)) + '</span></div>' +
+      '<div class="gc-reason"><b>' + esc(o.customer_name || (o.customer && o.customer.name) || 'Cliente') + '</b>' +
+      (phone ? ' · <a href="tel:+' + esc(String(phone).replace(/\D/g, '')) + '">' + esc(phone) + '</a>' : '') +
+      (o.waGroupOpt ? ' · <b>Grupo WA</b>' : '') +
+      (maps ? ' · <a href="' + esc(maps) + '" target="_blank" rel="noopener">Maps</a>' : '') + '</div>' +
+      itemsHtml(o) +
+      '<p class="gc-note"><b>' + mt(o.total) + '</b> · ' + esc(ST_OS[o.status] || o.status) + ' · ' + esc(payLabel(o)) +
+      (payLine ? '<br>' + esc(payLine) + (o.payment_ref ? ' · SMS ' + esc(o.payment_ref) : '') : '') +
+      (o.note ? '<br>' + esc(o.note) : '') + '</p>' +
       '<div class="gc-actions">' +
-      (o.payment_status === 'declared' || o.payment_status === 'paid_declared' ? '<button class="gb ok" type="button" data-act="osord" data-id="' + o.id + '" data-do="paid">Confirmar → A preparar</button>' : '') +
-      (o.status !== 'preparing' && o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' ? '<button class="gb" type="button" data-act="osord" data-id="' + o.id + '" data-do="preparing">A preparar</button>' : '') +
-      (o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' ? '<button class="gb line" type="button" data-act="osord" data-id="' + o.id + '" data-do="ready">Pedido pronto</button>' : '') +
-      ((o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok ? '<button class="gb ok" type="button" data-act="osord" data-id="' + o.id + '" data-do="driver">Saiu para entrega</button>' : '') +
+      (xfer ? '<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="paid">Confirmar transferência → A preparar</button>' : '') +
+      (posDue ? '<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="pospaid">POS cobrado no local → Pago</button>' : '') +
+      (o.status !== 'preparing' && o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' && o.status !== 'cancelled' ? '<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="preparing">A preparar</button>' : '') +
+      (o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' && o.status !== 'cancelled' ? '<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="ready">Pedido pronto</button>' : '') +
+      ((o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok ? '<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="driver">Saiu para entrega</button>' : '') +
       (o.driver_ok && !o.client_ok && o.status !== 'delivered' ? '<span class="gp-muted">À espera da confirmação do cliente</span>' : '') +
+      (admin && pst !== 'paid' && o.status !== 'cancelled' && !posDue && !xfer ? '<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="markpaid">Marcar pago</button>' : '') +
       '</div></article>';
+  }
+  function tabOrders() {
+    const orders = (S.osDesk && S.osDesk.orders) || [];
+    const wait = orders.filter((o) => { const s = payStatusOf(o); return s === 'declared' || s === 'paid_declared'; });
+    const posDue = orders.filter((o) => payMethodOf(o) === 'pos' && payStatusOf(o) !== 'paid' && o.status !== 'cancelled');
+    const live = orders.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered');
+    const review = orders.filter((o) => o.status === 'review' || o.status === 'received' || o.status === 'no_confirm');
+    const prep = orders.filter((o) => o.status === 'preparing');
+    const ready = orders.filter((o) => o.status === 'ready' || o.status === 'on_the_way');
     return '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + wait.length + '</b><span>Transferências a confirmar</span></div>' +
-      '<div class="gp-kpi"><b>' + live.length + '</b><span>Pedidos ativos</span></div>' +
-      '<div class="gp-kpi"><b>' + orders.length + '</b><span>No histórico</span></div></div>' +
-      (wait.length ? '<div class="gp-sec"><span>A confirmar pagamento</span><span class="n">' + wait.length + '</span></div><div class="gp-list">' + wait.map(cardO).join('') + '</div>' : '') +
+      '<div class="gp-kpi hot"><b>' + posDue.length + '</b><span>POS por cobrar</span></div>' +
+      '<div class="gp-kpi"><b>' + live.length + '</b><span>Pedidos ativos</span></div></div>' +
+      (wait.length ? '<div class="gp-sec"><span>M-Pesa / e-Mola a confirmar</span><span class="n">' + wait.length + '</span></div><div class="gp-list">' + wait.map(cardO).join('') + '</div>' : '') +
+      (posDue.length ? '<div class="gp-sec"><span>POS no local — por pagar</span><span class="n">' + posDue.length + '</span></div><div class="gp-list">' + posDue.map(cardO).join('') + '</div>' : '') +
+      '<div class="gp-sec"><span>Em análise</span><span class="n">' + review.length + '</span></div>' +
+      (review.length ? '<div class="gp-list">' + review.map(cardO).join('') + '</div>' : '<div class="gp-card gp-empty">' + ic('list') + '<b>Nada em análise</b>Quando o cliente envia o pedido, aparece aqui com extras, ponto e notas.</div>') +
+      (prep.length ? '<div class="gp-sec"><span>Em preparação</span><span class="n">' + prep.length + '</span></div><div class="gp-list">' + prep.map(cardO).join('') + '</div>' : '') +
+      (ready.length ? '<div class="gp-sec"><span>Prontos / a caminho</span><span class="n">' + ready.length + '</span></div><div class="gp-list">' + ready.map(cardO).join('') + '</div>' : '') +
       '<div class="gp-sec"><span>Todos os pedidos</span><span class="n">' + orders.length + '</span></div>' +
-      (orders.length ? '<div class="gp-list">' + orders.map(cardO).join('') + '</div>' : '<div class="gp-card gp-empty">' + ic('list') + '<b>Sem pedidos ainda</b>Quando um cliente fizer pedido no site, aparece aqui sozinho.</div>');
+      (orders.length ? '<div class="gp-list">' + orders.map(cardO).join('') + '</div>' : '');
   }
 
   /* ====================================================================== TAB: CHAMADOS */
@@ -847,10 +1061,11 @@
       '<p class="gp-muted" style="margin:.8rem 0 0">Membro desde ' + since.getDate() + ' ' + MONN[since.getMonth()] + ' ' + since.getFullYear() + ' · ' + m30.count + ' atendimentos em 30 dias' + (m30.rating != null ? ' · nota ' + m30.rating.toFixed(1).replace('.', ',') + ' ★' : '') + '</p></div>' +
       '<div class="gp-card"><h3>Os meus dados</h3><form class="gp-form" data-form="profile" novalidate><div class="gp-row2"><label>Nome<input name="name" value="' + esc(me.name) + '" maxlength="60" required></label><label>Telemóvel<input name="phone" type="tel" value="' + esc(me.phone || '') + '" maxlength="20"></label></div>' +
       '<button class="gb" type="submit" style="justify-self:start">Guardar alterações</button><p class="gp-msg" role="status"></p></form></div>' +
+      '<div class="gp-card"><h3>Ecrã</h3><div class="gp-form"><button class="gb line" type="button" data-act="theme">' + ic('moon') + 'Alternar tema claro / escuro</button></div></div>' +
       '<div class="gp-card"><h3>Alertas</h3><div class="gp-form"><label style="display:flex;align-items:center;gap:.7rem;font-weight:700"><input type="checkbox" data-act="sound" ' + (S.soundOn ? 'checked' : '') + ' style="width:22px;min-height:22px"> Som quando chega um chamado</label>' +
       (canN ? '<button class="gb line" type="button" data-act="notif" ' + (perm === 'granted' ? 'disabled' : '') + '>' + ic('bell') + (perm === 'granted' ? 'Notificações ativas' : 'Ativar notificações do navegador') + '</button>' : '') +
       '<p class="gp-muted" style="margin:0">Mantenha esta página aberta (pode estar em segundo plano) para ser avisado de novos chamados.</p></div></div>' +
-      '<div class="gp-card"><h3>Palavra-passe</h3><form class="gp-form" data-form="pass" novalidate><label>Nova palavra-passe (mín. 8)<input name="password" type="password" autocomplete="new-password" required minlength="8"></label><button class="gb line" type="submit" style="justify-self:start">Alterar palavra-passe</button><p class="gp-msg" role="status"></p></form></div>' +
+      '<div class="gp-card"><h3>PIN / palavra-passe</h3><form class="gp-form" data-form="pass" novalidate><label>Novo PIN (mín. 4) ou palavra-passe<input name="password" type="password" autocomplete="new-password" required minlength="4"></label><button class="gb line" type="submit" style="justify-self:start">Alterar</button><p class="gp-msg" role="status"></p></form></div>' +
       '<button class="gb dark block" type="button" data-act="logout">' + ic('logout') + 'Terminar sessão</button>';
   }
 
@@ -873,7 +1088,24 @@
       '<div class="gp-kpi"><b>' + (all.rating == null ? '—' : all.rating.toFixed(1).replace('.', ',') + ' ★') + '</b><span>Nota média da equipa</span></div></div>' +
       '<div class="gp-sec"><span>Pedidos de acesso</span><span class="n">' + pending.length + '</span></div>' +
       (pending.length ? '<div class="gp-list">' + pending.map(memberCard).join('') + '</div>' : '<div class="gp-card gp-empty">' + ic('shield') + '<b>Sem pedidos pendentes</b>Quem criar conta na Área do garçom aparece aqui para aprovação.</div>') +
-      '<div class="gp-sec"><span>Equipa ativa</span><span class="n">' + active.length + '</span></div><div class="gp-list">' + active.map(memberCard).join('') + '</div>';
+      '<div class="gp-sec"><span>Equipa ativa</span><span class="n">' + active.length + '</span></div><div class="gp-list">' + active.map(memberCard).join('') + '</div>' +
+      tabTables();
+  }
+  function tabTables() {
+    const orders = ((S.osDesk && S.osDesk.orders) || []).filter((o) => o.status !== 'cancelled' && o.payment_status !== 'paid');
+    const g = {};
+    orders.forEach((o) => {
+      const k = orderPlace(o) || 'Sem mesa';
+      (g[k] = g[k] || []).push(o);
+    });
+    const keys = Object.keys(g);
+    if (!keys.length) return '<div class="gp-sec"><span>Contas por mesa</span><span class="n">0</span></div><div class="gp-card gp-empty">' + ic('card') + '<b>Nenhuma conta em aberto</b></div>';
+    return '<div class="gp-sec"><span>Contas por mesa</span><span class="n">' + keys.length + '</span></div><div class="gp-list">' + keys.map((k) => {
+      const list = g[k], tot = list.reduce((s, o) => s + Number(o.total || 0), 0);
+      return '<article class="gc"><div class="gc-top"><span class="gc-table">' + esc(k) + '</span><span class="gc-zone">' + mt(tot) + '</span></div>' +
+        list.map((o) => '<p class="gc-note"><b>' + esc(o.code) + '</b> · ' + esc(o.customer_name || '') + ' · ' + mt(o.total) + ' · ' + esc(ST_OS[o.status] || o.status) + '</p>').join('') +
+        '<div class="gc-actions"><button class="gb ok sm" type="button" data-act="closetable" data-k="' + esc(k) + '">Fechar conta (pago)</button></div></article>';
+    }).join('') + '</div>';
   }
 
   /* ====================================================================== EVENTOS */
@@ -893,14 +1125,30 @@
       try { await be.resetPassword(em.trim()); say(f, 'Enviámos um e-mail com o link para criar nova palavra-passe.', 'ok'); } catch (x) { say(f, x.message, 'err'); } return;
     }
     if (a === 'retry' || a === 'recheck') return boot();
-    if (a === 'logout') { await guard(() => be.signOut()); S.me = null; S.mine = null; S.team = null; S.calls = []; stopWork(); S.authTab = 'in'; S.view = 'auth'; S.msg = ''; return render(); }
+    if (a === 'logout') {
+      await guard(() => be && be.signOut());
+      store.del('aq.os.staff'); store.del('aq.os.staff.me'); S.osStaff = ''; S.osDesk = null;
+      S.me = null; S.mine = null; S.team = null; S.calls = []; stopWork(); S.authTab = 'in'; S.view = 'auth'; S.msg = '';
+      showStaffBar(false); paintNav(); return render();
+    }
+    if (a === 'theme') { toggleTheme(); return; }
+    if (a === 'closetable') {
+      const k = b.dataset.k;
+      const list = ((S.osDesk && S.osDesk.orders) || []).filter((o) => orderPlace(o) === k && o.status !== 'cancelled' && o.payment_status !== 'paid');
+      for (const o of list) {
+        const body = { payment_status: 'paid' };
+        let r = await guard(() => osFetch('/desk/orders/' + o.id, { method: 'PATCH', body }));
+        if (!r && window.AquaBus) r = AquaBus.patchOrder(o.id, body);
+      }
+      toast('Conta fechada como paga.', 'check', 'ok'); await loadOsDesk(); renderTab(); return;
+    }
     if (a === 'osord') {
       const doWhat = b.dataset.do, id = b.dataset.id;
-      const body = doWhat === 'paid' ? { payment_status: 'paid', status: 'preparing' } : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' } : { status: doWhat };
+      const body = doWhat === 'paid' ? { payment_status: 'paid', status: 'preparing' } : doWhat === 'pospaid' ? { payment_status: 'paid', payment_method: 'pos' } : doWhat === 'markpaid' ? { payment_status: 'paid' } : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' } : { status: doWhat };
       b.disabled = true;
       let r = await guard(() => osFetch('/desk/orders/' + id, { method: 'PATCH', body }));
       if (!r && window.AquaBus) { r = AquaBus.patchOrder(id, body); }
-      if (r) { toast(doWhat === 'paid' ? 'Transferência confirmada — pedido em preparação.' : doWhat === 'driver' ? 'Motorista confirmou a saída. A espera do cliente.' : doWhat === 'ready' ? 'Pedido marcado como pronto.' : 'Pedido em preparação.', 'check', 'ok'); await loadOsDesk(); renderTab(); }
+      if (r) { toast(doWhat === 'paid' ? 'Transferência confirmada — pedido em preparação.' : doWhat === 'pospaid' ? 'POS cobrado — este pedido está Pago.' : doWhat === 'markpaid' ? 'Pedido marcado como pago.' : doWhat === 'driver' ? 'Motorista confirmou a saída. A espera do cliente.' : doWhat === 'ready' ? 'Pedido marcado como pronto.' : 'Pedido em preparação.', 'check', 'ok'); await loadOsDesk(); renderTab(); }
       return;
     }
     if (a === 'tab') return enterTab(b.dataset.t);
@@ -953,14 +1201,34 @@
     say(f, '');
     const email = String(v.email || '').trim();
     try {
-      if (kind === 'osadmin') {
+      if (kind === 'pin') {
+        const pin = String(v.pin || '').trim();
+        if (pin.length < 4) return say(f, 'Indique o PIN da equipa.', 'err');
+        busy(f, true);
+        let ok = false;
+        try {
+          const r = await osFetch('/staff/open', { method: 'POST', body: { pin } });
+          if (r && r.token) {
+            store.set('aq.os.staff', r.token); S.osStaff = r.token;
+            const me = { id: 'os-w-' + r.waiter.id, user_id: 'os-w-' + r.waiter.id, name: r.waiter.name, email: '', phone: r.waiter.phone || '', role: 'waiter', active: true, color: '#00A8FF', created_at: iso(Date.now()) };
+            store.set('aq.os.staff.me', JSON.stringify(me)); S.me = me; ok = true;
+          }
+        } catch (e) { /* local */ }
+        if (!ok) {
+          const desk = backend();
+          if (!desk || !desk.openPin) throw new Error('PIN incorrecto.');
+          S.me = desk.openPin(pin);
+        }
+        S.msg = ''; toast('Sessão da equipa aberta.', 'check', 'ok'); await boot();
+      } else if (kind === 'osadmin') {
         if (!/^\S+@\S+\.\S+$/.test(email) || !v.password) return say(f, 'Indique o e-mail e a palavra-passe.', 'err');
         busy(f, true);
         await osFetch('/auth/login', { method: 'POST', body: { email, password: v.password, remember: true } });
+        const adminMe = { id: 's-admin', user_id: 's-admin', name: 'Administração', email: email, phone: '', role: 'admin', active: true, color: '#0A0A0A', created_at: iso(Date.now()) };
+        store.set('aq.os.staff.me', JSON.stringify(adminMe)); S.me = adminMe;
         await loadOsDesk();
-        if (!S.osDesk) { say(f, 'Esta conta não tem permissão de gestão.', 'err'); return; }
-        toast('Gestão de pedidos ligada em tempo real.', 'check', 'ok');
-        renderTab();
+        toast('Administração ligada.', 'check', 'ok');
+        await boot();
       } else if (kind === 'in') {
         if (!/^\S+@\S+\.\S+$/.test(email) || !v.password) return say(f, 'Indique o e-mail e a palavra-passe.', 'err');
         busy(f, true); await be.signIn(email, v.password); S.msg = ''; await boot();
@@ -979,11 +1247,11 @@
         busy(f, true); await be.updateProfile({ name: v.name, phone: v.phone }); S.me = await be.profile(); S.mine = null; say(f, 'Dados guardados.', 'ok');
         const w = $('.gp-who', root); if (w) w.parentElement.outerHTML = '<div class="gp-card"><div class="gp-who">' + avatar(S.me) + '<div><h2>' + esc(S.me.name) + '<span class="gp-role">' + (S.me.role === 'admin' ? 'Admin' : 'Garçom') + '</span></h2><small>' + esc(S.me.email || '') + '</small></div></div></div>';
       } else if (kind === 'pass') {
-        if (String(v.password).length < 8) return say(f, 'A palavra-passe precisa de pelo menos 8 caracteres.', 'err');
+        if (String(v.password).length < (mode() === 'desk' ? 4 : 8)) return say(f, 'Indique um PIN ou palavra-passe válida.', 'err');
         busy(f, true); await be.changePassword(v.password); f.reset(); say(f, 'Palavra-passe alterada.', 'ok');
       }
     } catch (x) {
-      if (kind === 'in' || kind === 'up' || kind === 'recover') { S.msg = x.message; S.msgType = 'err'; if (S.view === 'auth' || S.view === 'recover') { const keep = Object.assign({}, v); render(); const nf = $('form', root); if (nf) { ['name', 'email', 'phone'].forEach((k) => { if (nf.elements[k] && keep[k]) nf.elements[k].value = keep[k]; }); } } }
+      if (kind === 'in' || kind === 'up' || kind === 'recover' || kind === 'pin' || kind === 'osadmin') { S.msg = x.message; S.msgType = 'err'; if (S.view === 'auth' || S.view === 'recover') { const keep = Object.assign({}, v); render(); const nf = $('form', root); if (nf) { ['name', 'email', 'phone', 'pin'].forEach((k) => { if (nf.elements[k] && keep[k]) nf.elements[k].value = keep[k]; }); } } }
       else say(f, x.message, 'err');
     } finally { busy(f, false); }
   }
@@ -1008,14 +1276,21 @@
   function checkHash() {
     const h = location.hash;
     if (/type=recovery/.test(h) && mode() === 'live') { S.recovery = true; backend().session().then(() => openPortal('calls')); return; }
-    if (/^#garcom/.test(h)) openPortal(/stats/.test(h) ? 'stats' : 'orders');
+    if (/^#(garcom|equipa)/.test(h)) openPortal(/stats/.test(h) ? 'stats' : /admin/.test(h) ? 'team' : 'orders');
+    else if (/^#admin/.test(h)) openPortal('team');
   }
   function init() {
     try { if (store.get('aq.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* */ }
     buildNav();
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.open && !document.querySelector('dialog[open]')) closePortal(); });
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-open-staff]');
+      if (!b) return;
+      e.preventDefault();
+      openPortal(b.getAttribute('data-open-staff') || 'orders');
+    });
     window.addEventListener('hashchange', checkHash);
-    const be = backend(); if (be && be.hasStoredSession()) silentBoot();
+    const be = backend(); if (be && be.hasStoredSession()) silentBoot().then(() => { showStaffBar(staffLogged()); paintNav(); });
     startLiveCalls();
     checkHash();
   }

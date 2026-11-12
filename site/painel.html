@@ -179,14 +179,21 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
       id: String(o.id),
       code: o.code,
       table_code: o.place_label || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || ''),
-      lines: (o.items || []).map((it) => ({ name: it.name, unitPriceMzn: it.unit_price, quantity: it.qty, notes: '' })),
+      lines: (o.items || []).map((it) => {
+        const bits = [];
+        if (it.doneness != null && it.doneness !== '') bits.push('Ponto ' + it.doneness + '%');
+        const ex = it.extras;
+        if (Array.isArray(ex) && ex.length) bits.push(ex.map((x) => (typeof x === 'string' ? x : (x.name || x.id))).join(', '));
+        if (it.notes || it.note) bits.push(it.notes || it.note);
+        return { name: it.name, unitPriceMzn: it.unit_price, quantity: it.qty, notes: bits.join(' · ') };
+      }),
       total_mzn: o.total,
       status: o.status,
       customer_name: o.customer_name || o.customer?.name || '',
       customer_phone: o.customer_phone || o.customer?.phone || '',
       accepted_terms: true,
       accepted_at: o.created_at,
-      payment_status: o.payment_status === 'declared' ? 'paid_declared' : o.payment_status,
+      payment_status: (o.payment_method === 'pos' && o.payment_status !== 'paid') ? 'unpaid' : (o.payment_status === 'declared' ? 'paid_declared' : o.payment_status),
       payment_method: o.payment_method,
       payment_ref: o.payment_ref || o.paid_code,
       paid_at: o.paid_at,
@@ -283,7 +290,12 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
   /* ---------- vistas ---------- */
   const unpaidOf = (o) => o.status !== 'cancelled' && (o.payment_status === 'unpaid' || o.payment_status === 'pay_requested');
   const items = (o) => (o.lines || []).map((l) => `<li>${l.quantity}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''} <small>· ${money(l.unitPriceMzn * l.quantity)}</small></li>`).join('');
-  const payChip = (o) => `<span class="chip ${o.payment_status === 'paid' ? 'paid' : o.payment_status === 'paid_declared' ? 'decl' : 'unpaid'}">${PAY[o.payment_status]}${o.payment_method && o.payment_status !== 'unpaid' ? ' · ' + esc(METHOD[o.payment_method] || o.payment_method) : ''}</span>`;
+  const payChip = (o) => {
+    const posDue = o.payment_method === 'pos' && o.payment_status !== 'paid';
+    const st = posDue ? 'unpaid' : o.payment_status;
+    const lab = o.payment_status === 'paid' ? PAY.paid : (posDue ? 'Por pagar · POS' : (PAY[st] || st));
+    return `<span class="chip ${o.payment_status === 'paid' ? 'paid' : o.payment_status === 'paid_declared' ? 'decl' : 'unpaid'}">${esc(lab)}${o.payment_method && o.payment_status === 'paid' ? ' · ' + esc(METHOD[o.payment_method] || o.payment_method) : ''}</span>`;
+  };
   function card(o) {
     const late = o.status === 'delivered' && unpaidOf(o) && mins(o.created_at) > LATE_MIN;
     const el = document.createElement('article'); el.className = 'card' + (late ? ' late' : '') + (fresh.has(o.id) ? ' new' : '');
@@ -292,7 +304,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
       <ul class="items">${items(o)}</ul>
       <div class="row"><b>${money(o.total_mzn)}</b><span class="chips">${payChip(o)}</span></div>
       ${late ? '<small style="color:#B42318;font-weight:700">Conta em aberto há mais de ' + LATE_MIN + ' min — falar com o cliente</small>' : ''}
-      <div class="acts">${o.payment_status === 'paid_declared' ? `<button class="btn sm" data-confpay="${o.id}">Confirmar transferência → A preparar</button>` : ''}${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${o.status === 'on_the_way' && !o.client_ok ? '<small>À espera da confirmação do cliente</small>' : ''}${unpaidOf(o) || o.payment_status === 'paid_declared' ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}<button class="btn sm line" data-open="${o.id}">Detalhes</button></div>`;
+      <div class="acts">${o.payment_status === 'paid_declared' && o.payment_method !== 'pos' ? `<button class="btn sm" data-confpay="${o.id}">Confirmar transferência → A preparar</button>` : ''}${o.payment_method === 'pos' && o.payment_status !== 'paid' && o.status !== 'cancelled' ? `<button class="btn sm" data-pospay="${o.id}">POS cobrado no local → Pago</button>` : ''}${NEXT[o.status] ? `<button class="btn sm" data-next="${o.id}">${NEXT_TXT[o.status]}</button>` : ''}${o.status === 'on_the_way' && !o.client_ok ? '<small>À espera da confirmação do cliente</small>' : ''}${(unpaidOf(o) && o.payment_method !== 'pos') || o.payment_status === 'paid_declared' ? `<button class="btn sm line" data-pay="${o.id}">Marcar pago</button>` : ''}<button class="btn sm line" data-open="${o.id}">Detalhes</button></div>`;
     return el;
   }
   function renderActive() {
@@ -397,6 +409,7 @@ const LATE_MIN = 20;       /* pedido entregue e por pagar há mais de X minutos 
       await update(o.id, next === 'on_the_way' ? { status: 'on_the_way', driver_ok: true } : { status: next });
     }
     else if (b.dataset.confpay) { await update(b.dataset.confpay, { payment_status: 'paid', status: 'preparing' }); }
+    else if (b.dataset.pospay) { await update(b.dataset.pospay, { payment_status: 'paid', payment_method: 'pos' }); }
     else if (b.dataset.pay) { const o = orders.find((x) => x.id === b.dataset.pay); askPay([o.id], o.code + ' · ' + o.customer_name + ' · ' + money(o.total_mzn)); }
     else if (b.dataset.closetable) { const list = orders.filter((o) => o.table_code === b.dataset.closetable && o.status !== 'cancelled' && o.payment_status !== 'paid'); askPay(list.map((o) => o.id), nice(b.dataset.closetable) + ' · ' + list.length + ' pedido(s) · ' + money(list.reduce((s, o) => s + o.total_mzn, 0))); }
     else if (b.dataset.cancel) { const r = ($('#cReason') || {}).value || ''; if (r.trim().length < 3) { alert('Escreva o motivo do cancelamento.'); return; } await update(b.dataset.cancel, { status: 'cancelled', cancel_reason: r.trim() }); }

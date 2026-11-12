@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=flow4"></script>
+<script src="i18n.js?v=ops3"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,9 +68,9 @@ picture.aq-pic{display:contents}
 .nav{display:none;min-width:0;max-width:100%;justify-self:end}
 .nav ul{display:flex;flex-wrap:nowrap;gap:.1rem;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
 .nav ul::-webkit-scrollbar{display:none}
-.nav a{position:relative;display:block;padding:.45rem .5rem;font:800 .7rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:#000;text-decoration:none;white-space:nowrap;transition:color var(--ease)}
-.nav a::after{content:"";position:absolute;left:.5rem;right:.5rem;bottom:-2px;height:3px;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform var(--ease)}
-.nav a:hover{color:var(--cyan-d)} .nav a:hover::after{transform:scaleX(1)}
+.nav a,.nav .nav-staff{position:relative;display:block;padding:.45rem .5rem;font:800 .7rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:#000;text-decoration:none;white-space:nowrap;transition:color var(--ease);background:none;border:0;cursor:pointer}
+.nav a::after,.nav .nav-staff::after{content:"";position:absolute;left:.5rem;right:.5rem;bottom:-2px;height:3px;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform var(--ease)}
+.nav a:hover,.nav .nav-staff:hover{color:var(--cyan-d)} .nav a:hover::after,.nav .nav-staff:hover::after{transform:scaleX(1)}
 .head-right{display:flex;align-items:center;gap:.5rem;flex:none}
 .langpick{position:relative;flex:none}
 .lang-btn{display:inline-flex;align-items:center;gap:.42rem;min-height:46px;padding:.22rem .72rem .22rem .26rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background-color var(--ease),border-color var(--ease)}
@@ -108,8 +108,8 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .header.open .mmenu{display:block}
 .mmenu ul{list-style:none;margin:0;padding:0}
 .mmenu li{border-bottom:1px solid rgba(0,0,0,.1)}
-.mmenu li a{display:block;padding:1rem 0;font:800 1.5rem var(--fh);text-transform:uppercase;color:#000;text-decoration:none;transition:transform var(--ease),color var(--ease)}
-.mmenu li a:hover{transform:translateX(8px);color:var(--cyan-d)}
+.mmenu li a,.mmenu .nav-staff{display:block;width:100%;padding:1rem 0;font:800 1.5rem var(--fh);text-transform:uppercase;color:#000;text-decoration:none;text-align:left;background:none;border:0;cursor:pointer;transition:transform var(--ease),color var(--ease)}
+.mmenu li a:hover,.mmenu .nav-staff:hover{transform:translateX(8px);color:var(--cyan-d)}
 .mmenu .btn{margin-top:1.5rem;width:100%}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media(max-width:420px){.brand small{display:none}.brand img{width:48px;height:48px}}
@@ -682,8 +682,7 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .mtable select{max-width:240px}
 @media(min-width:900px){.mtool{grid-template-columns:1fr auto auto;align-items:center}}
 .mgrid-wrap{max-height:min(78svh,52rem);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;overflow-anchor:none;scroll-padding-top:.5rem;margin-top:.7rem;padding:.55rem .45rem .7rem;border:1.5px solid var(--cyan-line);border-radius:22px;background:rgba(255,255,255,.55)}
-.mgrid-wrap.show-all{max-height:none;overflow:visible}
-.mgrid{display:grid;grid-template-columns:1fr;gap:.85rem;margin-top:0;width:100%;max-width:100%;overflow-x:clip}
+.mgrid{display:grid;grid-template-columns:1fr;gap:.85rem;margin-top:0;width:100%;max-width:100%;overflow-x:clip;align-items:start}
 .menu-skip{margin:.9rem 0 0;text-align:center}
 .menu-skip a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.4rem 1.1rem;border-radius:999px;background:var(--cyan);color:#000;font:800 .82rem var(--fh);text-decoration:none;letter-spacing:.04em;text-transform:uppercase}
 .menu-skip a:hover{background:var(--yellow)}
@@ -693,11 +692,15 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .sh.center .bar2{margin:.7rem auto 0}
 .sh.center p{text-align:center;margin:.85rem auto 0;max-width:32rem}
 #espacos .sh.center{margin-bottom:1.2rem}
-.mcard{display:grid;grid-template-columns:112px minmax(0,1fr);background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;overflow:hidden;min-width:0;box-shadow:0 14px 30px -22px rgba(0,105,168,.6);transition:transform var(--ease),box-shadow var(--ease),border-color var(--ease)}
+.mcard{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto;align-items:stretch;align-content:start;background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;overflow:hidden;min-width:0;box-shadow:0 14px 30px -22px rgba(0,105,168,.6);transition:transform var(--ease),box-shadow var(--ease),border-color var(--ease)}
 .mcard:hover{transform:translateY(-4px);border-color:var(--cyan);box-shadow:0 24px 40px -22px rgba(0,168,255,.7)}
-.mimg{position:relative;border:0;padding:0;min-height:112px;min-width:112px;cursor:pointer;display:grid;place-items:center;background:linear-gradient(150deg,var(--cyan),#9EDCFF);color:#000;overflow:hidden}
-.mimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s}
-.mcard:hover .mimg img{transform:scale(1.08)}
+@keyframes mcat-fade{from{opacity:0}to{opacity:1}}
+@keyframes mcard-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.mcat-now.m-in{animation:mcat-fade .38s ease both}
+.mcard.m-in{animation:mcard-in .5s cubic-bezier(.22,.72,.2,1) both;animation-delay:var(--d,0ms)}
+@media(prefers-reduced-motion:reduce){.mcat-now.m-in,.mcard.m-in{animation:none}}
+.mimg{position:relative;border:0;padding:0;width:112px;height:112px;min-height:112px;max-height:112px;min-width:112px;cursor:pointer;display:grid;place-items:center;background:linear-gradient(150deg,var(--cyan),#9EDCFF);color:#000;overflow:hidden;align-self:start;flex:none}
+.mimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 42%;transform:none}
 .mimg .ico{width:48px;height:48px;opacity:.85}
 .mbody{display:grid;gap:.5rem;align-content:space-between;padding:.9rem 1rem;min-width:0}
 .mbody h3{font:800 1.02rem/1.2 var(--fh);overflow-wrap:anywhere}
@@ -706,12 +709,11 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .price{font:800 1.2rem var(--fh);color:var(--cyan-d)}
 .add{width:44px;height:44px;border:0;border-radius:50%;background:var(--yellow);color:#000;font:800 1.5rem/1 var(--fh);cursor:pointer;transition:transform var(--ease),background-color var(--ease)}
 .add:hover{background:var(--cyan);transform:scale(1.14) rotate(90deg)}
-.mcat-now{grid-column:1/-1;margin:0;padding:.15rem 0 .4rem;font:800 .92rem var(--fh);letter-spacing:.04em;color:var(--cyan-d);position:sticky;top:0;z-index:1;background:linear-gradient(#fff 70%,rgba(255,255,255,0))}
-.mgrid-wrap.show-all .mcat-now{position:static;background:none}
+.mcat-now{grid-column:1/-1;margin:0;padding:.25rem .15rem .5rem;font:800 .92rem var(--fh);letter-spacing:.04em;color:var(--cyan-d);position:sticky;top:0;z-index:2;background:linear-gradient(#fff 82%,rgba(255,255,255,0))}
 .mempty{grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem}
 .menu-note{margin:1.6rem auto 0;max-width:46rem;text-align:center;font-size:.88rem;color:var(--muted)}
-@media(min-width:720px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard{grid-template-columns:1fr}.mimg{aspect-ratio:5/4;min-height:180px}}
-@media(min-width:1100px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{aspect-ratio:4/3;min-height:220px}}
+@media(min-width:720px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard{grid-template-columns:1fr;grid-template-rows:auto auto}.mimg{width:100%;height:188px;min-height:188px;max-height:188px;min-width:0}}
+@media(min-width:1100px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{height:220px;min-height:220px;max-height:220px}}
 /* botões flutuantes */
 .fabs{position:fixed;left:1rem;right:auto;bottom:calc(.9rem + env(safe-area-inset-bottom,0px));z-index:80;display:grid;gap:.6rem;justify-items:start;max-width:min(100vw - 1.5rem, 22rem);pointer-events:none}
 .fabs .fab,.fabs .fab-hint{pointer-events:auto}
@@ -996,7 +998,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops1">
+<link rel="stylesheet" href="garcom.css?v=ops3">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1050,9 +1052,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
         <li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li>
         <li><a href="#horarios" data-i18n="nav.hours">Horários</a></li>
         <li><a href="#contactos" data-i18n="nav.contact">Contacto</a></li>
-        <li><a href="/os#/conta" data-i18n="nav.account">Conta</a></li>
-        <li><a href="/os#/staff" data-i18n="nav.staff">Garçom</a></li>
-        <li><a href="/os#/admin" data-i18n="nav.admin">Admin</a></li>
+        <li><button type="button" class="nav-staff" data-open-staff="orders" data-i18n="nav.staff">Área da equipa</button></li>
       </ul>
     </nav>
     <div class="head-right">
@@ -1081,9 +1081,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li>
       <li><a href="#horarios" data-i18n="nav.hours">Horários</a></li>
       <li><a href="#contactos" data-i18n="nav.contact">Contacto</a></li>
-      <li><a href="/os#/conta" data-i18n="nav.account">Conta</a></li>
-      <li><a href="/os#/staff" data-i18n="nav.staff">Garçom</a></li>
-      <li><a href="/os#/admin" data-i18n="nav.admin">Admin</a></li>
+      <li><button type="button" class="nav-staff" data-open-staff="orders" data-i18n="nav.staff">Área da equipa</button></li>
     </ul>
     <a class="btn btn-cyan" href="#bilhetes" data-i18n="bookDay">Reservar Dia</a>
   </nav>
@@ -1287,7 +1285,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <nav class="reveal" style="--d:100ms" data-i18n-aria="foot.links"><h2 data-i18n="foot.links">Links rápidos</h2><ul><li><a href="#inicio" data-i18n="nav.home">Início</a></li><li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li><li><a href="#menu" data-i18n="nav.menu">Menu</a></li><li><a href="#experiencias" data-i18n="nav.experiences">Experiências</a></li><li><a href="#bilhetes" data-i18n="nav.booking">Reservas</a></li><li><a href="#faq" data-i18n="nav.faq">Perguntas frequentes</a></li></ul></nav>
   </div>
   <div class="wm" aria-hidden="true">AQUA CLUB</div>
-  <div class="legal"><div class="wrap" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem"><p style="margin:0;max-width:none">© <span id="year"></span> <span data-i18n="foot.copy">Aqua Club. Todos os direitos reservados.</span></p><p style="margin:0;max-width:none"><span data-i18n="foot.mz">Beira, Moçambique ·</span> <a href="painel.html" style="color:inherit;opacity:.7" data-i18n="foot.staff">Área da equipa</a></p></div></div>
+  <div class="legal"><div class="wrap" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem"><p style="margin:0;max-width:none">© <span id="year"></span> <span data-i18n="foot.copy">Aqua Club. Todos os direitos reservados.</span></p><p style="margin:0;max-width:none"><span data-i18n="foot.mz">Beira, Moçambique ·</span> <a href="#equipa" data-open-staff="orders" style="color:inherit;opacity:.7" data-i18n="foot.staff">Área da equipa</a></p></div></div>
 </footer>
 
 <dialog class="story-dlg" id="storyDlg" aria-labelledby="storyT">
@@ -1425,7 +1423,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <ol class="otrack" id="otrack"><li data-i18n="st.review">Em análise</li><li data-i18n="cart.prep">Em preparação</li><li data-i18n="st.ready">Pronto</li><li data-i18n="cart.del">Entregue</li></ol>
     <a class="wafall" data-wa href="#" target="_blank" rel="noopener noreferrer" hidden data-i18n="cart.waFall">Não abriu? Toque aqui para abrir o WhatsApp</a>
     <p class="menu-note" style="margin:.2rem 0 0" data-i18n="cart.noCancel">Este pedido não pode ser cancelado. Para alterar algo, chame o garçom.</p>
-    <div class="dfoot" id="ovActs"><button class="btn btn-cyan" type="button" id="orderPay" data-i18n="cart.pay">Pagar / pedir a conta</button><button class="btn btn-cyan" type="button" id="orderGot" hidden data-i18n="cart.got">Confirmar que recebi</button><button class="btn btn-line" type="button" id="orderChange" data-i18n="cart.change">Pedir alteração</button></div>
+    <div class="dfoot" id="ovActs"><button class="btn btn-cyan" type="button" id="orderPay" hidden></button><button class="btn btn-cyan" type="button" id="orderGot" hidden data-i18n="cart.got">Confirmar que recebi</button><button class="btn btn-line" type="button" id="orderChange" data-i18n="cart.change">Pedir alteração</button></div>
     <div class="dfoot"><button class="linkbtn" type="button" id="orderBack" hidden data-i18n="cart.backHist">Voltar aos pedidos</button><button class="linkbtn" type="button" id="orderHist" data-i18n="fab.my">Os meus pedidos</button><button class="linkbtn" type="button" id="orderNew" data-i18n="cart.another">Fazer outro pedido</button></div>
   </div>
 </div></dialog>
@@ -1436,7 +1434,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div id="hlist"></div>
   <p class="menu-note" style="margin:0" data-i18n="cart.viewHint">Toque num pedido para ver todos os detalhes. Os pedidos antigos ficam só para consulta.</p>
   <p class="menu-note" style="margin:0" data-i18n="pay.histNote">Os pedidos ficam registados em seu nome e não podem ser cancelados depois de enviados. Para alterar algo, chame o garçom.</p>
-  <div class="dfoot"><button class="btn btn-line" type="button" id="histMenu" data-i18n="cart.another">Fazer outro pedido</button><button class="btn btn-cyan" type="button" id="histPay" data-i18n="cart.pay">Pagar / pedir a conta</button></div>
+  <div class="dfoot"><button class="btn btn-line" type="button" id="histMenu" data-i18n="cart.another">Fazer outro pedido</button></div>
 </div></dialog>
 
 <dialog class="dlg" id="payDlg" aria-labelledby="payT"><div class="dpad">
@@ -1635,7 +1633,7 @@ const REVIEWS = [];
     burger.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#' + (open ? 'i-close' : 'i-menu') + '"/></svg>';
   };
   burger.addEventListener('click', () => setMenu(!header.classList.contains('open')));
-  $$('#mmenu a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  $$('#mmenu a, #mmenu .nav-staff').forEach((a) => a.addEventListener('click', () => setMenu(false)));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
   matchMedia('(min-width:1100px)').addEventListener('change', (m) => { if (m.matches) setMenu(false); });
 
@@ -1833,9 +1831,12 @@ const REVIEWS = [];
   const POLL_MS = 8000;
   const rmsg = (reason) => ({ request_bill: tr('call.r_bill'), menu_question: tr('call.r_menu'), new_order: tr('call.r_new'), urgent_other: tr('call.r_urgent') }[reason] || reason);
   const STEPS = ['review', 'preparing', 'ready', 'delivered'];
-  const kitchenStep = (st) => ({ review: 0, received: 0, preparing: 1, ready: 2, on_the_way: 2, delivered: 3 }[st] ?? 0);
+  const kitchenStep = (st) => ({ review: 0, received: 0, no_confirm: 0, sent: 0, preparing: 1, ready: 2, on_the_way: 2, delivered: 3 }[st] ?? 0);
   const CHANGE_WAIT = 3 * 60 * 1000;
+  const PAY_CHANGE_MS = 10 * 60 * 60 * 1000;
+  const VENUE_KM = 0.55;
   const changeLeft = (o) => Math.max(0, CHANGE_WAIT - (Date.now() - Number(o && o.ts || 0)));
+  const payChangeLeft = (o) => Math.max(0, PAY_CHANGE_MS - (Date.now() - Number(o && o.ts || 0)));
   function settleLocalDelivery(o) {
     if (!o || o.status === 'cancelled') return o;
     if (o.driver_ok && o.client_ok) o.status = 'delivered';
@@ -1844,12 +1845,16 @@ const REVIEWS = [];
   }
   const omsgAt = (i) => [tr('cart.recMsg'), tr('cart.prepMsg'), tr('cart.wayMsg'), tr('cart.delMsg')][i] || '';
   const stTxt = (k) => tr('st.' + k);
-  const payTxt = (k) => tr('pay.' + k);
+  const payTxt = (k, o) => {
+    if (o && (o.method === 'pos' || o.payment_method === 'pos') && k !== 'paid') return tr('pay.unpaid');
+    return tr('pay.' + k);
+  };
   if (CONTACT.whatsapp === '258840000000') console.warn('[Aqua Club] O número de WhatsApp ainda é o de exemplo. Troque-o em CONTACT.whatsapp antes de publicar.');
 
   /* identidade do aparelho, dados do cliente e histórico (ficam neste telemóvel) */
   const DEVICE = (() => { let d = store.get('aq.dev'); if (!d) { d = uid(); store.set('aq.dev', d); } return d; })();
   let history = []; try { history = JSON.parse(store.get('aq.orders') || '[]'); } catch (e) { history = []; }
+  history.forEach((o) => { if (o && o.method === 'pos' && o.pay !== 'paid') o.pay = 'unpaid'; });
   let cust = {}; try { cust = JSON.parse(store.get('aq.cust') || '{}'); } catch (e) { cust = {}; }
   const saveHist = () => store.set('aq.orders', JSON.stringify(history.slice(-80)));
   const isOpen = (o) => o.status !== 'cancelled' && o.pay !== 'paid' && o.pay !== 'paid_declared';
@@ -1937,7 +1942,11 @@ const REVIEWS = [];
         customer_name: o.name, customer_phone: o.phone, payment_status: 'unpaid', created_at: new Date().toISOString(),
         waGroupOpt: !!o.waGroupOpt,
         lat: o.lat, lng: o.lng, mapsUrl: o.mapsUrl, navUrl: o.navUrl, address: o.address,
-        items: (o.lines || []).map((l) => ({ name: l.name, unit_price: l.unitPriceMzn || l.price, qty: l.quantity || l.qty }))
+        items: (o.lines || []).map((l) => ({
+          name: l.name, unit_price: l.unitPriceMzn || l.price, qty: l.quantity || l.qty,
+          extras: extraNames(l.extras || []) ? extraNames(l.extras || []).split(', ') : (l.extras || []),
+          doneness: l.doneness, notes: l.notes || l.note || ''
+        }))
       });
     }
     if (isLive()) {
@@ -1950,27 +1959,39 @@ const REVIEWS = [];
     }
     if (mode === 'demo') { [['preparing', 4500], ['on_the_way', 9500], ['delivered', 14500]].forEach(([s, ms]) => setTimeout(() => emit(o.id, { status: s }), ms)); }
   }
-  async function apiPay(o, status, method, ref) {
-    o.pay = status === 'paid_declared' || status === 'declared' ? 'paid_declared' : (status || o.pay);
-    o.method = method || o.method;
+  async function apiPay(o, status, method, ref, geo) {
+    if (method === 'pos') {
+      o.pay = (o.pay === 'paid') ? 'paid' : 'unpaid';
+      o.method = 'pos';
+    } else {
+      o.pay = status === 'paid_declared' || status === 'declared' ? 'paid_declared' : (status || o.pay);
+      o.method = method || o.method;
+    }
     o.ref = ref || o.ref || '';
     if (o.pay === 'paid_declared' && !['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
-    if (window.AquaBus) AquaBus.patchOrder(o.id || o.code, { payment_status: o.pay === 'paid_declared' ? 'declared' : o.pay, payment_method: method, pay: o.pay, status: o.status });
+    if (window.AquaBus) AquaBus.patchOrder(o.id || o.code, { payment_status: o.pay === 'paid_declared' ? 'declared' : o.pay, payment_method: o.method, pay: o.pay, status: o.status });
     try {
       if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
-        const r = await AquaOS.declarePay(o, method, ref);
+        const r = await AquaOS.declarePay(o, method, ref, geo);
         if (r) {
-          const p = r.payment_status === 'declared' ? 'paid_declared' : (r.payment_status || o.pay);
-          if (!(o.pay === 'paid_declared' && p === 'unpaid')) o.pay = p;
           o.method = r.payment_method || o.method;
           o.ref = r.payment_ref || o.ref;
-          if (r.status) o.status = r.status;
+          if (o.method === 'pos' && r.payment_status !== 'paid') {
+            o.pay = 'unpaid';
+          } else {
+            const p = r.payment_status === 'declared' ? 'paid_declared' : (r.payment_status || o.pay);
+            if (!(o.pay === 'paid_declared' && p === 'unpaid')) o.pay = p;
+            if (r.status) o.status = r.status;
+          }
         }
       } else if (isLive()) {
         const { error } = await sb.rpc('set_payment', { p_code: o.code, p_status: status, p_method: method, p_ref: ref || null });
         if (error) throw error;
       }
-    } catch (e) { /* fica declarado neste telemóvel à espera da administração */ }
+    } catch (e) {
+      const code = e && (e.code || e.message);
+      if (code === 'not_on_site' || code === 'need_site' || code === 'pay_window') throw e;
+    }
   }
   let pollT = 0, liveSock = null;
   function applyRemoteOrder(raw) {
@@ -1979,11 +2000,12 @@ const REVIEWS = [];
     const o = history.find((x) => (r.code && x.code === r.code) || (r.id && String(x.id) === String(r.id)));
     if (!o) return false;
     const payRaw = r.payment_status || r.pay;
-    const pay = payRaw === 'declared' ? 'paid_declared' : (payRaw || o.pay);
+    let pay = payRaw === 'declared' ? 'paid_declared' : (payRaw || o.pay);
+    if ((o.method === 'pos' || r.payment_method === 'pos') && pay !== 'paid') pay = 'unpaid';
     const st = r.status || o.status;
     let changed = false;
     if (st && st !== o.status) { o.status = st; changed = true; }
-    if (pay && pay !== o.pay && !(o.pay === 'paid_declared' && pay === 'unpaid') && !(o.pay === 'paid' && pay !== 'paid')) { o.pay = pay; changed = true; }
+    if (pay && pay !== o.pay && !(o.pay === 'paid' && pay !== 'paid') && !(o.pay === 'paid_declared' && pay === 'unpaid' && o.method !== 'pos')) { o.pay = pay; changed = true; }
     if (r.payment_method && r.payment_method !== o.method) { o.method = r.payment_method; changed = true; }
     if (r.payment_ref && r.payment_ref !== o.ref) { o.ref = r.payment_ref; changed = true; }
     const dok = r.driver_ok === true || r.driver_ok === 1;
@@ -2019,6 +2041,7 @@ const REVIEWS = [];
         applyRemoteOrder(data[0]);
       } catch (e) { /* tenta de novo */ }
     }
+    if (ov && cartDlg.open && $('#orderView') && !$('#orderView').hidden) paintOrderView();
   }
   function bindLiveOrders() {
     if (window.AquaOS && AquaOS.connectLive) {
@@ -2043,7 +2066,8 @@ const REVIEWS = [];
     bindLiveOrders();
     if (pollT) return;
     pollT = setInterval(() => {
-      if (window.AquaOS && AquaOS.socketUp && AquaOS.socketUp()) return;
+      const viewing = cartDlg.open && $('#orderView') && !$('#orderView').hidden;
+      if (window.AquaOS && AquaOS.socketUp && AquaOS.socketUp() && !viewing) return;
       refreshOrdersNow();
     }, POLL_MS);
     refreshOrdersNow();
@@ -2437,10 +2461,19 @@ const REVIEWS = [];
       mtabs.scrollLeft = Math.max(0, left);
     }
     if (document.querySelector('dialog[open]') || document.body.style.position === 'fixed') return;
-    const bar = $('#menu .mtool') || $('#menu');
-    if (!bar) return;
-    const delta = bar.getBoundingClientRect().top - 8;
-    if (Math.abs(delta) > 6) window.scrollBy({ top: delta, left: 0, behavior: reduce ? 'auto' : 'smooth' });
+    const tool = $('#menu .mtool');
+    const pin = document.querySelector('#mgrid .mcat-now') || wrap || tool;
+    if (!pin) return;
+    const head = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--head')) || 72;
+    const toolH = tool ? tool.getBoundingClientRect().height : 0;
+    const dest = Math.max(0, pin.getBoundingClientRect().top + window.scrollY - head - toolH - 8);
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    try { window.scrollTo({ top: dest, left: 0, behavior: 'instant' }); }
+    catch (e) { window.scrollTo(0, dest); }
+    html.style.scrollBehavior = prev;
+    if (wrap) wrap.scrollTop = 0;
   }
   function setMenuCat(id) {
     id = String(id || '').trim();
@@ -2456,13 +2489,13 @@ const REVIEWS = [];
     const sheet = $('#mcatDlg');
     const fromSheet = !!(sheet && sheet.open);
     if (fromSheet) {
-      pendingMenuY = menuAbsY();
+      pendingMenuY = document.body.style.position === 'fixed' ? lockY : (window.scrollY || lockY);
       sheet.close();
     }
     let n = 0;
     const go = () => {
       n += 1;
-      if (n < 20 && fromSheet && (document.querySelector('dialog[open]') || document.body.style.position === 'fixed')) {
+      if (n < 40 && fromSheet && (document.querySelector('dialog[open]') || document.body.style.position === 'fixed')) {
         requestAnimationFrame(go);
         return;
       }
@@ -2501,19 +2534,19 @@ const REVIEWS = [];
   function renderMenu() {
     const wrap = $('#mgridWrap') || (mgrid && mgrid.closest('.mgrid-wrap'));
     if (wrap) {
+      wrap.classList.remove('show-all');
       wrap.scrollTop = 0;
-      wrap.classList.toggle('show-all', cat !== 'todos');
     }
     mgrid.innerHTML = '';
     const items = listedMenu();
     const title = document.createElement('p');
-    title.className = 'mcat-now';
+    title.className = 'mcat-now m-in';
     title.setAttribute('aria-live', 'polite');
     title.textContent = catLabel(cat) + ' · ' + items.length;
     mgrid.appendChild(title);
-    if (!items.length) { mgrid.insertAdjacentHTML('beforeend', '<p class="mempty">' + esc(tr('menu.empty')) + '</p>'); return; }
+    if (!items.length) { mgrid.insertAdjacentHTML('beforeend', '<p class="mempty">' + esc(tr('menu.empty')) + '</p>'); if (wrap) wrap.scrollTop = 0; return; }
     items.forEach((m, i) => {
-      const el = document.createElement('article'); el.className = 'mcard reveal r-up in'; el.style.setProperty('--d', Math.min(i, 5) * 70 + 'ms');
+      const el = document.createElement('article'); el.className = 'mcard m-in'; el.style.setProperty('--d', Math.min(i, 10) * 42 + 'ms');
       el.innerHTML = `<button class="mimg" type="button" aria-label="${esc(tr('menu.details', { n: m.name }))}">${media(m)}</button><div class="mbody"><div><h3>${esc(m.name)}</h3><p>${esc(m.desc)}</p></div><div class="mfoot"><b class="price">${money(m.price)}</b><button class="add" type="button" aria-label="${esc(tr('menu.addAria', { n: m.name }))}">+</button></div></div>`;
       $('.mimg', el).addEventListener('click', () => openItem(m));
       $('.add', el).addEventListener('click', () => { addToCart(m.id, 1, ''); });
@@ -2558,7 +2591,7 @@ const REVIEWS = [];
     const doneness = curItem.doneness ? Number($('#itDoneness').value) : null;
     let note = $('#itNote').value.trim();
     if (doneness != null) note = (note ? note + ' · ' : '') + tr('menu.ponto', { n: doneness });
-    if (extras.length) note = (note ? note + ' · ' : '') + extras.join(', ');
+    if (extras.length) note = (note ? note + ' · ' : '') + extraNames(extras);
     addToCart(curItem.id, curQty, note, extras, doneness);
     if (placeReady(place)) itemDlg.close();
   });
@@ -2859,7 +2892,7 @@ const REVIEWS = [];
     history.push(o); saveHist(); clearCart(); msg.textContent = '';
     if (mode === 'demo' && !isLive()) watch(o.id, (d) => { o.status = d.status; saveHist(); paintOrderView(); renderHist(); updateFabs(); });
     orderReadonly = false; ov = o; $('#cartEdit').hidden = true; $('#orderView').hidden = false; paintOrderView(); renderHist(); updateFabs(); startPolling();
-    setTimeout(() => { cartDlg.close(); openPay(); }, 600);
+    if (!o.method) setTimeout(() => { if (ov && ov.id === o.id && !ov.method) openPay(ov, { first: true }); }, 500);
   });
   function extraNames(ids) {
     if (!ids || !ids.length) return '';
@@ -2898,7 +2931,7 @@ const REVIEWS = [];
       (ov.deliveryFee ? `<li><span>${esc(tr('place.feeLine', { b: tr('place.' + (ov.deliveryBand || 'city')) }))}</span><b>${money(ov.deliveryFee)}</b></li>` : '') +
       `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(ov.total)}</b></li>`;
     const bits = [];
-    bits.push('<div><b>' + esc(stTxt(ov.status)) + '</b> · ' + esc(payTxt(ov.pay)) + '</div>');
+    bits.push('<div><b>' + esc(stTxt(ov.status)) + '</b> · ' + esc(payTxt(ov.pay, ov)) + '</div>');
     if (ov.fulfillment === 'takeaway') bits.push('<div><b>' + esc(tr('place.take')) + '</b> ' + esc(ov.take === 'delivery' ? tr('place.delivery') : tr('place.pickup')) + '</div>');
     if (ov.address) bits.push('<div><b>' + esc(tr('place.addr')) + '</b> ' + esc(ov.address) + '</div>');
     if (ov.lat && ov.lng) bits.push('<div><b>GPS</b> ' + Number(ov.lat).toFixed(5) + ', ' + Number(ov.lng).toFixed(5) + (ov.km ? ' · ' + Number(ov.km).toFixed(1) + ' km' : '') + (ov.navUrl ? ' · <a href="' + esc(ov.navUrl) + '" target="_blank" rel="noopener noreferrer">Google Maps</a>' : '') + '</div>');
@@ -2908,14 +2941,25 @@ const REVIEWS = [];
     const box = $('#odetail');
     if (box) { box.innerHTML = bits.join(''); box.hidden = bits.length < 2 && !orderReadonly; }
     const s = kitchenStep(ov.status), sent = ov.status === 'sent', canc = ov.status === 'cancelled';
-    $('#otrack').hidden = sent || canc;
-    $$('#otrack li').forEach((li, i) => { li.classList.toggle('done', i < s || s === 3); li.classList.toggle('now', i === s && s < 3); });
+    $('#otrack').hidden = canc;
+    $$('#otrack li').forEach((li, i) => {
+      li.classList.toggle('done', i < s);
+      li.classList.toggle('now', i === s);
+      li.setAttribute('aria-current', i === s ? 'step' : 'false');
+    });
     const waitDel = !canc && ov.status !== 'delivered' && (ov.status === 'ready' || ov.status === 'on_the_way' || ov.driver_ok);
     $('#omsg').textContent = orderReadonly ? tr('cart.viewOnly') : (ov.status === 'no_confirm' ? tr('st.no_confirm') : canc ? tr('cart.cancelled') : sent ? tr('cart.sentWa') : ov.client_ok && !ov.driver_ok ? tr('cart.waitDriver') : ov.driver_ok && !ov.client_ok ? tr('cart.waitYou') : omsgAt(s));
-    $('#opay').textContent = payTxt(ov.pay);
+    $('#opay').textContent = payTxt(ov.pay, ov);
+    const payBtn = $('#orderPay');
+    const needFirst = !ov.method && ov.pay !== 'paid' && !canc;
+    const canSwap = !needFirst && ov.method && ov.pay !== 'paid' && !canc && payChangeLeft(ov) > 0;
+    if (payBtn) {
+      payBtn.hidden = !(needFirst || canSwap);
+      payBtn.disabled = false;
+      payBtn.textContent = needFirst ? tr('pay.choose') : tr('pay.changeMethod');
+    }
     const acts = $('#ovActs');
-    if (acts) acts.hidden = orderReadonly && !waitDel;
-    $('#orderPay').hidden = orderReadonly || ov.pay === 'paid' || ov.pay === 'paid_declared' || canc;
+    if (acts) acts.hidden = (orderReadonly && !waitDel && (!payBtn || payBtn.hidden));
     const left = changeLeft(ov);
     const canChange = !orderReadonly && !canc && ov.status !== 'delivered' && left <= 0;
     $('#orderChange').hidden = orderReadonly || canc || ov.status === 'delivered';
@@ -2938,7 +2982,11 @@ const REVIEWS = [];
     if (histDlg.open) histDlg.close();
     cartDlg.showModal();
   }
-  $('#orderPay').addEventListener('click', () => { cartDlg.close(); openPay(); });
+  $('#orderPay').addEventListener('click', () => {
+    if (!ov) return;
+    if (!ov.method) openPay(ov, { first: true });
+    else openPay(ov, { change: true });
+  });
   $('#orderHist').addEventListener('click', () => { cartDlg.close(); openHist(); });
   $('#orderBack')?.addEventListener('click', () => { cartDlg.close(); openHist(); });
   $('#orderChange').addEventListener('click', () => {
@@ -2963,10 +3011,15 @@ const REVIEWS = [];
   function renderHist() {
     const od = owedTotal(), pend = history.filter((o) => o.status !== 'cancelled' && o.pay === 'paid_declared').reduce((s, o) => s + o.total, 0);
     const draftsN = loadDrafts().length;
-    $('#hsum').innerHTML = od ? `<div class="hs warn"><b>${esc(tr('pay.unpaid'))}</b><strong>${money(od)}</strong><span>${esc(tr('pay.open', { n: owed().length }))}</span></div>`
-      : pend ? `<div class="hs"><b>${esc(tr('pay.confirming'))}</b><strong>${money(pend)}</strong><span>${esc(tr('pay.confirm'))}</span></div>`
-      : history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('pay.noneDue'))}</span></div>` : `<div class="hs"><b>${esc(draftsN ? tr('st.draft') : tr('pay.none'))}</b><span>${esc(draftsN ? tr('cart.resumeDraft') : tr('pay.noneH'))}</span></div>`;
-    $('#histPay').hidden = !od;
+    const parts = [];
+    if (od) parts.push(`<div class="hs warn"><b>${esc(tr('pay.unpaid'))}</b><strong>${money(od)}</strong><span>${esc(tr('pay.open', { n: owed().length }))}</span></div>`);
+    if (pend) parts.push(`<div class="hs"><b>${esc(tr('pay.confirming'))}</b><strong>${money(pend)}</strong><span>${esc(tr('pay.confirm'))}</span></div>`);
+    if (!parts.length) {
+      parts.push(history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('pay.noneDue'))}</span></div>` : `<div class="hs"><b>${esc(draftsN ? tr('st.draft') : tr('pay.none'))}</b><span>${esc(draftsN ? tr('cart.resumeDraft') : tr('pay.noneH'))}</span></div>`);
+    }
+    $('#hsum').innerHTML = parts.join('');
+    const histPay = $('#histPay');
+    if (histPay) histPay.hidden = true;
     const list = $('#hlist'); list.innerHTML = '';
     loadDrafts().slice().reverse().forEach((d) => {
       const el = document.createElement('button'); el.type = 'button'; el.className = 'hcard';
@@ -2984,7 +3037,7 @@ const REVIEWS = [];
       el.setAttribute('aria-label', tr('cart.viewAria', { c: o.code }));
       const qty = (l) => l.quantity || l.qty || 1;
       el.innerHTML = `<div class="hrow"><b>${esc(o.code)}</b><span>${when(o.ts)}</span></div><p class="hmeta">${esc(o.placeLabel || nice(o.table))} · ${esc(o.name)} · ${esc(showPhone(o.phone))}</p>
-        <div class="chips"><span class="chip2 st-${o.status}">${esc(stTxt(o.status))}</span><span class="chip2 pay-${o.pay}">${esc(payTxt(o.pay))}</span></div>
+        <div class="chips"><span class="chip2 st-${o.status}">${esc(stTxt(o.status))}</span><span class="chip2 pay-${o.method === 'pos' && o.pay !== 'paid' ? 'unpaid' : o.pay}">${esc(payTxt(o.pay, o))}</span>${o.method ? `<span class="chip2">${esc(payMethodLabel(o.method))}</span>` : ''}</div>
         <ul class="osum">${o.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('')}<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(o.total)}</b></li></ul>
         <p class="hpeek">${esc(tr('cart.viewHintShort'))}</p>
         ${o.status === 'sent' ? `<span class="linkbtn" data-recv>${esc(tr('pay.got'))}</span>` : ''}`;
@@ -2999,11 +3052,26 @@ const REVIEWS = [];
     });
   }
   function openHist() { renderHist(); histDlg.showModal(); }
-  $('#histPay').addEventListener('click', () => { histDlg.close(); openPay(); });
   $('#histMenu').addEventListener('click', () => { histDlg.close(); $('#menu').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
 
   /* pagamento */
-  const payDlg = $('#payDlg'); let paySel = null;
+  const payDlg = $('#payDlg'); let paySel = null, payTarget = null, payIntent = 'first', payGeo = null;
+  function payLocked(o) {
+    return !o || o.status === 'cancelled' || o.pay === 'paid';
+  }
+  function payable(o) {
+    return !payLocked(o);
+  }
+  function getOnSite() {
+    return new Promise((ok, no) => {
+      if (!navigator.geolocation) { no(new Error('geo')); return; }
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const lat = pos.coords.latitude, lng = pos.coords.longitude;
+        const km = kmBetween(lat, lng, CLUB_GEO.lat, CLUB_GEO.lng);
+        ok({ lat, lng, km, here: km <= VENUE_KM });
+      }, () => no(new Error('geo')), { enableHighAccuracy: true, maximumAge: 15000, timeout: 14000 });
+    });
+  }
   function readPayResume() {
     try { return JSON.parse(store.get('aq.payResume') || 'null'); } catch (e) { return null; }
   }
@@ -3022,10 +3090,31 @@ const REVIEWS = [];
       try { const i = document.createElement('textarea'); i.value = text; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); done(); } catch (e) { /* */ }
     }
   }
-  function openPay() {
-    const open = owed(); if (!open.length) { savePayResume(null); openHist(); return; }
-    const amount = open.reduce((s, o) => s + o.total, 0), codes = open.map((o) => o.code).join(', ');
-    $('#paySum').innerHTML = `<div class="hs warn"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(codes)}</span></div>`;
+  async function openPay(order, opts) {
+    const o = payable(order) ? order : (payable(ov) ? ov : null);
+    const change = !!(opts && opts.change);
+    const first = !!(opts && opts.first) || (!change && o && !o.method);
+    if (!o) { savePayResume(null); return; }
+    if (change) {
+      if (payChangeLeft(o) <= 0) { if ($('#omsg')) $('#omsg').textContent = tr('pay.windowGone'); return; }
+      try {
+        const geo = await getOnSite();
+        if (!geo.here) { if ($('#omsg')) $('#omsg').textContent = tr('pay.tooFar'); alert(tr('pay.tooFar')); return; }
+        payGeo = geo;
+      } catch (e) {
+        if ($('#omsg')) $('#omsg').textContent = tr('pay.needHere');
+        alert(tr('pay.needHere'));
+        return;
+      }
+    } else if (!first && o.method) {
+      return;
+    } else {
+      payGeo = null;
+    }
+    payIntent = change ? 'change' : 'first';
+    payTarget = o;
+    const amount = o.total;
+    $('#paySum').innerHTML = `<div class="hs warn"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(o.code)} · ${esc(tr('pay.thisOrder'))}</span></div>`;
     paySel = null; $('#payInfo').innerHTML = ''; $('#payMsg').textContent = ''; $('#payGo').hidden = true;
     const box = $('#payMethods'); box.innerHTML = '';
     PAYMENT.methods.forEach((m) => {
@@ -3042,68 +3131,82 @@ const REVIEWS = [];
           $('#payCopy').addEventListener('click', () => {
             copyPayNumber(m.digits || m.number, $('#payCopy'));
             persistSession();
-            savePayResume({ method: m.id, hold: true });
+            savePayResume({ method: m.id, hold: true, orderId: o.id, code: o.code });
             $('#payMsg').textContent = tr('pay.stay');
           });
           $('#payMsg').textContent = tr('pay.stay');
-          savePayResume({ method: m.id, hold: true });
+          savePayResume({ method: m.id, hold: true, orderId: o.id, code: o.code });
         } else {
           $('#payInfo').innerHTML = `<p class="payinfo">${esc(hint)}</p>`;
-          $('#payMsg').textContent = '';
+          $('#payMsg').textContent = tr('pay.posWait', { c: o.code });
           savePayResume(null);
         }
-        $('#payGo').hidden = false; $('#payGo').textContent = m.number ? tr('pay.done') : tr('pay.ask');
+        $('#payGo').hidden = false; $('#payGo').textContent = m.number ? tr('pay.done') : tr('pay.posAsk');
       });
       box.appendChild(b);
     });
     const resume = readPayResume();
-    if (resume && resume.method && resume.method !== 'pos') {
+    if (resume && resume.method && resume.method !== 'pos' && (String(resume.orderId) === String(o.id) || resume.code === o.code)) {
       const idx = PAYMENT.methods.findIndex((m) => m.id === resume.method);
       const btns = $$('.payopt', box);
       if (idx >= 0 && btns[idx]) btns[idx].click();
     }
     if (histDlg.open) histDlg.close();
-    if (cartDlg.open) cartDlg.close();
+    const pt = $('#payT');
+    if (pt) pt.textContent = change ? tr('pay.changeMethod') : tr('pay.title');
     if (!payDlg.open) payDlg.showModal();
   }
   function maybeResumePay() {
-    if (!owed().length) { savePayResume(null); return; }
     const r = readPayResume();
     if (!r || !r.hold || !r.method || r.method === 'pos') return;
+    const o = history.find((x) => String(x.id) === String(r.orderId) || x.code === r.code);
+    if (payLocked(o)) { savePayResume(null); return; }
     if (payDlg.open) return;
     const busy = ['cartDlg', 'placeDlg', 'itemDlg', 'callDlg', 'termsDlg'].some((id) => { const d = document.getElementById(id); return d && d.open; });
     if (busy) return;
-    openPay();
+    openPay(o);
   }
   $('#payGo').addEventListener('click', async () => {
     if (!paySel) return;
-    const open = owed(), amount = open.reduce((s, o) => s + o.total, 0), msg = $('#payMsg');
+    const o = payable(payTarget) ? payTarget : null;
+    const msg = $('#payMsg');
+    if (!o) { msg.textContent = tr('pay.fail', { e: '' }); return; }
+    if (payIntent === 'change') {
+      if (payChangeLeft(o) <= 0) { msg.textContent = tr('pay.windowGone'); return; }
+      try {
+        const geo = payGeo && payGeo.here ? payGeo : await getOnSite();
+        if (!geo.here) { msg.textContent = tr('pay.tooFar'); return; }
+        payGeo = geo;
+      } catch (e) { msg.textContent = tr('pay.needHere'); return; }
+    }
     try {
-      if (!paySel.number) {
-        for (const o of open) { await apiPay(o, 'pay_requested', paySel.id, ''); o.pay = 'pay_requested'; o.method = paySel.id; }
+      if (paySel.id === 'pos' || !paySel.number) {
+        await apiPay(o, 'unpaid', 'pos', '', payGeo);
+        o.pay = 'unpaid';
+        o.method = 'pos';
         savePayResume(null);
-        saveHist(); renderHist(); updateFabs(); payDlg.close();
-        const code = (typeof callCode === 'function' ? callCode() : '') || table || String(place.tableNumber || '');
-        if (code) apiCall(code, 'request_bill').catch(() => {});
-        openHist();
-        const note = $('#hsum');
-        if (note) {
-          const extra = document.createElement('p'); extra.className = 'menu-note'; extra.textContent = tr('pay.waitWaiter');
-          extra.style.margin = '.4rem 0 0';
-          note.appendChild(extra);
+        saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close();
+        if (!o.billAsked) {
+          o.billAsked = true;
+          saveHist();
+          const code = (typeof callCode === 'function' ? callCode() : '') || table || String(place.tableNumber || '');
+          if (code && o.fulfillment !== 'takeaway') apiCall(code, 'request_bill').catch(() => {});
         }
+        if (ov && (ov.id === o.id || ov.code === o.code)) { ov = o; if (!cartDlg.open) cartDlg.showModal(); paintOrderView(); }
         return;
       }
-      for (const o of open) {
-        await apiPay(o, 'paid_declared', paySel.id, '');
-        o.pay = 'paid_declared';
-        o.method = paySel.id;
-        o.ref = '';
-        if (!['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
-      }
+      await apiPay(o, 'paid_declared', paySel.id, '', payGeo);
+      o.pay = 'paid_declared';
+      o.method = paySel.id;
+      o.ref = '';
+      if (!['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
       savePayResume(null);
-      saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close(); openHist();
-    } catch (e) { msg.textContent = tr('pay.fail', { e: e.message || e }); }
+      saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close();
+      if (ov && (ov.id === o.id || ov.code === o.code)) { ov = o; if (!cartDlg.open) { $('#cartEdit').hidden = true; $('#orderView').hidden = false; cartDlg.showModal(); } paintOrderView(); }
+    } catch (e) {
+      const code = e && (e.code || e.message);
+      msg.textContent = code === 'not_on_site' || code === 'need_site' ? tr('pay.tooFar') : code === 'pay_window' ? tr('pay.windowGone') : tr('pay.fail', { e: e.message || e });
+    }
   });
 
   /* chamar garçom */
@@ -3213,7 +3316,7 @@ const REVIEWS = [];
   function updateFabs() {
     const fc = $('#fabCart'), n = cartCount(), od = owedTotal(), liveO = latestLiveOrder();
     fc.hidden = !(n || history.length);
-    $('#fabCartTxt').textContent = n ? tr('fab.cartN', { n, m: money(grandTotal()) }) : od ? tr('fab.bill', { m: money(od) }) : liveO ? tr('st.' + liveO.status) : tr('fab.my');
+    $('#fabCartTxt').textContent = n ? tr('fab.cartN', { n, m: money(grandTotal()) }) : liveO ? (tr('st.' + liveO.status) + (od ? ' · ' + tr('fab.bill', { m: money(od) }) : '')) : od ? tr('fab.bill', { m: money(od) }) : tr('fab.my');
     fc.classList.toggle('owe', !n && od > 0);
     const f = $('#fabCall'), txt = $('#fabCallTxt');
     f.classList.toggle('pending', Boolean(call && (call.status === 'pending' || call.status === 'sent'))); f.classList.toggle('accepted', Boolean(call && call.status === 'accepted'));
@@ -3518,8 +3621,8 @@ const REVIEWS = [];
   });
 })();
 </script>
-<script src="os-config.js?v=ops1"></script>
-<script src="garcom.js?v=ops1"></script>
-<script src="os-bridge.js?v=ops1"></script>
+<script src="os-config.js?v=ops3"></script>
+<script src="garcom.js?v=ops3"></script>
+<script src="os-bridge.js?v=ops3"></script>
 </body>
 </html>
