@@ -429,10 +429,13 @@ app.get('/api/orders/status', (req, res) => {
 function settleDelivery(id) {
   const o = db.prepare('SELECT * FROM orders WHERE id=?').get(id);
   if (!o || o.status === 'cancelled') return o;
-  if (o.driver_ok && o.client_ok && o.status !== 'delivered') {
+  const paid = o.payment_status === 'paid';
+  const got = !!(o.driver_ok && o.client_ok);
+  if (got && paid) {
     db.prepare("UPDATE orders SET status='delivered' WHERE id=?").run(id);
-  } else if ((o.driver_ok || o.client_ok) && (o.status === 'ready' || o.status === 'preparing')) {
-    db.prepare("UPDATE orders SET status='on_the_way' WHERE id=?").run(id);
+  } else if (got && o.status !== 'delivered' && ['review', 'received', 'preparing', 'ready'].includes(o.status)) {
+    const deliv = o.take === 'delivery' || o.fulfillment === 'takeaway';
+    db.prepare("UPDATE orders SET status=? WHERE id=?").run(deliv && o.take === 'delivery' ? 'on_the_way' : 'ready', id);
   }
   return db.prepare('SELECT * FROM orders WHERE id=?').get(id);
 }
@@ -754,27 +757,20 @@ function applyOrderPatch(id, body = {}) {
   if (!o) return null;
   const { status, payment_status, payment_method, payment_ref, driver_ok, client_ok } = body;
   const allowed = ['review', 'received', 'preparing', 'ready', 'on_the_way', 'delivered', 'cancelled', 'no_confirm'];
-  if (driver_ok) db.prepare('UPDATE orders SET driver_ok=1 WHERE id=?').run(id);
-  if (client_ok) db.prepare('UPDATE orders SET client_ok=1 WHERE id=?').run(id);
-  if (status === 'delivered') {
-    db.prepare('UPDATE orders SET driver_ok=1 WHERE id=?').run(id);
-    const cur = db.prepare('SELECT client_ok FROM orders WHERE id=?').get(id);
-    if (!cur.client_ok) {
-      db.prepare("UPDATE orders SET status='on_the_way' WHERE id=? AND status NOT IN ('delivered','cancelled')").run(id);
-    } else {
-      db.prepare("UPDATE orders SET status='delivered' WHERE id=?").run(id);
-    }
+  if (driver_ok || body.received_ok) db.prepare('UPDATE orders SET driver_ok=1 WHERE id=?').run(id);
+  if (client_ok || body.received_ok) db.prepare('UPDATE orders SET client_ok=1 WHERE id=?').run(id);
+  if (status === 'delivered' || body.received_ok) {
+    db.prepare('UPDATE orders SET driver_ok=1, client_ok=1 WHERE id=?').run(id);
   } else if (status && allowed.includes(status) && status !== 'delivered') {
     db.prepare('UPDATE orders SET status=? WHERE id=?').run(status, id);
   }
-  settleDelivery(id);
   if (payment_ref) db.prepare('UPDATE orders SET payment_ref=? WHERE id=?').run(String(payment_ref).slice(0, 80), id);
   if (payment_status === 'paid') {
     const pc = o.paid_code || paidCode(o.code);
     const method = ['mpesa', 'emola', 'pos', 'cash', 'card'].includes(payment_method) ? payment_method : (o.payment_method || 'pos');
-    const cur = db.prepare('SELECT status FROM orders WHERE id=?').get(id);
+    const cur = db.prepare('SELECT status, driver_ok, client_ok FROM orders WHERE id=?').get(id);
     db.prepare("UPDATE orders SET payment_status='paid', payment_method=?, paid_code=?, paid_at=datetime('now') WHERE id=?").run(method, pc, id);
-    if (!status && ['review', 'received', 'no_confirm'].includes(cur.status)) {
+    if (!status && !cur.driver_ok && ['review', 'received', 'no_confirm'].includes(cur.status)) {
       db.prepare("UPDATE orders SET status='preparing' WHERE id=?").run(id);
     }
   } else if (payment_status === 'rejected' || payment_status === 'no_confirm') {
@@ -782,6 +778,7 @@ function applyOrderPatch(id, body = {}) {
   } else if (payment_status === 'declared') {
     db.prepare("UPDATE orders SET payment_status='declared' WHERE id=?").run(id);
   }
+  settleDelivery(id);
   logEvent('admin_order', { id, status, payment_status });
   const full = orderFull(id);
   emitAll('order:updated', full);

@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops3"></script>
+<script src="i18n.js?v=ops5"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,11 +60,11 @@ picture.aq-pic{display:contents}
 .header .wrap{padding-inline:.85rem;max-width:1280px}
 .bar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:var(--head);grid-auto-flow:dense;align-items:center;gap:.55rem .7rem;min-height:var(--head);height:var(--head);padding:0;overflow:visible}
 .brand,.head-right,.nav,.burger{grid-row:1}
-.brand{display:flex;align-items:center;gap:.65rem;min-width:0;text-decoration:none}
-.brand img{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none;background:#e8f6ff}
-.brand span{display:flex;flex-direction:column;justify-content:center;min-width:0;font-family:var(--fh);text-transform:uppercase;color:var(--cyan-d);line-height:1}
-.brand b{font-size:clamp(1.02rem,4.1vw,1.42rem);font-weight:800;letter-spacing:.04em;white-space:nowrap}
-.brand small{margin-top:.28rem;font-size:clamp(.42rem,1.55vw,.58rem);font-weight:700;letter-spacing:.16em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand{display:flex;align-items:center;gap:.5rem;min-width:0;text-decoration:none;overflow:visible}
+.brand img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none;background:#e8f6ff}
+.brand span{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-width:0;font-family:var(--fh);text-transform:uppercase;color:var(--cyan-d);line-height:1.05}
+.brand b{font-size:clamp(.98rem,4vw,1.38rem);font-weight:800;letter-spacing:.03em;white-space:nowrap}
+.brand small{display:block;margin-top:.22rem;font-size:clamp(.5rem,2.15vw,.62rem);font-weight:700;letter-spacing:.08em;white-space:nowrap}
 .nav{display:none;min-width:0;max-width:100%;justify-self:end}
 .nav ul{display:flex;flex-wrap:nowrap;gap:.1rem;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
 .nav ul::-webkit-scrollbar{display:none}
@@ -112,7 +112,12 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .mmenu li a:hover,.mmenu .nav-staff:hover{transform:translateX(8px);color:var(--cyan-d)}
 .mmenu .btn{margin-top:1.5rem;width:100%}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-@media(max-width:420px){.brand small{display:none}.brand img{width:48px;height:48px}}
+@media(max-width:420px){
+  .brand img{width:42px;height:42px}
+  .brand{gap:.42rem}
+  .brand b{font-size:1.02rem;letter-spacing:.02em}
+  .brand small{display:block;font-size:.52rem;letter-spacing:.06em;margin-top:.18rem}
+}
 @media(max-width:360px){.lang-btn > span:not(.flag){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.lang-btn{padding-inline:.28rem}}
 @media(min-width:720px) and (max-width:1099px){
   .head-right .btn{display:inline-flex;padding:.5rem .85rem;font-size:.7rem;min-height:44px}
@@ -127,7 +132,7 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
   .head-right .btn{display:inline-flex}
   .brand img{width:56px;height:56px}
   .brand b{font-size:1.45rem}
-  .brand small{font-size:.58rem;letter-spacing:.2em}
+  .brand small{font-size:.62rem;letter-spacing:.12em}
 }
 
 /* hero slideshow */
@@ -429,13 +434,14 @@ textarea:hover{border-color:var(--cyan)}textarea:focus{outline:none;border-color
 .bk-text .lead{margin-top:1rem;color:#1d262d;width:100%;max-width:none}
 @media(max-width:999px){
   .book-stage{padding:.35rem 10px .5rem}
-  .bk-text{max-width:none;width:100%;padding-inline:.1rem;padding-bottom:1.15rem}
-  .bk-text h1{margin-top:.5rem;font-size:clamp(2.05rem,8.8vw,2.85rem);line-height:.96;letter-spacing:-.03em}
-  .bk-text .lead{display:block;margin-top:.7rem;font-size:clamp(1rem,3.9vw,1.14rem);line-height:1.55;overflow:visible;-webkit-line-clamp:unset}
-  .cta-stack{margin-top:1.15rem;width:100%;justify-items:center}
-  .cta{width:100%;justify-content:center}
+  .bk-text{max-width:none;width:100%;padding:0 max(10.6rem, 42vw) 1.15rem .1rem;box-sizing:border-box}
+  .bk-text h1{margin-top:.5rem;font-size:clamp(1.72rem,7.2vw,2.55rem);line-height:.98;letter-spacing:-.03em}
+  .bk-text .lead{display:block;margin-top:.7rem;font-size:clamp(.95rem,3.6vw,1.1rem);line-height:1.5;overflow:visible;-webkit-line-clamp:unset}
+  .cta-stack{margin-top:1.15rem;width:100%;justify-items:start}
+  .cta{width:100%;justify-content:flex-start}
   .story-slot{padding:.7rem 0 1.15rem}
   .cap{min-height:3.6rem}
+  .bk-grid{padding-bottom:calc(var(--dock) + .4rem)}
 }
 @media(min-width:1000px){
   .bk-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-rows:auto auto auto;gap:.7rem 2rem;padding:calc(var(--head-bar) + .9rem) 2rem .8rem;min-height:0;align-items:start;align-content:start}
@@ -720,15 +726,21 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 @media(min-width:720px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard{grid-template-columns:1fr;grid-template-rows:auto auto}.mimg{width:100%;height:188px;min-height:188px;max-height:188px;min-width:0}}
 @media(min-width:1100px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{height:220px;min-height:220px;max-height:220px}}
 /* botões flutuantes */
-.fabs{position:fixed;left:1rem;right:auto;bottom:calc(.9rem + env(safe-area-inset-bottom,0px));z-index:80;display:grid;gap:.6rem;justify-items:start;max-width:min(100vw - 1.5rem, 22rem);pointer-events:none}
+.fabs{position:fixed;left:auto;right:.7rem;bottom:calc(.85rem + env(safe-area-inset-bottom,0px));z-index:80;display:grid;gap:.42rem;justify-items:end;width:max-content;max-width:min(calc(100vw - 1.15rem), 16.5rem);pointer-events:none}
 .fabs .fab,.fabs .fab-hint{pointer-events:auto}
-html.staff-chrome .fabs{bottom:calc(var(--dock) + .45rem)}
+html.staff-chrome .fabs{bottom:calc(var(--dock) + .4rem)}
 .pn[hidden],html:not(.staff-chrome) .pn{display:none!important}
-@media(min-width:720px){.fabs{left:auto;right:1rem;justify-items:end}}
-.fab{display:inline-flex;align-items:center;gap:.6rem;min-height:56px;padding:.6rem 1.25rem;border:0;border-radius:999px;font:800 .82rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:#000;cursor:pointer;box-shadow:0 16px 30px -10px rgba(0,0,0,.55);transition:transform var(--ease),background-color var(--ease)}
+.fab{display:inline-flex;align-items:center;justify-content:flex-start;gap:.45rem;min-height:48px;padding:.48rem .95rem;border:0;border-radius:999px;font:800 .72rem var(--fh);letter-spacing:.05em;text-transform:uppercase;color:#000;cursor:pointer;max-width:100%;box-shadow:0 12px 26px -10px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.7);transition:transform var(--ease),background-color var(--ease)}
+.fab .ico{width:18px;height:18px;flex:none}
+.fab span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fab:hover{transform:translateY(-3px) scale(1.04)}
+@media(min-width:720px){
+  .fabs{right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));max-width:18rem}
+  .fab{min-height:52px;padding:.55rem 1.15rem;font-size:.8rem}
+}
 .fab[hidden]{display:none}
 .fab.cart{background:var(--cyan)}
+.fab.cart.live{animation:fabp 1.8s ease-in-out infinite}
 .fab.order{background:var(--yellow);color:#000}
 .fab.call{background:#000;color:#fff}
 .fab.call .ico{color:var(--yellow)}
@@ -992,7 +1004,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .payinfo{margin:0;padding:.9rem 1rem;border-radius:16px;background:var(--cyan-soft);font-size:.95rem}
 .terms{margin:0;padding-left:1.2rem;display:grid;gap:.7rem;font-size:.95rem}
 .fab.cart.owe{background:var(--yellow)}
-.fab-hint{max-width:230px;padding:.7rem 1rem;border:0;border-radius:18px 18px 4px 18px;background:#fff;color:#000;font:700 .85rem/1.35 var(--fh);text-align:left;cursor:pointer;box-shadow:0 14px 30px -10px rgba(0,0,0,.45);animation:sheet .4s ease}
+.fab-hint{max-width:210px;padding:.65rem .9rem;border:0;border-radius:18px 18px 18px 4px;background:#fff;color:#000;font:700 .8rem/1.35 var(--fh);text-align:right;cursor:pointer;box-shadow:0 14px 30px -10px rgba(0,0,0,.45),0 0 0 2px rgba(255,255,255,.7);animation:sheet .4s ease}
 .fab-hint[hidden]{display:none}
 .cs.sent{background:var(--yellow)}
 .cs.sent .cs-ic .ico{animation:ring 1.4s ease-in-out infinite;transform-origin:50% 10%}
@@ -1003,7 +1015,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops3">
+<link rel="stylesheet" href="garcom.css?v=ops5">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1048,7 +1060,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div class="wrap bar">
     <a class="brand" href="#inicio" data-i18n-aria="brand">
       <img src="assets/logo.webp" alt="" width="48" height="48" onerror="this.onerror=null;this.src='assets/logo.png'">
-      <span><b>Aqua Club</b><small data-i18n="brandSub">Complexo Aquático</small></span>
+      <span><b>Aqua Club</b><small data-i18n="brandSub">COMPLEXO AQUÁTICO</small></span>
     </a>
     <nav class="nav" data-i18n-aria="nav.main">
       <ul>
@@ -1280,7 +1292,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <footer class="footer" id="contacto">
   <div class="wrap f-grid">
     <div class="reveal">
-      <a class="brand" href="#inicio" data-i18n-aria="brand"><img src="assets/logo.webp" alt="" width="48" height="48" onerror="this.onerror=null;this.src='assets/logo.png'"><span><b>Aqua Club</b><small data-i18n="brandSub">Complexo Aquático</small></span></a>
+      <a class="brand" href="#inicio" data-i18n-aria="brand"><img src="assets/logo.webp" alt="" width="48" height="48" onerror="this.onerror=null;this.src='assets/logo.png'"><span><b>Aqua Club</b><small data-i18n="brandSub">COMPLEXO AQUÁTICO</small></span></a>
       <p data-i18n="foot.blurb">O seu complexo de lazer aquático de referência. Diversão, boa disposição e momentos inesquecíveis.</p>
       <div class="socials" data-i18n-aria="foot.social">
         <a href="#" data-social="instagram" aria-label="Instagram"><svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg></a>
@@ -1848,8 +1860,12 @@ const REVIEWS = [];
   const payChangeLeft = (o) => Math.max(0, PAY_CHANGE_MS - (Date.now() - Number(o && o.ts || 0)));
   function settleLocalDelivery(o) {
     if (!o || o.status === 'cancelled') return o;
-    if (o.driver_ok && o.client_ok) o.status = 'delivered';
-    else if ((o.driver_ok || o.client_ok) && (o.status === 'ready' || o.status === 'preparing' || o.status === 'review' || o.status === 'received')) o.status = 'on_the_way';
+    const paid = o.pay === 'paid';
+    const got = !!(o.received_ok || (o.driver_ok && o.client_ok));
+    if (got && paid) o.status = 'delivered';
+    else if (got && o.status !== 'delivered') {
+      o.status = o.take === 'delivery' ? 'on_the_way' : (['review', 'received', 'preparing'].includes(o.status) ? 'ready' : o.status);
+    }
     return o;
   }
   const omsgAt = (i) => [tr('cart.recMsg'), tr('cart.prepMsg'), tr('cart.wayMsg'), tr('cart.delMsg')][i] || '';
@@ -1946,11 +1962,14 @@ const REVIEWS = [];
     } catch (e) { /* continua no registo local */ }
     if (window.AquaBus) {
       AquaBus.pushOrder({
-        id: o.id, code: o.code, nConta: o.nConta, table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
-        place_label: o.placeLabel, fulfillment: o.fulfillment, total: o.total, status: o.status || 'review',
+        id: o.id, code: o.code, nConta: o.nConta, nPedido: o.nPedido || o.nConta,
+        table_number: parseInt(String(o.table).replace(/\D/g, ''), 10) || null,
+        place_label: o.placeLabel, fulfillment: o.fulfillment, take: o.take || '',
+        total: o.total, delivery_fee: o.deliveryFee || 0, deliveryFee: o.deliveryFee || 0,
+        status: o.status || 'review',
         customer_name: o.name, customer_phone: o.phone, payment_status: 'unpaid', created_at: new Date().toISOString(),
-        waGroupOpt: !!o.waGroupOpt,
-        lat: o.lat, lng: o.lng, mapsUrl: o.mapsUrl, navUrl: o.navUrl, address: o.address,
+        waGroupOpt: !!o.waGroupOpt, ts: o.ts,
+        lat: o.lat, lng: o.lng, mapsUrl: o.mapsUrl, navUrl: o.navUrl, address: o.address, bairro: o.bairro || '',
         items: (o.lines || []).map((l) => ({
           name: l.name, unit_price: l.unitPriceMzn || l.price, qty: l.quantity || l.qty,
           extras: extraNames(l.extras || []) ? extraNames(l.extras || []).split(', ') : (l.extras || []),
@@ -2003,6 +2022,7 @@ const REVIEWS = [];
     }
   }
   let pollT = 0, liveSock = null;
+  const ST_RANK = { review: 0, received: 0, no_confirm: 0, sent: 0, preparing: 1, ready: 2, on_the_way: 2, delivered: 3, cancelled: 9 };
   function applyRemoteOrder(raw) {
     const r = raw && raw.order ? raw.order : raw;
     if (!r) return false;
@@ -2013,7 +2033,10 @@ const REVIEWS = [];
     if ((o.method === 'pos' || r.payment_method === 'pos') && pay !== 'paid') pay = 'unpaid';
     const st = r.status || o.status;
     let changed = false;
-    if (st && st !== o.status) { o.status = st; changed = true; }
+    if (st && st !== o.status) {
+      const up = (ST_RANK[st] ?? 0) >= (ST_RANK[o.status] ?? 0) || st === 'cancelled';
+      if (up) { o.status = st; changed = true; }
+    }
     if (pay && pay !== o.pay && !(o.pay === 'paid' && pay !== 'paid') && !(o.pay === 'paid_declared' && pay === 'unpaid' && o.method !== 'pos')) { o.pay = pay; changed = true; }
     if (r.payment_method && r.payment_method !== o.method) { o.method = r.payment_method; changed = true; }
     if (r.payment_ref && r.payment_ref !== o.ref) { o.ref = r.payment_ref; changed = true; }
@@ -2021,11 +2044,12 @@ const REVIEWS = [];
     const cok = r.client_ok === true || r.client_ok === 1;
     if (dok && !o.driver_ok) { o.driver_ok = true; changed = true; }
     if (cok && !o.client_ok) { o.client_ok = true; changed = true; }
+    if ((r.received_ok === true || r.received_ok === 1) && !o.received_ok) { o.received_ok = true; changed = true; }
     const before = o.status;
     settleLocalDelivery(o);
     if (o.status !== before) changed = true;
-    if (!changed) return false;
     if (ov && (ov.code === o.code || String(ov.id) === String(o.id))) ov = o;
+    if (!changed) return false;
     saveHist(); renderHist(); paintOrderView(); updateFabs();
     return true;
   }
@@ -2073,8 +2097,14 @@ const REVIEWS = [];
     }
     if (window.__aqLiveBound) return;
     window.__aqLiveBound = true;
-    const bump = () => { refreshFromBus(); refreshCallsFromBus(); };
+    const bump = () => {
+      refreshFromBus();
+      refreshCallsFromBus();
+      updateFabs();
+      if (ov) paintOrderView();
+    };
     window.addEventListener('aq-os-up', bump);
+    window.addEventListener('storage', (e) => { if (e && e.key === 'aq.os.bus') bump(); });
     try {
       window.__aqOrdBc = new BroadcastChannel('aq-os');
       window.__aqOrdBc.onmessage = bump;
@@ -2086,10 +2116,12 @@ const REVIEWS = [];
     pollT = setInterval(() => {
       refreshFromBus();
       refreshCallsFromBus();
+      updateFabs();
+      if (ov) paintOrderView();
       const viewing = cartDlg.open && $('#orderView') && !$('#orderView').hidden;
       if (window.AquaOS && AquaOS.socketUp && AquaOS.socketUp() && !viewing) return;
       refreshOrdersNow();
-    }, 3000);
+    }, 1500);
     refreshOrdersNow();
   }
 
@@ -2115,22 +2147,26 @@ const REVIEWS = [];
     try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Maputo' }).format(ts ? new Date(ts) : new Date()); }
     catch (e) { const d = ts ? new Date(ts) : new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   }
-  function contaScope(o) {
-    return clubDay(o && o.ts) + '|' + String((o && o.phone) || '') + '|' + String((o && o.table) || '') + '|' + String((o && o.fulfillment) || '');
+  function phoneKey(o) {
+    let d = String((o && (o.phone || o.customer_phone || (o.customer && o.customer.phone))) || '').replace(/\D/g, '');
+    if (d.startsWith('00')) d = d.slice(2);
+    if (d.length > 9) d = d.slice(-9);
+    return d || ('code:' + String((o && (o.id || o.code)) || ''));
   }
+  function contaScope(o) { return phoneKey(o); }
   function ensureContas() {
     const groups = {};
     history.filter((o) => o && o.status !== 'cancelled').slice().sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0) || String(a.code || '').localeCompare(String(b.code || ''))).forEach((o) => {
-      const k = contaScope(o);
+      const k = phoneKey(o);
       groups[k] = (groups[k] || 0) + 1;
       o.nConta = groups[k];
+      o.nPedido = groups[k];
     });
   }
   function contaNo(o) {
     if (!o) return 0;
-    if (o.nConta) return Number(o.nConta) || 0;
     ensureContas();
-    return Number(o.nConta) || 0;
+    return Number(o.nPedido || o.nConta) || 0;
   }
   function contaLabel(o) {
     const n = contaNo(o);
@@ -2138,8 +2174,8 @@ const REVIEWS = [];
   }
   function nextConta(o) {
     ensureContas();
-    const k = contaScope(o);
-    return history.filter((x) => x && x.status !== 'cancelled' && contaScope(x) === k).reduce((m, x) => Math.max(m, Number(x.nConta) || 0), 0) + 1;
+    const k = phoneKey(o);
+    return history.filter((x) => x && x.status !== 'cancelled' && phoneKey(x) === k).reduce((m, x) => Math.max(m, Number(x.nPedido || x.nConta) || 0), 0) + 1;
   }
   ensureContas();
   saveHist();
@@ -2936,7 +2972,7 @@ const REVIEWS = [];
       lines, total: grandTotal(), name, phone, waGroupOpt,
       status: 'review', pay: 'unpaid', method: '', ref: ''
     };
-    o.nConta = nextConta(o);
+    o.nConta = o.nPedido = nextConta(o);
     try { await apiOrder(o); } catch (e) { msg.textContent = tr('cart.fail', { e: e.message || e }); btn.disabled = false; return; }
     if (window.AquaOS && AquaOS.joinOrder && o.code) AquaOS.joinOrder(o.code);
     cust = { name, phone, waGroup: waGroupOpt }; store.set('aq.cust', JSON.stringify(cust));
@@ -2993,7 +3029,9 @@ const REVIEWS = [];
     if (box) { box.innerHTML = bits.join(''); box.hidden = bits.length < 2 && !orderReadonly; }
     const s = kitchenStep(ov.status), sent = ov.status === 'sent', canc = ov.status === 'cancelled';
     $('#otrack').hidden = canc;
-    $$('#otrack li').forEach((li, i) => {
+    const steps = $$('#otrack li');
+    if (steps[2]) steps[2].textContent = ov.status === 'on_the_way' ? tr('st.on_the_way') : tr('st.ready');
+    steps.forEach((li, i) => {
       li.classList.toggle('done', i < s);
       li.classList.toggle('now', i === s);
       li.setAttribute('aria-current', i === s ? 'step' : 'false');
@@ -3047,9 +3085,10 @@ const REVIEWS = [];
   $('#orderGot')?.addEventListener('click', async () => {
     if (!ov) return;
     ov.client_ok = true;
+    ov.received_ok = true;
     settleLocalDelivery(ov);
     saveHist();
-    if (window.AquaBus) AquaBus.patchOrder(ov.id || ov.code, { client_ok: 1, status: ov.status });
+    if (window.AquaBus) AquaBus.patchOrder(ov.id || ov.code, { client_ok: 1, received_ok: true, status: ov.status });
     try { if (window.AquaOS && AquaOS.confirmDelivery) await AquaOS.confirmDelivery(ov); } catch (e) { /* local */ }
     orderReadonly = ov.status === 'delivered' || ov.status === 'cancelled';
     paintOrderView(); renderHist(); updateFabs();
@@ -3365,11 +3404,18 @@ const REVIEWS = [];
     const live = history.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered');
     return live.length ? live[live.length - 1] : null;
   }
+  function fabStatusTxt(o) {
+    if (!o) return tr('fab.my');
+    const st = tr('st.' + o.status);
+    const pay = o.pay === 'paid' ? '' : (o.pay === 'paid_declared' ? ' · ' + tr('pay.paid_declared') : '');
+    return st + pay;
+  }
   function updateFabs() {
     const fc = $('#fabCart'), n = cartCount(), od = owedTotal(), liveO = latestLiveOrder();
     fc.hidden = !(n || history.length);
-    $('#fabCartTxt').textContent = n ? tr('fab.cartN', { n, m: money(grandTotal()) }) : liveO ? (tr('st.' + liveO.status) + (od ? ' · ' + tr('fab.bill', { m: money(od) }) : '')) : od ? tr('fab.bill', { m: money(od) }) : tr('fab.my');
+    $('#fabCartTxt').textContent = n ? tr('fab.cartN', { n, m: money(grandTotal()) }) : liveO ? fabStatusTxt(liveO) : od ? tr('fab.bill', { m: money(od) }) : tr('fab.my');
     fc.classList.toggle('owe', !n && od > 0);
+    fc.classList.toggle('live', !n && !!liveO);
     const f = $('#fabCall'), txt = $('#fabCallTxt');
     f.classList.toggle('pending', Boolean(call && (call.status === 'pending' || call.status === 'sent'))); f.classList.toggle('accepted', Boolean(call && call.status === 'accepted'));
     txt.textContent = !call ? tr('fab.call') : call.status === 'pending' ? tr('fab.wait') : call.status === 'sent' ? tr('fab.sent') : call.status === 'accepted' ? tr('fab.coming', { n: call.by || tr('nav.staff') }) : tr('fab.call');
@@ -3694,7 +3740,7 @@ const REVIEWS = [];
 })();
 </script>
 <script src="os-config.js?v=ops3"></script>
-<script src="garcom.js?v=ops3"></script>
-<script src="os-bridge.js?v=ops3"></script>
+<script src="garcom.js?v=ops6"></script>
+<script src="os-bridge.js?v=ops6"></script>
 </body>
 </html>

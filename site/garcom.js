@@ -522,7 +522,7 @@
       S.osMsg = '';
       if (!S.osPoll) S.osPoll = setInterval(() => {
         if (staffLogged()) loadOsDesk().then(() => { if (S.open && S.view === 'app' && (S.tab === 'orders' || S.tab === 'team')) renderTab(); }).catch(() => {});
-      }, 4000);
+      }, 2000);
     } catch (e) {
       if (window.AquaBus) {
         const d = AquaBus.read();
@@ -912,17 +912,46 @@
   function itemsHtml(o) {
     const rows = o.items || o.lines || [];
     if (!rows.length) return '<p class="gc-note">Sem linhas neste pedido.</p>';
+    const fee = Number(o.delivery_fee || o.deliveryFee || 0);
     return '<ul class="gc-items">' + rows.map((i) => {
       const qty = i.qty || i.quantity || 1;
       const name = i.name || i.item_id || 'Item';
       const extra = lineBits(i);
       const price = i.line_total != null ? i.line_total : (i.unit_price || i.unitPriceMzn || 0) * qty;
       return '<li><b>' + esc(qty) + '× ' + esc(name) + '</b>' + (extra ? '<small>' + esc(extra) + '</small>' : '') + '<span>' + mt(price) + '</span></li>';
-    }).join('') + '</ul>';
+    }).join('') +
+      (fee ? '<li><b>Entrega</b><span>' + mt(fee) + '</span></li>' : '') +
+      '<li class="tot"><b>Total</b><span>' + mt(o.total) + '</span></li></ul>';
   }
   function orderPlace(o) {
     return o.place_label || o.placeLabel || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || o.address || '');
   }
+  function isPaid(o) { return payStatusOf(o) === 'paid'; }
+  function isGot(o) { return !!(o.received_ok || (o.driver_ok && o.client_ok)); }
+  function isDelivery(o) {
+    return o.take === 'delivery' || /delivery/i.test(String(orderPlace(o) || ''));
+  }
+  function phoneKey(o) {
+    let d = String(o.customer_phone || (o.customer && o.customer.phone) || o.phone || '').replace(/\D/g, '');
+    if (d.startsWith('00')) d = d.slice(2);
+    if (d.length > 9) d = d.slice(-9);
+    return d || ('code:' + String(o.id || o.code || ''));
+  }
+  function pedidoNo(o) { return Number(o.nPedido || o.nConta || 0) || 0; }
+  function assignPedidoNumbers(orders) {
+    const groups = {};
+    (orders || []).filter((o) => o && o.status !== 'cancelled').slice().sort((a, b) => {
+      const ta = Date.parse(a.created_at || a.ts || 0) || Number(a.ts) || 0;
+      const tb = Date.parse(b.created_at || b.ts || 0) || Number(b.ts) || 0;
+      return ta - tb || String(a.code || '').localeCompare(String(b.code || ''));
+    }).forEach((o) => {
+      const k = phoneKey(o);
+      groups[k] = (groups[k] || 0) + 1;
+      o.nPedido = groups[k];
+      o.nConta = groups[k];
+    });
+  }
+  function kv(k, v) { return v ? '<div class="gc-kv"><span>' + esc(k) + '</span><b>' + v + '</b></div>' : ''; }
   function cardO(o) {
     const mth = payMethodOf(o);
     const pst = payStatusOf(o);
@@ -932,45 +961,85 @@
     const admin = S.me && S.me.role === 'admin';
     const xfer = pst === 'declared' || pst === 'paid_declared';
     const posDue = mth === 'pos' && pst !== 'paid' && o.status !== 'cancelled';
-    const bill = o.nConta ? ('Conta ' + o.nConta) : '';
-    return '<article class="gc' + (xfer || posDue ? ' u1' : '') + '"><div class="gc-top"><span class="gc-table">' + esc(bill || o.code) + '</span><span class="gc-zone">' + esc(orderPlace(o)) + (bill && o.code ? ' · ' + esc(o.code) : '') + '</span></div>' +
-      '<div class="gc-reason"><b>' + esc(o.customer_name || (o.customer && o.customer.name) || 'Cliente') + '</b>' +
-      (phone ? ' · <a href="tel:+' + esc(String(phone).replace(/\D/g, '')) + '">' + esc(phone) + '</a>' : '') +
-      (o.waGroupOpt ? ' · <b>Grupo WA</b>' : '') +
-      (maps ? ' · <a href="' + esc(maps) + '" target="_blank" rel="noopener">Maps</a>' : '') + '</div>' +
+    const n = pedidoNo(o);
+    const title = n ? ('Pedido ' + n) : (o.code || 'Pedido');
+    const whenTxt = o.created_at || o.ts ? hhmm(ts(o.created_at) || Number(o.ts) || Date.now()) : '';
+    const kind = o.fulfillment === 'dine_in' ? 'No local' : (isDelivery(o) ? 'Delivery' : (o.take === 'pickup' ? 'Para levar · busca' : (o.fulfillment || '')));
+    const got = isGot(o), paid = isPaid(o);
+    const done = o.status === 'delivered' && paid;
+    const cls = done ? ' done' : (xfer || posDue ? ' u1' : '');
+    const acts = [];
+    if (!done && o.status !== 'cancelled') {
+      if (xfer) acts.push('<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="paid">Confirmar pagamento</button>');
+      if (posDue) acts.push('<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="pospaid">POS cobrado → Pago</button>');
+      if (admin && pst !== 'paid' && !posDue && !xfer) acts.push('<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="markpaid">Confirmar pago</button>');
+      if (!['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) acts.push('<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="preparing">A preparar</button>');
+      if (!['ready', 'on_the_way', 'delivered'].includes(o.status)) acts.push('<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="ready">Pedido pronto</button>');
+      if (isDelivery(o) && (o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok && !got) acts.push('<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="driver">Saiu para entrega</button>');
+      if (!got) acts.push('<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="receive">Marcar entregue</button>');
+    }
+    return '<article class="gc' + cls + '"><div class="gc-top"><span class="gc-table">' + esc(title) + '</span>' +
+      '<span class="gc-zone">' + esc(kind || orderPlace(o) || 'Pedido') + '</span></div>' +
+      '<div class="gc-chips">' +
+      '<span class="gp-chip">' + esc(ST_OS[o.status] || o.status) + '</span>' +
+      '<span class="gp-chip ' + (paid ? 'ok' : (xfer ? 'wait' : '')) + '">' + esc(payLabel(o)) + '</span>' +
+      (got && !paid ? '<span class="gp-chip wait">Recebido · falta pagamento</span>' : '') +
+      (done ? '<span class="gp-chip ok">Entregue e pago</span>' : '') +
+      '</div>' +
+      '<div class="gc-meta">' +
+      kv('Código', esc(o.code || '—') + (whenTxt ? ' · ' + esc(whenTxt) : '')) +
+      kv('Cliente', esc(o.customer_name || (o.customer && o.customer.name) || 'Cliente')) +
+      kv('Telemóvel', phone ? '<a href="tel:+' + esc(String(phone).replace(/\D/g, '')) + '">' + esc(phone) + '</a>' : '') +
+      kv('Local', esc(orderPlace(o))) +
+      kv('Morada', esc(o.address || o.bairro || '')) +
+      kv('GPS', (o.lat && o.lng) ? (Number(o.lat).toFixed(5) + ', ' + Number(o.lng).toFixed(5) + (maps ? ' · <a href="' + esc(maps) + '" target="_blank" rel="noopener">Maps</a>' : '')) : (maps ? '<a href="' + esc(maps) + '" target="_blank" rel="noopener">Maps</a>' : '')) +
+      kv('WhatsApp', o.waGroupOpt ? 'Quer grupo WA' : '') +
+      kv('Pagamento', esc(payLine || payLabel(o)) + (o.payment_ref || o.ref ? ' · SMS ' + esc(o.payment_ref || o.ref) : '')) +
+      kv('Notas', esc(o.note || '')) +
+      '</div>' +
       itemsHtml(o) +
-      '<p class="gc-note"><b>' + mt(o.total) + '</b> · ' + esc(ST_OS[o.status] || o.status) + ' · ' + esc(payLabel(o)) +
-      (payLine ? '<br>' + esc(payLine) + (o.payment_ref ? ' · SMS ' + esc(o.payment_ref) : '') : '') +
-      (o.note ? '<br>' + esc(o.note) : '') + '</p>' +
-      '<div class="gc-actions">' +
-      (xfer ? '<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="paid">Confirmar transferência → A preparar</button>' : '') +
-      (posDue ? '<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="pospaid">POS cobrado no local → Pago</button>' : '') +
-      (o.status !== 'preparing' && o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' && o.status !== 'cancelled' ? '<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="preparing">A preparar</button>' : '') +
-      (o.status !== 'ready' && o.status !== 'on_the_way' && o.status !== 'delivered' && o.status !== 'cancelled' ? '<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="ready">Pedido pronto</button>' : '') +
-      ((o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok ? '<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="driver">Saiu para entrega</button>' : '') +
-      (o.driver_ok && !o.client_ok && o.status !== 'delivered' ? '<span class="gp-muted">À espera da confirmação do cliente</span>' : '') +
-      (admin && pst !== 'paid' && o.status !== 'cancelled' && !posDue && !xfer ? '<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="markpaid">Marcar pago</button>' : '') +
-      '</div></article>';
+      (acts.length ? '<div class="gc-actions">' + acts.join('') + '</div>' : (done ? '<p class="gp-muted" style="margin:0">Pedido cumprido: pago e recebido.</p>' : '')) +
+      '</article>';
   }
   function tabOrders() {
     const orders = (S.osDesk && S.osDesk.orders) || [];
-    const wait = orders.filter((o) => { const s = payStatusOf(o); return s === 'declared' || s === 'paid_declared'; });
-    const posDue = orders.filter((o) => payMethodOf(o) === 'pos' && payStatusOf(o) !== 'paid' && o.status !== 'cancelled');
-    const live = orders.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered');
-    const review = orders.filter((o) => o.status === 'review' || o.status === 'received' || o.status === 'no_confirm');
-    const prep = orders.filter((o) => o.status === 'preparing');
-    const ready = orders.filter((o) => o.status === 'ready' || o.status === 'on_the_way');
-    return '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + wait.length + '</b><span>Transferências a confirmar</span></div>' +
-      '<div class="gp-kpi hot"><b>' + posDue.length + '</b><span>POS por cobrar</span></div>' +
-      '<div class="gp-kpi"><b>' + live.length + '</b><span>Pedidos ativos</span></div></div>' +
-      (wait.length ? '<div class="gp-sec"><span>M-Pesa / e-Mola a confirmar</span><span class="n">' + wait.length + '</span></div><div class="gp-list">' + wait.map(cardO).join('') + '</div>' : '') +
-      (posDue.length ? '<div class="gp-sec"><span>POS no local — por pagar</span><span class="n">' + posDue.length + '</span></div><div class="gp-list">' + posDue.map(cardO).join('') + '</div>' : '') +
-      '<div class="gp-sec"><span>Em análise</span><span class="n">' + review.length + '</span></div>' +
-      (review.length ? '<div class="gp-list">' + review.map(cardO).join('') + '</div>' : '<div class="gp-card gp-empty">' + ic('list') + '<b>Nada em análise</b>Quando o cliente envia o pedido, aparece aqui com extras, ponto e notas.</div>') +
-      (prep.length ? '<div class="gp-sec"><span>Em preparação</span><span class="n">' + prep.length + '</span></div><div class="gp-list">' + prep.map(cardO).join('') + '</div>' : '') +
-      (ready.length ? '<div class="gp-sec"><span>Prontos / a caminho</span><span class="n">' + ready.length + '</span></div><div class="gp-list">' + ready.map(cardO).join('') + '</div>' : '') +
-      '<div class="gp-sec"><span>Todos os pedidos</span><span class="n">' + orders.length + '</span></div>' +
-      (orders.length ? '<div class="gp-list">' + orders.map(cardO).join('') + '</div>' : '');
+    assignPedidoNumbers(orders);
+    const seen = new Set();
+    const take = (pred) => orders.filter((o) => { if (seen.has(o.id) || o.status === 'cancelled') return false; if (!pred(o)) return false; seen.add(o.id); return true; });
+    const wait = take((o) => { const s = payStatusOf(o); return s === 'declared' || s === 'paid_declared'; });
+    const posDue = take((o) => payMethodOf(o) === 'pos' && !isPaid(o));
+    const waitPay = take((o) => isGot(o) && !isPaid(o) && o.status !== 'delivered');
+    const review = take((o) => o.status === 'review' || o.status === 'received' || o.status === 'no_confirm');
+    const prep = take((o) => o.status === 'preparing');
+    const ready = take((o) => o.status === 'ready' || o.status === 'on_the_way');
+    const done = take((o) => o.status === 'delivered' && isPaid(o));
+    const liveN = orders.filter((o) => o.status !== 'cancelled' && !(o.status === 'delivered' && isPaid(o))).length;
+    const paidN = orders.filter((o) => o.status !== 'cancelled' && isPaid(o)).length;
+    const doneN = orders.filter((o) => o.status === 'delivered' && isPaid(o)).length;
+    const t0 = startOfDay(Date.now());
+    const cmap = new Map();
+    [].concat(S.calls || [], S.liveCalls || [], (S.osDesk && S.osDesk.calls) || []).forEach((c) => {
+      if (!c) return;
+      const id = String(c.id || '');
+      const st = c.status === 'closed' ? 'completed' : c.status;
+      cmap.set(id, Object.assign({}, c, { status: st, createdAt: c.createdAt || c.created_at, completedAt: c.completedAt || c.closed_at }));
+    });
+    const attended = Array.from(cmap.values()).filter((c) => (c.status === 'completed' || c.status === 'accepted') && (ts(c.completedAt) >= t0 || ts(c.createdAt) >= t0 || ts(c.acceptedAt || c.accepted_at) >= t0)).length;
+    const block = (title, list, empty) => '<div class="gp-sec"><span>' + title + '</span><span class="n">' + list.length + '</span></div>' +
+      (list.length ? '<div class="gp-list">' + list.map(cardO).join('') + '</div>' : (empty || ''));
+    return '<div class="gp-kpis"><div class="gp-kpi"><b>' + attended + '</b><span>Chamados atendidos</span></div>' +
+      '<div class="gp-kpi"><b>' + doneN + '</b><span>Pedidos concluídos</span></div>' +
+      '<div class="gp-kpi"><b>' + paidN + '</b><span>Pagos</span></div>' +
+      '<div class="gp-kpi hot"><b>' + done.length + '</b><span>Entregues</span></div>' +
+      '<div class="gp-kpi hot"><b>' + wait.length + '</b><span>Pagamentos a confirmar</span></div>' +
+      '<div class="gp-kpi"><b>' + liveN + '</b><span>Pedidos ativos</span></div></div>' +
+      (wait.length ? block('M-Pesa / e-Mola a confirmar', wait) : '') +
+      (posDue.length ? block('POS no local — por pagar', posDue) : '') +
+      (waitPay.length ? block('Recebidos · falta confirmar pagamento', waitPay) : '') +
+      block('Em análise', review, '<div class="gp-card gp-empty">' + ic('list') + '<b>Nada em análise</b>Quando o cliente envia o pedido, aparece aqui com extras, ponto e notas.</div>') +
+      (prep.length ? block('Em preparação', prep) : '') +
+      (ready.length ? block('Prontos / a caminho', ready) : '') +
+      (done.length ? block('Entregues (pago e recebido)', done) : '');
   }
 
   /* ====================================================================== TAB: CHAMADOS */
@@ -1106,12 +1175,12 @@
       (g[k] = g[k] || []).push(o);
     });
     const keys = Object.keys(g);
-    if (!keys.length) return '<div class="gp-sec"><span>Contas por mesa</span><span class="n">0</span></div><div class="gp-card gp-empty">' + ic('card') + '<b>Nenhuma conta em aberto</b></div>';
-    return '<div class="gp-sec"><span>Contas por mesa</span><span class="n">' + keys.length + '</span></div><div class="gp-list">' + keys.map((k) => {
+    if (!keys.length) return '<div class="gp-sec"><span>Pedidos em aberto por mesa</span><span class="n">0</span></div><div class="gp-card gp-empty">' + ic('card') + '<b>Nenhum pedido em aberto</b></div>';
+    return '<div class="gp-sec"><span>Pedidos em aberto por mesa</span><span class="n">' + keys.length + '</span></div><div class="gp-list">' + keys.map((k) => {
       const list = g[k], tot = list.reduce((s, o) => s + Number(o.total || 0), 0);
       return '<article class="gc"><div class="gc-top"><span class="gc-table">' + esc(k) + '</span><span class="gc-zone">' + mt(tot) + '</span></div>' +
-        list.map((o) => '<p class="gc-note"><b>' + esc(o.code) + '</b> · ' + esc(o.customer_name || '') + ' · ' + mt(o.total) + ' · ' + esc(ST_OS[o.status] || o.status) + '</p>').join('') +
-        '<div class="gc-actions"><button class="gb ok sm" type="button" data-act="closetable" data-k="' + esc(k) + '">Fechar conta (pago)</button></div></article>';
+        list.map((o) => '<p class="gc-note"><b>' + esc(pedidoNo(o) ? ('Pedido ' + pedidoNo(o)) : o.code) + '</b> · ' + esc(o.customer_name || '') + ' · ' + mt(o.total) + ' · ' + esc(ST_OS[o.status] || o.status) + '</p>').join('') +
+        '<div class="gc-actions"><button class="gb ok sm" type="button" data-act="closetable" data-k="' + esc(k) + '">Marcar pagos nesta mesa</button></div></article>';
     }).join('') + '</div>';
   }
 
@@ -1163,16 +1232,30 @@
         const body = { payment_status: 'paid' };
         await patchDeskOrder(o.id, body);
       }
-      toast('Conta fechada como paga.', 'check', 'ok'); await loadOsDesk(); renderTab(); return;
+      toast('Pedidos desta mesa marcados como pagos.', 'check', 'ok'); await loadOsDesk(); renderTab(); return;
     }
     if (a === 'osord') {
       const doWhat = b.dataset.do, id = b.dataset.id;
-      const body = doWhat === 'paid' ? { payment_status: 'paid', status: 'preparing' } : doWhat === 'pospaid' ? { payment_status: 'paid', payment_method: 'pos' } : doWhat === 'markpaid' ? { payment_status: 'paid' } : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' } : { status: doWhat };
+      const body = doWhat === 'paid' ? { payment_status: 'paid' }
+        : doWhat === 'pospaid' ? { payment_status: 'paid', payment_method: 'pos' }
+        : doWhat === 'markpaid' ? { payment_status: 'paid' }
+        : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' }
+        : doWhat === 'receive' ? { received_ok: true, client_ok: true, driver_ok: true }
+        : { status: doWhat };
       b.disabled = true;
       const r = await patchDeskOrder(id, body);
       b.disabled = false;
       if (r) {
-        toast(doWhat === 'paid' ? 'Transferência confirmada — pedido em preparação.' : doWhat === 'pospaid' ? 'POS cobrado — este pedido está Pago.' : doWhat === 'markpaid' ? 'Pedido marcado como pago.' : doWhat === 'driver' ? 'Motorista confirmou a saída. A espera do cliente.' : doWhat === 'ready' ? 'Pedido marcado como pronto.' : 'Pedido em preparação.', 'check', 'ok');
+        const paidNow = (r.payment_status === 'paid' || r.pay === 'paid');
+        const gotNow = !!(r.received_ok || (r.driver_ok && r.client_ok));
+        const msg = r.status === 'delivered' && paidNow ? 'Pedido entregue — pago e recebido.'
+          : doWhat === 'receive' && !paidNow ? 'Recebido pelo cliente. Falta confirmar o pagamento.'
+          : (doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid') && gotNow ? 'Pagamento confirmado — pedido entregue.'
+          : doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid' ? 'Pagamento confirmado.'
+          : doWhat === 'driver' ? 'Saiu para entrega.'
+          : doWhat === 'ready' ? 'Pedido marcado como pronto.'
+          : 'Pedido em preparação.';
+        toast(msg, 'check', 'ok');
         await loadOsDesk();
         renderTab();
       } else toast('Não foi possível atualizar este pedido.', 'alert', 'err');

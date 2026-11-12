@@ -148,8 +148,16 @@
         if (patch.payment_status === 'paid') o.pay = 'paid';
         if (patch.payment_status === 'declared') o.pay = 'paid_declared';
         if (patch.payment_status === 'unpaid') o.pay = 'unpaid';
-        if (o.driver_ok && o.client_ok) o.status = 'delivered';
-        else if ((o.driver_ok || o.client_ok) && (o.status === 'ready' || o.status === 'preparing' || o.status === 'review' || o.status === 'received')) o.status = 'on_the_way';
+        if (patch.received_ok) { o.received_ok = true; o.client_ok = true; o.driver_ok = true; }
+        const paid = o.payment_status === 'paid' || o.pay === 'paid';
+        const got = !!(o.received_ok || (o.driver_ok && o.client_ok));
+        if (got && paid) o.status = 'delivered';
+        else if (got && o.status !== 'cancelled' && o.status !== 'delivered') {
+          const deliv = o.take === 'delivery' || /delivery/i.test(String(o.place_label || o.placeLabel || ''));
+          o.status = deliv ? 'on_the_way' : (o.status === 'preparing' || o.status === 'review' || o.status === 'received' ? 'ready' : o.status);
+        } else if (paid && ['review', 'received', 'no_confirm'].includes(o.status)) {
+          o.status = 'preparing';
+        }
       }
       writeBus(d); return o;
     }
@@ -229,8 +237,9 @@
         name: o.name || '',
         phone: o.phone || '',
         waGroupOpt: !!o.waGroupOpt,
-        nConta: o.nConta || 0,
-        note: [o.nConta ? ('Conta ' + o.nConta) : '', o.note, o.bairro, o.waGroupOpt ? 'Grupo WA: sim' : '', o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
+        nConta: o.nConta || o.nPedido || 0,
+        nPedido: o.nPedido || o.nConta || 0,
+        note: [o.nPedido || o.nConta ? ('Pedido ' + (o.nPedido || o.nConta)) : '', o.note, o.bairro, o.waGroupOpt ? 'Grupo WA: sim' : '', o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
         lines: (o.lines || []).map((l) => ({
           itemId: l.itemId || l.menuItemId,
           qty: l.qty || l.quantity,
