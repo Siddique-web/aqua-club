@@ -378,7 +378,8 @@
   async function osFetch(path, opts = {}) {
     const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
     if (S.osStaff) headers.Authorization = 'Bearer ' + S.osStaff;
-    const res = await fetch('/api' + path, { credentials: 'include', method: opts.method || 'GET', headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    const root = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
+    const res = await fetch(root + '/api' + path, { credentials: 'include', method: opts.method || 'GET', headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw Object.assign(new Error(data.error || 'fail'), { status: res.status, code: data.error });
     return data;
@@ -434,8 +435,22 @@
   }
 
   /* ====================================================================== BARRA INFERIOR */
+  function staffChrome() {
+    try {
+      const q = new URLSearchParams(location.search);
+      if (q.get('equipa') === '1' || q.get('staff') === '1') return true;
+      if (/^#garcom/.test(location.hash || '')) return true;
+      if (store.get('aq.os.staff')) return true;
+    } catch (e) { /* */ }
+    return false;
+  }
+  function showStaffBar(on) {
+    document.documentElement.classList.toggle('staff-chrome', !!on);
+    if (pn) pn.hidden = !on;
+  }
   function buildNav() {
-    pn = document.createElement('nav'); pn.className = 'pn'; pn.id = 'pn'; pn.setAttribute('aria-label', 'Navegação rápida');
+    pn = document.createElement('nav'); pn.className = 'pn'; pn.id = 'pn'; pn.setAttribute('aria-label', 'Navegação da equipa'); pn.hidden = !staffChrome();
+    showStaffBar(staffChrome());
     pn.innerHTML = [['home', 'Início', 'home'], ['garcom', 'Garçom', 'user'], ['stats', 'Estatísticas', 'chart'], ['theme', 'Tema', 'moon']].map((x) =>
       '<button type="button" data-k="' + x[0] + '" aria-label="' + x[1] + '" title="' + x[1] + '">' + ic(x[2]) + '<span class="lbl">' + x[1] + '</span>' + (x[0] === 'garcom' ? '<span class="bd" id="pnBd" hidden>0</span>' : '') + '</button>').join('');
     document.body.appendChild(pn);
@@ -476,13 +491,13 @@
   function setInert(on) { Array.from(document.body.children).forEach((el) => { if (el === root || el === pn || el === toasts || /^(SCRIPT|STYLE|LINK|DIALOG)$/.test(el.tagName)) return; if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert'); }); }
   async function openPortal(tab) {
     build(); S.tab = tab || 'orders'; S.open = true; root.hidden = false;
-    document.documentElement.classList.add('gp-open'); setInert(true); syncNav();
+    document.documentElement.classList.add('gp-open'); showStaffBar(true); setInert(true); syncNav();
     await boot();
     const f = $('.gp-x', root); if (f && S.view !== 'auth') f.focus({ preventScroll: true });
   }
   function closePortal() {
     if (!S.open) return; S.open = false; if (root) root.hidden = true;
-    document.documentElement.classList.remove('gp-open'); setInert(false); syncNav();
+    document.documentElement.classList.remove('gp-open'); showStaffBar(staffChrome()); setInert(false); syncNav();
     if (/^#garcom/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* */ } }
   }
 

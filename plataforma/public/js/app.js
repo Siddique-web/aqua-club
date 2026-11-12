@@ -833,6 +833,7 @@ function drawCat(rows) {
 function connectSocket() {
   if (!window.io) return;
   state.socket = window.io({ transports: ['websocket', 'polling'] });
+  state.socket.emit('join', 'ops');
   state.socket.on('order:new', () => { if (state.view==='admin') loadAdmin(); if (state.view==='staff' && state.staff) loadStaff(); });
   state.socket.on('order:updated', () => { if (state.view==='admin') loadAdmin(); if (state.view==='staff' && state.staff) loadStaff(); if (state.view==='conta') loadMine(); });
   state.socket.on('call:new', (c) => { toast(`${tr('callWaiter')} ${tr('table')} ${c.table_number}`); if (state.view==='admin') loadAdmin(); if (state.view==='staff') loadStaff(); });

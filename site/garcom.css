@@ -5,8 +5,9 @@
 
 /* ---------- espaço para a barra inferior ---------- */
 .footer { padding-bottom: 0; }
-.fabs { bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px)) !important; }
+html.staff-chrome .fabs { bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px)) !important; }
 html:has(dialog[open]) .pn, html.dlg-open .pn { visibility: hidden !important; pointer-events: none !important; }
+.pn[hidden] { display: none !important; }
 html.gp-open, html.gp-open body { overflow: hidden; }
 
 /* ---------- BARRA INFERIOR (pílula) ---------- */

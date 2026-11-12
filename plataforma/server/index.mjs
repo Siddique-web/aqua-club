@@ -66,7 +66,8 @@ let orderSeq = Number(db.prepare('SELECT COUNT(*) AS c FROM orders').get().c);
 
 function pad(n) { return String(n).padStart(4, '0'); }
 function nextOrderCode() {
-  orderSeq += 1;
+  const row = db.prepare('SELECT COALESCE(MAX(id), 0) AS m FROM orders').get();
+  orderSeq = Math.max(orderSeq, Number(row && row.m) || 0) + 1;
   return 'AQ-' + pad(orderSeq);
 }
 function paidCode(openCode) {

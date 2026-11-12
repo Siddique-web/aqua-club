@@ -34,15 +34,89 @@
   let lang = localStorage.getItem('aqua_lang') || 'pt';
   let catalog = null;
   let live = false;
+  let origin = '';
+  let sock = null;
+  let sockUp = false;
 
   function apiOrigin() {
     try {
       const q = new URLSearchParams(location.search).get('api');
+      if (q) {
+        localStorage.setItem('aqua_api', q);
+        return String(q).replace(/\/$/, '');
+      }
       const stored = localStorage.getItem('aqua_api');
-      return String(q || stored || '').replace(/\/$/, '');
-    } catch (e) { return ''; }
+      if (stored) return String(stored).replace(/\/$/, '');
+      const cfg = String(window.AQUA_API || '').replace(/\/$/, '');
+      if (cfg) return cfg;
+    } catch (e) { /* */ }
+    return '';
   }
-  function apiUrl(path) { return apiOrigin() + '/api' + path; }
+  function apiUrl(path) { return origin + '/api' + path; }
+
+  async function probeOrigin(base) {
+    const root = String(base || '').replace(/\/$/, '');
+    const url = root + '/api/health';
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 2500);
+    try {
+      const res = await fetch(url, { credentials: 'include', signal: ctrl.signal });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data && data.ok) return root;
+    } catch (e) { /* */ }
+    finally { clearTimeout(t); }
+    return '';
+  }
+
+  async function resolveOrigin() {
+    const preferred = apiOrigin();
+    if (preferred) {
+      const ok = await probeOrigin(preferred);
+      if (ok) return ok;
+    }
+    const same = await probeOrigin(location.origin);
+    if (same) return same;
+    return '';
+  }
+
+  function loadIo(cb) {
+    if (window.io) { cb(window.io); return; }
+    if (!origin) { cb(null); return; }
+    const s = document.createElement('script');
+    s.src = origin + '/socket.io/socket.io.js';
+    s.async = true;
+    s.onload = () => cb(window.io || null);
+    s.onerror = () => cb(null);
+    document.head.appendChild(s);
+  }
+
+  function connectSock(handlers) {
+    loadIo((io) => {
+      if (!io || sock) {
+        if (sock && handlers) bindSock(handlers);
+        return;
+      }
+      try {
+        sock = io(origin || undefined, { transports: ['websocket', 'polling'], withCredentials: true });
+        sock.on('connect', () => { sockUp = true; });
+        sock.on('disconnect', () => { sockUp = false; });
+        bindSock(handlers || {});
+      } catch (e) { sock = null; sockUp = false; }
+    });
+  }
+
+  function bindSock(handlers) {
+    if (!sock) return;
+    sock.off('order:updated'); sock.off('order:new'); sock.off('call:updated'); sock.off('call:new');
+    if (handlers.onOrder) {
+      sock.on('order:updated', handlers.onOrder);
+      sock.on('order:new', handlers.onOrder);
+    }
+    if (handlers.onCall) {
+      sock.on('call:updated', handlers.onCall);
+      sock.on('call:new', handlers.onCall);
+    }
+  }
 
   const BUS_KEY = 'aq.os.bus';
   function readBus() {
@@ -109,12 +183,29 @@
     const cats = [
       ['rapidos', { pt: 'Pratos rápidos', en: 'Quick dishes', es: 'Platos rápidos', fr: 'Plats rapides', zh: '快手菜' }[lang] || 'Pratos rápidos'],
       ['todos', { pt: 'Todos', en: 'All', es: 'Todo', fr: 'Tout', zh: '全部' }[lang] || 'Todos']
-    ].concat((catalog.categories || []).filter((c) => c.id !== 'rapidos').map((c) => [c.id, loc(c, lang)]));
+    ];
+    const seen = new Set(['rapidos', 'todos']);
+    (catalog.categories || []).forEach((c) => {
+      if (!c || !c.id || seen.has(c.id)) return;
+      seen.add(c.id);
+      cats.push([c.id, loc(c, lang) || c.id]);
+    });
+    (catalog.menu || []).forEach((m) => {
+      if (!m || !m.cat || seen.has(m.cat)) return;
+      seen.add(m.cat);
+      cats.push([m.cat, m.cat]);
+    });
     AquaUI.rebuildCats(cats);
   }
 
   window.AquaOS = {
     live: () => live,
+    origin: () => origin,
+    socketUp: () => sockUp,
+    connectLive(handlers) { connectSock(handlers || {}); },
+    joinOrder(code) {
+      if (sock && code) try { sock.emit('join', 'order:' + code); } catch (e) { /* */ }
+    },
     async canOrder() { return live; },
     async placeOrder(o) {
       const dine = o.fulfillment !== 'takeaway';
@@ -231,6 +322,7 @@
 
   async function boot() {
     applyLangButtons();
+    origin = await resolveOrigin();
     try {
       catalog = await loadCatalog();
       if (catalog.club) {
@@ -261,6 +353,7 @@
           desc: loc(m.desc, lang) || '',
           price: m.price,
           img: photoFor(m),
+          available: m.available !== false,
           quick: !!m.quick,
           doneness: !!m.doneness,
           extras: m.extras || [],
@@ -272,6 +365,7 @@
       paintMenuLang();
       AquaUI.fillTables();
       if (AquaUI.rebuildWall) AquaUI.rebuildWall();
+      if (live) connectSock({});
       if (AquaUI.liveOrders) AquaUI.liveOrders();
     } catch (e) { console.warn('Catálogo em linha indisponível; menu local.', e); }
   }
