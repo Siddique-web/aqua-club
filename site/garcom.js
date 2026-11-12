@@ -354,9 +354,37 @@
     const pub = (s) => { const o = Object.assign({}, s); delete o.pin; return o; };
     const api = {
       mode: 'desk', onRecovery: null,
-      createCall: async () => { throw new Error('Use o botão do cliente para chamar.'); },
-      callStatus: async () => null,
-      cancelCall: async () => false,
+      async createCall(table, reason, note, device) {
+        const n = parseInt(String(table).replace(/\D/g, ''), 10);
+        const mapped = { request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente', waiter: 'urgente' }[reason] || reason || 'urgente';
+        const id = 'c' + Date.now();
+        if (window.AquaBus) {
+          AquaBus.pushCall({
+            id,
+            table_number: Number.isFinite(n) && n > 0 ? n : 0,
+            place: table || '',
+            reason: mapped,
+            note: String(note || '').slice(0, 140),
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            device_id: device || null
+          });
+        }
+        ping();
+        return id;
+      },
+      async callStatus(id) {
+        const key = String(id).replace(/^os-/, '');
+        const c = (((window.AquaBus && AquaBus.read()) || {}).calls || []).find((x) => String(x.id) === key || String(x.serverId) === key);
+        if (!c) return null;
+        return { status: c.status === 'closed' ? 'completed' : c.status, by: c.waiterName || '', createdAt: c.created_at, acceptedAt: c.accepted_at };
+      },
+      async cancelCall(id) {
+        const key = String(id).replace(/^os-/, '');
+        if (window.AquaBus) AquaBus.patchCall(key, { status: 'cancelled', closed_at: new Date().toISOString() });
+        ping();
+        return true;
+      },
       rateCall: async () => false,
       hasStoredSession: () => !!readMe() || !!store.get('aq.os.staff'),
       async session() { const m = readMe(); return m ? { id: m.user_id, email: m.email || '' } : null; },
@@ -421,7 +449,22 @@
         if (window.AquaBus) AquaBus.patchCall(osId, { status: 'pending', accepted_at: null, waiterName: '', waiter_id: null });
         ping(); return true;
       },
-      async team() { const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.'); return readRoster().map(pub); },
+      async team() { const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.'); return readRoster(); },
+      async inviteStaff({ name, pin, phone }) {
+        const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.');
+        const n = String(name || '').trim().slice(0, 60);
+        if (n.length < 2) throw new Error('Indique o nome do garçom.');
+        const p = String(pin || '').trim();
+        if (p.length < 4) throw new Error('O PIN precisa de pelo menos 4 dígitos.');
+        const d = readRoster();
+        if (d.some((s) => String(s.pin) === p)) throw new Error('Este PIN já está em uso.');
+        const id = 'w-' + Date.now().toString(36);
+        d.splice(Math.max(0, d.length - 1), 0, {
+          id, user_id: id, name: n, email: '', phone: String(phone || '').trim().slice(0, 20),
+          role: 'waiter', active: true, color: COLORS[d.length % COLORS.length], pin: p, created_at: iso(Date.now())
+        });
+        writeRoster(d); ping(); return true;
+      },
       async setStaff(id, active, role) {
         const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.');
         const d = readRoster(); const t = d.find((s) => s.id === id); if (!t) return false;
@@ -521,7 +564,7 @@
       S.osDesk = await osFetch('/desk/board');
       S.osMsg = '';
       if (!S.osPoll) S.osPoll = setInterval(() => {
-        if (staffLogged()) loadOsDesk().then(() => { if (S.open && S.view === 'app' && (S.tab === 'orders' || S.tab === 'team')) renderTab(); }).catch(() => {});
+        if (staffLogged()) loadOsDesk().then(() => { if (S.open && S.view === 'app' && ['orders', 'team', 'dash', 'member', 'stats'].includes(S.tab)) renderTab(); }).catch(() => {});
       }, 2000);
     } catch (e) {
       if (window.AquaBus) {
@@ -604,7 +647,7 @@
     pn.addEventListener('click', (e) => { const b = e.target.closest('button[data-k]'); if (!b) return; navGo(b.dataset.k); });
   }
   function navGo(k) {
-    if (k === 'admin') { if (S.open && S.view === 'app') enterTab('team'); else openPortal('team'); }
+    if (k === 'admin') { if (S.open && S.view === 'app') enterTab('dash'); else openPortal('dash'); }
     else if (S.open && S.view === 'app') enterTab(k);
     else openPortal(k);
     syncNav();
@@ -612,7 +655,7 @@
   function syncNav() {
     if (!pn) return;
     if (!S.me && staffLogged()) { /* keep */ }
-    const cur = !S.open ? '' : (S.tab === 'team' ? 'admin' : S.tab);
+    const cur = !S.open ? '' : ((S.tab === 'team' || S.tab === 'dash' || S.tab === 'member') ? 'admin' : S.tab);
     $$('button[data-k]', pn).forEach((b) => { if (b.dataset.k === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   }
   function toggleTheme() { const d = document.documentElement; if (d.dataset.theme === 'dark') { delete d.dataset.theme; store.set('aq.theme', 'light'); } else { d.dataset.theme = 'dark'; store.set('aq.theme', 'dark'); } }
@@ -648,7 +691,7 @@
   }
   function closePortal() {
     if (!S.open) return; S.open = false; if (root) root.hidden = true;
-    document.documentElement.classList.remove('gp-open'); showStaffBar(staffLogged()); setInert(false); paintNav();
+    document.documentElement.classList.remove('gp-open', 'gp-admin'); showStaffBar(staffLogged()); setInert(false); paintNav();
     if (/^#(garcom|equipa|admin)/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* */ } }
   }
 
@@ -685,7 +728,7 @@
     const st = c.status === 'closed' ? 'completed' : c.status;
     return {
       id: 'os-' + c.id, osId: c.id, live: true,
-      tableCode: 'Mesa-' + String(c.table_number).padStart(2, '0'),
+      tableCode: (Number(c.table_number) > 0 ? ('Mesa-' + String(c.table_number).padStart(2, '0')) : (c.place || c.note || 'Cliente')),
       zone: 'all',
       reason: reasonMap[c.reason] || c.reason,
       note: [c.customer_name, c.customer_phone, c.note].filter(Boolean).join(' · '),
@@ -732,7 +775,7 @@
         if (fresh.length) alertNew(fresh);
       }
       S.lastLive = new Set(pend.map((c) => c.id));
-      if (S.open && S.view === 'app' && (S.tab === 'calls' || S.tab === 'orders') && sigOf(mapped) !== prev) renderTab();
+      if (S.open && S.view === 'app' && ['calls', 'orders', 'dash', 'member', 'team'].includes(S.tab) && sigOf(mapped) !== prev) renderTab();
     } catch (e) { /* */ }
   }
   function startLiveCalls() {
@@ -743,7 +786,7 @@
       window.__aqStaffUp = true;
       const bump = () => {
         refreshLiveCalls();
-        if (S.open && S.view === 'app' && S.tab === 'orders') loadOsDesk().then(() => { if (S.tab === 'orders') renderTab(); }).catch(() => {});
+        if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) loadOsDesk().then(() => { if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) renderTab(); }).catch(() => {});
       };
       window.addEventListener('aq-os-up', bump);
       try {
@@ -755,7 +798,7 @@
       S.osSock = window.io({ transports: ['websocket', 'polling'] });
       S.osSock.on('call:new', () => refreshLiveCalls());
       S.osSock.on('call:updated', () => refreshLiveCalls());
-      S.osSock.on('order:new', () => { if (S.tab === 'orders') loadOsDesk().then(() => { if (S.tab === 'orders') renderTab(); }); });
+      S.osSock.on('order:new', () => { if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) loadOsDesk().then(() => renderTab()); });
     } else if (!window.io && !document.querySelector('script[data-aq-io]')) {
       const origin = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
       if (!origin) return;
@@ -783,7 +826,7 @@
       const pend = S.calls.filter((c) => c.status === 'pending'); setBadge(pend.length);
       if (S.lastPend) { const fresh = pend.filter((c) => !S.lastPend.has(c.id)); if (fresh.length) alertNew(fresh); }
       S.lastPend = new Set(pend.map((c) => c.id));
-      if (S.open && S.view === 'app' && S.tab === 'calls' && sigOf(list) !== prev) renderTab();
+      if (S.open && S.view === 'app' && ['calls', 'dash', 'member', 'team', 'stats'].includes(S.tab) && sigOf(list) !== prev) renderTab();
     } catch (e) { /* offline: tenta no próximo ciclo */ }
   }
   function tick() {
@@ -808,6 +851,9 @@
     else if (v === 'recover') m.innerHTML = viewRecover();
     else if (v === 'error') m.innerHTML = viewSimple('alert', 'Não foi possível carregar', esc(S.msg || 'Verifique a ligação à internet.'), false, true);
     else if (v === 'app') { m.innerHTML = appFrame(); renderTab(); }
+    document.documentElement.classList.toggle('gp-admin', !!(S.open && S.me && S.me.role === 'admin' && v === 'app'));
+    const brand = root && $('.gp-brand span', root);
+    if (brand) brand.innerHTML = 'Aqua <b>Club</b> · ' + (S.me && S.me.role === 'admin' && v === 'app' ? 'Admin' : 'Garçom');
     syncNav();
   }
   function viewSimple(icon, title, text, logout, retry) {
@@ -855,24 +901,48 @@
     return '<div class="gp-auth"><div class="gp-hero"><div class="ico">' + ic('shield') + '</div><h2>Nova palavra-passe</h2><p>Escolha uma palavra-passe nova para a sua conta.</p></div><div class="gp-card"><form class="gp-form" data-form="recover" novalidate>' +
       '<label>Nova palavra-passe (mín. 8)<input name="password" type="password" autocomplete="new-password" required minlength="8"></label><button class="gb block" type="submit">Guardar</button><p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg) + '</p></form></div></div>';
   }
+  function staffTabs() {
+    if (S.me && S.me.role === 'admin') return [
+      ['dash', 'Painel', 'home'], ['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'],
+      ['team', 'Equipa', 'users'], ['stats', 'Relatórios', 'chart'], ['profile', 'Casa', 'user']
+    ];
+    return [
+      ['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'], ['hist', 'Histórico', 'list'],
+      ['stats', 'Estatísticas', 'chart'], ['profile', 'Perfil', 'user']
+    ];
+  }
+  function tabSelected(id) {
+    if (S.tab === id) return true;
+    if (S.tab === 'member' && id === 'team') return true;
+    return false;
+  }
+  function tabBadge(id) {
+    if (id === 'calls') return '<span class="n" id="tabN"' + (S.pendingN ? '' : ' hidden') + '>' + S.pendingN + '</span>';
+    if (id === 'orders') return '<span class="n" id="tabNOrd"' + (S.osN ? '' : ' hidden') + '>' + S.osN + '</span>';
+    return '';
+  }
   function appFrame() {
-    const me = S.me, tabs = [['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'], ['hist', 'Histórico', 'list'], ['stats', 'Estatísticas', 'chart'], ['profile', 'Perfil', 'user']];
-    if (me.role === 'admin') tabs.push(['team', 'Admin', 'users']);
-    return '<div class="gp-card"><div class="gp-who">' + avatar(me) + '<div><h2>' + esc(me.name) + '<span class="gp-role">' + (me.role === 'admin' ? 'Admin' : 'Garçom') + '</span></h2><small>' + esc(me.email || me.phone || 'PIN da casa') + '</small></div></div></div>' +
-      '<div class="gp-tabs" role="tablist" aria-label="Secções">' + tabs.map((t) => '<button class="gp-tab" type="button" role="tab" data-act="tab" data-t="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + ic(t[2]) + t[1] +
-        (t[0] === 'calls' ? '<span class="n" id="tabN"' + (S.pendingN ? '' : ' hidden') + '>' + S.pendingN + '</span>' : '') +
-        (t[0] === 'orders' ? '<span class="n" id="tabNOrd"' + (S.osN ? '' : ' hidden') + '>' + S.osN + '</span>' : '') + '</button>').join('') + '</div><div id="gpc" aria-live="polite"></div>';
+    const me = S.me, admin = me.role === 'admin', tabs = staffTabs();
+    const who = '<div class="gp-card"><div class="gp-who">' + avatar(me) + '<div><h2>' + esc(me.name) + '<span class="gp-role">' + (admin ? 'Admin' : 'Garçom') + '</span></h2><small>' + esc(me.email || me.phone || 'PIN da casa') + '</small></div></div></div>';
+    if (admin) {
+      const side = '<nav class="gp-side" aria-label="Secções">' + tabs.map((t) =>
+        '<button class="gp-side-btn" type="button" data-act="tab" data-t="' + t[0] + '" aria-selected="' + tabSelected(t[0]) + '" title="' + t[1] + '">' + ic(t[2]) + '<span class="gp-side-lab">' + t[1] + '</span>' + tabBadge(t[0]) + '</button>'
+      ).join('') + '</nav>';
+      return '<div class="gp-shell is-admin">' + side + '<div class="gp-maincol">' + who + '<div id="gpc" aria-live="polite"></div></div></div>';
+    }
+    return who +
+      '<div class="gp-tabs" role="tablist" aria-label="Secções">' + tabs.map((t) => '<button class="gp-tab" type="button" role="tab" data-act="tab" data-t="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + ic(t[2]) + t[1] + tabBadge(t[0]) + '</button>').join('') + '</div><div id="gpc" aria-live="polite"></div>';
   }
   async function enterTab(t) {
-    if (t === 'admin') t = 'team';
-    if (t === 'team' && !(S.me && S.me.role === 'admin')) t = 'calls';
+    if (t === 'admin') t = (S.me && S.me.role === 'admin') ? 'dash' : 'orders';
+    if ((t === 'team' || t === 'dash' || t === 'member') && !(S.me && S.me.role === 'admin')) t = 'calls';
     S.tab = t; if (S.view !== 'app') { syncNav(); return; }
-    $$('.gp-tab', root).forEach((b) => { const on = b.dataset.t === S.tab; b.setAttribute('aria-selected', String(on)); if (on && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) { /* */ } } }); syncNav();
+    $$('.gp-tab, .gp-side-btn', root).forEach((b) => { const on = tabSelected(b.dataset.t); b.setAttribute('aria-selected', String(on)); if (on && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) { /* */ } } }); syncNav();
     const c = $('#gpc'); if (!c) return;
     try {
-      if (t === 'orders' || t === 'team') { c.innerHTML = loadingHTML; await loadOsDesk(); }
-      if (['hist', 'stats', 'profile'].includes(t) && (!S.mine || Date.now() - S.mineAt > 15000)) { if (!S.mine) c.innerHTML = loadingHTML; await loadMine(); }
-      if (t === 'team') { c.innerHTML = loadingHTML; await loadTeam(); }
+      if (t === 'orders' || t === 'team' || t === 'dash' || t === 'member' || t === 'stats') { c.innerHTML = loadingHTML; await loadOsDesk(); }
+      if (['hist', 'stats', 'profile', 'dash', 'member'].includes(t) && (!S.mine || Date.now() - S.mineAt > 15000)) { if (!S.mine) c.innerHTML = loadingHTML; await loadMine(); }
+      if (t === 'team' || t === 'dash' || t === 'member') { c.innerHTML = loadingHTML; await loadTeam(); }
     } catch (e) { toast(esc(e.message), 'alert', 'err'); if (!S.mine) S.mine = []; }
     if (S.tab === t) renderTab();
   }
@@ -880,8 +950,164 @@
   async function loadTeam() { const be = backend(); const [staff, calls] = await Promise.all([be.team(), be.listCalls(startOfDay(Date.now()) - 29 * 864e5)]); S.team = { staff, calls }; }
   function renderTab() {
     const c = $('#gpc'); if (!c || S.view !== 'app') return;
-    const f = { orders: tabOrders, calls: tabCalls, hist: tabHist, stats: tabStats, profile: tabProfile, team: tabTeam }[S.tab] || tabOrders;
+    const f = { orders: tabOrders, calls: tabCalls, hist: tabHist, stats: tabStats, profile: tabProfile, team: tabTeam, dash: tabDash, member: tabMember }[S.tab] || tabOrders;
     const sc = $('#gpScroll'), y = sc ? sc.scrollTop : 0; c.innerHTML = f(); if (sc) sc.scrollTop = y; tick();
+    $$('.gp-tab, .gp-side-btn', root).forEach((b) => b.setAttribute('aria-selected', String(tabSelected(b.dataset.t))));
+  }
+
+  /* ====================================================================== DASHBOARD ADMIN */
+  const ZONE_CYCLE = ['rooftop', 'piscina', 'sala-principal'];
+  function mergedCalls() {
+    const cmap = new Map();
+    [].concat(S.calls || [], S.liveCalls || [], S.mine || [], (S.osDesk && S.osDesk.calls) || [], (S.team && S.team.calls) || []).forEach((c) => {
+      if (!c) return;
+      const id = String(c.id || '');
+      if (!id) return;
+      const st = c.status === 'closed' ? 'completed' : c.status;
+      const prev = cmap.get(id) || {};
+      cmap.set(id, Object.assign({}, prev, c, {
+        status: st,
+        createdAt: c.createdAt || c.created_at || prev.createdAt,
+        acceptedAt: c.acceptedAt || c.accepted_at || prev.acceptedAt,
+        completedAt: c.completedAt || c.closed_at || prev.completedAt,
+        by: c.by || c.waiterName || prev.by || '',
+        byUser: c.byUser || c.waiter_id || prev.byUser || null
+      }));
+    });
+    return Array.from(cmap.values());
+  }
+  function orderMs(o) { return Date.parse(o.created_at || o.ts || 0) || Number(o.ts) || 0; }
+  function deskOrders() { return ((S.osDesk && S.osDesk.orders) || []).filter((o) => o && o.status !== 'cancelled'); }
+  function revenueOf(list) { return list.filter(isPaid).reduce((s, o) => s + Number(o.total || 0), 0); }
+  function callsForMember(m, calls) {
+    const ids = new Set([String(m.id || ''), String(m.user_id || '')]);
+    const name = String(m.name || '').toLowerCase();
+    return (calls || []).filter((c) => {
+      const uid = String(c.byUser || c.waiter_id || '');
+      const by = String(c.by || c.waiterName || '').toLowerCase();
+      return ids.has(uid) || (name && by === name);
+    });
+  }
+  function dayBars(series, money) {
+    const maxD = Math.max(1, ...series.map((x) => x.n));
+    return '<div class="gp-bars">' + series.map((x) => {
+      const label = money ? mt(x.n) : (x.n || '');
+      return '<div class="col' + (x.today ? ' today' : '') + '" title="' + x.key + ': ' + label + '"><u>' + (money ? (x.n ? Math.round(x.n / 1000) + 'k' : '') : (x.n || '')) + '</u><i style="height:' + Math.round((x.n / maxD) * 100) + '%"></i><em>' + x.label + '</em></div>';
+    }).join('') + '</div>';
+  }
+  function moneySeries(orders, days) {
+    const t0 = startOfDay(Date.now()), per = {};
+    (orders || []).forEach((o) => {
+      const ms = orderMs(o); if (!ms || !isPaid(o)) return;
+      const k = dayKey(ms); per[k] = (per[k] || 0) + Number(o.total || 0);
+    });
+    const series = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const ms = t0 - i * 864e5, d = new Date(ms);
+      series.push({ key: dayKey(ms), label: DAYN[d.getDay()], n: per[dayKey(ms)] || 0, today: i === 0 });
+    }
+    return series;
+  }
+  function miniCal(hotDays) {
+    const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    const first = new Date(y, m, 1);
+    const startPad = (first.getDay() + 6) % 7;
+    const dim = new Date(y, m + 1, 0).getDate();
+    const today = now.getDate();
+    const hot = hotDays || new Set();
+    const cells = [];
+    ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].forEach((d) => cells.push('<em>' + d + '</em>'));
+    for (let i = 0; i < startPad; i++) cells.push('<button type="button" class="mute" tabindex="-1"></button>');
+    for (let d = 1; d <= dim; d++) {
+      const key = y + '-' + pad(m + 1) + '-' + pad(d);
+      cells.push('<button type="button" class="' + (d === today ? 'on' : '') + (hot.has(key) ? ' dot' : '') + '" tabindex="-1">' + d + '</button>');
+    }
+    return '<div class="gp-cal"><div class="gp-cal-head"><span>' + MONN[m] + ' ' + y + '</span><span class="gp-muted">movimento</span></div><div class="gp-cal-grid">' + cells.join('') + '</div></div>';
+  }
+  function tabDash() {
+    const orders = deskOrders();
+    assignPedidoNumbers(orders);
+    const t0 = startOfDay(Date.now());
+    const todayO = orders.filter((o) => orderMs(o) >= t0);
+    const calls = mergedCalls();
+    const pend = calls.filter((c) => c.status === 'pending').length;
+    const paidToday = todayO.filter(isPaid);
+    const due = orders.filter((o) => !isPaid(o) && o.status !== 'delivered').length;
+    const staff = ((S.team && S.team.staff) || []).filter((m) => m.active);
+    const waiters = staff.filter((m) => m.role !== 'admin');
+    const hot = new Set();
+    orders.forEach((o) => { const ms = orderMs(o); if (ms) hot.add(dayKey(ms)); });
+    calls.forEach((c) => { const ms = ts(c.createdAt); if (ms) hot.add(dayKey(ms)); });
+    const feed = orders.slice().sort((a, b) => orderMs(b) - orderMs(a)).slice(0, 6);
+    const callFeed = calls.filter((c) => c.status === 'pending' || c.status === 'accepted').slice(0, 4);
+    const faces = waiters.slice(0, 10).map((m) =>
+      '<button class="gp-face" type="button" data-act="memberview" data-id="' + esc(m.id) + '" title="' + esc(m.name) + '" style="background:' + esc(m.color || '#00A8FF') + '">' + esc((m.name || '?').split(' ').map((p) => p[0]).slice(0, 2).join('')) + '</button>'
+    ).join('');
+    const weekO = moneySeries(orders, 7);
+    const weekC = computeStats(calls, t0 - 6 * 864e5, 7);
+    return '<section class="gp-hero-ban"><span class="gp-chip">Aqua Club · casa ao vivo</span><h2>A casa trabalha melhor junta.</h2><p>Pedidos, chamados, pagamentos e a equipa — o pulso do complexo, em tempo real.</p></section>' +
+      '<div class="gp-bento">' +
+      '<div class="gp-glass"><h3 class="gp-h">Equipa no piso</h3><div class="gp-faces">' + faces +
+      '<button class="gp-face add" type="button" data-act="tab" data-t="team" title="Gerir equipa">+</button></div>' +
+      '<p class="gp-muted" style="margin:.75rem 0 0">' + waiters.length + ' garçons activos. Toque num perfil para ver gráficos e PIN.</p></div>' +
+      '<div class="gp-glass">' + miniCal(hot) + '</div>' +
+      '<div class="gp-stat-grid span2">' +
+      '<div class="gp-stat ink"><b>' + mt(revenueOf(paidToday)) + '</b><span>Receita hoje</span></div>' +
+      '<div class="gp-stat cyan"><b>' + todayO.length + '</b><span>Pedidos hoje</span></div>' +
+      '<div class="gp-stat"><b>' + pend + '</b><span>Chamados à espera</span></div>' +
+      '<div class="gp-stat sand"><b>' + due + '</b><span>Por cobrar</span></div></div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Receita · 7 dias</h3>' + dayBars(weekO, true) + '</div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Atendimentos · 7 dias</h3>' + dayBars(weekC.series) + '</div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Últimos pedidos</h3><div class="gp-feed">' +
+      (feed.length ? feed.map((o) => '<div class="gp-feed-row">' + avatar({ name: o.customer_name || 'Cliente', color: '#00A8FF' }) +
+        '<div><b>' + esc(pedidoNo(o) ? ('Pedido ' + pedidoNo(o)) : (o.code || 'Pedido')) + '</b><small>' + esc(o.customer_name || 'Cliente') + ' · ' + esc(orderPlace(o) || '') + '</small></div>' +
+        '<span class="gp-chip ' + (isPaid(o) ? 'ok' : 'wait') + '">' + mt(o.total) + '</span></div>').join('') : '<p class="gp-muted">Ainda sem pedidos nesta sessão.</p>') +
+      '</div><div class="gp-quick" style="margin-top:.8rem"><button class="gb sm" type="button" data-act="tab" data-t="orders">Ver todos os pedidos</button></div></div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Sala agora</h3><div class="gp-feed">' +
+      (callFeed.length ? callFeed.map((c) => '<div class="gp-feed-row">' + ic(REASON_IC[c.reason] || 'bell') +
+        '<div><b>' + esc(tableName(c.tableCode) || c.place || 'Chamado') + '</b><small>' + esc(REASONS[c.reason] || c.reason) + (c.by ? ' · ' + esc(c.by) : '') + '</small></div>' +
+        '<span class="gp-chip ' + (c.status === 'pending' ? 'wait' : 'ok') + '">' + (c.status === 'pending' ? 'À espera' : 'A caminho') + '</span></div>').join('') : '<p class="gp-muted">Tudo calmo no piso.</p>') +
+      '</div><div class="gp-quick" style="margin-top:.8rem"><button class="gb sm line" type="button" data-act="tab" data-t="calls">Abrir chamados</button></div></div>' +
+      '<div class="gp-glass span2"><h3 class="gp-h">Gestão da casa</h3><div class="gp-quick">' +
+      '<button class="gb" type="button" data-act="tab" data-t="orders">Pedidos e pagamentos</button>' +
+      '<button class="gb line" type="button" data-act="tab" data-t="calls">Chamados</button>' +
+      '<button class="gb line" type="button" data-act="tab" data-t="team">Equipa e PINs</button>' +
+      '<button class="gb dark" type="button" data-act="tab" data-t="stats">Relatórios</button></div></div></div>';
+  }
+  function tabMember() {
+    const staff = (S.team && S.team.staff) || [];
+    const m = staff.find((x) => x.id === S.viewMember || x.user_id === S.viewMember);
+    if (!m) return '<div class="gp-card gp-empty">' + ic('users') + '<b>Perfil não encontrado</b><button class="gb" type="button" data-act="tab" data-t="team">Voltar à equipa</button></div>';
+    const calls = callsForMember(m, mergedCalls());
+    const t0 = startOfDay(Date.now());
+    const st = computeStats(calls, t0 - 29 * 864e5, 30);
+    const today = computeStats(calls, t0, 1);
+    const week = computeStats(calls, t0 - 6 * 864e5, 7);
+    const since = new Date(ts(m.created_at) || Date.now());
+    const zi = Math.max(0, staff.filter((x) => x.role !== 'admin').findIndex((x) => x.id === m.id));
+    const zone = ZONES[ZONE_CYCLE[zi % ZONE_CYCLE.length]] || 'Piso';
+    const recent = calls.slice().sort((a, b) => ts(b.createdAt) - ts(a.createdAt)).slice(0, 6);
+    const initials = (m.name || '?').split(' ').map((p) => p[0]).slice(0, 2).join('');
+    return '<p><button class="gb line sm" type="button" data-act="tab" data-t="team">' + ic('users') + ' Toda a equipa</button></p>' +
+      '<section class="gp-prof-ban"><div class="inner">' +
+      '<div class="gp-av lg" style="background:' + esc(m.color || '#00A8FF') + '">' + esc(initials) + '</div>' +
+      '<div><span class="gp-online"><i></i>' + (m.active ? 'Disponível no piso' : 'Inactivo') + '</span>' +
+      '<h2>' + esc(m.name) + '</h2><p class="gp-muted" style="color:rgba(255,255,255,.8);margin:.2rem 0 0">' + (m.role === 'admin' ? 'Administração' : 'Garçom') + ' · ' + esc(zone) + (m.phone ? ' · ' + esc(m.phone) : '') + '</p></div></div></section>' +
+      '<div class="gp-stat-grid">' +
+      '<div class="gp-stat ink"><b>' + today.count + '</b><span>Atendimentos hoje</span></div>' +
+      '<div class="gp-stat cyan"><b>' + esc(st.resp == null ? '—' : hm(st.resp)) + '</b><span>Resposta média</span></div>' +
+      '<div class="gp-stat"><b>' + (st.rating == null ? '—' : st.rating.toFixed(1).replace('.', ',') + ' ★') + '</b><span>Nota (30 dias)</span></div>' +
+      '<div class="gp-stat sand"><b>' + st.count + '</b><span>Atendimentos 30 d</span></div></div>' +
+      '<div class="gp-bento">' +
+      '<div class="gp-glass"><h3 class="gp-h">Sobre</h3><p class="gp-muted" style="margin:0">Membro desde ' + since.getDate() + ' ' + MONN[since.getMonth()] + ' ' + since.getFullYear() + '. Zona habitual: <b>' + esc(zone) + '</b>. PIN de acesso ' + (m.pin ? '<b>' + esc(m.pin) + '</b>' : 'definido na casa') + '.</p>' +
+      '<form class="gp-form" data-form="setpin" data-id="' + esc(m.id) + '" style="margin-top:1rem"><label>Novo PIN<input name="pin" inputmode="numeric" maxlength="8" required minlength="4" placeholder="1001"></label><button class="gb sm" type="submit">Actualizar PIN</button><p class="gp-msg" role="status"></p></form></div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Semana</h3>' + dayBars(week.series) + '</div>' +
+      '<div class="gp-glass span2"><h3 class="gp-h">Actividade recente</h3>' +
+      (recent.length ? '<div class="gp-feed">' + recent.map((c) => '<div class="gp-feed-row"><time>' + hhmm(ts(c.createdAt)) + '</time><div><b>' + esc(tableName(c.tableCode) || 'Chamado') + '</b><small>' + esc(REASONS[c.reason] || c.reason) + '</small></div><span class="gp-chip ' + (c.status === 'completed' ? 'ok' : 'wait') + '">' + (c.status === 'completed' ? 'Concluído' : (c.status === 'accepted' ? 'A caminho' : 'Aberto')) + '</span></div>').join('') + '</div>'
+        : '<p class="gp-muted">Ainda sem chamados atribuídos a esta pessoa nesta sessão.</p>') + '</div></div>' +
+      (m.user_id === S.me.user_id ? '' : '<div class="gp-quick" style="margin-top:.4rem">' +
+        (!m.active ? '<button class="gb ok" type="button" data-act="member" data-id="' + esc(m.id) + '" data-do="approve">Aprovar</button>'
+          : '<button class="gb line" type="button" data-act="member" data-id="' + esc(m.id) + '" data-do="' + (m.role === 'admin' ? 'demote' : 'promote') + '">' + (m.role === 'admin' ? 'Tornar garçom' : 'Tornar admin') + '</button><button class="gb bad" type="button" data-act="member" data-id="' + esc(m.id) + '" data-do="disable">Desativar</button>') + '</div>');
   }
 
   /* ====================================================================== TAB: PEDIDOS (sistema em tempo real) */
@@ -1130,11 +1356,13 @@
 
   /* ====================================================================== TAB: PERFIL */
   function tabProfile() {
-    const me = S.me, m30 = computeStats(S.mine || [], startOfDay(Date.now()) - 29 * 864e5, 30), since = new Date(ts(me.created_at));
+    const me = S.me, t0 = startOfDay(Date.now()), m30 = computeStats(S.mine || [], t0 - 29 * 864e5, 30), today = computeStats(S.mine || [], t0, 1), week = computeStats(S.mine || [], t0 - 6 * 864e5, 7), since = new Date(ts(me.created_at));
     const canN = 'Notification' in window, perm = canN ? Notification.permission : 'denied';
-    return '<div class="gp-card" style="text-align:center"><div style="display:grid;place-items:center;margin-bottom:.7rem">' + avatar(me, true) + '</div><h2 style="margin:0;font:800 1.5rem var(--fh,system-ui);text-transform:uppercase">' + esc(me.name) + '</h2>' +
-      '<p class="gp-muted" style="margin:.2rem 0 .6rem">' + esc(me.email || '') + (me.phone ? ' · ' + esc(me.phone) : '') + '</p><span class="gp-role" style="margin:0">' + (me.role === 'admin' ? 'Administrador' : 'Garçom') + '</span>' +
-      '<p class="gp-muted" style="margin:.8rem 0 0">Membro desde ' + since.getDate() + ' ' + MONN[since.getMonth()] + ' ' + since.getFullYear() + ' · ' + m30.count + ' atendimentos em 30 dias' + (m30.rating != null ? ' · nota ' + m30.rating.toFixed(1).replace('.', ',') + ' ★' : '') + '</p></div>' +
+    const initials = (me.name || '?').split(' ').map((p) => p[0]).slice(0, 2).join('');
+    return '<section class="gp-prof-ban"><div class="inner"><div class="gp-av lg" style="background:' + esc(me.color || '#00A8FF') + '">' + esc(initials) + '</div><div><span class="gp-online"><i></i>Em serviço</span><h2>' + esc(me.name) + '</h2><p style="margin:.2rem 0 0;color:rgba(255,255,255,.8)">' + (me.role === 'admin' ? 'Administração' : 'Garçom') + (me.phone ? ' · ' + esc(me.phone) : '') + '</p></div></div></section>' +
+      '<div class="gp-stat-grid"><div class="gp-stat ink"><b>' + today.count + '</b><span>Hoje</span></div><div class="gp-stat cyan"><b>' + esc(m30.resp == null ? '—' : hm(m30.resp)) + '</b><span>Resposta média</span></div><div class="gp-stat"><b>' + (m30.rating == null ? '—' : m30.rating.toFixed(1).replace('.', ',') + ' ★') + '</b><span>Nota 30 d</span></div><div class="gp-stat sand"><b>' + m30.count + '</b><span>Atendimentos 30 d</span></div></div>' +
+      '<div class="gp-glass"><h3 class="gp-h">A sua semana</h3>' + dayBars(week.series) + '</div>' +
+      '<p class="gp-muted">Membro desde ' + since.getDate() + ' ' + MONN[since.getMonth()] + ' ' + since.getFullYear() + (me.email ? ' · ' + esc(me.email) : '') + '</p>' +
       '<div class="gp-card"><h3>Os meus dados</h3><form class="gp-form" data-form="profile" novalidate><div class="gp-row2"><label>Nome<input name="name" value="' + esc(me.name) + '" maxlength="60" required></label><label>Telemóvel<input name="phone" type="tel" value="' + esc(me.phone || '') + '" maxlength="20"></label></div>' +
       '<button class="gb" type="submit" style="justify-self:start">Guardar alterações</button><p class="gp-msg" role="status"></p></form></div>' +
       '<div class="gp-card"><h3>Ecrã</h3><div class="gp-form"><button class="gb line" type="button" data-act="theme">' + ic('moon') + 'Alternar tema claro / escuro</button></div></div>' +
@@ -1152,8 +1380,8 @@
     const pending = staff.filter((m) => !m.active && m.role === 'waiter'), active = staff.filter((m) => m.active);
     const all = computeStats(calls.filter((c) => c.byUser), since, 30);
     const memberCard = (m) => {
-      const st = computeStats(calls.filter((c) => c.byUser === m.user_id), since, 30), self = m.user_id === me.user_id;
-      return '<div class="gp-card gp-member">' + avatar(m) + '<div><b style="font:800 1.05rem var(--fh,system-ui);text-transform:uppercase">' + esc(m.name) + '</b><span class="gp-role">' + (m.role === 'admin' ? 'Admin' : 'Garçom') + '</span> ' +
+      const st = computeStats(callsForMember(m, calls), since, 30), self = m.user_id === me.user_id;
+      return '<div class="gp-card gp-member" role="button" tabindex="0" data-act="memberview" data-id="' + esc(m.id) + '">' + avatar(m) + '<div><b style="font:800 1.05rem var(--fh,system-ui);text-transform:uppercase">' + esc(m.name) + '</b><span class="gp-role">' + (m.role === 'admin' ? 'Admin' : 'Garçom') + '</span> ' +
         (m.active ? '' : '<span class="gp-chip off">Inativo</span>') + '<br><small class="gp-muted">' + esc(m.email || '') + (m.phone ? ' · ' + esc(m.phone) : '') + '</small>' +
         '<div class="mini"><span><b>' + st.count + '</b> atend.</span><span>resposta <b>' + esc(st.resp == null ? '—' : hm(st.resp)) + '</b></span><span>nota <b>' + (st.rating == null ? '—' : st.rating.toFixed(1).replace('.', ',') + ' ★') + '</b></span></div></div>' +
         '<div class="acts">' + (!m.active ? '<button class="gb ok sm" type="button" data-act="member" data-id="' + esc(m.id) + '" data-do="approve">' + ic('check') + 'Aprovar</button>'
@@ -1162,6 +1390,7 @@
     };
     return '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + pending.length + '</b><span>A aguardar aprovação</span></div><div class="gp-kpi"><b>' + active.length + '</b><span>Na equipa</span></div><div class="gp-kpi"><b>' + all.count + '</b><span>Atendimentos (30 d)</span></div>' +
       '<div class="gp-kpi"><b>' + (all.rating == null ? '—' : all.rating.toFixed(1).replace('.', ',') + ' ★') + '</b><span>Nota média da equipa</span></div></div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Novo garçom</h3><form class="gp-form" data-form="invite" novalidate><div class="gp-row2"><label>Nome<input name="name" required maxlength="60" placeholder="Nome no piso"></label><label>PIN<input name="pin" inputmode="numeric" required minlength="4" maxlength="8" placeholder="ex. 1011"></label></div><label>Telemóvel (opcional)<input name="phone" type="tel" maxlength="20"></label><button class="gb" type="submit" style="justify-self:start">Criar perfil</button><p class="gp-msg" role="status"></p></form></div>' +
       '<div class="gp-sec"><span>Pedidos de acesso</span><span class="n">' + pending.length + '</span></div>' +
       (pending.length ? '<div class="gp-list">' + pending.map(memberCard).join('') + '</div>' : '<div class="gp-card gp-empty">' + ic('shield') + '<b>Sem pedidos pendentes</b>Quem criar conta na Área do garçom aparece aqui para aprovação.</div>') +
       '<div class="gp-sec"><span>Equipa ativa</span><span class="n">' + active.length + '</span></div><div class="gp-list">' + active.map(memberCard).join('') + '</div>' +
@@ -1262,6 +1491,7 @@
       return;
     }
     if (a === 'tab') return enterTab(b.dataset.t);
+    if (a === 'memberview') { S.viewMember = b.dataset.id; return enterTab('member'); }
     if (a === 'zone') { S.zone = b.dataset.v; return renderTab(); }
     if (a === 'hper') { S.hper = +b.dataset.v; return renderTab(); }
     if (a === 'period') { S.period = +b.dataset.v; return renderTab(); }
@@ -1304,7 +1534,7 @@
       const next = { approve: [true, 'waiter'], promote: [true, 'admin'], demote: [true, 'waiter'], disable: [false, m.role] }[d];
       if (d === 'disable' && !confirm('Desativar ' + m.name + '? Deixa de poder entrar e aceitar chamados.')) return;
       const ok = await guard(() => be.setStaff(m.id, next[0], next[1]));
-      if (ok) { toast(d === 'approve' ? esc(m.name) + ' aprovado(a).' : 'Equipa atualizada.', 'check', 'ok'); await guard(loadTeam); renderTab(); }
+      if (ok) { toast(d === 'approve' ? esc(m.name) + ' aprovado(a).' : 'Equipa atualizada.', 'check', 'ok'); await guard(loadTeam); if (S.tab === 'member' && d === 'disable') return enterTab('team'); renderTab(); }
     }
   }
   async function onSubmit(e) {
@@ -1362,6 +1592,12 @@
       } else if (kind === 'pass') {
         if (String(v.password).length < (mode() === 'desk' ? 4 : 8)) return say(f, 'Indique um PIN ou palavra-passe válida.', 'err');
         busy(f, true); await be.changePassword(v.password); f.reset(); say(f, 'Palavra-passe alterada.', 'ok');
+      } else if (kind === 'setpin') {
+        if (!be || !be.setPin) throw new Error('Sem permissão para alterar PIN.');
+        busy(f, true); await be.setPin(f.dataset.id, String(v.pin || '').trim()); say(f, 'PIN actualizado.', 'ok'); await guard(loadTeam); renderTab();
+      } else if (kind === 'invite') {
+        if (!be || !be.inviteStaff) throw new Error('Sem permissão para criar perfil.');
+        busy(f, true); await be.inviteStaff({ name: v.name, pin: v.pin, phone: v.phone }); f.reset(); say(f, 'Perfil criado. O garçom entra com este PIN.', 'ok'); await guard(loadTeam); renderTab();
       }
     } catch (x) {
       if (kind === 'in' || kind === 'up' || kind === 'recover' || kind === 'pin' || kind === 'osadmin') { S.msg = x.message; S.msgType = 'err'; if (S.view === 'auth' || S.view === 'recover') { const keep = Object.assign({}, v); render(); const nf = $('form', root); if (nf) { ['name', 'email', 'phone', 'pin'].forEach((k) => { if (nf.elements[k] && keep[k]) nf.elements[k].value = keep[k]; }); } } }
@@ -1389,8 +1625,8 @@
   function checkHash() {
     const h = location.hash;
     if (/type=recovery/.test(h) && mode() === 'live') { S.recovery = true; backend().session().then(() => openPortal('calls')); return; }
-    if (/^#(garcom|equipa)/.test(h)) openPortal(/stats/.test(h) ? 'stats' : /admin/.test(h) ? 'team' : 'orders');
-    else if (/^#admin/.test(h)) openPortal('team');
+    if (/^#(garcom|equipa)/.test(h)) openPortal(/stats/.test(h) ? 'stats' : /admin/.test(h) ? 'dash' : 'orders');
+    else if (/^#admin/.test(h)) openPortal('dash');
   }
   function init() {
     try { if (store.get('aq.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* */ }

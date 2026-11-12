@@ -532,9 +532,10 @@ app.post('/api/live/calls/:id/close', (req, res) => {
 app.post('/api/calls', (req, res) => {
   const user = readUser(req);
   const body = req.body || {};
-  const tableNumber = Number(body.tableNumber);
+  let tableNumber = Number(body.tableNumber);
   const reason = String(body.reason || '');
-  if (!tableNumber || tableNumber < 1 || tableNumber > 40) return res.status(400).json({ error: 'table' });
+  if (!Number.isFinite(tableNumber) || tableNumber < 0 || tableNumber > 40) return res.status(400).json({ error: 'table' });
+  if (tableNumber < 1) tableNumber = 0;
   if (!CALL_REASONS.some((r) => r.id === reason)) return res.status(400).json({ error: 'reason' });
   const name = guestName(body, user);
   const phone = guestPhone(body, user);

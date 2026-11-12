@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops11"></script>
+<script src="i18n.js?v=ops14"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1028,7 +1028,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops11">
+<link rel="stylesheet" href="garcom.css?v=ops14">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1943,22 +1943,29 @@ const REVIEWS = [];
   }
   async function apiCall(code, reason) {
     const extra = { name: cust.name || '', phone: cust.phone || '', note: placeReady(place) ? placeLabel(place) : '' };
+    const mapped = ({ request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente', waiter: 'urgente' }[reason] || reason || 'urgente');
+    const n = parseInt(String(code).replace(/\D/g, ''), 10);
+    const localId = 'c' + Date.now();
+    const row = {
+      id: localId,
+      table_number: Number.isFinite(n) && n > 0 ? n : 0,
+      place: code || extra.note || '',
+      reason: mapped,
+      note: extra.note || '',
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      customer_name: extra.name,
+      customer_phone: extra.phone
+    };
+    if (window.AquaBus) AquaBus.pushCall(row);
     try {
-      if (window.AquaOS && AquaOS.live && AquaOS.live()) return await AquaOS.createCall(code, reason, extra);
-    } catch (e) { /* bus local */ }
-    if (callsLive()) {
-      try { return await AquaCalls.createCall(code, reason, extra.note, DEVICE); } catch (e) { /* bus */ }
-    }
-    const id = Date.now();
-    if (window.AquaBus) {
-      AquaBus.pushCall({
-        id, table_number: parseInt(String(code).replace(/\D/g, ''), 10) || code,
-        reason: ({ request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente' }[reason] || reason),
-        note: extra.note || '', status: 'pending', created_at: new Date().toISOString(),
-        customer_name: extra.name, customer_phone: extra.phone
-      });
-    }
-    return id;
+      if (window.AquaOS && AquaOS.live && AquaOS.live()) {
+        const sid = await AquaOS.createCall(code, reason, extra);
+        if (sid && window.AquaBus) AquaBus.patchCall(localId, { serverId: sid });
+        return sid || localId;
+      }
+    } catch (e) { /* fica no bus local — a equipa vê na mesma */ }
+    return localId;
   }
   async function apiCancelCall(id) {
     if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.cancelCall) { try { await AquaOS.cancelCall(id); } catch (e) { /* */ } }
@@ -2726,7 +2733,7 @@ const REVIEWS = [];
     const p = JSON.parse(store.get('aq.pending') || 'null');
     if (p && p.kind === 'item' && p.id) pendingAdd = () => addToCart(p.id, p.qty || 1, p.note || '', p.extras, p.doneness);
     else if (p && p.kind === 'cart') pendingAdd = () => openCart();
-    else if (p && p.kind === 'call') pendingAdd = () => openCall(p.reason || '');
+    else if (p && p.kind === 'call') pendingAdd = () => openCall(p.reason || 'urgent_other');
   } catch (e) { /* */ }
   const saveCart = () => store.set('aq.cart', JSON.stringify(cart));
   function loadDrafts() {
@@ -3323,6 +3330,7 @@ const REVIEWS = [];
   /* chamar garçom */
   const callDlg = $('#callDlg'); let call = null, callTimer = 0, stopCall = null;
   function paintCall() {
+    if (!call) return;
     const box = $('#csBox'); box.className = 'cs ' + call.status;
     const t = $('#csTitle'), sub = $('#csSub'), time = $('#csTime'), st = call.status;
     $('#callCancel').hidden = st !== 'pending'; $('#callDone').hidden = !(st === 'accepted' || st === 'sent'); $('#callClose').hidden = st === 'pending' || st === 'accepted' || st === 'sent';
@@ -3383,41 +3391,53 @@ const REVIEWS = [];
     return table || '';
   }
   function openCall(reason) {
+    const why = reason || 'urgent_other';
     if (!placeReady(place)) {
-      pendingAdd = () => openCall(reason);
-      savePending({ kind: 'call', reason: reason || '' });
+      pendingAdd = () => openCall(why);
+      savePending({ kind: 'call', reason: why });
       openPlace();
       return;
     }
-    if (call && (call.status === 'pending' || call.status === 'accepted' || call.status === 'sent')) { $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall(); callDlg.showModal(); return; }
-    $('#callForm').hidden = false; $('#callStatus').hidden = true; $('#callMsg').textContent = ''; callDlg.showModal();
-    if (reason) startCall(reason);
+    if (call && (call.status === 'pending' || call.status === 'accepted' || call.status === 'sent')) {
+      $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall(); callDlg.showModal(); return;
+    }
+    $('#callMsg').textContent = '';
+    callDlg.showModal();
+    startCall(why);
   }
   async function startCall(reason) {
     const msg = $('#callMsg');
-    if (!placeReady(place)) { msg.textContent = tr('call.needPlace'); openPlace(); return; }
-    const code = callCode();
+    if (!placeReady(place)) { if (msg) msg.textContent = tr('call.needPlace'); openPlace(); return; }
     if (place.kind === 'dine' && place.tableNumber) {
       table = String(place.tableNumber);
       const sel = $('#callTable'); if (sel) sel.value = table;
     }
-    if (!code) { msg.textContent = tr('call.needPlace'); return; }
-    msg.textContent = tr('cart.sending');
+    const sel = $('#callTable');
+    const code = (sel && sel.value) || callCode();
+    if (!code) { if (msg) msg.textContent = tr('call.needPlace'); return; }
+    call = { id: null, reason, status: 'pending', t0: Date.now(), tAcc: 0, by: '', respMs: null, rated: false, ack: false };
+    $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall();
+    if (msg) msg.textContent = tr('cart.sending');
     try {
       const id = await apiCall(code, reason);
+      call.id = id;
       rememberCall({ id, reason, table: code, ts: Date.now(), status: 'pending' });
-      call = { id, reason, status: 'pending', t0: Date.now(), tAcc: 0, by: '', respMs: null, rated: false, ack: false };
       const rr0 = $('#csRate'); if (rr0) { rr0.dataset.on = ''; rr0.innerHTML = ''; rr0.hidden = true; }
       store.set('aq.call', JSON.stringify({ id, reason, t0: call.t0 }));
       armCall(id);
-      $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall();
-    } catch (e) { msg.textContent = tr('call.fail', { e: e.message || e }); }
+      paintCall();
+      updateFabs();
+    } catch (e) {
+      $('#callForm').hidden = false; $('#callStatus').hidden = true;
+      if (msg) msg.textContent = tr('call.fail', { e: e.message || e });
+      call = null;
+    }
   }
   $$('[data-reason]').forEach((b) => b.addEventListener('click', () => startCall(b.dataset.reason)));
   $('#callCancel').addEventListener('click', async () => { await apiCancelCall(call.id); call.status = 'cancelled'; paintCall(); });
   $('#callDone').addEventListener('click', () => { clearInterval(callPoll); call.ack = true; emit(call.id, { status: 'completed' }); });
   $('#callClose').addEventListener('click', () => { callDlg.close(); clearInterval(callPoll); call = null; store.set('aq.call', ''); updateFabs(); });
-  $('#fabCall').addEventListener('click', () => openCall());
+  $('#fabCall').addEventListener('click', () => openCall('urgent_other'));
 
   /* botões flutuantes */
   function latestLiveOrder() {
@@ -3765,7 +3785,7 @@ const REVIEWS = [];
 })();
 </script>
 <script src="os-config.js?v=ops3"></script>
-<script src="garcom.js?v=ops11"></script>
-<script src="os-bridge.js?v=ops11"></script>
+<script src="garcom.js?v=ops14"></script>
+<script src="os-bridge.js?v=ops14"></script>
 </body>
 </html>

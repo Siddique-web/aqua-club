@@ -146,7 +146,9 @@
       return d.orders[i < 0 ? 0 : i];
     },
     patchCall(id, patch) {
-      const d = readBus(); const c = (d.calls || []).find((x) => String(x.id) === String(id));
+      const d = readBus();
+      const key = String(id).replace(/^os-/, '');
+      const c = (d.calls || []).find((x) => String(x.id) === key || String(x.serverId) === key);
       if (c) Object.assign(c, patch); writeBus(d); return c;
     },
     patchOrder(id, patch) {
@@ -291,14 +293,15 @@
       }
     },
     async createCall(code, reason, extra) {
-      const map = { request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente' };
-      const tableNumber = parseInt(String(code).replace(/\D/g, ''), 10);
+      const map = { request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente', waiter: 'urgente' };
+      const parsed = parseInt(String(code).replace(/\D/g, ''), 10);
+      const tableNumber = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
       const r = await api('/calls', {
         method: 'POST',
         body: {
           tableNumber,
-          reason: map[reason] || reason || 'duvida',
-          note: (extra && extra.note) || '',
+          reason: map[reason] || reason || 'urgente',
+          note: (extra && extra.note) || String(code || ''),
           name: (extra && extra.name) || '',
           phone: (extra && extra.phone) || ''
         }
