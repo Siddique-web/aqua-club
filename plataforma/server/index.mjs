@@ -521,7 +521,19 @@ app.post('/api/live/calls/:id/accept', (req, res) => {
 
 app.post('/api/live/calls/:id/close', (req, res) => {
   const id = Number(req.params.id);
+  if (!Number.isFinite(id) || id < 1) return res.status(400).json({ error: 'id' });
   db.prepare("UPDATE calls SET status='closed', closed_at=datetime('now') WHERE id=? AND status IN ('pending','accepted')").run(id);
+  const call = db.prepare('SELECT * FROM calls WHERE id=?').get(id);
+  if (!call) return res.status(404).json({ error: 'missing' });
+  const payload = callPayload(call);
+  emitAll('call:updated', payload);
+  res.json({ call: payload });
+});
+
+app.post('/api/live/calls/:id/release', (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id) || id < 1) return res.status(400).json({ error: 'id' });
+  db.prepare("UPDATE calls SET status='pending', accepted_at=NULL, waiter_id=NULL WHERE id=? AND status IN ('accepted','pending')").run(id);
   const call = db.prepare('SELECT * FROM calls WHERE id=?').get(id);
   if (!call) return res.status(404).json({ error: 'missing' });
   const payload = callPayload(call);

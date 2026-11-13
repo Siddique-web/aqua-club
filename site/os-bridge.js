@@ -153,7 +153,15 @@
   window.AquaBus = {
     read: readBus,
     write: writeBus,
-    pushCall(c) { const d = readBus(); d.calls = d.calls || []; d.calls.unshift(c); writeBus(d); },
+    pushCall(c) {
+      const d = readBus();
+      d.calls = d.calls || [];
+      const key = String(c.serverId || c.id || '').replace(/^os-/, '');
+      const i = d.calls.findIndex((x) => String(x.id) === String(c.id) || (key && (String(x.id).replace(/^os-/, '') === key || String(x.serverId || '') === key)));
+      if (i >= 0) d.calls[i] = Object.assign({}, d.calls[i], c);
+      else d.calls.unshift(c);
+      writeBus(d);
+    },
     pushOrder(o) { const d = readBus(); d.orders = d.orders || []; d.orders.unshift(o); writeBus(d); },
     upsertOrder(o) {
       const d = readBus();
@@ -166,8 +174,17 @@
     patchCall(id, patch) {
       const d = readBus();
       const key = String(id).replace(/^os-/, '');
-      const c = (d.calls || []).find((x) => String(x.id) === key || String(x.serverId) === key);
-      if (c) Object.assign(c, patch); writeBus(d); return c;
+      let hit = null;
+      (d.calls || []).forEach((x) => {
+        const xid = String(x.id || '').replace(/^os-/, '');
+        const sid = String(x.serverId || '');
+        if (xid === key || sid === key || String(x.id) === String(id)) {
+          Object.assign(x, patch);
+          hit = x;
+        }
+      });
+      writeBus(d);
+      return hit;
     },
     patchOrder(id, patch) {
       const d = readBus(); const o = (d.orders || []).find((x) => String(x.id) === String(id) || String(x.code) === String(id));

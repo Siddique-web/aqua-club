@@ -777,8 +777,13 @@
         }
       } catch (e) { /* estático */ }
       const local = busCalls();
-      const seen = new Set(mapped.map((c) => c.id));
-      local.forEach((c) => { if (!seen.has(c.id)) mapped.push(c); });
+      const seen = new Map(mapped.map((c) => [callMergeKey(c), c]));
+      local.forEach((c) => {
+        const k = callMergeKey(c);
+        const prev = seen.get(k);
+        if (!prev || statusRank(c.status) > statusRank(prev.status)) seen.set(k, c);
+      });
+      mapped = Array.from(seen.values());
       const prev = sigOf(S.liveCalls || []);
       S.liveCalls = mapped;
       mergeLiveIntoCalls();
@@ -791,6 +796,63 @@
       S.lastLive = new Set(pend.map((c) => c.id));
       if (S.open && S.view === 'app' && ['calls', 'orders', 'dash', 'member', 'team'].includes(S.tab) && sigOf(mapped) !== prev) renderTab();
     } catch (e) { /* */ }
+  }
+  function applyCallLists(osId, patch) {
+    const st = patch.status === 'closed' ? 'completed' : patch.status;
+    const touch = (c) => {
+      if (!c) return;
+      const key = String(osId).replace(/^os-/, '');
+      if (callMergeKey(c).replace(/^os-/, '') !== key && String(c.id) !== String(osId)) return;
+      c.status = st;
+      if (patch.accepted_at) { c.acceptedAt = patch.accepted_at; c.accepted_at = patch.accepted_at; }
+      if (patch.closed_at) { c.completedAt = patch.closed_at; c.closed_at = patch.closed_at; }
+      if (patch.waiterName) { c.by = patch.waiterName; c.waiterName = patch.waiterName; }
+    };
+    (S.liveCalls || []).forEach(touch);
+    (S.calls || []).forEach(touch);
+    (S.mine || []).forEach(touch);
+    if (S.osDesk && S.osDesk.calls) S.osDesk.calls.forEach(touch);
+  }
+  async function finishStaffCall(id, action) {
+    const osId = String(id).replace(/^os-/, '');
+    const now = new Date().toISOString();
+    const name = (S.me && S.me.name) || 'Garçom';
+    const patch = action === 'accept'
+      ? { status: 'accepted', accepted_at: now, waiterName: name }
+      : action === 'complete'
+        ? { status: 'closed', closed_at: now }
+        : { status: 'pending', accepted_at: null, waiterName: '', waiter_id: null };
+    const path = action === 'accept' ? '/live/calls/' + osId + '/accept'
+      : action === 'release' ? '/live/calls/' + osId + '/release'
+        : '/live/calls/' + osId + '/close';
+    let remote = null;
+    if (hasOsApi() && /^\d+$/.test(osId)) {
+      try { remote = await osFetch(path, { method: 'POST', body: {} }); } catch (e) { remote = null; }
+    }
+    if (remote && remote.call) {
+      if (remote.call.status) patch.status = remote.call.status;
+      if (remote.call.accepted_at) patch.accepted_at = remote.call.accepted_at;
+      if (remote.call.closed_at) patch.closed_at = remote.call.closed_at;
+      if (remote.call.waiterName) patch.waiterName = remote.call.waiterName;
+    }
+    if (window.AquaBus) AquaBus.patchCall(osId, patch);
+    applyCallLists(osId, patch);
+    try {
+      window.dispatchEvent(new CustomEvent('aq-call', { detail: Object.assign({ id: osId, serverId: osId }, patch) }));
+    } catch (e) { /* */ }
+    toast(
+      action === 'accept' ? 'Chamado aceite — o cliente já vê que está a caminho.'
+        : action === 'complete' ? 'Chamado concluído. Bom trabalho!'
+          : 'Chamado devolvido à fila.',
+      action === 'release' ? 'undo' : 'check',
+      action === 'release' ? '' : 'ok'
+    );
+    S.mineAt = 0;
+    await refreshLiveCalls();
+    try { await loadOsDesk(); } catch (e) { /* */ }
+    await refreshCalls();
+    renderTab();
+    return true;
   }
   function startLiveCalls() {
     if (S.livePoll) return;
@@ -860,8 +922,10 @@
   function tick() {
     if (!S.open || !root) return; const now = Date.now();
     $$('.gc-timer[data-since]', root).forEach((el) => {
+      const card = el.closest('.gc');
+      if (card && card.classList.contains('done')) return;
       const ms = now - Date.parse(el.dataset.since); el.lastElementChild.textContent = mmss(ms);
-      const card = el.closest('.gc'); if (card && card.dataset.urg != null) { card.classList.toggle('u1', ms >= 120000 && ms < 300000); card.classList.toggle('u2', ms >= 300000); }
+      if (card && card.dataset.urg != null) { card.classList.toggle('u1', ms >= 120000 && ms < 300000); card.classList.toggle('u2', ms >= 300000); }
     });
   }
 
@@ -982,21 +1046,36 @@
 
   /* ====================================================================== DASHBOARD ADMIN */
   const ZONE_CYCLE = ['rooftop', 'piscina', 'sala-principal'];
+  function callMergeKey(c) {
+    const raw = String(c.osId || c.serverId || c.id || '').replace(/^os-/, '');
+    if (/^\d+$/.test(raw)) return 'os-' + raw;
+    return String(c.id || '');
+  }
+  function statusRank(s) {
+    if (s === 'cancelled') return 4;
+    if (s === 'completed' || s === 'closed') return 3;
+    if (s === 'accepted') return 2;
+    if (s === 'pending') return 1;
+    return 0;
+  }
   function mergedCalls() {
     const cmap = new Map();
-    [].concat(S.calls || [], S.liveCalls || [], S.mine || [], (S.osDesk && S.osDesk.calls) || [], (S.team && S.team.calls) || []).forEach((c) => {
-      if (!c) return;
-      const id = String(c.id || '');
+    [].concat(S.calls || [], S.liveCalls || [], S.mine || [], (S.osDesk && S.osDesk.calls) || [], (S.team && S.team.calls) || []).forEach((row) => {
+      if (!row) return;
+      const c = row.tableCode || row.live || row.osId ? row : mapOsCall(row);
+      const id = callMergeKey(c);
       if (!id) return;
       const st = c.status === 'closed' ? 'completed' : c.status;
-      const prev = cmap.get(id) || {};
-      cmap.set(id, Object.assign({}, prev, c, {
+      const prev = cmap.get(id);
+      if (prev && statusRank(prev.status) > statusRank(st)) return;
+      cmap.set(id, Object.assign({}, prev || {}, c, {
+        id,
         status: st,
-        createdAt: c.createdAt || c.created_at || prev.createdAt,
-        acceptedAt: c.acceptedAt || c.accepted_at || prev.acceptedAt,
-        completedAt: c.completedAt || c.closed_at || prev.completedAt,
-        by: c.by || c.waiterName || prev.by || '',
-        byUser: c.byUser || c.waiter_id || prev.byUser || null
+        createdAt: c.createdAt || c.created_at || (prev && prev.createdAt),
+        acceptedAt: c.acceptedAt || c.accepted_at || (prev && prev.acceptedAt),
+        completedAt: c.completedAt || c.closed_at || (prev && prev.completedAt),
+        by: c.by || c.waiterName || (prev && prev.by) || '',
+        byUser: c.byUser || c.waiter_id || (prev && prev.byUser) || null
       }));
     });
     return Array.from(cmap.values());
@@ -1540,7 +1619,7 @@
   function tabCalls() {
     const me = S.me, t0 = startOfDay(Date.now()), raw = mergedCalls(), admin = me.role === 'admin';
     const all = filterCalls(raw);
-    const isMine = (c) => c.byUser === me.user_id || !!c.live || c.by === me.name;
+    const isMine = (c) => c.byUser === me.user_id || c.by === me.name || (admin && (c.byUser === 'live' || !c.by));
     const zf = () => true;
     const pendAll = all.filter((c) => c.status === 'pending'), pend = pendAll.filter(zf).sort((a, b) => ts(a.createdAt) - ts(b.createdAt));
     const mine = all.filter((c) => c.status === 'accepted' && isMine(c)).sort((a, b) => ts(a.acceptedAt) - ts(b.acceptedAt));
@@ -1799,33 +1878,10 @@
     if (a === 'resetdemo') { await be.resetDemo(); S.mine = null; S.calls = []; S.lastPend = null; return boot(); }
     if (a === 'accept' || a === 'complete' || a === 'release') {
       if (b.disabled) return; b.disabled = true; const id = b.dataset.id;
-      if (String(id).startsWith('os-')) {
-        const osId = id.slice(3);
-        const path = a === 'complete' || a === 'release' ? '/live/calls/' + osId + '/close' : '/live/calls/' + osId + '/accept';
-        let r = null;
-        if (hasOsApi()) {
-          try { r = await osFetch(path, { method: 'POST', body: {} }); } catch (e) { r = null; }
-        }
-        if (window.AquaBus) {
-          const patch = a === 'accept'
-            ? { status: 'accepted', accepted_at: new Date().toISOString(), waiterName: (S.me && S.me.name) || 'Garçom' }
-            : { status: 'closed', closed_at: new Date().toISOString() };
-          const row = AquaBus.patchCall(osId, patch);
-          if (!r) r = { call: row };
-        }
-        if (r) {
-          toast(a === 'accept' ? 'Chamado aceite — o cliente já vê que está a caminho.' : a === 'complete' ? 'Chamado concluído. Bom trabalho!' : 'Chamado encerrado.', 'check', 'ok');
-          await refreshLiveCalls(); if (S.tab === 'calls') renderTab();
-        }
-        return;
-      }
-      const r = await guard(() => (a === 'accept' ? be.acceptCall(id) : a === 'complete' ? be.completeCall(id) : be.releaseCall(id)));
-      if (r === true) {
-        if (a === 'accept') toast('Chamado aceite — o cliente já vê que está a caminho.', 'check', 'ok');
-        else if (a === 'complete') toast('Chamado concluído. Bom trabalho!', 'check', 'ok');
-        else { toast('Chamado devolvido à fila.', 'undo'); if (S.lastPend) S.lastPend.add(id); }
-      } else if (r === false) toast(a === 'accept' ? 'Outro colega já aceitou este chamado.' : 'Não foi possível atualizar este chamado.', 'alert', 'err');
-      S.mineAt = 0; await refreshCalls(); if (S.tab === 'calls') renderTab(); return;
+      const ok = await finishStaffCall(id, a);
+      b.disabled = false;
+      if (!ok) toast(a === 'accept' ? 'Outro colega já aceitou este chamado.' : 'Não foi possível atualizar este chamado.', 'alert', 'err');
+      return;
     }
     if (a === 'member') {
       const m = S.team.staff.find((x) => x.id === b.dataset.id); if (!m) return; const d = b.dataset.do;
