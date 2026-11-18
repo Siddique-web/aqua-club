@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops27"></script>
+<script src="i18n.js?v=ops29"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -88,6 +88,7 @@ picture.aq-pic{display:contents}
 .flag[data-flag=en]{background:linear-gradient(#3C3B6E,#3C3B6E) 0 0 / 42% 54% no-repeat,repeating-linear-gradient(#B22234 0 7.69%,#fff 7.69% 15.38%)}
 .flag[data-flag=es]{background:linear-gradient(#C60B1E 0 23%,#FFC400 23% 77%,#C60B1E 77%)}
 .flag[data-flag=fr]{background:linear-gradient(90deg,#0055A4 0 33.4%,#fff 33.4% 66.6%,#EF4135 66.6%)}
+.flag[data-flag=it]{background:linear-gradient(90deg,#009246 0 33.4%,#fff 33.4% 66.6%,#CE2B37 66.6%)}
 .flag[data-flag=zh]{background:#DE2910}
 .flag[data-flag=zh]::after{content:"";position:absolute;left:22%;top:24%;width:32%;height:32%;background:#FFDE00;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 .lang-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:130;min-width:248px;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px;box-shadow:0 22px 44px -18px rgba(0,40,80,.45)}
@@ -719,8 +720,12 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .sh.center .display,.sh.center h2{text-align:center;margin:0 auto;color:var(--cyan-d);font-size:clamp(2.05rem,6.6vw,3.5rem);line-height:.94;letter-spacing:-.03em}
 .sh.center .bar2{width:64px;height:4px;margin:1rem auto 0;background:#111}
 .sh.center p{text-align:center;margin:1.15rem auto 0;max-width:28rem;font-size:1.02rem;line-height:1.55;color:var(--muted);text-wrap:pretty}
-#espacos .sh.center{margin-bottom:2.6rem;max-width:46rem}
-#espacos .sh.center .display{max-width:10.2em}
+#espacos .sh.center{width:100%;max-width:min(58rem,100%);margin:0 auto 2.8rem;padding-inline:clamp(.6rem,2vw,1.5rem);container-type:inline-size}
+#espacos .sh.center .eyebrow{width:100%;letter-spacing:.32em;margin-bottom:.85rem;font-size:clamp(.68rem,1.7vw,.82rem)}
+#espacos .sh.center .display{width:100%;max-width:none;white-space:nowrap;font-size:clamp(1.85rem,6.2vw,3.9rem);line-height:.9;letter-spacing:-.03em}
+#espacos .sh.center .display{font-size:clamp(1.85rem,6.15cqi,3.9rem)}
+#espacos .sh.center .bar2{width:80px;height:4px;margin:1.15rem auto 0}
+#espacos .sh.center p{width:100%;max-width:min(36rem,calc(100% - var(--fab-w) - 1rem));margin-top:1.25rem;font-size:clamp(1.02rem,2.1vw,1.16rem);line-height:1.5}
 .mcard{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto;align-items:stretch;align-content:start;background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;overflow:hidden;min-width:0;box-shadow:0 14px 30px -22px rgba(0,105,168,.6);transition:transform var(--ease),box-shadow var(--ease),border-color var(--ease)}
 .mcard:hover{transform:translateY(-4px);border-color:var(--cyan);box-shadow:0 24px 40px -22px rgba(0,168,255,.7)}
 @keyframes mcat-fade{from{opacity:0}to{opacity:1}}
@@ -1124,6 +1129,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
           <button type="button" role="option" data-lang="en"><span class="flag" data-flag="en" aria-hidden="true"></span>English <b>EN</b></button>
           <button type="button" role="option" data-lang="es"><span class="flag" data-flag="es" aria-hidden="true"></span>Español <b>ES</b></button>
           <button type="button" role="option" data-lang="fr"><span class="flag" data-flag="fr" aria-hidden="true"></span>Français <b>FR</b></button>
+          <button type="button" role="option" data-lang="it"><span class="flag" data-flag="it" aria-hidden="true"></span>Italiano <b>IT</b></button>
           <button type="button" role="option" data-lang="zh"><span class="flag" data-flag="zh" aria-hidden="true"></span>中文 <b>中</b></button>
         </div>
       </div>
@@ -1240,7 +1246,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <section class="band" id="espacos" aria-labelledby="esp-t"><div class="wrap">
   <div class="sh center">
     <span class="eyebrow" data-i18n="esp.eye">Experiência Aqua Club</span>
-    <h2 class="display" id="esp-t" data-i18n-html="esp.title">O seu oásis de<br>lazer no<br>coração de<br>Beira</h2>
+    <h2 class="display" id="esp-t" data-i18n-html="esp.title">O seu oásis de lazer no<br>coração de Beira</h2>
     <div class="bar2" aria-hidden="true"></div>
     <p data-i18n="esp.lead">Toque nas fotografias para explorar os cantos pensados para o seu bem-estar.</p>
   </div>

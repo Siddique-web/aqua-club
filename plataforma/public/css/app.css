@@ -28,6 +28,7 @@ h1,h2,h3{font-family:var(--fh);margin:0;letter-spacing:-.02em}
 .flag[data-flag=en]{background:linear-gradient(#3C3B6E,#3C3B6E) 0 0 / 42% 54% no-repeat,repeating-linear-gradient(#B22234 0 7.69%,#fff 7.69% 15.38%)}
 .flag[data-flag=es]{background:linear-gradient(#C60B1E 0 23%,#FFC400 23% 77%,#C60B1E 77%)}
 .flag[data-flag=fr]{background:linear-gradient(90deg,#0055A4 0 33.4%,#fff 33.4% 66.6%,#EF4135 66.6%)}
+.flag[data-flag=it]{background:linear-gradient(90deg,#009246 0 33.4%,#fff 33.4% 66.6%,#CE2B37 66.6%)}
 .flag[data-flag=zh]{background:#DE2910}
 .flag[data-flag=zh]::after{content:"";position:absolute;left:22%;top:24%;width:32%;height:32%;background:#FFDE00;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 .lang-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:50;min-width:240px;padding:.35rem;background:#fff;border:2px solid #000;border-radius:14px;box-shadow:0 18px 36px -16px rgba(0,0,0,.35)}
