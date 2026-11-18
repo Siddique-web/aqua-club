@@ -2001,13 +2001,13 @@ const REVIEWS = [];
           });
         }
         sb = window.supabase.createClient(url, key);
-        const { data, error } = await sb.from('tables').select('id,code,zone').order('code');
+      const { data, error } = await sb.from('tables').select('id,code,zone').order('code');
         if (!error && data && data.length) { dbTables = data; tables = data.map((r) => ({ code: r.code, zone: r.zone })); }
       } catch (e) {
         console.warn('Sistema indisponível; a usar WhatsApp.', e);
         sb = null;
       }
-      fillTables(); setNotes(); startPolling();
+    fillTables(); setNotes(); startPolling();
     })();
     return sbBoot;
   }
@@ -2155,8 +2155,8 @@ const REVIEWS = [];
     if (window.AquaBus) AquaBus.patchOrder(o.id || o.code, { payment_status: o.pay === 'paid_declared' ? 'declared' : o.pay, payment_method: o.method, pay: o.pay, status: o.status });
     try {
       if (isLive()) {
-        const { error } = await sb.rpc('set_payment', { p_code: o.code, p_status: status, p_method: method, p_ref: ref || null });
-        if (error) throw error;
+    const { error } = await sb.rpc('set_payment', { p_code: o.code, p_status: status, p_method: method, p_ref: ref || null });
+    if (error) throw error;
       } else if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
         const r = await AquaOS.declarePay(o, method, ref, geo);
         if (r) {
@@ -2218,20 +2218,36 @@ const REVIEWS = [];
     try { await initBackend(); } catch (e) { /* */ }
     const liveOs = window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.orderStatus;
     if (!liveOs && !isLive()) return;
-    for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
-      try {
-        if (isLive() && o.code) {
+    if (isLive() && sb) {
+      const next = [];
+      let dropped = false;
+      for (const o of history) {
+        if (!o || !o.code) { dropped = true; continue; }
+        try {
           const { data, error } = await sb.rpc('order_status', { p_code: o.code });
-          if (error) continue;
+          if (error) { next.push(o); continue; }
           const row = Array.isArray(data) ? data[0] : data;
-          if (row) applyRemoteOrder(Object.assign({ code: o.code, id: o.id }, row));
-          continue;
-        }
-        if (liveOs && o.code) {
-          const r = await AquaOS.orderStatus(o.code);
-          if (r) applyRemoteOrder(Object.assign({ code: o.code, id: o.id }, r));
-        }
-      } catch (e) { /* tenta de novo */ }
+          if (!row) { dropped = true; continue; }
+          applyRemoteOrder(Object.assign({ code: o.code, id: o.id }, row));
+          next.push(o);
+        } catch (e) { next.push(o); }
+      }
+      if (dropped) {
+        history = next;
+        if (ov && !history.some((x) => x && (x.id === ov.id || x.code === ov.code))) ov = null;
+        saveHist();
+        renderHist();
+        updateFabs();
+      }
+    } else {
+      for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
+        try {
+          if (liveOs && o.code) {
+            const r = await AquaOS.orderStatus(o.code);
+            if (r) applyRemoteOrder(Object.assign({ code: o.code, id: o.id }, r));
+          }
+        } catch (e) { /* tenta de novo */ }
+      }
     }
     if (ov && cartDlg.open && $('#orderView') && !$('#orderView').hidden) paintOrderView();
   }
@@ -4092,8 +4108,8 @@ const REVIEWS = [];
   });
 })();
 </script>
-<script src="os-config.js?v=ops37"></script>
-<script src="garcom.js?v=ops37"></script>
-<script src="os-bridge.js?v=ops37"></script>
+<script src="os-config.js?v=ops38"></script>
+<script src="garcom.js?v=ops38"></script>
+<script src="os-bridge.js?v=ops38"></script>
 </body>
 </html>
