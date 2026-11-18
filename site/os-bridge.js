@@ -1,35 +1,5 @@
 /* Liga o site original (slides e fotos) ao sistema de pedidos, mesas, pagamentos e línguas. */
 (function () {
-  const FOOD = {
-    tabuas: ['assets/prato-petiscos.jpg', 'assets/prato-petiscos-d2.jpg', 'assets/petiscos.jpg'],
-    entradas: ['assets/prato-petiscos.jpg', 'assets/prato-petiscos-d1.jpg', 'assets/petiscos.jpg'],
-    saladas: ['assets/prato-petiscos-d1.jpg', 'assets/petiscos.jpg'],
-    sopas: ['assets/prato-petiscos-d2.jpg', 'assets/prato-petiscos.jpg'],
-    pizzas: ['assets/prato-petiscos.jpg', 'assets/petiscos.jpg', 'assets/prato-petiscos-d1.jpg'],
-    massas: ['assets/prato-petiscos-d2.jpg', 'assets/prato-petiscos.jpg'],
-    carnes: ['assets/prato-petiscos-d2.jpg', 'assets/petiscos.jpg'],
-    peixes: ['assets/prato-petiscos-d1.jpg', 'assets/prato-petiscos.jpg'],
-    sandes: ['assets/prato-petiscos.jpg', 'assets/prato-petiscos-d1.jpg'],
-    vegetarianos: ['assets/petiscos.jpg', 'assets/prato-petiscos-d1.jpg'],
-    extras: ['assets/prato-petiscos-d2.jpg', 'assets/petiscos.jpg'],
-    sobremesas: ['assets/prato-mousse.jpg', 'assets/sobremesas.jpg', 'assets/prato-mousse-d1.jpg'],
-    cocktails: ['assets/bar.jpg', 'assets/prato-bar.jpg', 'assets/bar-balcao.jpg'],
-    cervejas: ['assets/bar-balcao.jpg', 'assets/bar.jpg'],
-    vinhos: ['assets/bar.jpg', 'assets/prato-bar.jpg'],
-    espirituosas: ['assets/bar-balcao.jpg', 'assets/bar.jpg'],
-    cafetaria: ['assets/bar.jpg', 'assets/bar-balcao.jpg'],
-    grupos: ['assets/prato-petiscos.jpg', 'assets/petiscos.jpg'],
-    rapidos: ['assets/prato-petiscos.jpg', 'assets/prato-petiscos-d1.jpg']
-  };
-  function hashId(id) {
-    let h = 0;
-    for (let i = 0; i < String(id).length; i++) h = ((h << 5) - h + id.charCodeAt(i)) | 0;
-    return Math.abs(h);
-  }
-  function photoFor(m) {
-    const pool = FOOD[m.cat] || FOOD.entradas;
-    return pool[hashId(m.id) % pool.length];
-  }
   const loc = (obj, lang) => (obj && typeof obj === 'object' && (obj[lang] || obj.pt)) || obj || '';
   let lang = localStorage.getItem('aqua_lang') || 'pt';
   let catalog = null;
@@ -418,7 +388,6 @@
           name: loc(m, lang),
           desc: loc(m.desc, lang) || '',
           price: m.price,
-          img: photoFor(m),
           available: m.available !== false,
           quick: !!m.quick,
           doneness: !!m.doneness,
