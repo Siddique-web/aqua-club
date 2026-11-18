@@ -2186,7 +2186,8 @@ const REVIEWS = [];
     const payRaw = r.payment_status || r.pay;
     let pay = payRaw === 'declared' ? 'paid_declared' : (payRaw || o.pay);
     if ((o.method === 'pos' || r.payment_method === 'pos') && pay !== 'paid') pay = 'unpaid';
-    const st = r.status || o.status;
+    const stRaw = r.status || o.status;
+    const st = stRaw === 'received' ? 'review' : stRaw;
       let changed = false;
     if (st && st !== o.status) {
       const up = (ST_RANK[st] ?? 0) >= (ST_RANK[o.status] ?? 0) || st === 'cancelled';
@@ -2214,19 +2215,22 @@ const REVIEWS = [];
   }
   async function refreshOrdersNow() {
     refreshFromBus();
+    try { await initBackend(); } catch (e) { /* */ }
     const liveOs = window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.orderStatus;
     if (!liveOs && !isLive()) return;
-      for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
-        try {
-        if (liveOs && o.code) {
-          const r = await AquaOS.orderStatus(o.code);
-          if (r) applyRemoteOrder(r);
+    for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
+      try {
+        if (isLive() && o.code) {
+          const { data, error } = await sb.rpc('order_status', { p_code: o.code });
+          if (error) continue;
+          const row = Array.isArray(data) ? data[0] : data;
+          if (row) applyRemoteOrder(Object.assign({ code: o.code, id: o.id }, row));
           continue;
         }
-        if (!isLive()) continue;
-          const { data, error } = await sb.rpc('order_status', { p_code: o.code });
-          if (error || !data || !data.length) continue;
-        applyRemoteOrder(data[0]);
+        if (liveOs && o.code) {
+          const r = await AquaOS.orderStatus(o.code);
+          if (r) applyRemoteOrder(Object.assign({ code: o.code, id: o.id }, r));
+        }
       } catch (e) { /* tenta de novo */ }
     }
     if (ov && cartDlg.open && $('#orderView') && !$('#orderView').hidden) paintOrderView();
@@ -2275,7 +2279,7 @@ const REVIEWS = [];
       updateFabs();
       if (ov) paintOrderView();
       const viewing = cartDlg.open && $('#orderView') && !$('#orderView').hidden;
-      if (window.AquaOS && AquaOS.socketUp && AquaOS.socketUp() && !viewing) return;
+      if (!isLive() && window.AquaOS && AquaOS.socketUp && AquaOS.socketUp() && !viewing) return;
       refreshOrdersNow();
     }, 1500);
     refreshOrdersNow();
@@ -4088,8 +4092,8 @@ const REVIEWS = [];
   });
 })();
 </script>
-<script src="os-config.js?v=ops36"></script>
-<script src="garcom.js?v=ops36"></script>
-<script src="os-bridge.js?v=ops36"></script>
+<script src="os-config.js?v=ops37"></script>
+<script src="garcom.js?v=ops37"></script>
+<script src="os-bridge.js?v=ops37"></script>
 </body>
 </html>
