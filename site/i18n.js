@@ -1,4 +1,4 @@
-﻿/* Línguas do site: PT · EN · ES · FR · IT · 中 */
+/* Línguas do site: PT · EN · ES · FR · IT · 中 */
 (function () {
   const P = (pt, en, es, fr, zh, it) => ({ pt, en, es, fr, zh, it });
   const LANGS = ['pt', 'en', 'es', 'fr', 'it', 'zh'];

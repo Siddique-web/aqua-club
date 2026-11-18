@@ -12,7 +12,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import { Server as SocketIO } from 'socket.io';
-import { db, seedIfEmpty, todayISO, waiterForTable, publicUser, logEvent, addAlert, transaction } from './db.mjs';
+import { db, seedIfEmpty, todayISO, waiterForTable, publicUser, logEvent, addAlert, transaction, findWaiterByPhone, waiterPublic } from './db.mjs';
 import { MENU, CATEGORIES, DONENESS_SCALE, GLOBAL_EXTRAS, CLUB, ZONES, CALL_REASONS } from './catalog.mjs';
 
 seedIfEmpty();
@@ -588,20 +588,49 @@ app.get('/api/staff/kiosk', (_req, res) => {
   res.json({ waiters });
 });
 
-app.post('/api/staff/open', (req, res) => {
-  const { waiterId, pin } = req.body || {};
+const staffLoginLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 12, standardHeaders: true, legacyHeaders: false });
+
+app.post('/api/staff/open', staffLoginLimiter, (req, res) => {
+  const { waiterId, pin, phone, code } = req.body || {};
+  const secret = String(code || pin || '');
+  if (secret.length < 4) return res.status(400).json({ error: 'pin' });
   let w = null;
-  if (waiterId) {
-    w = db.prepare('SELECT * FROM waiters WHERE id=? AND active=1').get(Number(waiterId));
-  } else if (pin) {
-    const list = db.prepare('SELECT * FROM waiters WHERE pin=? AND active=1').all(String(pin));
-    if (list.length > 1) return res.status(400).json({ error: 'ambiguous' });
-    w = list[0] || null;
+  if (phone) w = findWaiterByPhone(phone);
+  else if (waiterId) w = db.prepare('SELECT * FROM waiters WHERE id=? AND active=1').get(Number(waiterId));
+  if (!w) return res.status(401).json({ error: 'pin' });
+  if (w.locked_until && Date.parse(w.locked_until) > Date.now()) {
+    return res.status(423).json({ error: 'locked', message: 'Conta temporariamente bloqueada. Aguarde 15 minutos.' });
   }
-  if (!w || String(w.pin) !== String(pin)) return res.status(401).json({ error: 'pin' });
+  const hash = w.pin_hash || '';
+  const ok = hash
+    ? bcrypt.compareSync(secret, hash)
+    : (w.pin && String(w.pin) === secret);
+  if (!ok) {
+    const fails = Number(w.login_fails || 0) + 1;
+    const lock = fails >= 8 ? new Date(Date.now() + 15 * 60_000).toISOString() : null;
+    db.prepare('UPDATE waiters SET login_fails=?, locked_until=? WHERE id=?').run(fails, lock, w.id);
+    return res.status(401).json({ error: 'pin' });
+  }
+  db.prepare("UPDATE waiters SET login_fails=0, locked_until=NULL WHERE id=?").run(w.id);
   const shift = db.prepare('SELECT * FROM shifts WHERE waiter_id=? AND work_date=?').get(w.id, todayISO());
-  const token = jwt.sign({ wid: w.id, kind: 'staff' }, JWT_SECRET, { expiresIn: '14h' });
-  res.json({ token, waiter: { id: w.id, name: w.name, photo: w.photo, bio: w.bio, phone: w.phone }, shift });
+  const token = jwt.sign({ wid: w.id, kind: 'staff', job: w.job || 'cashier' }, JWT_SECRET, { expiresIn: '14h' });
+  res.json({ token, waiter: waiterPublic(w), shift });
+});
+
+app.post('/api/staff/password', (req, res) => {
+  const me = staffFrom(req);
+  if (!me || !me.can_change_passwords) return res.status(403).json({ error: 'forbidden', message: 'Só o IT pode alterar códigos de acesso.' });
+  const body = req.body || {};
+  const next = String(body.pin || body.code || body.password || '');
+  if (next.length < 5) return res.status(400).json({ error: 'pin', message: 'O código precisa de pelo menos 5 dígitos.' });
+  let target = null;
+  if (body.phone) target = findWaiterByPhone(body.phone);
+  else if (body.waiterId) target = db.prepare('SELECT * FROM waiters WHERE id=?').get(Number(body.waiterId));
+  if (!target) return res.status(404).json({ error: 'missing' });
+  const hash = bcrypt.hashSync(next, 12);
+  db.prepare("UPDATE waiters SET pin_hash=?, pin='', login_fails=0, locked_until=NULL WHERE id=?").run(hash, target.id);
+  logEvent('staff_password', { by: me.id, target: target.id });
+  res.json({ ok: true, waiter: { id: target.id, name: target.name } });
 });
 
 function staffFrom(req) {

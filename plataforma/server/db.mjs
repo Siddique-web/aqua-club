@@ -4,6 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { ZONES } from './catalog.mjs';
+import { CASA_STAFF, STAFF_BOOTSTRAP_CODE, mzDigits } from './casa-staff.mjs';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -151,6 +152,14 @@ CREATE INDEX IF NOT EXISTS idx_events_kind ON events(kind, created_at);
 `);
 
 for (const sql of [
+  "ALTER TABLE waiters ADD COLUMN role TEXT NOT NULL DEFAULT 'waiter'",
+  "ALTER TABLE waiters ADD COLUMN job TEXT NOT NULL DEFAULT 'cashier'",
+  'ALTER TABLE waiters ADD COLUMN pin_hash TEXT',
+  'ALTER TABLE waiters ADD COLUMN can_change_passwords INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE waiters ADD COLUMN perms TEXT',
+  'ALTER TABLE waiters ADD COLUMN login_fails INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE waiters ADD COLUMN locked_until TEXT',
+  'ALTER TABLE waiters ADD COLUMN title TEXT',
   'ALTER TABLE orders ADD COLUMN customer_name TEXT',
   'ALTER TABLE orders ADD COLUMN customer_phone TEXT',
   'ALTER TABLE orders ADD COLUMN place_label TEXT',
@@ -190,7 +199,6 @@ export function seedIfEmpty() {
   for (const z of ZONES) {
     db.prepare('UPDATE tables SET zone=? WHERE number BETWEEN ? AND ?').run(z.id, z.from, z.to);
   }
-  const nWaiters = db.prepare('SELECT COUNT(*) AS c FROM waiters').get().c;
   const nTables = db.prepare('SELECT COUNT(*) AS c FROM tables').get().c;
   const nAdmin = db.prepare("SELECT COUNT(*) AS c FROM users WHERE role='admin'").get().c;
 
@@ -206,31 +214,7 @@ export function seedIfEmpty() {
     });
   }
 
-  if (!nWaiters) {
-    const waiters = [
-      ['Amélia Nhampossa', '848110001', 'A vida à beira da piscina, com um sorriso.'],
-      ['João Mucavele', '848110002', 'Especialista nas tábuas e no rooftop.'],
-      ['Nádia Cossa', '848110003', 'Rápida, atenta aos detalhes do cocktail.'],
-      ['Carlos Tembe', '848110004', 'Grelhados e ponto da carne no ponto certo.'],
-      ['Sónia Machava', '848110005', 'Sala principal e grupos.'],
-      ['Pedro Mondlane', '848110006', 'Bar e pedidos para levar.'],
-      ['Lucrécia Dava', '848110007', 'Famílias e área jardim.'],
-      ['Miguel Chissano', '848110008', 'Noite, vinhos e espirituosas.'],
-      ['Beatriz Langa', '848110009', 'Pizzas, massas e pratos rápidos.'],
-      ['Samuel Matola', '848110010', 'Marisco e mesas VIP.']
-    ];
-    const ins = db.prepare('INSERT INTO waiters (name, phone, pin, photo, bio, active) VALUES (?,?,?,?,?,1)');
-    waiters.forEach((w, i) => {
-      const pin = process.env.AQUA_WAITER_PIN_BASE
-        ? String(Number(process.env.AQUA_WAITER_PIN_BASE) + i)
-        : String(10000 + crypto.randomInt(89999));
-      ins.run(w[0], '258' + w[1], pin, svgAvatar(w[0], 190 + i * 18), w[2]);
-    });
-    const date = todayISO();
-    const ranges = [[1, 4], [5, 8], [9, 12], [13, 16], [17, 20], [21, 24], [25, 28], [29, 32], [33, 36], [37, 40]];
-    const sh = db.prepare('INSERT INTO shifts (waiter_id, work_date, table_from, table_to) VALUES (?,?,?,?)');
-    ranges.forEach((r, i) => sh.run(i + 1, date, r[0], r[1]));
-  }
+  ensureCasaStaff();
 
   if (!nAdmin) {
     const email = process.env.AQUA_ADMIN_EMAIL;
@@ -248,6 +232,75 @@ export function seedIfEmpty() {
         VALUES ('customer','Cliente Demo',?,?,?,1,1)`).run(String(cEmail).trim().toLowerCase(), '', ch);
     }
   }
+}
+
+export function ensureCasaStaff() {
+  const hash = bcrypt.hashSync(STAFF_BOOTSTRAP_CODE, 12);
+  const casaPhones = new Set(CASA_STAFF.map((s) => mzDigits(s.phone)));
+  const rows = db.prepare('SELECT id, phone FROM waiters').all();
+  for (const row of rows) {
+    if (!casaPhones.has(mzDigits(row.phone))) {
+      db.prepare('UPDATE waiters SET active=0 WHERE id=?').run(row.id);
+    }
+  }
+  const find = db.prepare('SELECT * FROM waiters');
+  const byPhone = new Map(find.all().map((w) => [mzDigits(w.phone), w]));
+  CASA_STAFF.forEach((s, i) => {
+    const phone = mzDigits(s.phone);
+    const stored = '258' + phone;
+    const photo = svgAvatar(s.name, 190 + i * 22);
+    const perms = JSON.stringify(s.perms);
+    const existing = byPhone.get(phone);
+    if (existing) {
+      db.prepare(`UPDATE waiters SET name=?, phone=?, role=?, job=?, title=?, bio=?, photo=?,
+        can_change_passwords=?, perms=?, active=1, pin=''
+        WHERE id=?`).run(
+        s.name, stored, s.role, s.job, s.title, s.bio, photo,
+        s.can_change_passwords ? 1 : 0, perms, existing.id
+      );
+      if (!existing.pin_hash || process.env.AQUA_STAFF_RESET_CODES === '1') {
+        db.prepare('UPDATE waiters SET pin_hash=? WHERE id=?').run(hash, existing.id);
+      }
+    } else {
+      db.prepare(`INSERT INTO waiters (name, phone, pin, pin_hash, photo, bio, active, role, job, title, can_change_passwords, perms)
+        VALUES (?,?,?,?,?,?,1,?,?,?,?,?)`).run(
+        s.name, stored, '', hash, photo, s.bio, s.role, s.job, s.title,
+        s.can_change_passwords ? 1 : 0, perms
+      );
+    }
+  });
+  const date = todayISO();
+  const ids = db.prepare("SELECT id FROM waiters WHERE active=1 ORDER BY id").all().map((r) => r.id);
+  const sh = db.prepare('INSERT OR IGNORE INTO shifts (waiter_id, work_date, table_from, table_to) VALUES (?,?,?,?)');
+  ids.forEach((id, i) => {
+    const from = 1 + i * 28;
+    sh.run(id, date, from, Math.min(200, from + 27));
+  });
+}
+
+export function findWaiterByPhone(phone) {
+  const want = mzDigits(phone);
+  if (!want || want.length < 8) return null;
+  return db.prepare('SELECT * FROM waiters WHERE active=1').all()
+    .find((w) => mzDigits(w.phone) === want) || null;
+}
+
+export function waiterPublic(row) {
+  if (!row) return null;
+  let perms = [];
+  try { perms = JSON.parse(row.perms || '[]'); } catch { perms = []; }
+  return {
+    id: row.id,
+    name: row.name,
+    photo: row.photo,
+    bio: row.bio,
+    phone: row.phone,
+    role: row.role === 'admin' ? 'admin' : 'waiter',
+    job: row.job || 'cashier',
+    title: row.title || '',
+    can_change_passwords: !!row.can_change_passwords,
+    perms
+  };
 }
 
 export function logEvent(kind, payload) {

@@ -1131,8 +1131,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
           <button type="button" role="option" data-lang="fr"><span class="flag" data-flag="fr" aria-hidden="true"></span>Français <b>FR</b></button>
           <button type="button" role="option" data-lang="it"><span class="flag" data-flag="it" aria-hidden="true"></span>Italiano <b>IT</b></button>
           <button type="button" role="option" data-lang="zh"><span class="flag" data-flag="zh" aria-hidden="true"></span>中文 <b>中</b></button>
-        </div>
-      </div>
+    </div>
+  </div>
       <a class="btn btn-cyan" href="#bilhetes" data-i18n="bookDay">Reservar Dia</a>
       <button class="burger" id="burger" type="button" data-i18n-aria="openMenu" aria-expanded="false" aria-controls="mmenu"><svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg></button>
     </div>
@@ -1182,11 +1182,11 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
         <div class="cta"><a class="btn btn-cyan" href="#menu" data-i18n="hero.ctaMenu">Ver o menu</a><a class="btn btn-line" href="#bilhetes" data-i18n="bookMyDay">Reservar o meu dia</a></div>
       </div>
     </div>
-    <ul class="facts">
+      <ul class="facts">
       <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-drink"/></svg></span><b data-i18n="hero.f1n">Bar</b><span data-i18n="hero.f1">Gastronomia &amp; Bar</span></li>
       <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-kids"/></svg></span><b data-i18n="hero.f2n">Kids</b><span data-i18n="hero.f2">Área Infantil Aqua Kids</span></li>
       <li><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-dice"/></svg></span><b data-i18n="hero.f3n">Bilhar</b><span data-i18n="hero.f3">Mesas de Bilhar &amp; Lazer</span></li>
-    </ul>
+      </ul>
   </div>
 </section>
 
@@ -1202,7 +1202,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div class="menu-head">
     <div class="sh"><span class="eyebrow" data-i18n="menu.eye">Gastronomia &amp; Bar</span><h2 class="display" id="menu-t" data-i18n="menu.title">O nosso menu</h2><div class="bar2" aria-hidden="true"></div><p data-i18n="menu.lead">Escolha a categoria, junte ao pedido e levamos à mesa. Preços em meticais (MT).</p></div>
     <ol class="how-inline"><li data-i18n="menu.s1">Onde está</li><li data-i18n="menu.s2">Filtre e adicione</li><li data-i18n="menu.s3">Envie o pedido</li></ol>
-  </div>
+      </div>
   <div class="wall-panel reveal">
     <h3 class="display" data-i18n="menu.wallT">Os pratos do Aqua Club</h3>
     <p data-i18n="menu.wallP">Toque num prato para ver detalhes, extras e o ponto da carne.</p>
@@ -1464,7 +1464,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     </div>
     <div class="cart-dock">
     <div class="cart-picked" id="cartCheckout">
-      <div id="cartBody"></div>
+    <div id="cartBody"></div>
       <p class="dtotal"><span data-i18n="cart.total">Total</span> <b id="cartTotal"></b></p>
     </div>
     <div class="cart-id" id="cartId">
@@ -1947,6 +1947,14 @@ const REVIEWS = [];
 
   /* identidade do aparelho, dados do cliente e histórico (ficam neste telemóvel) */
   const DEVICE = (() => { let d = store.get('aq.dev'); if (!d) { d = uid(); store.set('aq.dev', d); } return d; })();
+  if (!store.get('aq.cloud.reset.v1')) {
+    store.set('aq.orders', '[]');
+    store.set('aq.os.bus', JSON.stringify({ orders: [], calls: [] }));
+    store.set('aq.call', '');
+    store.set('aq.callLog', '[]');
+    try { localStorage.removeItem('aqua_api'); } catch (e) { /* */ }
+    store.set('aq.cloud.reset.v1', '1');
+  }
   let history = []; try { history = JSON.parse(store.get('aq.orders') || '[]'); } catch (e) { history = []; }
   history.forEach((o) => {
     if (o && o.method === 'pos' && o.pay !== 'paid') o.pay = 'unpaid';
@@ -2013,16 +2021,22 @@ const REVIEWS = [];
     };
     if (window.AquaBus) AquaBus.pushCall(row);
     try {
+      if (callsLive() && AquaCalls.mode && AquaCalls.mode() === 'live') {
+        const sid = await AquaCalls.createCall(String(code), reason, loc, DEVICE);
+        if (sid && window.AquaBus) AquaBus.patchCall(localId, { serverId: sid, id: sid });
+        return sid || localId;
+      }
       if (window.AquaOS && AquaOS.live && AquaOS.live()) {
         const sid = await AquaOS.createCall(code, reason, extra);
         if (sid && window.AquaBus) AquaBus.patchCall(localId, { serverId: sid });
         return sid || localId;
       }
-    } catch (e) { /* fica no bus local — a equipa vê na mesma */ }
+    } catch (e) { throw e; }
     return localId;
   }
   async function apiCancelCall(id) {
-    if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.cancelCall) { try { await AquaOS.cancelCall(id); } catch (e) { /* */ } }
+    if (callsLive() && AquaCalls.mode && AquaCalls.mode() === 'live') { try { await AquaCalls.cancelCall(id); } catch (e) { /* */ } }
+    else if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.cancelCall) { try { await AquaOS.cancelCall(id); } catch (e) { /* */ } }
     else if (callsLive()) await AquaCalls.cancelCall(id);
     if (window.AquaBus) AquaBus.patchCall(id, { status: 'cancelled', closed_at: new Date().toISOString() });
     emit(id, { status: 'cancelled' });
@@ -2059,19 +2073,49 @@ const REVIEWS = [];
     if (!window.AquaBus) return;
     history.filter((o) => o && o.status !== 'cancelled').forEach((o) => AquaBus.upsertOrder(orderToBus(o)));
   }
+  async function cloudTableRow(o) {
+    const dine = o.fulfillment === 'dine_in';
+    const want = dine ? String(o.table || '').replace(/\D/g, '') : (o.take === 'delivery' ? 'delivery' : 'takeaway');
+    const keys = [want, String(o.table || ''), 'recinto', 'takeaway'].filter(Boolean);
+    let t = dbTables.find((x) => keys.includes(String(x.code)));
+    if (!t && sb) {
+      const { data } = await sb.from('tables').select('id,code,zone').in('code', keys);
+      if (data && data.length) {
+        dbTables = dbTables.concat(data.filter((r) => !dbTables.some((x) => x.id === r.id)));
+        t = data.find((x) => keys.includes(String(x.code))) || data[0];
+      }
+    }
+    return t || null;
+  }
   async function apiOrder(o) {
-    try {
-      if (window.AquaOS && AquaOS.live && AquaOS.live()) return await AquaOS.placeOrder(o);
-    } catch (e) { /* continua no registo local */ }
     if (window.AquaBus) AquaBus.upsertOrder(orderToBus(o));
     if (isLive()) {
-      const t = dbTables.find((x) => x.code === o.table);
-      if (!t) throw new Error(tr('cart.noTable'));
-      const { error } = await sb.from('orders').insert({ id: o.id, code: o.code, table_id: t.id, table_code: t.code, lines: o.lines, total_mzn: o.total, status: 'received',
-        customer_name: o.name, customer_phone: o.phone, accepted_terms: true, accepted_at: new Date(o.ts).toISOString(), device_id: DEVICE, payment_status: 'unpaid' });
+      const t = await cloudTableRow(o);
+      if (!t) throw new Error('Mesas da nuvem em falta. Corra o SQL v5 no Supabase.');
+      const payload = {
+        id: o.id, code: o.code, table_id: t.id, table_code: t.code, lines: o.lines, total_mzn: o.total,
+        status: 'received', customer_name: o.name, customer_phone: o.phone, accepted_terms: true,
+        accepted_at: new Date(o.ts).toISOString(), device_id: DEVICE, payment_status: 'unpaid',
+        fulfillment: o.fulfillment || null, take: o.take || null, address: o.address || null,
+        place_label: o.placeLabel || null, lat: o.lat || null, lng: o.lng || null,
+        note: o.note || null, wa_group: !!o.waGroupOpt, delivery_fee: o.deliveryFee || 0
+      };
+      let { error } = await sb.from('orders').insert(payload);
+      if (error && /column|schema cache/i.test(error.message || '')) {
+        const slim = {
+          id: o.id, code: o.code, table_id: t.id, table_code: t.code, lines: o.lines, total_mzn: o.total,
+          status: 'received', customer_name: o.name, customer_phone: o.phone, accepted_terms: true,
+          accepted_at: payload.accepted_at, device_id: DEVICE, payment_status: 'unpaid'
+        };
+        const r2 = await sb.from('orders').insert(slim);
+        error = r2.error;
+      }
       if (error) throw error;
       return;
     }
+    try {
+      if (window.AquaOS && AquaOS.live && AquaOS.live()) return await AquaOS.placeOrder(o);
+    } catch (e) { /* continua no registo local */ }
     if (mode === 'demo') { [['preparing', 4500], ['on_the_way', 9500], ['delivered', 14500]].forEach(([s, ms]) => setTimeout(() => emit(o.id, { status: s }), ms)); }
   }
   async function apiPay(o, status, method, ref, geo) {
@@ -2086,7 +2130,10 @@ const REVIEWS = [];
     if (o.pay === 'paid_declared' && !['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
     if (window.AquaBus) AquaBus.patchOrder(o.id || o.code, { payment_status: o.pay === 'paid_declared' ? 'declared' : o.pay, payment_method: o.method, pay: o.pay, status: o.status });
     try {
-      if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
+      if (isLive()) {
+        const { error } = await sb.rpc('set_payment', { p_code: o.code, p_status: status, p_method: method, p_ref: ref || null });
+        if (error) throw error;
+      } else if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.declarePay) {
         const r = await AquaOS.declarePay(o, method, ref, geo);
         if (r) {
           o.method = r.payment_method || o.method;
@@ -2099,9 +2146,6 @@ const REVIEWS = [];
             if (r.status) o.status = r.status;
           }
         }
-      } else if (isLive()) {
-        const { error } = await sb.rpc('set_payment', { p_code: o.code, p_status: status, p_method: method, p_ref: ref || null });
-        if (error) throw error;
       }
     } catch (e) {
       const code = e && (e.code || e.message);
@@ -2119,7 +2163,7 @@ const REVIEWS = [];
     let pay = payRaw === 'declared' ? 'paid_declared' : (payRaw || o.pay);
     if ((o.method === 'pos' || r.payment_method === 'pos') && pay !== 'paid') pay = 'unpaid';
     const st = r.status || o.status;
-    let changed = false;
+      let changed = false;
     if (st && st !== o.status) {
       const up = (ST_RANK[st] ?? 0) >= (ST_RANK[o.status] ?? 0) || st === 'cancelled';
       if (up) { o.status = st; changed = true; }
@@ -2148,16 +2192,16 @@ const REVIEWS = [];
     refreshFromBus();
     const liveOs = window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.orderStatus;
     if (!liveOs && !isLive()) return;
-    for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
-      try {
+      for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
+        try {
         if (liveOs && o.code) {
           const r = await AquaOS.orderStatus(o.code);
           if (r) applyRemoteOrder(r);
           continue;
         }
         if (!isLive()) continue;
-        const { data, error } = await sb.rpc('order_status', { p_code: o.code });
-        if (error || !data || !data.length) continue;
+          const { data, error } = await sb.rpc('order_status', { p_code: o.code });
+          if (error || !data || !data.length) continue;
         applyRemoteOrder(data[0]);
       } catch (e) { /* tenta de novo */ }
     }
@@ -3452,8 +3496,8 @@ const REVIEWS = [];
     });
     clearInterval(callTimer); callTimer = 0;
     clearInterval(callPoll);
-    const tick = async () => {
-      if (!call || call.id !== id) { clearInterval(callPoll); return; }
+      const tick = async () => {
+        if (!call || call.id !== id) { clearInterval(callPoll); return; }
       try {
         let r = null;
         if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.callStatus) r = await AquaOS.callStatus(id);
@@ -3515,10 +3559,10 @@ const REVIEWS = [];
   function paintCallLiveHint() {
     const el = $('#callLiveHint');
     if (!el) return;
-    const ok = !!(window.AquaOS && AquaOS.live && AquaOS.live());
+    const ok = !!(BACKEND.url && BACKEND.key) || !!(window.AquaOS && AquaOS.live && AquaOS.live());
     el.textContent = ok
-      ? 'A administração e os garçons recebem este chamado ao vivo.'
-      : 'Para o chamado chegar a outro telemóvel, abra o site pelo sistema (npm start na pasta plataforma, porta 5173). Sem isso, só funciona neste aparelho.';
+      ? 'A administração e os garçons recebem este chamado ao vivo na nuvem.'
+      : 'Para o chamado chegar a outro telemóvel, ligue o Supabase (os-config.js).';
   }
   function showCallStep(step) {
     const placeBox = $('#callPlace'), reasons = $('#callReasons');
@@ -4019,8 +4063,8 @@ const REVIEWS = [];
   });
 })();
 </script>
-<script src="os-config.js?v=ops20"></script>
-<script src="garcom.js?v=ops20"></script>
-<script src="os-bridge.js?v=ops21"></script>
+<script src="os-config.js?v=ops33"></script>
+<script src="garcom.js?v=ops33"></script>
+<script src="os-bridge.js?v=ops33"></script>
 </body>
 </html>
