@@ -219,15 +219,28 @@
       },
       async patchOrder(id, body) {
         const c = await need();
-        const { error } = await c.rpc('staff_patch_order', {
+        const pay = body.payment_status === 'declared' ? 'paid_declared' : (body.payment_status || null);
+        const st = body.status === 'review' ? 'received' : (body.status || null);
+        const { error: rpcErr } = await c.rpc('staff_patch_order', {
           p_id: id,
-          p_status: body.status || null,
-          p_pay: body.payment_status || null,
+          p_status: st,
+          p_pay: pay,
           p_method: body.payment_method || null,
           p_driver: body.driver_ok ? true : null,
           p_received: body.received_ok ? true : null
         });
-        if (error) throw fail(error);
+        if (rpcErr) {
+          const patch = {};
+          if (st) patch.status = st;
+          if (pay) patch.payment_status = pay;
+          if (body.payment_method) patch.payment_method = body.payment_method;
+          if (body.driver_ok) patch.driver_ok = true;
+          if (body.client_ok) patch.client_ok = true;
+          if (body.received_ok) { patch.received_ok = true; patch.client_ok = true; patch.driver_ok = true; }
+          if (pay === 'paid') patch.paid_at = new Date().toISOString();
+          const { error } = await c.from('orders').update(patch).eq('id', id);
+          if (error) throw fail(error);
+        }
         const { data } = await c.from('orders').select('*').eq('id', id).maybeSingle();
         return mapCloudOrder(data) || { id, status: body.status, payment_status: body.payment_status };
       },
@@ -928,11 +941,17 @@
       document.head.appendChild(s);
     }
   }
+  function pulseLive() {
+    refreshCalls();
+    loadOsDesk().then(() => {
+      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'calls'].includes(S.tab)) renderTab();
+    }).catch(() => {});
+  }
   function startWork() {
     stopWork(); const be = backend(); if (!be) return;
-    S.unsub = be.subscribe(() => { clearTimeout(deb); deb = setTimeout(refreshCalls, 250); });
-    S.pollT = setInterval(refreshCalls, 4000); S.tickT = setInterval(tick, 1000);
-    S.alarmT = setInterval(nagPending, 3500); refreshCalls();
+    S.unsub = be.subscribe(() => { clearTimeout(deb); deb = setTimeout(pulseLive, 200); });
+    S.pollT = setInterval(pulseLive, 2500); S.tickT = setInterval(tick, 1000);
+    S.alarmT = setInterval(nagPending, 3500); pulseLive();
     startLiveCalls();
   }
   function nagPending() {
@@ -942,7 +961,13 @@
     beep();
     try { if (navigator.vibrate) navigator.vibrate([160, 70, 160]); } catch (e) { /* */ }
   }
-  function stopWork() { if (S.unsub) { try { S.unsub(); } catch (e) { /* */ } } S.unsub = null; clearInterval(S.pollT); clearInterval(S.tickT); clearInterval(S.alarmT); S.lastPend = null; setBadge(0); }
+  function stopWork() {
+    if (S.unsub) { try { S.unsub(); } catch (e) { /* */ } }
+    S.unsub = null;
+    clearInterval(S.pollT); clearInterval(S.tickT); clearInterval(S.alarmT); clearInterval(S.osPoll);
+    S.pollT = 0; S.tickT = 0; S.alarmT = 0; S.osPoll = 0;
+    S.lastPend = null; setBadge(0);
+  }
   const sigOf = (l) => l.map((c) => c.id + c.status + c.by + c.released).join('|');
   async function refreshCalls() {
     if (!S.me || !S.me.active) return;
