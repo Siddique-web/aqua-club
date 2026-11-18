@@ -773,8 +773,33 @@ html:not(.staff-chrome) .fabs{bottom:max(.75rem, env(safe-area-inset-bottom,0px)
 .fab.call.accepted{background:var(--cyan);color:#000}
 .fab.call.accepted .ico{color:#000}
 @keyframes fabp{50%{box-shadow:0 0 0 10px rgba(255,215,0,.35),0 16px 30px -10px rgba(0,0,0,.55)}}
+#aqToasts.aq-toasts,#aqToasts:popover-open{position:fixed!important;inset:unset!important;top:calc(4.35rem + env(safe-area-inset-top,0px))!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%);z-index:2147483646;display:grid;gap:.4rem;width:min(92vw,400px);height:auto!important;pointer-events:none;margin:0!important;padding:0!important;border:0!important;background:transparent!important;overflow:visible;color-scheme:light}
+.aq-toast{pointer-events:none;display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(10,18,28,.92);color:#fff;padding:.7rem 1.05rem;border-radius:999px;font:650 .86rem/1.35 var(--fb);box-shadow:0 12px 28px -14px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);animation:aqtoast .32s ease}
+.aq-toast.ok{border-color:rgba(255,215,0,.55)}
+.aq-toast.err{background:rgba(120,22,32,.94);border-color:rgba(255,180,180,.25)}
+.aq-toast.out{opacity:0;transform:translateY(-6px);transition:opacity .25s,transform .25s}
+@keyframes aqtoast{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 /* janelas (item, pedido, chamada) */
 .dlg{border:0;padding:0;width:min(640px,100%);max-width:100%;max-height:100dvh;margin:auto auto 0;border-radius:28px 28px 0 0;background:#fff;color:#000;overflow-x:hidden;overflow-y:auto;box-shadow:0 -24px 60px rgba(0,0,0,.4);box-sizing:border-box}
+.guest-dlg{width:min(440px,100%)}
+.guest-stick{position:sticky;top:0;z-index:5;background:#fff;padding-bottom:.45rem}
+.guest-hero{text-align:center;padding:.05rem 0 .55rem}
+.guest-hero img{width:40px;height:40px;border-radius:12px;object-fit:cover}
+.guest-hero h2{margin:.4rem 0 .15rem;font:800 1.18rem/1.15 var(--fh);letter-spacing:-.03em}
+.guest-hero p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.4}
+.guest-seg{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;padding:.28rem;border-radius:999px;background:#F3F7FB;margin:0}
+.guest-seg button{border:0;border-radius:999px;min-height:40px;background:transparent;font:800 .72rem var(--fh);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;color:#5a6a76}
+.guest-seg button[aria-selected=true]{background:#111;color:var(--yellow)}
+.guest-form{display:grid;gap:.55rem}
+.guest-form label{display:grid;gap:.28rem;font:700 .75rem var(--fh);color:#223}
+.guest-form input{min-height:44px;border:1.5px solid var(--cyan-line);border-radius:14px;padding:.5rem .85rem;font:600 .95rem var(--fb);width:100%;box-sizing:border-box}
+.guest-form input:focus{outline:2px solid var(--cyan);border-color:var(--cyan)}
+.guest-form .btn{margin-top:.25rem}
+.guest-msg{min-height:1.2em;margin:.35rem 0 0;font:600 .85rem var(--fb)}
+#gMsgBanner:empty{display:none;margin:0}
+.guest-msg.err{color:#b42318}
+.guest-msg.ok{color:#0f7a3a}
+.guest-note{margin:.2rem 0 0;font-size:.8rem;color:var(--muted);text-align:center}
 .dlg::backdrop{background:rgba(0,20,35,.62);backdrop-filter:blur(3px)}
 .dlg[open]{animation:sheet .35s ease}
 @keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
@@ -1380,6 +1405,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div class="dfoot"><button class="btn btn-line" type="button" id="lbPrev" data-i18n="dlg.prev">‹ Anterior</button><span id="lbCount" class="cs-time"></span><button class="btn btn-line" type="button" id="lbNext" data-i18n="dlg.next">Seguinte ›</button></div>
 </div></dialog>
 
+<div class="aq-toasts" id="aqToasts" role="status" aria-live="polite" popover="manual"></div>
 <div class="fabs" id="fabs">
   <button class="fab cart" id="fabCart" type="button" hidden><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span id="fabCartTxt" data-i18n="fab.see">Ver pedido</span></button>
   <button class="fab-hint" id="fabHint" type="button" hidden data-i18n="fab.hint">Precisa de ajuda? Chame o garçom aqui ↓</button>
@@ -1564,6 +1590,40 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   </div>
 </div></dialog>
 
+<dialog class="dlg guest-dlg" id="guestDlg" aria-labelledby="guestT">
+  <div class="dpad">
+    <div class="guest-stick">
+    <div class="dhead"><h2 id="guestT">A sua conta</h2><button class="dx" type="button" data-close aria-label="Fechar">✕</button></div>
+    <div class="guest-hero">
+      <img src="assets/logo.webp" alt="" width="40" height="40" onerror="this.src='assets/logo.png'">
+      <h2>Bem-vindo ao Aqua Club</h2>
+      <p>Para pedir ou chamar o garçom, crie conta ou entre. Os dados ficam na nuvem da casa.</p>
+    </div>
+    <div class="guest-seg" role="tablist" aria-label="Entrar ou criar conta">
+      <button type="button" role="tab" id="guestTabUp" aria-selected="true">Criar conta</button>
+      <button type="button" role="tab" id="guestTabIn" aria-selected="false">Entrar</button>
+    </div>
+    <p class="guest-msg" id="gMsgBanner" role="status"></p>
+    </div>
+    <form class="guest-form" id="guestFormUp" novalidate>
+      <label>Nome completo<input name="name" id="gName" autocomplete="name" maxlength="80" required placeholder="Como no documento"></label>
+      <label>E-mail válido<input name="email" id="gEmailUp" type="email" autocomplete="email" required placeholder="nome@email.com"></label>
+      <label>Contacto (telemóvel)<input name="phone" id="gPhone" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="84 000 0000" maxlength="15"></label>
+      <label>Palavra-passe<input name="password" id="gPassUp" type="password" autocomplete="new-password" required minlength="6" placeholder="Mínimo 6 caracteres"></label>
+      <label>Confirmar palavra-passe<input name="password2" id="gPass2" type="password" autocomplete="new-password" required minlength="6" placeholder="Repita a palavra-passe"></label>
+      <button class="btn btn-cyan btn-block" type="submit">Criar conta e continuar</button>
+      <p class="guest-msg" id="gMsgUp" role="alert"></p>
+      <p class="guest-note">Ao criar conta aceita que o Aqua Club use estes dados só para pedidos e atendimento.</p>
+    </form>
+    <form class="guest-form" id="guestFormIn" hidden novalidate>
+      <label>E-mail<input name="email" id="gEmailIn" type="email" autocomplete="username" required placeholder="nome@email.com"></label>
+      <label>Palavra-passe<input name="password" id="gPassIn" type="password" autocomplete="current-password" required minlength="6"></label>
+      <button class="btn btn-cyan btn-block" type="submit">Entrar</button>
+      <p class="guest-msg" id="gMsgIn" role="alert"></p>
+    </form>
+  </div>
+</dialog>
+
 <script>
 /* ===== LIGAÇÃO AO SISTEMA DE PEDIDOS (opcional) =====
    Deixe vazio para o modo demonstração (a resposta do garçom é simulada).
@@ -1625,6 +1685,43 @@ const REVIEWS = [];
   'use strict';
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  function say(text, kind) {
+    const msg = String(text || '').trim();
+    if (!msg) return;
+    let box = $('#aqToasts');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'aqToasts';
+      box.className = 'aq-toasts';
+      box.setAttribute('role', 'status');
+      box.setAttribute('aria-live', 'polite');
+    }
+    if (box.parentNode !== document.body) document.body.appendChild(box);
+    if (typeof box.showPopover === 'function') {
+      try { if (!box.matches(':popover-open')) box.showPopover(); } catch (e) { /* */ }
+    }
+    while (box.childElementCount > 1) box.firstElementChild.remove();
+    const t = document.createElement('p');
+    t.className = 'aq-toast' + (kind === 'err' ? ' err' : kind === 'ok' ? ' ok' : '');
+    t.textContent = msg;
+    box.appendChild(t);
+    const ms = kind === 'err' ? 4200 : 2800;
+    setTimeout(() => {
+      t.classList.add('out');
+      setTimeout(() => { t.remove(); if (!box.childElementCount && box.parentNode === document.body) { /* keep */ } }, 280);
+    }, reduce ? 1800 : ms);
+  }
+  window.AquaSay = say;
+  document.addEventListener('close', (e) => {
+    const box = $('#aqToasts');
+    if (box && e.target && e.target.tagName === 'DIALOG' && e.target.contains(box)) document.body.appendChild(box);
+  }, true);
+  $('#langBar')?.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-lang]');
+    if (!b) return;
+    const names = { pt: 'Português', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano', zh: '中文' };
+    setTimeout(() => say('Língua: ' + (names[b.dataset.lang] || b.dataset.lang) + '.'), 80);
+  });
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const imgUrl = (p) => {
     if (typeof ASSETS === 'undefined') return p;
@@ -2000,9 +2097,10 @@ const REVIEWS = [];
             s.onload = ok; s.onerror = no; document.head.appendChild(s);
           });
         }
-        sb = window.supabase.createClient(url, key);
+        sb = window.supabase.createClient(url, key, { auth: { storageKey: 'aq-guest-auth', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
       const { data, error } = await sb.from('tables').select('id,code,zone').order('code');
         if (!error && data && data.length) { dbTables = data; tables = data.map((r) => ({ code: r.code, zone: r.zone })); }
+        await loadGuest();
       } catch (e) {
         console.warn('Sistema indisponível; a usar WhatsApp.', e);
         sb = null;
@@ -2011,6 +2109,159 @@ const REVIEWS = [];
     })();
     return sbBoot;
   }
+  let guest = null, pendingGuestFn = null;
+  const emailOk = (v) => /^\S+@\S+\.\S+$/.test(String(v || '').trim());
+  async function upsertCustomerRow(user, extra) {
+    if (!sb || !user) return null;
+    const name = String((extra && extra.name) || user.user_metadata && user.user_metadata.name || '').trim().slice(0, 80);
+    const phone = String((extra && extra.phone) || user.user_metadata && user.user_metadata.phone || '').replace(/\D/g, '');
+    const email = String(user.email || '').trim().toLowerCase();
+    const row = { user_id: user.id, name: name || splitMail(email), email, phone: phone || '' };
+    const { error } = await sb.from('customers').upsert(row, { onConflict: 'user_id' });
+    if (error) return null;
+    return row;
+  }
+  function splitMail(email) { return String(email || 'Cliente').split('@')[0]; }
+  async function loadGuest() {
+    guest = null;
+    if (!sb) return null;
+    const { data } = await sb.auth.getSession();
+    const user = data && data.session && data.session.user;
+    if (!user) return null;
+    if (/@staff\.aquaclub\.mz$/i.test(user.email || '')) {
+      await sb.auth.signOut();
+      return null;
+    }
+    let row = null;
+    const q = await sb.from('customers').select('*').eq('user_id', user.id).maybeSingle();
+    row = q.data;
+    if (!row) row = await upsertCustomerRow(user);
+    guest = { id: user.id, name: (row && row.name) || '', email: user.email, phone: (row && row.phone) || '' };
+    if (guest.name) cust.name = guest.name;
+    if (guest.phone) cust.phone = normPhone(guest.phone) || guest.phone;
+    store.set('aq.cust', JSON.stringify(cust));
+    return guest;
+  }
+  function guestMsg(kind, text) {
+    ['gMsgUp', 'gMsgIn', 'gMsgBanner'].forEach((id) => {
+      const el = $('#' + id);
+      if (!el) return;
+      el.className = 'guest-msg' + (kind ? ' ' + kind : '');
+      el.textContent = text || '';
+    });
+    if (text && (kind === 'err' || kind === 'ok')) say(text, kind);
+  }
+  function showGuestTab(which) {
+    const up = which === 'up';
+    $('#guestTabUp').setAttribute('aria-selected', up ? 'true' : 'false');
+    $('#guestTabIn').setAttribute('aria-selected', up ? 'false' : 'true');
+    $('#guestFormUp').hidden = !up;
+    $('#guestFormIn').hidden = up;
+    guestMsg('', '');
+  }
+  function openGuestAuth(tab) {
+    showGuestTab(tab || 'up');
+    $('#guestDlg').showModal();
+  }
+  async function afterGuest(fn) {
+    try { await initBackend(); } catch (e) { /* */ }
+    if (!sb) { openGuestAuth('up'); guestMsg('err', 'Sem ligação à nuvem. Tente de novo.'); return; }
+    await loadGuest();
+    if (guest && guest.id) return fn();
+    pendingGuestFn = fn;
+    openGuestAuth('up');
+  }
+  function finishGuestAuth() {
+    const fn = pendingGuestFn; pendingGuestFn = null;
+    try { $('#guestDlg').close(); } catch (e) { /* */ }
+    if (fn) fn();
+  }
+  function mzPhone(v) {
+    const n = normPhone(v);
+    return n && /^2588[2-7]\d{7}$/.test(n) ? n : '';
+  }
+  function authErr(e) {
+    const t = String((e && (e.message || e.error_description)) || e || '');
+    if (/already registered|already been registered|User already registered/i.test(t)) return 'Este e-mail já tem conta. Entre com a palavra-passe.';
+    if (/Invalid login credentials/i.test(t)) return 'E-mail ou palavra-passe incorrectos.';
+    if (/Email not confirmed/i.test(t)) return 'Confirme o e-mail (caixa de entrada) e volte a entrar.';
+    if (/Password should be at least/i.test(t)) return 'A palavra-passe precisa de pelo menos 6 caracteres.';
+    if (/invalid.*email/i.test(t)) return 'Indique um e-mail válido.';
+    if (/rate limit|too many/i.test(t)) return 'Demasiadas tentativas. Espere um minuto.';
+    return t || 'Não foi possível continuar.';
+  }
+  $('#guestTabUp')?.addEventListener('click', () => showGuestTab('up'));
+  $('#guestTabIn')?.addEventListener('click', () => showGuestTab('in'));
+  $('#guestFormUp')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    guestMsg('', '');
+    const name = $('#gName').value.trim().replace(/\s+/g, ' ');
+    const email = $('#gEmailUp').value.trim().toLowerCase();
+    const phone = mzPhone($('#gPhone').value);
+    const pass = $('#gPassUp').value;
+    const pass2 = $('#gPass2').value;
+    if (name.split(' ').filter((p) => p.length >= 2).length < 2) { guestMsg('err', 'Indique o nome completo.'); $('#gName').focus(); return; }
+    if (!emailOk(email) || /@staff\.aquaclub\.mz$/i.test(email)) { guestMsg('err', 'Indique um e-mail válido de cliente.'); $('#gEmailUp').focus(); return; }
+    if (!phone) { guestMsg('err', 'Contacto inválido. Use um telemóvel moçambicano (84, 85, 86, 87…).'); $('#gPhone').focus(); return; }
+    if (pass.length < 6) { guestMsg('err', 'A palavra-passe precisa de pelo menos 6 caracteres.'); $('#gPassUp').focus(); return; }
+    if (pass !== pass2) { guestMsg('err', 'As palavras-passe não coincidem.'); $('#gPass2').focus(); return; }
+    try { await initBackend(); } catch (err) { /* */ }
+    if (!sb) { guestMsg('err', 'Sem ligação à nuvem.'); return; }
+    const btn = e.submitter || $('#guestFormUp button[type=submit]');
+    if (btn) btn.disabled = true;
+    guestMsg('', 'A criar a sua conta…');
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email, password: pass,
+        options: { data: { name, phone }, emailRedirectTo: location.origin + location.pathname }
+      });
+      if (error) throw error;
+      let user = data.user;
+      if (!data.session) {
+        const inn = await sb.auth.signInWithPassword({ email, password: pass });
+        if (inn.error && /Email not confirmed/i.test(inn.error.message || '')) {
+          guestMsg('err', 'Conta criada. Confirme o e-mail e depois entre. No Supabase: Authentication → Providers → Email → desligue “Confirm email” para entrar já.');
+          return;
+        }
+        if (inn.error) throw inn.error;
+        user = inn.data.user;
+      }
+      await upsertCustomerRow(user, { name, phone });
+      await loadGuest();
+      if (!guest || !guest.id) throw new Error('Conta criada, mas o perfil não ficou na base. Corra o SQL v8 no Supabase.');
+      guestMsg('ok', 'Conta criada. Bem-vindo, ' + guest.name.split(' ')[0] + '.');
+      setTimeout(finishGuestAuth, 350);
+    } catch (err) {
+      guestMsg('err', authErr(err));
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  });
+  $('#guestFormIn')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    guestMsg('', '');
+    const email = $('#gEmailIn').value.trim().toLowerCase();
+    const pass = $('#gPassIn').value;
+    if (!emailOk(email)) { guestMsg('err', 'Indique o e-mail da conta.'); return; }
+    if (!pass) { guestMsg('err', 'Indique a palavra-passe.'); return; }
+    try { await initBackend(); } catch (err) { /* */ }
+    if (!sb) { guestMsg('err', 'Sem ligação à nuvem.'); return; }
+    const btn = e.submitter || $('#guestFormIn button[type=submit]');
+    if (btn) btn.disabled = true;
+    guestMsg('', 'A entrar…');
+    try {
+      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+      await loadGuest();
+      if (!guest || !guest.id) throw new Error('Esta conta não existe como cliente na base de dados.');
+      guestMsg('ok', 'Sessão iniciada.');
+      setTimeout(finishGuestAuth, 250);
+    } catch (err) {
+      guestMsg('err', authErr(err));
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  });
   /* chamados: com Supabase ou demonstração passam por window.AquaCalls (garcom.js); sem backend vão por WhatsApp */
   const callsLive = () => Boolean(window.AquaCalls && AquaCalls.mode() !== 'whatsapp');
   function rememberCall(row) {
@@ -2021,6 +2272,7 @@ const REVIEWS = [];
     } catch (e) { /* */ }
   }
   async function apiCall(code, reason) {
+    if (!guest || !guest.id) throw new Error('Entre na sua conta para chamar o garçom.');
     const loc = callLocLabel();
     const extra = { name: cust.name || '', phone: cust.phone || '', note: loc, place: loc };
     const mapped = ({ request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente', waiter: 'urgente' }[reason] || reason || 'urgente');
@@ -2111,6 +2363,7 @@ const REVIEWS = [];
   async function apiOrder(o) {
     if (window.AquaBus) AquaBus.upsertOrder(orderToBus(o));
     try { await initBackend(); } catch (e) { /* */ }
+    if (isLive() && (!guest || !guest.id)) throw new Error('Entre na sua conta para enviar o pedido.');
     if (isLive()) {
       const hit = await cloudTableRow(o);
       if (!hit) throw new Error('Mesas da nuvem em falta. Corra o SQL v5 no Supabase.');
@@ -2120,6 +2373,7 @@ const REVIEWS = [];
         id: o.id, code: o.code, table_id: t.id, table_code: tableCode, lines: o.lines, total_mzn: o.total,
         status: 'received', customer_name: o.name, customer_phone: o.phone, accepted_terms: true,
         accepted_at: new Date(o.ts).toISOString(), device_id: DEVICE, payment_status: 'unpaid',
+        customer_user_id: (guest && guest.id) || null,
         fulfillment: o.fulfillment || null, take: o.take || null, address: o.address || null,
         place_label: o.placeLabel || null, lat: o.lat || null, lng: o.lng || null,
         note: o.note || null, wa_group: !!o.waGroupOpt, delivery_fee: o.deliveryFee || 0
@@ -2605,11 +2859,12 @@ const REVIEWS = [];
     } else if (place.take !== 'pickup') { err.textContent = tr('place.needKind'); return; }
     savePlace();
     $('#placeDlg').close();
+    say('Local definido: ' + placeLabel(place) + '.', 'ok');
     if (pendingAdd) runPending();
     else openCart();
   });
   $('#placeChip').addEventListener('click', () => openPlace());
-  $('#fabOrder').addEventListener('click', () => { if (placeReady(place)) openCart(); else openPlace(); });
+  $('#fabOrder').addEventListener('click', () => afterGuest(() => { if (placeReady(place)) openCart(); else openPlace(); }));
   paintPlaceChip();
 
   function fillTables() {
@@ -2844,8 +3099,7 @@ const REVIEWS = [];
     });
     if (wrap) wrap.scrollTop = 0;
   }
-  let toastT = 0;
-  function toast(name) { const b = $('#fabCartTxt'); $('#fabCart').hidden = false; b.textContent = '✓ ' + name; clearTimeout(toastT); toastT = setTimeout(updateFabs, 1600); }
+  function toast(name) { say('Adicionou ' + name + ' ao pedido.', 'ok'); }
 
   /* janela do prato */
   const itemDlg = $('#itemDlg'); let curItem = null, curQty = 1;
@@ -2969,6 +3223,7 @@ const REVIEWS = [];
     if (!placeReady(place)) {
       pendingAdd = () => addToCart(id, qty, note, extras, doneness);
       savePending({ kind: 'item', id, qty, note, extras: extras || [], doneness });
+      say('Indique primeiro onde está, para adicionar ao pedido.');
       openPlace();
       return;
     }
@@ -2983,9 +3238,12 @@ const REVIEWS = [];
   function takeFromCart(id) {
     const i = cart.findIndex((x) => x.id === id);
     if (i < 0) return;
+    const nome = cart[i].name || id;
     cart[i].qty -= 1;
-    if (cart[i].qty < 1) cart.splice(i, 1);
+    const gone = cart[i].qty < 1;
+    if (gone) cart.splice(i, 1);
     renderCart(); updateFabs();
+    say(gone ? ('Retirou ' + nome + ' do pedido.') : ('Menos uma unidade de ' + nome + '.'));
   }
   function persistSession() {
     saveCart();
@@ -3054,10 +3312,12 @@ const REVIEWS = [];
   }
   function enterCheckout() {
     if (!cart.length) return;
+    const was = $('#cartEdit').classList.contains('checkout');
     $('#cartEdit').classList.add('checkout');
     syncCartDock();
     const name = $('#custName');
     if (name) name.focus({ preventScroll: true });
+    if (!was) say('A confirmar o pedido. Verifique o local e os seus dados.');
   }
   function leaveCheckout() {
     $('#cartEdit').classList.remove('checkout');
@@ -3130,11 +3390,13 @@ const REVIEWS = [];
     if (!window.confirm(tr('cart.cancelAsk'))) return;
     clearCart();
     cartDlg.close();
+    say('Pedido em rascunho cancelado.');
   });
   $('#draftNew')?.addEventListener('click', () => {
     if (!cart.length) return;
     parkDraft();
     $('#cartMsg').textContent = tr('cart.savedDraft');
+    say('Pedido guardado em rascunho. Pode começar outro.');
     place = {};
     table = new URLSearchParams(location.search).get('mesa') || '';
     store.set('aq.place', '');
@@ -3146,6 +3408,7 @@ const REVIEWS = [];
     else openPlace();
   });
   $('#sendOrder').addEventListener('click', async () => {
+    if (!guest || !guest.id) { afterGuest(() => $('#sendOrder').click()); return; }
     const msg = $('#cartMsg'); msg.textContent = '';
     if (!placeReady(place)) { msg.textContent = tr('place.set'); openPlace(); return; }
     if (!$('#cartEdit').classList.contains('checkout')) { enterCheckout(); return; }
@@ -3155,11 +3418,12 @@ const REVIEWS = [];
     if (needId) {
       enterCheckout();
     }
-    if (name.length < 2) { msg.textContent = tr('cart.needName'); $('#custName').focus({ preventScroll: false }); $('#custName').scrollIntoView({ block: 'nearest' }); return; }
-    if (!phone) { msg.textContent = tr('cart.needPhone'); $('#custPhone').focus({ preventScroll: false }); $('#custPhone').scrollIntoView({ block: 'nearest' }); return; }
-    if (!$('#custTerms').checked) { msg.textContent = tr('cart.needTerms'); $('#custTerms').scrollIntoView({ block: 'nearest' }); return; }
+    if (name.length < 2) { msg.textContent = tr('cart.needName'); say(tr('cart.needName'), 'err'); $('#custName').focus({ preventScroll: false }); $('#custName').scrollIntoView({ block: 'nearest' }); return; }
+    if (!phone) { msg.textContent = tr('cart.needPhone'); say(tr('cart.needPhone'), 'err'); $('#custPhone').focus({ preventScroll: false }); $('#custPhone').scrollIntoView({ block: 'nearest' }); return; }
+    if (!$('#custTerms').checked) { msg.textContent = tr('cart.needTerms'); say(tr('cart.needTerms'), 'err'); $('#custTerms').scrollIntoView({ block: 'nearest' }); return; }
     const waGroupOpt = Boolean($('#custWaGroup') && $('#custWaGroup').checked);
     const btn = $('#sendOrder'); btn.disabled = true; msg.textContent = tr('cart.sending');
+    say('A enviar o seu pedido…');
     const lines = cart.map((l) => {
       const m = byId(l.id) || { name: l.name, price: l.price };
       return { menuItemId: l.id, itemId: l.id, name: m.name, unitPriceMzn: lineUnit(l), quantity: l.qty, qty: l.qty, extras: l.extras || [], doneness: l.doneness, notes: l.note || undefined };
@@ -3179,13 +3443,14 @@ const REVIEWS = [];
       status: 'review', pay: 'unpaid', method: '', ref: ''
     };
     o.nConta = o.nPedido = nextConta(o);
-    try { await apiOrder(o); } catch (e) { msg.textContent = tr('cart.fail', { e: e.message || e }); btn.disabled = false; return; }
+    try { await apiOrder(o); } catch (e) { msg.textContent = tr('cart.fail', { e: e.message || e }); say(tr('cart.fail', { e: e.message || e }), 'err'); btn.disabled = false; return; }
     if (window.AquaOS && AquaOS.joinOrder && o.code) AquaOS.joinOrder(o.code);
     cust = { name, phone, waGroup: waGroupOpt }; store.set('aq.cust', JSON.stringify(cust));
     history.push(o); saveHist(); clearCart(); msg.textContent = '';
+    say('Pedido ' + o.code + ' enviado. A cozinha vai recebê-lo.', 'ok');
     if (mode === 'demo' && !isLive()) watch(o.id, (d) => { o.status = d.status; saveHist(); paintOrderView(); renderHist(); updateFabs(); });
     orderReadonly = false; ov = o; $('#cartEdit').hidden = true; $('#orderView').hidden = false; paintOrderView(); renderHist(); updateFabs(); startPolling();
-    if (!o.method) setTimeout(() => { if (ov && ov.id === o.id && !ov.method) openPay(ov, { first: true }); }, 500);
+    say('Quando quiser pagar, toque em Pedir a conta.');
   });
   function extraNames(ids) {
     if (!ids || !ids.length) return '';
@@ -3248,12 +3513,11 @@ const REVIEWS = [];
     $('#omsg').textContent = archived ? tr('cart.recordMsg') : (orderReadonly ? tr('cart.viewOnly') : (ov.status === 'no_confirm' ? tr('st.no_confirm') : canc ? tr('cart.cancelled') : ov.client_ok && !ov.driver_ok ? tr('cart.waitDriver') : ov.driver_ok && !ov.client_ok ? tr('cart.waitYou') : omsgAt(s)));
     $('#opay').textContent = archived ? tr('cart.record') : payTxt(ov.pay, ov);
     const payBtn = $('#orderPay');
-    const needFirst = !ov.method && ov.pay !== 'paid' && !canc;
-    const canSwap = !needFirst && ov.method && ov.pay !== 'paid' && !canc && payChangeLeft(ov) > 0;
+    const unpaid = ov.pay !== 'paid' && !canc;
     if (payBtn) {
-      payBtn.hidden = !(needFirst || canSwap);
+      payBtn.hidden = !unpaid;
       payBtn.disabled = false;
-      payBtn.textContent = needFirst ? tr('pay.choose') : tr('pay.changeMethod');
+      payBtn.textContent = ov.billAsked && ov.method ? tr('pay.changeMethod') : tr('call.bill');
     }
     const acts = $('#ovActs');
     if (acts) acts.hidden = (orderReadonly && !waitDel && (!payBtn || payBtn.hidden));
@@ -3281,8 +3545,7 @@ const REVIEWS = [];
   }
   $('#orderPay').addEventListener('click', () => {
     if (!ov) return;
-    if (!ov.method) openPay(ov, { first: true });
-    else openPay(ov, { change: true });
+    askBill(ov);
   });
   $('#orderHist').addEventListener('click', () => { cartDlg.close(); openHist(); });
   $('#orderBack')?.addEventListener('click', () => { cartDlg.close(); openHist(); });
@@ -3301,8 +3564,9 @@ const REVIEWS = [];
     try { if (window.AquaOS && AquaOS.confirmDelivery) await AquaOS.confirmDelivery(ov); } catch (e) { /* local */ }
     orderReadonly = ov.status === 'delivered' || ov.status === 'cancelled';
     paintOrderView(); renderHist(); updateFabs();
+    say('Confirmou que recebeu o pedido ' + (ov.code || '') + '.', 'ok');
   });
-  $('#orderNew').addEventListener('click', () => { cartDlg.close(); $('#menu').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
+  $('#orderNew').addEventListener('click', () => { cartDlg.close(); $('#menu').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); say('A escolher mais pratos no menu.'); });
   $('#toHist').addEventListener('click', () => { cartDlg.close(); openHist(); });
 
   /* os meus pedidos (lista + histórico + conta) */
@@ -3355,8 +3619,44 @@ const REVIEWS = [];
   function openHist() { renderHist(); histDlg.showModal(); }
   $('#histMenu').addEventListener('click', () => { histDlg.close(); $('#menu').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
 
-  /* pagamento */
-  const payDlg = $('#payDlg'); let paySel = null, payTarget = null, payIntent = 'first', payGeo = null;
+  /* pagamento — só depois de Pedir a conta */
+  const payDlg = $('#payDlg'); let paySel = null, payTarget = null, payIntent = 'first', payGeo = null, payBusy = false, pendingBillPay = null;
+  function unpaidForBill() {
+    if (pendingBillPay && payable(pendingBillPay) && pendingBillPay.pay !== 'paid') return pendingBillPay;
+    if (ov && payable(ov) && ov.pay !== 'paid') return ov;
+    const live = history.filter((o) => o && o.status !== 'cancelled' && o.pay !== 'paid');
+    return live.length ? live[live.length - 1] : null;
+  }
+  function afterBillCall() {
+    const o = unpaidForBill();
+    if (!o) { say('Não há conta em aberto para pagar.'); return; }
+    o.billAsked = true;
+    saveHist();
+    pendingBillPay = o;
+    try { if (callDlg.open) callDlg.close(); } catch (e) { /* */ }
+    if (payDlg.open) return;
+    openPay(o, { first: !o.method, change: !!(o.method && o.pay !== 'paid'), fromBill: true });
+  }
+  function askBill(o) {
+    pendingBillPay = o || unpaidForBill();
+    afterGuest(async () => {
+      const bill = pendingBillPay || unpaidForBill();
+      if (!bill) { say('Não há pedido por pagar.', 'err'); return; }
+      if (payDlg.open) return;
+      pendingBillPay = bill;
+      if (call && ['pending', 'sent', 'accepted'].includes(call.status)) {
+        afterBillCall();
+        return;
+      }
+      fillCallPlace();
+      if (!readCallPlace()) {
+        const ok = await startCall('request_bill');
+        if (!ok) openCall('request_bill');
+        return;
+      }
+      openCall('request_bill');
+    });
+  }
   function payLocked(o) {
     return !o || o.status === 'cancelled' || o.pay === 'paid';
   }
@@ -3382,7 +3682,7 @@ const REVIEWS = [];
   }
   function copyPayNumber(digits, el) {
     const text = String(digits || '').replace(/\D/g, '');
-    const done = () => { if (el) el.textContent = tr('pay.copied') + ' · ' + (paySel && paySel.number || text); };
+    const done = () => { if (el) el.textContent = tr('pay.copied') + ' · ' + (paySel && paySel.number || text); say('Número copiado. Pode colar na transferência.'); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(done).catch(() => {
         try { const i = document.createElement('textarea'); i.value = text; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); done(); } catch (e) { /* */ }
@@ -3392,10 +3692,14 @@ const REVIEWS = [];
     }
   }
   async function openPay(order, opts) {
+    if (payBusy || (payDlg && payDlg.open)) return;
     const o = payable(order) ? order : (payable(ov) ? ov : null);
     const change = !!(opts && opts.change);
     const first = !!(opts && opts.first) || (!change && o && !o.method);
     if (!o) { savePayResume(null); return; }
+    if (!(o.billAsked || (opts && opts.fromBill))) return;
+    payBusy = true;
+    try {
     if (change) {
       if (payChangeLeft(o) <= 0) { if ($('#omsg')) $('#omsg').textContent = tr('pay.windowGone'); return; }
       try {
@@ -3418,7 +3722,10 @@ const REVIEWS = [];
     $('#paySum').innerHTML = `<div class="hs warn"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(contaLabel(o))} · ${esc(o.code)} · ${esc(tr('pay.thisOrder'))}</span></div>`;
     paySel = null; $('#payInfo').innerHTML = ''; $('#payMsg').textContent = ''; $('#payGo').hidden = true;
     const box = $('#payMethods'); box.innerHTML = '';
+    const seenPay = {};
     PAYMENT.methods.forEach((m) => {
+      if (!m || !m.id || seenPay[m.id]) return;
+      seenPay[m.id] = true;
       const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
       const short = m.id === 'pos' ? tr('pay.posS') : (m.network ? m.network : tr('pay.mobile'));
       const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
@@ -3432,11 +3739,11 @@ const REVIEWS = [];
           $('#payCopy').addEventListener('click', () => {
             copyPayNumber(m.digits || m.number, $('#payCopy'));
             persistSession();
-            savePayResume({ method: m.id, hold: true, orderId: o.id, code: o.code });
+            savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o.id, code: o.code });
             $('#payMsg').textContent = tr('pay.stay');
           });
           $('#payMsg').textContent = tr('pay.stay');
-          savePayResume({ method: m.id, hold: true, orderId: o.id, code: o.code });
+          savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o.id, code: o.code });
         } else {
           $('#payInfo').innerHTML = `<p class="payinfo">${esc(hint)}</p>`;
           $('#payMsg').textContent = tr('pay.posWait', { c: o.code });
@@ -3456,16 +3763,20 @@ const REVIEWS = [];
     const pt = $('#payT');
     if (pt) pt.textContent = change ? tr('pay.changeMethod') : tr('pay.title');
     if (!payDlg.open) payDlg.showModal();
+    } finally {
+      payBusy = false;
+    }
   }
   function maybeResumePay() {
     const r = readPayResume();
     if (!r || !r.hold || !r.method || r.method === 'pos') return;
     const o = history.find((x) => String(x.id) === String(r.orderId) || x.code === r.code);
-    if (payLocked(o)) { savePayResume(null); return; }
-    if (payDlg.open) return;
-    const busy = ['cartDlg', 'placeDlg', 'itemDlg', 'callDlg', 'termsDlg'].some((id) => { const d = document.getElementById(id); return d && d.open; });
+    if (payLocked(o) || !o) { savePayResume(null); return; }
+    if (!o.billAsked) return;
+    if (payDlg.open || payBusy) return;
+    const busy = ['cartDlg', 'placeDlg', 'itemDlg', 'callDlg', 'termsDlg', 'guestDlg'].some((id) => { const d = document.getElementById(id); return d && d.open; });
     if (busy) return;
-    openPay(o);
+    openPay(o, { first: !o.method, fromBill: true });
   }
   $('#payGo').addEventListener('click', async () => {
     if (!paySel) return;
@@ -3488,6 +3799,7 @@ const REVIEWS = [];
         savePayResume(null);
         saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close();
         if (ov && (ov.id === o.id || ov.code === o.code)) { ov = o; if (!cartDlg.open) cartDlg.showModal(); paintOrderView(); }
+        say('Escolheu pagar no local com POS. O garçom trata do terminal.', 'ok');
         return;
       }
       await apiPay(o, 'paid_declared', paySel.id, '', payGeo);
@@ -3498,9 +3810,11 @@ const REVIEWS = [];
       savePayResume(null);
       saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close();
       if (ov && (ov.id === o.id || ov.code === o.code)) { ov = o; if (!cartDlg.open) { $('#cartEdit').hidden = true; $('#orderView').hidden = false; cartDlg.showModal(); } paintOrderView(); }
+      say('Declarou o pagamento por ' + payMethodLabel(paySel.id) + '. A casa vai confirmar.', 'ok');
     } catch (e) {
       const code = e && (e.code || e.message);
       msg.textContent = code === 'not_on_site' || code === 'need_site' ? tr('pay.tooFar') : code === 'pay_window' ? tr('pay.windowGone') : tr('pay.fail', { e: e.message || e });
+      say(msg.textContent, 'err');
     }
   });
 
@@ -3525,6 +3839,12 @@ const REVIEWS = [];
     }
     if (st === 'completed' || st === 'cancelled') store.set('aq.call', '');
     updateFabs();
+    const ck = st + '|' + (call.by || '');
+    if (ck !== paintCall._said) {
+      paintCall._said = ck;
+      if (st === 'accepted') say((call.by || 'O garçom') + ' aceitou o chamado e está a caminho.', 'ok');
+      else if (st === 'completed') say('O atendimento foi concluído. Obrigado.', 'ok');
+    }
   }
   /* acompanha o chamado: bus local (WhatsApp) ou consulta ao servidor a cada 3 s (Supabase/demonstração) */
   let callPoll = 0;
@@ -3660,6 +3980,7 @@ const REVIEWS = [];
     return '';
   }
   function openCall(reason) {
+    if (!guest || !guest.id) { afterGuest(() => openCall(reason)); return; }
     SCallReason = reason || 'urgent_other';
     if (call && (call.status === 'pending' || call.status === 'accepted' || call.status === 'sent')) {
       $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall(); callDlg.showModal(); return;
@@ -3673,19 +3994,25 @@ const REVIEWS = [];
   let SCallReason = 'urgent_other';
   async function startCall(reason) {
     const msg = $('#callMsg');
+    if (call && ['pending', 'sent', 'accepted'].includes(call.status)) {
+      if (reason === 'request_bill' || reason === 'conta') { afterBillCall(); return true; }
+      $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall();
+      if (!callDlg.open) callDlg.showModal();
+      return false;
+    }
     const need = readCallPlace();
     if (need) {
       if (msg) msg.textContent = need;
       $('#callForm').hidden = false; $('#callStatus').hidden = true;
       showCallStep(1);
-      return;
+      return false;
     }
     if (place.tableNumber) {
       table = String(place.tableNumber);
       const sel = $('#callTable'); if (sel) sel.value = table;
     }
     const code = callCode();
-    if (!code) { if (msg) msg.textContent = tr('call.needPlace'); showCallStep(1); return; }
+    if (!code) { if (msg) msg.textContent = tr('call.needPlace'); showCallStep(1); return false; }
     call = { id: null, reason, status: 'pending', t0: Date.now(), tAcc: 0, by: '', respMs: null, rated: false, ack: false };
     $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall();
     if (msg) msg.textContent = tr('cart.sending');
@@ -3698,15 +4025,25 @@ const REVIEWS = [];
       armCall(id);
       paintCall();
       updateFabs();
+      const bill = reason === 'request_bill' || reason === 'conta';
+      if (bill) {
+        say('Conta pedida. O garçom foi avisado. Escolha como pagar.', 'ok');
+        afterBillCall();
+      } else {
+        say('Chamado enviado: ' + rmsg(reason) + '. O garçom vai ser avisado.', 'ok');
+      }
+      return true;
     } catch (e) {
       $('#callForm').hidden = false; $('#callStatus').hidden = true;
       if (msg) msg.textContent = tr('call.fail', { e: e.message || e });
+      say(tr('call.fail', { e: e.message || e }), 'err');
       call = null;
+      return false;
     }
   }
   $$('#callReasons [data-reason]').forEach((b) => b.addEventListener('click', () => startCall(b.dataset.reason)));
-  $('#callCancel').addEventListener('click', async () => { await apiCancelCall(call.id); call.status = 'cancelled'; paintCall(); });
-  $('#callDone').addEventListener('click', () => { clearInterval(callPoll); call.ack = true; emit(call.id, { status: 'completed' }); });
+  $('#callCancel').addEventListener('click', async () => { await apiCancelCall(call.id); call.status = 'cancelled'; paintCall(); say('Cancelou o chamado ao garçom.'); });
+  $('#callDone').addEventListener('click', () => { clearInterval(callPoll); call.ack = true; emit(call.id, { status: 'completed' }); say('Confirmou que já foi atendido.', 'ok'); });
   $('#callClose').addEventListener('click', () => { callDlg.close(); clearInterval(callPoll); call = null; store.set('aq.call', ''); updateFabs(); });
   $('#callNext').addEventListener('click', () => {
     const msg = $('#callMsg');
@@ -3717,7 +4054,7 @@ const REVIEWS = [];
   });
   $('#callBackPlace').addEventListener('click', () => { showCallStep(1); $('#callMsg').textContent = ''; });
   $('#callMesa').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('#callNext').click(); } });
-  $('#fabCall').addEventListener('click', (e) => { e.preventDefault(); openCall('urgent_other'); });
+  $('#fabCall').addEventListener('click', (e) => { e.preventDefault(); afterGuest(() => openCall('urgent_other')); });
 
   /* botões flutuantes */
   function latestLiveOrder() {
@@ -4104,12 +4441,13 @@ const REVIEWS = [];
     const tipoLabel = { 'Piscina & Sol': tr('exp.geral'), 'Dia em Família': tr('exp.fam'), 'Almoço ou Jantar': tr('exp.vip'), 'Grupo & Amigos': tr('exp.grp') }[String(f.get('tipo'))] || f.get('tipo');
     const text = tr('hours.wa', { nome, data: d + '/' + m + '/' + y, pessoas, tipo: tipoLabel });
     msg.textContent = tr('hours.opening');
+    say('Pedido de reserva a abrir no WhatsApp.', 'ok');
     window.open('https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
   });
 })();
 </script>
-<script src="os-config.js?v=ops38"></script>
-<script src="garcom.js?v=ops38"></script>
-<script src="os-bridge.js?v=ops38"></script>
+<script src="os-config.js?v=ops41"></script>
+<script src="garcom.js?v=ops41"></script>
+<script src="os-bridge.js?v=ops41"></script>
 </body>
 </html>
