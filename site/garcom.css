@@ -78,6 +78,9 @@ html.gp-open .fabs { visibility: hidden !important; pointer-events: none !import
 .gp-empty { text-align: center; padding: 2rem 1rem; color: #3D4852; }
 .gp-empty .gi { width: 46px; height: 46px; color: var(--cyan, #00A8FF); margin-bottom: .4rem; }
 .gp-empty b { display: block; font: 800 1.05rem var(--fh, system-ui); color: #000; text-transform: uppercase; }
+.gp-person { display: flex; align-items: flex-start; gap: .75rem; }
+.gp-dot { width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; flex: none; margin-top: .45rem; }
+.gp-dot.on { background: #16A34A; box-shadow: 0 0 0 4px rgba(22, 163, 74, .22); }
 
 /* botões */
 .gb { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 46px; padding: .6rem 1.25rem; border: 2px solid transparent; border-radius: 999px; font: 800 .8rem var(--fh, system-ui); letter-spacing: .07em; text-transform: uppercase; cursor: pointer; background: var(--cyan, #00A8FF); color: #000; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }

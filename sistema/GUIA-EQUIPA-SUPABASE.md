@@ -26,6 +26,7 @@ SQL Editor → New query → Run:
 6. `sistema/supabase/schema_v6_tempo_real.sql`
 7. `sistema/supabase/schema_v7_estado_cliente.sql`
 8. `sistema/supabase/schema_v8_clientes.sql` (contas de cliente; só `@staff.aquaclub.mz` entra na equipa)
+9. `sistema/supabase/schema_v9_presenca.sql` (online/offline de clientes e da equipa)
 
 **Authentication → Providers → Email:** ligue “Allow new users to sign up”.  
 Para o cliente entrar logo após criar conta, desligue **Confirm email**.

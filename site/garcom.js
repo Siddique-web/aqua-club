@@ -210,6 +210,25 @@
         const c = await need(); const { data, error } = await c.from('staff').select('*').not('user_id', 'is', null).order('created_at', { ascending: true });
         if (error) throw fail(error); return data || [];
       },
+      async heartbeat() {
+        const c = await need();
+        await c.rpc('heartbeat');
+      },
+      async people() {
+        const c = await need();
+        const [st, cu, pr] = await Promise.all([
+          c.from('staff').select('user_id,name,email,phone,role,active').not('user_id', 'is', null),
+          c.from('customers').select('user_id,name,email,phone,created_at'),
+          c.from('presence').select('user_id,kind,name,email,phone,last_seen')
+        ]);
+        return {
+          staff: st.data || [],
+          customers: cu.data || [],
+          presence: pr.data || [],
+          staffErr: st.error && st.error.message,
+          custErr: cu.error && cu.error.message
+        };
+      },
       setStaff: (id, active, role) => rpc('admin_set_staff', { p_id: id, p_active: active, p_role: role }),
       async listOrders() {
         const c = await need();
@@ -252,6 +271,7 @@
           ch = c.channel('gp-live-' + Math.random().toString(36).slice(2, 7))
             .on('postgres_changes', { event: '*', schema: 'public', table: 'waiter_calls' }, () => cb())
             .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => cb())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'presence' }, () => cb())
             .subscribe();
         }).catch(() => {});
         return () => { dead = true; if (ch && sb) sb.removeChannel(ch); };
@@ -372,6 +392,8 @@
       },
       /* admin */
       async team() { const d = read(); const m = meRow(d); if (!m || !m.active || m.role !== 'admin') throw new Error('Sem permissão.'); return d.staff.map(pub); },
+      async heartbeat() { return; },
+      async people() { const d = read(); return { staff: d.staff || [], customers: [], presence: [] }; },
       async setStaff(id, active, role) {
         const d = read(), m = meRow(d); if (!m || !m.active || m.role !== 'admin') throw new Error('Sem permissão.');
         if (role !== 'waiter' && role !== 'admin') throw new Error('Papel inválido.');
@@ -502,6 +524,8 @@
         ping(); return true;
       },
       async team() { const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.'); return readRoster().map(pub); },
+      async heartbeat() { return; },
+      async people() { return { staff: readRoster().map(pub), customers: [], presence: [] }; },
       async inviteStaff() {
         throw new Error('Novas contas só se criam na nuvem.');
       },
@@ -943,9 +967,18 @@
   }
   function pulseLive() {
     refreshCalls();
+    beatPresence();
     loadOsDesk().then(() => {
-      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'calls'].includes(S.tab)) renderTab();
+      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'calls', 'people'].includes(S.tab)) renderTab();
     }).catch(() => {});
+    if (S.open && S.view === 'app' && S.tab === 'people' && S.me && S.me.role === 'admin') {
+      loadPeople().then(() => { if (S.tab === 'people') renderTab(); }).catch(() => {});
+    }
+  }
+  function beatPresence() {
+    const be = backend();
+    if (!be || !be.heartbeat || !S.me) return;
+    be.heartbeat().catch(() => {});
   }
   function startWork() {
     stopWork(); const be = backend(); if (!be) return;
@@ -953,6 +986,7 @@
     S.pollT = setInterval(pulseLive, 2500); S.tickT = setInterval(tick, 1000);
     S.alarmT = setInterval(nagPending, 3500); pulseLive();
     startLiveCalls();
+    beatPresence();
   }
   function nagPending() {
     if (!S.soundOn || !S.me || !S.me.active) return;
@@ -1056,7 +1090,7 @@
   function staffTabs() {
     if (S.me && S.me.role === 'admin') return [
       ['dash', 'Painel', 'home'], ['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'],
-      ['team', 'Equipa', 'users'], ['stats', 'Relatórios', 'chart'], ['profile', 'Casa', 'user']
+      ['team', 'Equipa', 'users'], ['people', 'Pessoas', 'users'], ['stats', 'Relatórios', 'chart'], ['profile', 'Casa', 'user']
     ];
     return [
       ['dash', 'Painel', 'home'], ['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'],
@@ -1084,7 +1118,7 @@
   async function enterTab(t) {
     const admin = !!(S.me && S.me.role === 'admin');
     if (t === 'admin') t = 'dash';
-    if ((t === 'team' || t === 'member') && !admin) t = 'dash';
+    if ((t === 'team' || t === 'member' || t === 'people') && !admin) t = 'dash';
     S.tab = t; if (S.view !== 'app') { syncNav(); return; }
     $$('.gp-tab, .gp-side-btn', root).forEach((b) => { const on = tabSelected(b.dataset.t); b.setAttribute('aria-selected', String(on)); if (on && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) { /* */ } } }); syncNav();
     const c = $('#gpc'); if (!c) return;
@@ -1092,14 +1126,31 @@
       if (t === 'orders' || t === 'team' || t === 'dash' || t === 'member' || t === 'stats') { c.innerHTML = loadingHTML; await loadOsDesk(); }
       if (['hist', 'stats', 'profile', 'dash', 'member'].includes(t) && (!S.mine || Date.now() - S.mineAt > 15000)) { if (!S.mine) c.innerHTML = loadingHTML; await loadMine(); }
       if (admin && (t === 'team' || t === 'dash' || t === 'member' || t === 'stats')) { c.innerHTML = loadingHTML; await loadTeam(); }
+      if (admin && t === 'people') { c.innerHTML = loadingHTML; await loadPeople(); }
     } catch (e) { toast(esc(e.message), 'alert', 'err'); if (!S.mine) S.mine = []; }
     if (S.tab === t) renderTab();
   }
   async function loadMine() { S.mine = await backend().myCalls(startOfDay(Date.now()) - 29 * 864e5); S.mineAt = Date.now(); }
   async function loadTeam() { const be = backend(); const [staff, calls] = await Promise.all([be.team(), be.listCalls(startOfDay(Date.now()) - 29 * 864e5)]); S.team = { staff, calls }; }
+  async function loadPeople() {
+    const be = backend();
+    if (!be.people) { S.people = { staff: (S.team && S.team.staff) || [], customers: [], presence: [] }; return; }
+    S.people = await be.people();
+  }
+  function isOnline(uid, map) {
+    const row = map && map[uid];
+    if (!row || !row.last_seen) return false;
+    const t = Date.parse(row.last_seen);
+    return Number.isFinite(t) && (Date.now() - t) < 50000;
+  }
+  function presenceMap() {
+    const m = {};
+    ((S.people && S.people.presence) || []).forEach((p) => { if (p && p.user_id) m[p.user_id] = p; });
+    return m;
+  }
   function renderTab() {
     const c = $('#gpc'); if (!c || S.view !== 'app') return;
-    const f = { orders: tabOrders, calls: tabCalls, hist: tabHist, stats: tabStats, profile: tabProfile, team: tabTeam, dash: tabDash, member: tabMember }[S.tab] || tabOrders;
+    const f = { orders: tabOrders, calls: tabCalls, hist: tabHist, stats: tabStats, profile: tabProfile, team: tabTeam, dash: tabDash, member: tabMember, people: tabPeople }[S.tab] || tabOrders;
     const sc = $('#gpScroll'), y = sc ? sc.scrollTop : 0; c.innerHTML = f(); if (sc) sc.scrollTop = y; tick();
     $$('.gp-tab, .gp-side-btn', root).forEach((b) => b.setAttribute('aria-selected', String(tabSelected(b.dataset.t))));
   }
@@ -1804,6 +1855,41 @@
         list.map((o) => '<p class="gc-note"><b>' + esc(pedidoNo(o) ? ('Pedido ' + pedidoNo(o)) : o.code) + '</b> · ' + esc(o.customer_name || '') + ' · ' + mt(o.total) + ' · ' + esc(ST_OS[o.status] || o.status) + '</p>').join('') +
         '<div class="gc-actions"><button class="gb ok sm" type="button" data-act="closetable" data-k="' + esc(k) + '">Marcar pagos nesta mesa</button></div></article>';
     }).join('') + '</div>';
+  }
+
+  function tabPeople() {
+    const data = S.people || { staff: [], customers: [], presence: [] };
+    const map = presenceMap();
+    const staff = data.staff || [];
+    const customers = data.customers || [];
+    const seenCust = {};
+    customers.forEach((c) => { if (c.user_id) seenCust[c.user_id] = true; });
+    (data.presence || []).forEach((p) => {
+      if (p.kind === 'customer' && p.user_id && !seenCust[p.user_id]) {
+        customers.push({ user_id: p.user_id, name: p.name, email: p.email, phone: p.phone });
+        seenCust[p.user_id] = true;
+      }
+    });
+    const onStaff = staff.filter((m) => isOnline(m.user_id, map)).length;
+    const onCust = customers.filter((m) => isOnline(m.user_id, map)).length;
+    const row = (m, kind) => {
+      const on = isOnline(m.user_id, map);
+      const seen = map[m.user_id] && map[m.user_id].last_seen;
+      const when = seen ? new Date(seen).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'nunca';
+      const role = kind === 'staff' ? (m.role === 'admin' ? 'Admin' : 'Funcionário') : 'Cliente';
+      return '<div class="gp-card gp-person"><span class="gp-dot' + (on ? ' on' : '') + '" title="' + (on ? 'Online' : 'Offline') + '"></span><div><b>' + esc(m.name || '—') + '</b> <span class="gp-role">' + role + '</span>' +
+        (m.active === false ? ' <span class="gp-chip off">Inativo</span>' : '') +
+        '<br><small class="gp-muted">' + esc(m.email || '') + (m.phone ? ' · ' + esc(m.phone) : '') +
+        '<br>' + (on ? 'Ligado agora' : ('Última vez: ' + when)) + '</small></div></div>';
+    };
+    const note = data.custErr ? '<p class="gp-muted">Para ver clientes, corra o SQL v9 no Supabase.</p>' : '';
+    return '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + onStaff + '</b><span>Funcionários online</span></div><div class="gp-kpi"><b>' + (staff.length - onStaff) + '</b><span>Funcionários offline</span></div>' +
+      '<div class="gp-kpi hot"><b>' + onCust + '</b><span>Clientes online</span></div><div class="gp-kpi"><b>' + (customers.length - onCust) + '</b><span>Clientes offline</span></div></div>' +
+      note +
+      '<div class="gp-sec"><span>Funcionários</span><span class="n">' + staff.length + '</span></div>' +
+      (staff.length ? '<div class="gp-list">' + staff.map((m) => row(m, 'staff')).join('') + '</div>' : '<div class="gp-card gp-empty">' + ic('users') + '<b>Sem funcionários</b></div>') +
+      '<div class="gp-sec"><span>Clientes</span><span class="n">' + customers.length + '</span></div>' +
+      (customers.length ? '<div class="gp-list">' + customers.map((m) => row(m, 'customer')).join('') + '</div>' : '<div class="gp-card gp-empty">' + ic('users') + '<b>Sem clientes registados</b></div>');
   }
 
   /* ====================================================================== EVENTOS */
