@@ -235,7 +235,8 @@ export function seedIfEmpty() {
 }
 
 export function ensureCasaStaff() {
-  const hash = bcrypt.hashSync(STAFF_BOOTSTRAP_CODE, 12);
+  if (!CASA_STAFF.length) return;
+  const hash = STAFF_BOOTSTRAP_CODE.length >= 6 ? bcrypt.hashSync(STAFF_BOOTSTRAP_CODE, 12) : null;
   const casaPhones = new Set(CASA_STAFF.map((s) => mzDigits(s.phone)));
   const rows = db.prepare('SELECT id, phone FROM waiters').all();
   for (const row of rows) {
@@ -258,7 +259,7 @@ export function ensureCasaStaff() {
         s.name, stored, s.role, s.job, s.title, s.bio, photo,
         s.can_change_passwords ? 1 : 0, perms, existing.id
       );
-      if (!existing.pin_hash || process.env.AQUA_STAFF_RESET_CODES === '1') {
+      if (hash && (!existing.pin_hash || process.env.AQUA_STAFF_RESET_CODES === '1')) {
         db.prepare('UPDATE waiters SET pin_hash=? WHERE id=?').run(hash, existing.id);
       }
     } else {

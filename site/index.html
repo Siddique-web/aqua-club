@@ -1971,7 +1971,7 @@ const REVIEWS = [];
   const emit = (id, d) => bus.dispatchEvent(new CustomEvent(id, { detail: d }));
   const watch = (id, cb) => { const h = (e) => cb(e.detail); bus.addEventListener(id, h); return () => bus.removeEventListener(id, h); };
   const WAITERS = ['Amélia', 'Joaquim', 'Nádia'];
-  let sb = null, dbTables = [], tables = TABLES.slice(), table = new URLSearchParams(location.search).get('mesa') || store.get('aq.mesa') || '';
+  let sb = null, sbBoot = null, dbTables = [], tables = TABLES.slice(), table = new URLSearchParams(location.search).get('mesa') || store.get('aq.mesa') || '';
   const isLive = () => Boolean(sb);
   function openWa(text) {
     const url = 'https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent(text);
@@ -1983,15 +1983,33 @@ const REVIEWS = [];
     $$('[data-demo]').forEach((d) => { d.hidden = !n; d.textContent = n; });
   }
   async function initBackend() {
-    if (!(BACKEND.url && BACKEND.key)) return;
-    try {
-      await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js'; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
-      sb = window.supabase.createClient(BACKEND.url, BACKEND.key);
-      const { data, error } = await sb.from('tables').select('id,code,zone').order('code');
-      if (error) throw error;
-      if (data && data.length) { dbTables = data; tables = data.map((r) => ({ code: r.code, zone: r.zone })); }
-    } catch (e) { console.warn('Sistema indisponível; a usar WhatsApp.', e); sb = null; }
-    fillTables(); setNotes(); startPolling();
+    const cloud = window.AQUA_SUPABASE || {};
+    const url = String(cloud.url || BACKEND.url || '').replace(/\/$/, '');
+    const key = cloud.anonKey || cloud.key || BACKEND.key || '';
+    if (!url || !key) return;
+    BACKEND.url = url;
+    BACKEND.key = key;
+    if (sb) return;
+    if (sbBoot) return sbBoot;
+    sbBoot = (async () => {
+      try {
+        if (!(window.supabase && window.supabase.createClient)) {
+          await new Promise((ok, no) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';
+            s.onload = ok; s.onerror = no; document.head.appendChild(s);
+          });
+        }
+        sb = window.supabase.createClient(url, key);
+        const { data, error } = await sb.from('tables').select('id,code,zone').order('code');
+        if (!error && data && data.length) { dbTables = data; tables = data.map((r) => ({ code: r.code, zone: r.zone })); }
+      } catch (e) {
+        console.warn('Sistema indisponível; a usar WhatsApp.', e);
+        sb = null;
+      }
+      fillTables(); setNotes(); startPolling();
+    })();
+    return sbBoot;
   }
   /* chamados: com Supabase ou demonstração passam por window.AquaCalls (garcom.js); sem backend vão por WhatsApp */
   const callsLive = () => Boolean(window.AquaCalls && AquaCalls.mode() !== 'whatsapp');
@@ -2021,6 +2039,7 @@ const REVIEWS = [];
     };
     if (window.AquaBus) AquaBus.pushCall(row);
     try {
+      try { await initBackend(); } catch (e) { /* */ }
       if (callsLive() && AquaCalls.mode && AquaCalls.mode() === 'live') {
         const sid = await AquaCalls.createCall(String(code), reason, loc, DEVICE);
         if (sid && window.AquaBus) AquaBus.patchCall(localId, { serverId: sid, id: sid });
@@ -2076,24 +2095,29 @@ const REVIEWS = [];
   async function cloudTableRow(o) {
     const dine = o.fulfillment === 'dine_in';
     const want = dine ? String(o.table || '').replace(/\D/g, '') : (o.take === 'delivery' ? 'delivery' : 'takeaway');
-    const keys = [want, String(o.table || ''), 'recinto', 'takeaway'].filter(Boolean);
+    const keys = [want, String(o.table || ''), 'recinto', 'takeaway', 'delivery'].filter(Boolean);
     let t = dbTables.find((x) => keys.includes(String(x.code)));
-    if (!t && sb) {
-      const { data } = await sb.from('tables').select('id,code,zone').in('code', keys);
-      if (data && data.length) {
-        dbTables = dbTables.concat(data.filter((r) => !dbTables.some((x) => x.id === r.id)));
-        t = data.find((x) => keys.includes(String(x.code))) || data[0];
+    if (sb) {
+      if (!dbTables.length || !t) {
+        const { data } = await sb.from('tables').select('id,code,zone').order('code');
+        if (data && data.length) {
+          dbTables = data;
+          t = data.find((x) => keys.includes(String(x.code))) || data.find((x) => x.code === 'recinto') || data[0];
+        }
       }
     }
-    return t || null;
+    return t ? { table: t, code: want || t.code } : null;
   }
   async function apiOrder(o) {
     if (window.AquaBus) AquaBus.upsertOrder(orderToBus(o));
+    try { await initBackend(); } catch (e) { /* */ }
     if (isLive()) {
-      const t = await cloudTableRow(o);
-      if (!t) throw new Error('Mesas da nuvem em falta. Corra o SQL v5 no Supabase.');
+      const hit = await cloudTableRow(o);
+      if (!hit) throw new Error('Mesas da nuvem em falta. Corra o SQL v5 no Supabase.');
+      const t = hit.table;
+      const tableCode = hit.code || t.code;
       const payload = {
-        id: o.id, code: o.code, table_id: t.id, table_code: t.code, lines: o.lines, total_mzn: o.total,
+        id: o.id, code: o.code, table_id: t.id, table_code: tableCode, lines: o.lines, total_mzn: o.total,
         status: 'received', customer_name: o.name, customer_phone: o.phone, accepted_terms: true,
         accepted_at: new Date(o.ts).toISOString(), device_id: DEVICE, payment_status: 'unpaid',
         fulfillment: o.fulfillment || null, take: o.take || null, address: o.address || null,
@@ -2103,7 +2127,7 @@ const REVIEWS = [];
       let { error } = await sb.from('orders').insert(payload);
       if (error && /column|schema cache/i.test(error.message || '')) {
         const slim = {
-          id: o.id, code: o.code, table_id: t.id, table_code: t.code, lines: o.lines, total_mzn: o.total,
+          id: o.id, code: o.code, table_id: t.id, table_code: tableCode, lines: o.lines, total_mzn: o.total,
           status: 'received', customer_name: o.name, customer_phone: o.phone, accepted_terms: true,
           accepted_at: payload.accepted_at, device_id: DEVICE, payment_status: 'unpaid'
         };
@@ -3898,6 +3922,7 @@ const REVIEWS = [];
     renderMenu,
     fillTables,
     rebuildWall,
+    initBackend,
     liveOrders() { bindLiveOrders(); syncHistToBus(); },
     rebuildCats(list) {
       CATS.length = 0;
@@ -4063,8 +4088,8 @@ const REVIEWS = [];
   });
 })();
 </script>
-<script src="os-config.js?v=ops33"></script>
-<script src="garcom.js?v=ops33"></script>
-<script src="os-bridge.js?v=ops33"></script>
+<script src="os-config.js?v=ops35"></script>
+<script src="garcom.js?v=ops35"></script>
+<script src="os-bridge.js?v=ops35"></script>
 </body>
 </html>

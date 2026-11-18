@@ -3,7 +3,7 @@
 -- SQL Editor → New query → colar → Run.
 -- Correr DEPOIS de schema.sql + schema_v2_pedidos.sql + schema_v3_garcons.sql.
 --
--- Login: telemóvel Moçambique + código (bootstrap 123456, depois só o IT altera).
+-- Login: telemóvel da ficha + código (hash bcrypt). Só o IT altera códigos.
 -- ============================================================================
 
 create extension if not exists pgcrypto;

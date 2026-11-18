@@ -380,33 +380,19 @@
 
   /* ================================================================== BACKEND DESK (PIN local + API se existir) */
   function makeDesk() {
-    const ROSTER = 'aq.os.roster.v2';
+    const ROSTER = 'aq.os.roster.v3';
     const SESS = 'aq.os.staff.me';
     const COLORS = ['#00A8FF', '#FFB400', '#16A34A', '#E11D48', '#7C3AED', '#0891B2', '#0A0A0A'];
-    const CASA = [
-      { name: 'Ana', phone: '852329121', job: 'cashier', role: 'waiter', title: 'Caixa', pin: '123456' },
-      { name: 'Joana', phone: '878613887', job: 'cashier', role: 'waiter', title: 'Caixa', pin: '123456' },
-      { name: 'Otília', phone: '870369844', job: 'cashier', role: 'waiter', title: 'Caixa', pin: '123456' },
-      { name: 'Margarida', phone: '872961130', job: 'cashier', role: 'waiter', title: 'Caixa', pin: '123456' },
-      { name: 'Raquel Diogo', phone: '879501491', job: 'manager', role: 'admin', title: 'Gerente', pin: '123456' },
-      { name: 'João', phone: '863586932', job: 'manager', role: 'admin', title: 'Gerente', pin: '123456' },
-      { name: 'Siddique Faizy Rego', phone: '845961528', job: 'it', role: 'admin', title: 'IT', pin: '123456', can_change_passwords: true }
-    ];
+    try { store.del('aq.os.roster.v2'); } catch (e) { /* */ }
     const digits = (p) => { let d = String(p || '').replace(/\D/g, ''); if (d.startsWith('258')) d = d.slice(3); if (d.startsWith('0')) d = d.slice(1); return d; };
-    const isIt = (m) => !!(m && (m.can_change_passwords || m.job === 'it' || digits(m.phone) === '845961528'));
-    const seedRoster = () => CASA.map((s, i) => ({
-      id: 'w-' + (i + 1), user_id: 'w-' + (i + 1), name: s.name, email: '', phone: s.phone,
-      role: s.role, job: s.job, title: s.title, active: true, color: COLORS[i % COLORS.length],
-      pin: s.pin, can_change_passwords: !!s.can_change_passwords,
-      created_at: iso(Date.now() - (30 - i) * 864e5)
-    }));
+    const isIt = (m) => !!(m && (m.can_change_passwords || m.job === 'it'));
     const readRoster = () => {
-      try { const d = JSON.parse(store.get(ROSTER) || ''); if (Array.isArray(d) && d.length) return d; } catch (e) { /* */ }
-      const d = seedRoster(); store.set(ROSTER, JSON.stringify(d)); return d;
+      try { const d = JSON.parse(store.get(ROSTER) || ''); if (Array.isArray(d)) return d.map((s) => { const o = Object.assign({}, s); delete o.pin; return o; }); } catch (e) { /* */ }
+      return [];
     };
-    const writeRoster = (d) => store.set(ROSTER, JSON.stringify(d));
-    const readMe = () => { try { return JSON.parse(store.get(SESS) || ''); } catch (e) { return null; } };
-    const writeMe = (m) => { if (m) store.set(SESS, JSON.stringify(m)); else store.del(SESS); };
+    const writeRoster = (d) => store.set(ROSTER, JSON.stringify((d || []).map((s) => { const o = Object.assign({}, s); delete o.pin; return o; })));
+    const readMe = () => { try { const m = JSON.parse(store.get(SESS) || ''); if (m) delete m.pin; return m; } catch (e) { return null; } };
+    const writeMe = (m) => { if (m) { const o = Object.assign({}, m); delete o.pin; store.set(SESS, JSON.stringify(o)); } else store.del(SESS); };
     const listeners = new Set();
     const ping = () => { listeners.forEach((f) => { try { f(); } catch (e) { /* */ } }); };
     try {
@@ -460,13 +446,8 @@
       async signUp() { throw new Error('Peça à administração para criar o seu PIN.'); },
       async signOut() { writeMe(null); store.del('aq.os.staff'); ping(); },
       async resetPassword() { throw new Error('Peça à administração para repor o PIN.'); },
-      async changePassword(pw, targetId) {
-        const me = readMe(); if (!me) throw new Error('Sem sessão.');
-        if (!isIt(me)) throw new Error('Só o IT pode alterar códigos de acesso.');
-        if (String(pw).length < 5) throw new Error('O código precisa de pelo menos 5 dígitos.');
-        const d = readRoster();
-        const row = d.find((s) => s.user_id === (targetId || me.user_id) || s.id === targetId); if (!row) throw new Error('Sem permissão.');
-        row.pin = String(pw); writeRoster(d); if (row.user_id === me.user_id) { me.pin = String(pw); writeMe(me); }
+      async changePassword() {
+        throw new Error('Os códigos só se alteram na nuvem, com sessão de IT.');
       },
       async profile() { const m = readMe(); return m ? pub(m) : null; },
       async updateProfile({ name, phone }) {
@@ -477,20 +458,11 @@
         Object.assign(me, { name: row.name, phone: row.phone }); writeRoster(d); writeMe(me); return true;
       },
       roster: () => readRoster().map(pub),
-      openPin(pin, waiterId, phone) {
-        const d = readRoster();
-        const code = String(pin || '');
-        let row = null;
-        if (phone) row = d.find((s) => digits(s.phone) === digits(phone) && s.active);
-        else if (waiterId) row = d.find((s) => String(s.id) === String(waiterId) || String(s.user_id) === String(waiterId));
-        if (!row || !row.active || String(row.pin) !== code) throw new Error('Telemóvel ou código incorrectos.');
-        writeMe(row); ping(); return pub(row);
+      openPin() {
+        throw new Error('Entre com a conta da nuvem. Códigos não ficam neste telemóvel.');
       },
-      setPin(id, pin) {
-        const me = readMe(); if (!isIt(me)) throw new Error('Só o IT pode alterar códigos de acesso.');
-        if (String(pin).length < 5) throw new Error('O código precisa de pelo menos 5 dígitos.');
-        const d = readRoster(); const t = d.find((s) => s.id === id); if (!t) return false;
-        t.pin = String(pin); writeRoster(d); ping(); return true;
+      setPin() {
+        throw new Error('Os códigos só se alteram na nuvem, com sessão de IT.');
       },
       async listCalls() {
         const bus = (window.AquaBus && AquaBus.read()) || { calls: [] };
@@ -516,21 +488,9 @@
         if (window.AquaBus) AquaBus.patchCall(osId, { status: 'pending', accepted_at: null, waiterName: '', waiter_id: null });
         ping(); return true;
       },
-      async team() { const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.'); return readRoster(); },
-      async inviteStaff({ name, pin, phone }) {
-        const me = readMe(); if (!isIt(me)) throw new Error('Só o IT pode criar códigos de acesso.');
-        const n = String(name || '').trim().slice(0, 60);
-        if (n.length < 2) throw new Error('Indique o nome do garçom.');
-        const p = String(pin || '').trim();
-        if (p.length < 4) throw new Error('O PIN precisa de pelo menos 4 dígitos.');
-        const d = readRoster();
-        if (d.some((s) => String(s.pin) === p)) throw new Error('Este PIN já está em uso.');
-        const id = 'w-' + Date.now().toString(36);
-        d.splice(Math.max(0, d.length - 1), 0, {
-          id, user_id: id, name: n, email: '', phone: String(phone || '').trim().slice(0, 20),
-          role: 'waiter', active: true, color: COLORS[d.length % COLORS.length], pin: p, created_at: iso(Date.now())
-        });
-        writeRoster(d); ping(); return true;
+      async team() { const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.'); return readRoster().map(pub); },
+      async inviteStaff() {
+        throw new Error('Novas contas só se criam na nuvem.');
       },
       async setStaff(id, active, role) {
         const me = readMe(); if (!me || me.role !== 'admin') throw new Error('Sem permissão.');
@@ -1045,7 +1005,7 @@
           '<label>Telemóvel<input name="phone" type="tel" inputmode="numeric" autocomplete="username" required placeholder="84 000 0000" maxlength="15"></label>' +
           pw('pin', 'Código de acesso', 'current-password', 5) +
           '<button class="gb block" type="submit">Entrar</button>' +
-          '<p class="gp-muted" style="margin:0">Exemplo: 845961528 e o código 123456. Não use e-mail.</p>' +
+          '<p class="gp-muted" style="margin:0">Use o telemóvel da ficha e o código que o IT lhe deu. Não use e-mail.</p>' +
           '<p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg) + '</p></form></div></div>';
     }
     return '<div class="gp-auth"><div class="gp-hero"><div class="ico">' + ic('user') + '</div><h2>Área do garçom</h2><p>Aceite chamados das mesas, acompanhe o seu desempenho e a sua equipa.</p></div>' +

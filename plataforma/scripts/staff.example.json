@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Nome",
+    "phone": "840000000",
+    "job": "cashier",
+    "role": "waiter",
+    "title": "Caixa",
+    "bio": "",
+    "perms": ["tables", "orders", "bills", "cash_close"],
+    "can_change_passwords": false
+  }
+]

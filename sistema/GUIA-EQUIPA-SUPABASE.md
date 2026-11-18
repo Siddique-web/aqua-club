@@ -1,103 +1,54 @@
 # Aqua Club — PostgreSQL / Supabase e contas da equipa
 
-Login de todos: **telemóvel + código `123456`**.  
-Só **Siddique Faizy Rego (84 596 1528)** pode alterar códigos.
+As fichas e os códigos **não estão neste repositório**.  
+Ficam em `plataforma/data/staff.json` (pasta ignorada pelo Git) e no Auth do Supabase, com o código em hash (bcrypt).
 
-## 1. Criar o projecto
+Só o perfil **IT** (`can_change_passwords`) altera códigos.
 
-1. Abra [https://supabase.com/dashboard](https://supabase.com/dashboard) e entre.
-2. **New project** → nome `aqua-club` → palavra-passe forte da base (guarde-a) → região mais próxima.
-3. Espere o projecto ficar **Active**.
+## 1. Projecto
 
-## 2. Tamanho mínimo da password (6)
+1. [https://supabase.com/dashboard](https://supabase.com/dashboard)
+2. Projecto **aqua-club** → estado **Healthy**.
 
-1. **Authentication → Providers → Email**.
-2. **Authentication → Sign In / Providers → Email**: **Minimum password length = 6**.
-3. Guarde.
+## 2. Palavra-passe Auth
 
-## 3. Scripts SQL (pela ordem)
+**Authentication → Providers → Email**: comprimento mínimo **6**.
 
-No menu **SQL Editor → New query**, cole e **Run** um a um:
+## 3. SQL (pela ordem)
+
+SQL Editor → New query → Run:
 
 1. `sistema/supabase/schema.sql`
 2. `sistema/supabase/schema_v2_pedidos.sql`
 3. `sistema/supabase/schema_v3_garcons.sql`
 4. `sistema/supabase/schema_v4_equipa.sql`
+5. `sistema/supabase/schema_v5_nuvem.sql`
 
 ## 4. Chaves
 
 **Project Settings → API**:
 
-- Project URL → `SUPABASE_URL`
-- `anon` `public` → `SUPABASE_ANON_KEY`
-- `service_role` → `SUPABASE_SERVICE_ROLE_KEY` (nunca no site público)
+- URL + `anon` / publishable → só estas no `site/os-config.js` (chave **pública**, protegida por RLS)
+- `service_role` → só no `.env` local, **nunca** no site nem no Git
 
-## 5. Criar as 7 contas
+## 5. Ficha local (servidor)
 
-Na pasta `plataforma`:
+```
+copy plataforma\scripts\staff.example.json plataforma\data\staff.json
+```
 
-```powershell
+Edite telefones **só nesse ficheiro**. Depois:
+
+```
+$env:AQUA_STAFF_BOOTSTRAP_CODE="codigo-secreto-min-6"
 $env:SUPABASE_URL="https://SEU-PROJECTO.supabase.co"
-$env:SUPABASE_SERVICE_ROLE_KEY="eyJ..."
+$env:SUPABASE_SERVICE_ROLE_KEY="…"
 node scripts/seed-supabase-equipa.mjs
 ```
 
-Isto cria no Auth e na tabela `staff`:
+## 6. Segurança
 
-| Nome | Função | Telemóvel | Código inicial |
-|---|---|---|---|
-| Ana | Caixa | 852329121 | 123456 |
-| Joana | Caixa | 878613887 | 123456 |
-| Otília | Caixa | 870369844 | 123456 |
-| Margarida | Caixa | 872961130 | 123456 |
-| Raquel Diogo | Gerente | 879501491 | 123456 |
-| João | Gerente | 863586932 | 123456 |
-| Siddique Faizy Rego | IT | 845961528 | 123456 |
-
-Caixa: mesas, pedidos, contas, fecho de caixa.  
-Gerente: gere o restaurante.  
-IT: o mesmo, e **único** a mudar códigos.
-
-## 6. Ligar o site
-
-Em `site/os-config.js`:
-
-```js
-window.AQUA_API = window.AQUA_API || '';
-window.AQUA_SUPABASE = {
-  url: 'https://SEU-PROJECTO.supabase.co',
-  anonKey: 'eyJ-anon'
-};
-```
-
-Reinicie o servidor (`npm start` em `plataforma`) e abra `http://localhost:5173`.
-
-Área da equipa: telemóvel (ex. `852329121`) + código `123456`.
-
-## 7. PostgreSQL local (opcional)
-
-Se quiser o mesmo SQL no seu Postgres:
-
-```bash
-psql "postgresql://USER:SENHA@HOST:5432/aqua_club" -f sistema/supabase/schema.sql
-psql "postgresql://USER:SENHA@HOST:5432/aqua_club" -f sistema/supabase/schema_v2_pedidos.sql
-psql "postgresql://USER:SENHA@HOST:5432/aqua_club" -f sistema/supabase/schema_v3_garcons.sql
-psql "postgresql://USER:SENHA@HOST:5432/aqua_club" -f sistema/supabase/schema_v4_equipa.sql
-```
-
-O Express (`plataforma`) já grava a equipa na SQLite local **e** aceita o mesmo login telefone+código. Com o Supabase ligado, a Área do garçom usa as contas Auth.
-
-## 8. Alterar códigos (só IT)
-
-1. Entre como **Siddique Faizy Rego** (`845961528` + código actual).
-2. Perfil da pessoa ou Equipa → **Actualizar código**.
-3. Depois de mudar, o `123456` deixa de funcionar para essa pessoa.
-
-O código é guardado com **bcrypt** (custo 12). Oito tentativas falhadas bloqueiam 15 minutos.
-
-## 9. Segurança
-
-- Não publique a `service_role`.
-- Troque o `JWT_SECRET` no `.env` da `plataforma`.
-- Peça ao Siddique para trocar o `123456` de cada um após o primeiro dia.
-- Números: 84/85/86/87 com 9 dígitos, com ou sem `258`.
+- Códigos no Auth (bcrypt no Postgres / Auth). Não em JavaScript público.
+- 8 tentativas falhadas → bloqueio 15 min.
+- Rode a `service_role` se alguma vez apareceu num terminal.
+- Troque os códigos no primeiro dia de operação (perfil IT).

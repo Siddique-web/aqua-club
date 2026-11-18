@@ -7,7 +7,8 @@
  *   node scripts/seed-supabase-equipa.mjs
  *
  * No dashboard: Authentication → Sign In / Providers → Email
- * Minimum password length = 6 (o código inicial é 123456).
+ * Minimum password length ≥ 6. Código: variável AQUA_STAFF_BOOTSTRAP_CODE.
+ * Ficha da casa: plataforma/data/staff.json (não vai para o Git).
  */
 import { CASA_STAFF, STAFF_BOOTSTRAP_CODE, mzDigits, staffEmail } from '../server/casa-staff.mjs';
 
@@ -17,6 +18,14 @@ const CODE = STAFF_BOOTSTRAP_CODE;
 
 if (!URL || !KEY) {
   console.error('Defina SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.');
+  process.exit(1);
+}
+if (!CASA_STAFF.length) {
+  console.error('Crie plataforma/data/staff.json a partir de scripts/staff.example.json');
+  process.exit(1);
+}
+if (CODE.length < 6) {
+  console.error('Defina AQUA_STAFF_BOOTSTRAP_CODE (mín. 6) no ambiente. Não a grave no Git.');
   process.exit(1);
 }
 
@@ -71,7 +80,7 @@ for (const [i, s] of CASA_STAFF.entries()) {
     } catch (e) {
       console.error('Falhou Auth para', s.name, e.message);
       if (/password/i.test(e.message)) {
-        console.error('No dashboard: Authentication → Settings → Password min length = 5');
+        console.error('No dashboard: Authentication → Settings → Password min length ≥ 6');
       }
       process.exit(1);
     }
@@ -108,5 +117,5 @@ for (const [i, s] of CASA_STAFF.entries()) {
   }
 }
 
-console.log('\nPronto. Entrada: telemóvel + código ' + CODE);
-console.log('Só Siddique Faizy Rego (845961528) pode alterar códigos.');
+console.log('\nPronto. Entrada: telemóvel da ficha + código definido no ambiente.');
+console.log('Só o perfil IT (can_change_passwords) altera códigos.');
