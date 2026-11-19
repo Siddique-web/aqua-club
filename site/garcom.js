@@ -161,7 +161,9 @@
       /* cliente */
       createCall: (table, reason, note, device) => rpc('create_call', { p_table: table, p_reason: reason, p_note: note || null, p_device: device || null }),
       async callStatus(id) {
-        const r = first(await rpc('call_status', { p_id: id })); if (!r) return null;
+        const pid = String(id || '').replace(/^os-/, '').replace(/^sb-/i, '');
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pid)) return null;
+        const r = first(await rpc('call_status', { p_id: pid })); if (!r) return null;
         return { status: r.status, by: r.accepted_by_name || '', createdAt: r.created_at, acceptedAt: r.accepted_at, completedAt: r.completed_at, rating: r.rating };
       },
       cancelCall: (id) => rpc('cancel_call', { p_id: id }),
@@ -926,21 +928,21 @@
   }
   function isUuid(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id || '')); }
   function cloudCallId(id) {
-    const raw = String(id || '').replace(/^os-/, '');
-    if (isUuid(raw)) return raw;
+    const raw = bareCallId(id);
+    if (isUuid(raw)) return raw.toLowerCase();
     const hit = mergedCalls().find((c) => {
-      const a = String(c.id || '').replace(/^os-/, '');
-      const b = String(c.osId || c.serverId || '').replace(/^os-/, '');
+      const a = bareCallId(c.id);
+      const b = bareCallId(c.osId || c.serverId);
       return a === String(id) || a === raw || b === raw || callMergeKey(c) === callMergeKey({ id: raw, osId: raw });
     });
-    const cand = hit && String(hit.osId || hit.serverId || hit.id || '').replace(/^os-/, '');
-    return isUuid(cand) ? cand : raw;
+    const cand = hit && bareCallId(hit.osId || hit.serverId || hit.id);
+    return isUuid(cand) ? cand.toLowerCase() : raw;
   }
   async function persistCloudCall(id, action) {
     const raw = cloudCallId(id);
     const be = backend();
     if (!be || !be.acceptCall) return true;
-    if (be.mode === 'live' && !isUuid(raw)) return true;
+    if (be.mode === 'live' && !isUuid(raw)) return false;
     try {
       if (action === 'accept') return !!(await be.acceptCall(raw));
       if (action === 'complete') return !!(await be.completeCall(raw));
@@ -980,7 +982,8 @@
     }
     applyCallLists(osId, patch);
     try {
-      window.dispatchEvent(new CustomEvent('aq-call', { detail: Object.assign({ id: osId, serverId: osId }, patch) }));
+      const cloud = cloudCallId(id);
+      window.dispatchEvent(new CustomEvent('aq-call', { detail: Object.assign({ id: cloud || osId, serverId: cloud || osId }, patch) }));
     } catch (e) { /* */ }
     toast(
       action === 'accept' ? 'Chamado aceite — o cliente já vê que está a caminho.'
@@ -1245,15 +1248,25 @@
     const by = String(c.by || c.waiterName || '').trim().toLowerCase();
     return !!(name && by && by === name);
   }
+  function bareCallId(id) {
+    return String(id || '').replace(/^os-/, '').replace(/^sb-/i, '');
+  }
   function callMergeKey(c) {
     if (!c) return '';
-    const sid = String(c.osId || c.serverId || '').replace(/^os-/, '');
-    const id = String(c.id || '').replace(/^os-/, '');
+    const sid = bareCallId(c.osId || c.serverId);
+    const id = bareCallId(c.id);
     if (isUuid(sid)) return 'sb-' + sid.toLowerCase();
     if (isUuid(id)) return 'sb-' + id.toLowerCase();
     if (/^\d+$/.test(sid)) return 'os-' + sid;
     if (/^\d+$/.test(id)) return 'os-' + id;
     return String(c.id || id || '');
+  }
+  function realCallId(c) {
+    const sid = bareCallId(c && (c.osId || c.serverId));
+    const id = bareCallId(c && c.id);
+    if (isUuid(id)) return id.toLowerCase();
+    if (isUuid(sid)) return sid.toLowerCase();
+    return String((c && c.id) || sid || '');
   }
   function statusRank(s) {
     if (s === 'cancelled') return 4;
@@ -1267,23 +1280,24 @@
     (list || []).forEach((row) => {
       if (!row) return;
       const c = row.tableCode || row.live || row.osId ? row : mapOsCall(row);
-      const id = callMergeKey(c);
-      if (!id) return;
+      const key = callMergeKey(c);
+      if (!key) return;
+      const prev = cmap.get(key);
+      const rid = realCallId(c) || (prev && prev.id) || key;
       const st = c.status === 'closed' ? 'completed' : c.status;
-      const prev = cmap.get(id);
       if (prev && statusRank(prev.status) > statusRank(st)) {
-        cmap.set(id, Object.assign({}, c, prev, { id, status: prev.status }));
+        cmap.set(key, Object.assign({}, c, prev, { id: prev.id || rid, osId: prev.osId || rid, status: prev.status }));
         return;
       }
-      cmap.set(id, Object.assign({}, prev || {}, c, {
-        id,
+      cmap.set(key, Object.assign({}, prev || {}, c, {
+        id: rid,
         status: st,
         createdAt: c.createdAt || c.created_at || (prev && prev.createdAt),
         acceptedAt: c.acceptedAt || c.accepted_at || (prev && prev.acceptedAt),
         completedAt: c.completedAt || c.closed_at || (prev && prev.completedAt),
         by: c.by || c.waiterName || (prev && prev.by) || '',
         byUser: c.byUser || c.accepted_by_user || (prev && prev.byUser) || null,
-        osId: c.osId || c.serverId || (prev && prev.osId) || null
+        osId: rid
       }));
     });
     return Array.from(cmap.values());

@@ -29,6 +29,7 @@ SQL Editor → New query → Run:
 9. `sistema/supabase/schema_v9_presenca.sql` (online/offline de clientes e da equipa)
 10. `sistema/supabase/schema_v10_limpar_pedidos.sql` (só quando quiser esvaziar pedidos)
 11. `sistema/supabase/schema_v11_carga.sql` (heartbeat mais leve com muita gente)
+12. `sistema/supabase/schema_v12_chamados_cliente.sql` (cliente vê aceite/concluído ao vivo)
 
 **Authentication → Providers → Email:** ligue “Allow new users to sign up”.  
 Para o cliente entrar logo após criar conta, desligue **Confirm email**.

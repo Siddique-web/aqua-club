@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops49"></script>
+<script src="i18n.js?v=ops50"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1106,7 +1106,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops49">
+<link rel="stylesheet" href="garcom.css?v=ops50">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -4080,51 +4080,83 @@ const REVIEWS = [];
       else if (st === 'completed') say('Atendimento concluído.', 'ok');
     }
   }
-  /* acompanha o chamado: bus local (WhatsApp) ou consulta ao servidor a cada 3 s (Supabase/demonstração) */
+  /* acompanha o chamado na nuvem: realtime + sondagem de segurança */
   let callPoll = 0;
+  function callUuid(id) { return String(id || '').replace(/^os-/, '').replace(/^sb-/i, ''); }
+  async function fetchCallStatus(id) {
+    const pid = callUuid(id);
+    if (sb && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pid)) {
+      const { data } = await sb.rpc('call_status', { p_id: pid });
+      const r = Array.isArray(data) ? data[0] : data;
+      if (r && r.status) return { status: r.status === 'closed' ? 'completed' : r.status, by: r.accepted_by_name || '', createdAt: r.created_at, acceptedAt: r.accepted_at };
+    }
+    if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.callStatus) {
+      const r = await AquaOS.callStatus(id);
+      if (r) return r;
+    }
+    if (callsLive()) {
+      const r = await AquaCalls.callStatus(id);
+      if (r) return r;
+    }
+    if (window.AquaBus) {
+      const key = callUuid(id);
+      const c = (AquaBus.read().calls || []).find((x) => String(x.id) === String(id) || callUuid(x.id) === key || callUuid(x.serverId) === key);
+      if (c) return { status: c.status === 'closed' ? 'completed' : c.status, by: c.waiterName || '' };
+    }
+    return null;
+  }
+  function bindGuestCallRt(id) {
+    const pid = callUuid(id);
+    if (!sb || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pid)) return () => {};
+    try {
+      const ch = sb.channel('guest-call-' + pid)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'waiter_calls', filter: 'id=eq.' + pid }, (p) => {
+          const row = p && p.new;
+          if (!row) return;
+          emit(id, { status: row.status === 'closed' ? 'completed' : row.status, by: row.accepted_by_name || '', createdAt: row.created_at, acceptedAt: row.accepted_at });
+        })
+        .subscribe();
+      return () => { try { sb.removeChannel(ch); } catch (e) { /* */ } };
+    } catch (e) { return () => {}; }
+  }
   function armCall(id) {
     if (stopCall) stopCall();
-    stopCall = watch(id, (d) => {
-      if (!call || call.id !== id) return;
-      call.status = d.status;
-      if (d.status === 'accepted') { call.tAcc = call.tAcc || Date.now(); call.by = d.by || call.by; if (d.createdAt && d.acceptedAt) call.respMs = Date.parse(d.acceptedAt) - Date.parse(d.createdAt); }
-      if (d.status === 'pending') { call.by = ''; call.tAcc = 0; call.respMs = null; }
-      if (d.status === 'completed' && d.by) call.by = d.by;
+    const unwatch = watch(id, (d) => {
+      if (!call || String(call.id) !== String(id)) return;
+      const st = d.status === 'closed' ? 'completed' : d.status;
+      call.status = st;
+      if (st === 'accepted') { call.tAcc = call.tAcc || Date.now(); call.by = d.by || call.by; if (d.createdAt && d.acceptedAt) call.respMs = Date.parse(d.acceptedAt) - Date.parse(d.createdAt); }
+      if (st === 'pending') { call.by = ''; call.tAcc = 0; call.respMs = null; }
+      if (st === 'completed' && d.by) call.by = d.by;
       paintCall();
     });
     clearInterval(callTimer); callTimer = 0;
     clearInterval(callPoll);
-      const tick = async () => {
-        if (!call || call.id !== id) { clearInterval(callPoll); return; }
+    const tick = async () => {
+      if (!call || String(call.id) !== String(id)) { clearInterval(callPoll); return; }
       try {
-        let r = null;
-        if (window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.callStatus) r = await AquaOS.callStatus(id);
-        else if (callsLive()) r = await AquaCalls.callStatus(id);
-        else if (window.AquaBus) {
-          const key = String(id).replace(/^os-/, '');
-          const c = (AquaBus.read().calls || []).find((x) => String(x.id) === String(id) || String(x.id).replace(/^os-/, '') === key || String(x.serverId || '') === key);
-          if (c) r = { status: c.status === 'closed' ? 'completed' : c.status, by: c.waiterName || '' };
-        }
+        const r = await fetchCallStatus(id);
         if (r) { emit(id, r); if (r.status === 'completed' || r.status === 'cancelled' || r.status === 'closed') clearInterval(callPoll); }
       } catch (e) { /* tenta de novo */ }
     };
-    tick(); callPoll = setInterval(tick, 2000);
+    tick();
+    callPoll = setInterval(tick, 1200);
     const onLive = (ev) => {
       const c = ev && ev.detail;
       if (!c || !call) return;
-      const key = String(id).replace(/^os-/, '');
-      const hit = [c.id, c.serverId].some((v) => v != null && (String(v) === String(id) || String(v).replace(/^os-/, '') === key));
+      const key = callUuid(id);
+      const hit = [c.id, c.serverId].some((v) => v != null && (String(v) === String(id) || callUuid(v) === key));
       if (!hit) return;
-      const st = c.status === 'closed' ? 'completed' : c.status;
-      emit(id, { status: st, by: c.waiterName || c.by || '' });
+      emit(id, { status: c.status === 'closed' ? 'completed' : c.status, by: c.waiterName || c.by || '' });
     };
     window.addEventListener('aq-call', onLive);
-    const wrap = setInterval(() => {
-      if (!call || call.id !== id) {
-        clearInterval(wrap);
-        window.removeEventListener('aq-call', onLive);
-      }
-    }, 4000);
+    const unsubRt = bindGuestCallRt(id);
+    stopCall = () => {
+      unwatch();
+      unsubRt();
+      clearInterval(callPoll);
+      window.removeEventListener('aq-call', onLive);
+    };
   }
   function resumeCall() {
     let sv = null; try { sv = JSON.parse(store.get('aq.call') || 'null'); } catch (e) { /* */ }
@@ -4742,8 +4774,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops49"></script>
-<script src="garcom.js?v=ops49"></script>
-<script src="os-bridge.js?v=ops49"></script>
+<script src="os-config.js?v=ops50"></script>
+<script src="garcom.js?v=ops50"></script>
+<script src="os-bridge.js?v=ops50"></script>
 </body>
 </html>
