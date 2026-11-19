@@ -236,7 +236,10 @@ export function seedIfEmpty() {
 
 export function ensureCasaStaff() {
   if (!CASA_STAFF.length) return;
-  const hash = STAFF_BOOTSTRAP_CODE.length >= 6 ? bcrypt.hashSync(STAFF_BOOTSTRAP_CODE, 12) : null;
+  const waiterCode = STAFF_BOOTSTRAP_CODE;
+  const adminCode = String(process.env.AQUA_ADMIN_PASSWORD || waiterCode).trim();
+  const waiterHash = waiterCode.length >= 6 ? bcrypt.hashSync(waiterCode, 12) : null;
+  const adminHash = adminCode.length >= 8 ? bcrypt.hashSync(adminCode, 12) : waiterHash;
   const casaPhones = new Set(CASA_STAFF.map((s) => mzDigits(s.phone)));
   const rows = db.prepare('SELECT id, phone FROM waiters').all();
   for (const row of rows) {
@@ -252,6 +255,7 @@ export function ensureCasaStaff() {
     const photo = svgAvatar(s.name, 190 + i * 22);
     const perms = JSON.stringify(s.perms);
     const existing = byPhone.get(phone);
+    const hash = s.role === 'admin' ? adminHash : waiterHash;
     if (existing) {
       db.prepare(`UPDATE waiters SET name=?, phone=?, role=?, job=?, title=?, bio=?, photo=?,
         can_change_passwords=?, perms=?, active=1, pin=''

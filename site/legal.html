@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Termos de uso e privacidade do Aqua Club — notas de conferência, identificação fiscal e tratamento de dados na Beira.">
+<title data-i18n="legal.title">Termos de uso e privacidade — Aqua Club</title>
+<script src="i18n.js?v=ops64"></script>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00A8FF; --cyan-d:#0069A8; --cyan-soft:#E6F6FF; --yellow:#FFD700;
+  --ink:#0A0A0A; --muted:#3D4852; --head:72px;
+  --fh:"Poppins","Microsoft YaHei",system-ui,sans-serif; --fb:"Inter","Microsoft YaHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box} html,body{margin:0;background:#fff;color:var(--ink);font:400 1rem/1.65 var(--fb)}
+a{color:var(--cyan-d)} h1,h2,p{margin:0}
+.wrap{width:100%;max-width:760px;margin-inline:auto;padding-inline:1rem}
+.header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:4px solid var(--cyan)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:var(--head)}
+.brand{display:flex;align-items:center;gap:.5rem;text-decoration:none;min-width:0}
+.brand img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.brand span{display:flex;flex-direction:column;font-family:var(--fh);text-transform:uppercase;color:var(--cyan-d);line-height:1.05}
+.brand b{font-size:1.05rem;font-weight:800}
+.brand small{font-size:.55rem;font-weight:700;letter-spacing:.08em}
+.head-right{display:flex;align-items:center;gap:.4rem}
+.langpick{position:relative}
+.lang-btn{display:inline-flex;align-items:center;gap:.42rem;min-height:44px;padding:.22rem .72rem .22rem .26rem;border:2.5px solid #000;border-radius:999px;background:#fff;font:800 .68rem var(--fh);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.flag{--s:1.7rem;position:relative;display:inline-block;width:var(--s);height:var(--s);border-radius:50%;overflow:hidden;background:#ccc}
+.flag[data-flag=pt]{background:linear-gradient(90deg,#046A38 0 38%,#DA291C 38%)}
+.flag[data-flag=en]{background:linear-gradient(#3C3B6E,#3C3B6E) 0 0 / 42% 54% no-repeat,repeating-linear-gradient(#B22234 0 7.69%,#fff 7.69% 15.38%)}
+.flag[data-flag=es]{background:linear-gradient(#C60B1E 0 23%,#FFC400 23% 77%,#C60B1E 77%)}
+.flag[data-flag=fr]{background:linear-gradient(90deg,#0055A4 0 33.4%,#fff 33.4% 66.6%,#EF4135 66.6%)}
+.flag[data-flag=it]{background:linear-gradient(90deg,#009246 0 33.4%,#fff 33.4% 66.6%,#CE2B37 66.6%)}
+.flag[data-flag=zh]{background:#DE2910}
+.lang-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:30;min-width:240px;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px}
+.langpick.open .lang-menu{display:grid;gap:.15rem}
+.lang-menu button{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;width:100%;min-height:44px;padding:.4rem .7rem;border:0;border-radius:11px;background:transparent;cursor:pointer;font:600 .95rem var(--fb);text-align:left}
+.lang-menu button.on,.lang-menu button:hover{background:var(--cyan-soft)}
+.main{padding:1.4rem 0 3rem}
+h1{font:800 1.6rem/1.15 var(--fh);margin:0 0 .4rem}
+.lead{color:var(--muted);margin:0 0 1.2rem}
+.note{margin:0 0 1.4rem;padding:.7rem .85rem;background:#FFF4C4;border-radius:10px;font:700 .92rem/1.45 var(--fb)}
+article{display:grid;gap:1.15rem}
+h2{font:800 .95rem var(--fh);letter-spacing:.04em;text-transform:uppercase}
+.ids{display:grid;gap:.2rem;padding:1rem;background:var(--cyan-soft);border-radius:12px}
+.ids b{font:800 .95rem var(--fh)}
+.foot{padding:1.2rem 0 2rem;border-top:1px solid #e6eef4;color:var(--muted);font-size:.88rem}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" hidden><symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" d="m6 9 6 6 6-6"/></symbol></svg>
+<header class="header"><div class="wrap bar">
+  <a class="brand" href="index.html">
+    <img src="assets/logo.webp" alt="" width="44" height="44" onerror="this.onerror=null;this.src='assets/logo.png'">
+    <span><b>Aqua Club</b><small data-i18n="brandSub">COMPLEXO AQUÁTICO</small></span>
+  </a>
+  <div class="head-right">
+    <div class="langpick" id="langBar">
+      <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="langPick">
+        <span class="flag" id="langFlag" data-flag="pt" aria-hidden="true"></span>
+        <span data-i18n="lang">Língua</span>
+      </button>
+      <div class="lang-menu" role="listbox">
+        <button type="button" role="option" data-lang="pt" class="on"><span class="flag" data-flag="pt"></span>Português <b>PT</b></button>
+        <button type="button" role="option" data-lang="en"><span class="flag" data-flag="en"></span>English <b>EN</b></button>
+        <button type="button" role="option" data-lang="es"><span class="flag" data-flag="es"></span>Español <b>ES</b></button>
+        <button type="button" role="option" data-lang="fr"><span class="flag" data-flag="fr"></span>Français <b>FR</b></button>
+        <button type="button" role="option" data-lang="it"><span class="flag" data-flag="it"></span>Italiano <b>IT</b></button>
+        <button type="button" role="option" data-lang="zh"><span class="flag" data-flag="zh"></span>中文 <b>中</b></button>
+      </div>
+    </div>
+    <a href="index.html" data-i18n="legal.back">Voltar ao site</a>
+  </div>
+</div></header>
+<main class="wrap main">
+  <h1 data-i18n="legal.h1">Termos de uso e privacidade</h1>
+  <p class="lead">Aqua Club — Complexo Aquático · Centro Recreativo Banco de Moçambique · Beira</p>
+  <p class="note" data-i18n="legal.doc">Documento de conferência — Não serve de fatura fiscal</p>
+  <article>
+    <section>
+      <h2 data-i18n="legal.ids">Identificação do estabelecimento</h2>
+      <div class="ids">
+        <b>Aqua Club — Complexo Aquático</b>
+        <span>NUIT 400788103</span>
+        <span>Alvará comercial 018/07/13/RE/2026</span>
+        <span>Rua Capitães de Sena, Centro Recreativo Banco de Moçambique, Beira, Sofala, Moçambique</span>
+        <span><a href="tel:+258879501491">87 950 1491</a> · <a href="tel:+258863586932">86 358 6932</a></span>
+      </div>
+    </section>
+    <section>
+      <h2 data-i18n="legal.nature">Natureza desta plataforma</h2>
+      <p data-i18n="legal.natureP">O site e a app do Aqua Club são ferramentas de cardápio digital, reservas, salas e pedidos de mesa. Os resumos e comprovativos digitais são notas de conferência. Não são fatura, fatura-recibo nem venda a dinheiro. A fatura fiscal oficial é emitida no caixa do restaurante, no software certificado ou em blocos autorizados pela Autoridade Tributária de Moçambique.</p>
+    </section>
+    <section>
+      <h2 data-i18n="legal.vat">IVA e preços</h2>
+      <p data-i18n="legal.vatP">No regime geral de IVA, os preços do cardápio já incluem 16%. O resumo da conta mostra a base tributável e o IVA só para conferência. Se o restaurante estiver no regime simplificado (ISPC) ou isento, o sistema mostra só o total, sem calcular 16%.</p>
+    </section>
+    <section>
+      <h2 data-i18n="legal.data">Dados pessoais e conta</h2>
+      <p data-i18n="legal.privacy">Nome, e-mail e contacto servem só para reservas, atendimento e histórico de pedidos no Aqua Club.</p>
+      <p data-i18n="legal.dataP">Quando criar conta ou iniciar sessão, recolhemos nome e contacto para o identificar na mesa, nas reservas e no histórico. Não vendemos estes dados. Pode pedir a actualização ou apagamento junto do restaurante pelos contactos abaixo.</p>
+    </section>
+  </article>
+</main>
+<footer class="wrap foot">
+  <p>© Aqua Club. NUIT 400788103 · Alvará 018/07/13/RE/2026</p>
+</footer>
+</body>
+</html>

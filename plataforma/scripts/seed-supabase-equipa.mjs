@@ -15,6 +15,7 @@ import { CASA_STAFF, STAFF_BOOTSTRAP_CODE, mzDigits, staffEmail } from '../serve
 const URL = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || '';
 const CODE = STAFF_BOOTSTRAP_CODE;
+const ADMIN_CODE = String(process.env.AQUA_ADMIN_PASSWORD || CODE).trim();
 
 if (!URL || !KEY) {
   console.error('Defina SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.');
@@ -66,12 +67,13 @@ for (const [i, s] of CASA_STAFF.entries()) {
   const phone = mzDigits(s.phone);
   const email = staffEmail(phone);
   const meta = { name: s.name, phone, job: s.job, title: s.title };
+  const pass = s.role === 'admin' ? ADMIN_CODE : CODE;
   let userId = await findUserId(email);
   if (!userId) {
     try {
       const created = await api('/auth/v1/admin/users', 'POST', {
         email,
-        password: CODE,
+        password: pass,
         email_confirm: true,
         user_metadata: meta
       });
@@ -85,12 +87,10 @@ for (const [i, s] of CASA_STAFF.entries()) {
       process.exit(1);
     }
   } else {
-    await api('/auth/v1/admin/users/' + userId, 'PUT', {
-      password: CODE,
-      email_confirm: true,
-      user_metadata: meta
-    });
-    console.log('Auth actualizado:', s.name, email);
+    const body = { email_confirm: true, user_metadata: meta };
+    if (process.env.AQUA_STAFF_RESET_CODES === '1') body.password = pass;
+    await api('/auth/v1/admin/users/' + userId, 'PUT', body);
+    console.log('Auth já existia:', s.name, email);
   }
 
   const profile = {

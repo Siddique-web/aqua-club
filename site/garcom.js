@@ -176,7 +176,21 @@
         const d = String(phone || '').replace(/\D/g, '');
         const nine = d.startsWith('258') ? d.slice(3) : d.replace(/^0/, '');
         if (nine.length < 8) throw new Error('Indique o telemóvel da ficha (9 dígitos).');
-        return api.signIn(nine + '@staff.aquaclub.mz', String(code || ''));
+        const pw = String(code || '');
+        if (pw.length < 8) throw new Error('A palavra-passe precisa de pelo menos 8 caracteres.');
+        return api.signIn(nine + '@staff.aquaclub.mz', pw);
+      },
+      async setStaffCode(phone, code) {
+        const pw = String(code || '').trim();
+        if (pw.length < 8) throw new Error('A palavra-passe precisa de pelo menos 8 caracteres.');
+        await rpc('it_set_staff_code', { p_phone: phone, p_code: pw });
+      },
+      async setPin(id, code) {
+        const c = await need();
+        const { data, error } = await c.from('staff').select('phone').eq('id', id).maybeSingle();
+        if (error) throw fail(error);
+        if (!data || !data.phone) throw new Error('Esta conta não tem telemóvel na ficha.');
+        return api.setStaffCode(data.phone, code);
       },
       async signUp({ name, email, phone, password }) {
         const c = await need();
@@ -618,6 +632,33 @@
     osDesk: null, osStaff: store.get('aq.os.staff') || '', osMsg: '', osN: 0, osPoll: 0, livePoll: 0, liveCalls: [], lastLive: null,
     heard: new Set(), alertCalls: false, alertOrders: false };
   const mt = (n) => Number(n || 0).toLocaleString('pt-PT') + ' MT';
+  function vatParts(gross) {
+    const v = window.aquaVat ? window.aquaVat(gross) : { total: Math.round(Number(gross) || 0), base: 0, iva: 0, geral: false };
+    return v;
+  }
+  function vatNotice() {
+    return (window.aquaDocNotice && window.aquaDocNotice()) || 'Documento de conferência — Não serve de fatura fiscal';
+  }
+  function vatTableRows(total) {
+    const v = vatParts(total);
+    const L = window.AQUA_LEGAL || {};
+    const ids = L.nuit ? ('<p class="meta">NUIT ' + esc(L.nuit) + ' · Alvará ' + esc(L.alvara) + '<br>' + esc(L.address || '') + '</p>') : '';
+    const note = '<p class="note">' + esc(vatNotice()) + '</p>' + ids;
+    if (!v.geral) {
+      return '<tr class="tot"><td>Total</td><td class="r">' + esc(mt(v.total)) + '</td></tr></tbody></table>' +
+        '<p class="meta">Regime simplificado ou isento — sem discriminação de IVA 16%.</p>' + note;
+    }
+    return '<tr><td>Base tributável (incluída no total)</td><td class="r">' + esc(mt(v.base)) + '</td></tr>' +
+      '<tr><td>IVA 16% (incluído no total)</td><td class="r">' + esc(mt(v.iva)) + '</td></tr>' +
+      '<tr class="tot"><td>Total</td><td class="r">' + esc(mt(v.total)) + '</td></tr></tbody></table>' + note;
+  }
+  function vatItemLis(total) {
+    const v = vatParts(total);
+    const tax = v.geral
+      ? '<li class="tax"><b>Base tributável</b><span>' + mt(v.base) + '</span></li><li class="tax"><b>IVA 16%</b><span>' + mt(v.iva) + '</span></li>'
+      : '<li class="tax"><b>Sem discriminação de IVA 16%</b><span></span></li>';
+    return tax + '<li class="tot"><b>Total</b><span>' + mt(v.total) + '</span></li></ul><p class="gc-doc-note">' + esc(vatNotice()) + '</p>';
+  }
   function hasOsApi() {
     return !!(window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.origin && AquaOS.origin());
   }
@@ -1141,12 +1182,12 @@
     const desk = mode() === 'desk';
     const pw = (id, label, ac, min) => '<label>' + label + '<span class="gp-pw"><input id="' + id + '" name="' + id + '" type="password" autocomplete="' + ac + '" required minlength="' + (min || 8) + '" inputmode="' + (min === 4 ? 'numeric' : 'text') + '"><button type="button" data-act="pw" aria-label="Mostrar ou esconder a palavra-passe">' + ic('eye') + '</button></span></label>';
     if (desk || mode() === 'live') {
-      return '<div class="gp-auth"><div class="gp-hero"><div class="ico">' + ic('shield') + '</div><h2>Área da equipa</h2><p>Entre com o <b>telemóvel da ficha</b> e o código da casa. Só o IT pode alterar códigos.</p></div>' +
+      return '<div class="gp-auth"><div class="gp-hero"><div class="ico">' + ic('shield') + '</div><h2>Área da equipa</h2><p>Entre com o <b>telemóvel da ficha</b> e a palavra-passe da conta. Só o IT pode alterar senhas.</p></div>' +
         '<div class="gp-card"><form class="gp-form" data-form="pin" novalidate>' +
           '<label>Telemóvel<input name="phone" type="tel" inputmode="numeric" autocomplete="username" required placeholder="84 000 0000" maxlength="15"></label>' +
-          pw('pin', 'Código de acesso', 'current-password', 5) +
+          pw('pin', 'Palavra-passe', 'current-password', 8) +
           '<button class="gb block" type="submit">Entrar</button>' +
-          '<p class="gp-muted" style="margin:0">Use o telemóvel da ficha e o código que o IT lhe deu. Não use e-mail.</p>' +
+          '<p class="gp-muted" style="margin:0">Use o telemóvel da ficha e a palavra-passe que o IT lhe deu. Não use e-mail.</p>' +
           '<p class="gp-msg ' + S.msgType + '" role="alert">' + esc(S.msg) + '</p></form></div></div>';
     }
     return '<div class="gp-auth"><div class="gp-hero"><div class="ico">' + ic('user') + '</div><h2>Área do garçom</h2><p>Aceite chamados das mesas, acompanhe o seu desempenho e a sua equipa.</p></div>' +
@@ -1474,6 +1515,7 @@
       'td,th{padding:.38rem 0;border-bottom:1px solid #e8e8e8;vertical-align:top}' +
       'td.r,th.r{text-align:right;white-space:nowrap}' +
       '.tot td{font-weight:800;border:0;padding-top:.7rem}' +
+      '.note{margin:.8rem 0 0;padding:.55rem .7rem;background:#FFF4C4;font-weight:700;font-size:.82rem}' +
       '.page{page-break-after:always;padding-bottom:8px}' +
       '.page:last-child{page-break-after:auto}' +
       '@media print{body{margin:10mm}}';
@@ -1514,9 +1556,9 @@
     const extraRows = (fee ? '<tr><td>Entrega</td><td class="r">' + esc(mt(fee)) + '</td></tr>' : '') +
       (pizza && !hasPizzaLine ? '<tr><td>Pizza para levar</td><td class="r">' + esc(mt(pizza)) + '</td></tr>' : '');
     const bits = [title, o.code, when, name, phone, orderPlace(o), o.address || o.bairro || '', ST_OS[o.status] || o.status, payLabel(o), o.payment_ref || o.ref || '', o.note || ''].filter(Boolean);
-    return '<section class="page"><h1>Aqua Club — ' + esc(title) + '</h1><p class="meta">' + bits.map(esc).join('<br>') + '</p>' +
+    return '<section class="page"><h1>Aqua Club — Nota de conferência</h1><p class="meta">' + bits.map(esc).join('<br>') + '</p>' +
       '<table><thead><tr><th>Itens</th><th class="r">Valor</th></tr></thead><tbody>' + (trs || '<tr><td>Sem linhas</td><td></td></tr>') + extraRows +
-      '<tr class="tot"><td>Total</td><td class="r">' + esc(mt(o.total)) + '</td></tr></tbody></table></section>';
+      vatTableRows(o.total) + '</section>';
   }
   function filteredDeskOrders() {
     const src = deskOrders();
@@ -1686,7 +1728,7 @@
       '<div class="gp-stat sand"><b>' + st.count + '</b><span>Atendimentos 30 d</span></div></div>' +
       '<div class="gp-bento">' +
       '<div class="gp-glass"><h3 class="gp-h">Sobre</h3><p class="gp-muted" style="margin:0">Membro desde ' + since.getDate() + ' ' + MONN[since.getMonth()] + ' ' + since.getFullYear() + '. Zona habitual: <b>' + esc(zone) + '</b>. Código de acesso definido na casa (não é mostrado).</p>' +
-      ((S.me && (S.me.can_change_passwords || S.me.job === 'it')) ? '<form class="gp-form" data-form="setpin" data-id="' + esc(m.id) + '" style="margin-top:1rem"><label>Novo código<input name="pin" inputmode="numeric" maxlength="12" required minlength="5" placeholder="Novo código"></label><button class="gb sm" type="submit">Actualizar código</button><p class="gp-msg" role="status"></p></form>' : '<p class="gp-muted" style="margin:.8rem 0 0">Só o IT pode alterar o código desta conta.</p>') + '</div>' +
+      ((S.me && (S.me.can_change_passwords || S.me.job === 'it')) ? '<form class="gp-form" data-form="setpin" data-id="' + esc(m.id) + '" data-phone="' + esc(m.phone || '') + '" style="margin-top:1rem"><label>Nova palavra-passe<input name="pin" type="password" autocomplete="new-password" required minlength="8" maxlength="64" placeholder="Mín. 8 caracteres"></label><button class="gb sm" type="submit">Actualizar senha</button><p class="gp-msg" role="status"></p></form>' : '<p class="gp-muted" style="margin:.8rem 0 0">Só o IT pode alterar a palavra-passe desta conta.</p>') + '</div>' +
       '<div class="gp-glass"><h3 class="gp-h">Semana</h3>' + dayBars(week.series) + '</div>' +
       '<div class="gp-glass span2"><h3 class="gp-h">Actividade recente</h3>' +
       (recent.length ? '<div class="gp-feed">' + recent.map((c) => '<div class="gp-feed-row"><time>' + hhmm(ts(c.createdAt)) + '</time><div><b>' + esc(tableName(c.tableCode) || 'Chamado') + '</b><small>' + esc(REASONS[c.reason] || c.reason) + '</small></div><span class="gp-chip ' + (c.status === 'completed' ? 'ok' : 'wait') + '">' + (c.status === 'completed' ? 'Concluído' : (c.status === 'accepted' ? 'A caminho' : 'Aberto')) + '</span></div>').join('') + '</div>'
@@ -1734,7 +1776,7 @@
     }).join('') +
       (fee ? '<li><b>Entrega</b><span>' + mt(fee) + '</span></li>' : '') +
       (Number(o.pizza_take_fee || o.pizzaTakeFee || 0) && !(rows || []).some((i) => String(i.item_id || i.itemId || i.id || '') === 'fee-pizza-take') ? '<li><b>Pizza para levar</b><span>' + mt(o.pizza_take_fee || o.pizzaTakeFee) + '</span></li>' : '') +
-      '<li class="tot"><b>Total</b><span>' + mt(o.total) + '</span></li></ul>';
+      vatItemLis(o.total);
   }
   function orderPlace(o) {
     return o.place_label || o.placeLabel || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || o.address || '');
@@ -2024,8 +2066,8 @@
       (canN ? '<button class="gb line" type="button" data-act="notif" ' + (perm === 'granted' ? 'disabled' : '') + '>' + ic('bell') + (perm === 'granted' ? 'Notificações ativas' : 'Ativar notificações do navegador') + '</button>' : '') +
       '<p class="gp-muted" style="margin:0">Mantenha esta página aberta (pode estar em segundo plano) para ser avisado de novos chamados.</p></div></div>' +
       ((me.can_change_passwords || me.job === 'it')
-        ? '<div class="gp-card"><h3>Códigos da equipa</h3><p class="gp-muted">Só o IT altera códigos. Indique o telemóvel da pessoa e o novo código.</p><form class="gp-form" data-form="itpass" novalidate><label>Telemóvel da conta<input name="phone" type="tel" required placeholder="84 000 0000"></label><label>Novo código<input name="password" type="password" autocomplete="new-password" required minlength="5"></label><button class="gb line" type="submit" style="justify-self:start">Guardar código</button><p class="gp-msg" role="status"></p></form></div>'
-        : '<div class="gp-card"><h3>Código de acesso</h3><p class="gp-muted" style="margin:0">O seu código só pode ser alterado pelo IT (Siddique Faizy Rego).</p></div>') +
+        ? '<div class="gp-card"><h3>Senhas da equipa</h3><p class="gp-muted">Só o IT altera palavras-passe. Indique o telemóvel da pessoa e a nova senha (mín. 8 caracteres).</p><form class="gp-form" data-form="itpass" novalidate><label>Telemóvel da conta<input name="phone" type="tel" required placeholder="84 000 0000"></label><label>Nova palavra-passe<input name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="64"></label><button class="gb line" type="submit" style="justify-self:start">Guardar senha</button><p class="gp-msg" role="status"></p></form></div>'
+        : '<div class="gp-card"><h3>Palavra-passe</h3><p class="gp-muted" style="margin:0">A sua senha só pode ser alterada pelo IT (Siddique Faizy Rego).</p></div>') +
       '<button class="gb dark block" type="button" data-act="logout">' + ic('logout') + 'Terminar sessão</button>';
   }
 
@@ -2280,7 +2322,7 @@
         const pin = String(v.pin || '').trim();
         const phone = String(v.phone || '').trim();
         if (phone.replace(/\D/g, '').length < 8) return say(f, 'Indique o telemóvel da ficha.', 'err');
-        if (pin.length < 5) return say(f, 'Indique o código de acesso.', 'err');
+        if (pin.length < 8) return say(f, 'A palavra-passe precisa de pelo menos 8 caracteres.', 'err');
         busy(f, true);
         let ok = false;
         if (be && be.signInPhone && be.mode === 'live') {
@@ -2331,28 +2373,30 @@
         busy(f, true); await be.updateProfile({ name: v.name, phone: v.phone }); S.me = await be.profile(); S.mine = null; say(f, 'Dados guardados.', 'ok');
         const w = $('.gp-who', root); if (w) w.parentElement.outerHTML = '<div class="gp-card"><div class="gp-who">' + avatar(S.me) + '<div><h2>' + esc(S.me.name) + '<span class="gp-role">' + (S.me.role === 'admin' ? 'Admin' : 'Garçom') + '</span></h2><small>' + esc(S.me.email || '') + '</small></div></div></div>';
       } else if (kind === 'pass' || kind === 'itpass') {
-        if (!(S.me && (S.me.can_change_passwords || S.me.job === 'it'))) throw new Error('Só o IT pode alterar códigos de acesso.');
-        if (String(v.password).length < 5) return say(f, 'O código precisa de pelo menos 5 dígitos.', 'err');
+        if (!(S.me && (S.me.can_change_passwords || S.me.job === 'it'))) throw new Error('Só o IT pode alterar palavras-passe.');
+        if (String(v.password).length < 8) return say(f, 'A palavra-passe precisa de pelo menos 8 caracteres.', 'err');
         busy(f, true);
         const phone = String(v.phone || S.me.phone || '').trim();
         try {
           await osFetch('/staff/password', { method: 'POST', body: { phone, pin: v.password, code: v.password } });
         } catch (e) { /* local */ }
-        if (be && be.mode === 'live') {
-          const c = await (async () => be)();
-          if (c.rpc) { /* */ }
-        }
-        if (be && be.setPin && phone) {
+        if (be && be.mode === 'live' && be.setStaffCode) {
+          await be.setStaffCode(phone, v.password);
+        } else if (be && be.setPin && phone) {
           const roster = be.roster ? be.roster() : [];
           const hit = roster.find((s) => String(s.phone || '').replace(/\D/g, '').endsWith(phone.replace(/\D/g, '').slice(-9)));
           if (hit) await be.setPin(hit.id, String(v.password));
-        } else if (be && be.changePassword) {
-          await be.changePassword(v.password);
         }
-        f.reset(); say(f, 'Código actualizado.', 'ok');
+        f.reset(); say(f, 'Palavra-passe actualizada na nuvem.', 'ok');
       } else if (kind === 'setpin') {
-        if (!be || !be.setPin) throw new Error('Sem permissão para alterar PIN.');
-        busy(f, true); await be.setPin(f.dataset.id, String(v.pin || '').trim()); say(f, 'PIN actualizado.', 'ok'); await guard(loadTeam); renderTab();
+        if (!(S.me && (S.me.can_change_passwords || S.me.job === 'it'))) throw new Error('Só o IT pode alterar palavras-passe.');
+        const next = String(v.pin || '').trim();
+        if (next.length < 8) return say(f, 'A palavra-passe precisa de pelo menos 8 caracteres.', 'err');
+        busy(f, true);
+        if (be && be.mode === 'live' && be.setStaffCode && f.dataset.phone) await be.setStaffCode(f.dataset.phone, next);
+        else if (be && be.setPin) await be.setPin(f.dataset.id, next);
+        else throw new Error('Sem permissão para alterar a senha.');
+        say(f, 'Palavra-passe actualizada.', 'ok'); await guard(loadTeam); renderTab();
       } else if (kind === 'invite') {
         if (!be || !be.inviteStaff) throw new Error('Sem permissão para criar perfil.');
         busy(f, true); await be.inviteStaff({ name: v.name, pin: v.pin, phone: v.phone }); f.reset(); say(f, 'Perfil criado. O garçom entra com este PIN.', 'ok'); await guard(loadTeam); renderTab();

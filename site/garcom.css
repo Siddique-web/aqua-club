@@ -174,6 +174,8 @@ html.gp-open .fabs { visibility: hidden !important; pointer-events: none !import
 .gc-items span { font: 800 .85rem var(--fh, system-ui); white-space: nowrap; }
 .gc-items li.tot { background: #000; color: #fff; }
 .gc-items li.tot span { color: var(--yellow, #FFD700); }
+.gc-items li.tax { background: #fff; border: 1px dashed #BFE7FF; }
+.gc-doc-note { margin: .45rem 0 0; padding: .55rem .7rem; border-radius: 10px; background: #FFF4C4; color: #3a2a00; font: 700 .78rem/1.4 var(--fb, system-ui); }
 .gc-foot { display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
 .gc-timer { display: inline-flex; align-items: center; gap: .4rem; font: 800 1.15rem var(--fh, system-ui); font-variant-numeric: tabular-nums; }
 .gc-timer .gi { width: 18px; height: 18px; }

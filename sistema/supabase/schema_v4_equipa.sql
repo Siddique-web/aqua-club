@@ -64,11 +64,11 @@ begin
   if not is_it() then
     raise exception 'Só o IT pode alterar códigos de acesso.' using errcode = '42501';
   end if;
-  if p_code is null or char_length(p_code) < 5 then
-    raise exception 'O código precisa de pelo menos 5 caracteres.' using errcode = '22023';
+  if p_code is null or char_length(p_code) < 8 then
+    raise exception 'A palavra-passe precisa de pelo menos 8 caracteres.' using errcode = '22023';
   end if;
   update staff
-     set pin_hash = crypt(p_code, gen_salt('bf', 12)),
+     set pin_hash = crypt(p_code, gen_salt('bf'::text, 12)),
          login_fails = 0,
          locked_until = null
    where mz_phone(phone) = digits;

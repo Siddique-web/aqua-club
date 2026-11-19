@@ -1,7 +1,8 @@
 # Aqua Club — PostgreSQL / Supabase e contas da equipa
 
-As fichas e os códigos **não estão neste repositório**.  
-Ficam em `plataforma/data/staff.json` (pasta ignorada pelo Git) e no Auth do Supabase, com o código em hash (bcrypt).
+As fichas e as senhas **não estão neste repositório** nem no JavaScript do site.  
+Fichas: `plataforma/data/staff.json` (pasta ignorada pelo Git).  
+Senhas: só no Auth da nuvem, em **bcrypt** (hash lento, não reversível). SHA-256 não se usa para senhas — é rápido demais para um ataque. O site fala com a nuvem por **HTTPS**.
 
 Só o perfil **IT** (`can_change_passwords`) altera códigos.
 
@@ -30,6 +31,7 @@ SQL Editor → New query → Run:
 10. `sistema/supabase/schema_v10_limpar_pedidos.sql` (só quando quiser esvaziar pedidos)
 11. `sistema/supabase/schema_v11_carga.sql` (heartbeat mais leve com muita gente)
 12. `sistema/supabase/schema_v12_chamados_cliente.sql` (cliente vê aceite/concluído ao vivo)
+13. `sistema/supabase/schema_v13_senhas.sql` (hash das senhas da equipa na nuvem)
 
 **Authentication → Providers → Email:** ligue “Allow new users to sign up”.  
 Para o cliente entrar logo após criar conta, desligue **Confirm email**.

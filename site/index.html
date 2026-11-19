@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops58"></script>
+<script src="i18n.js?v=ops64"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -356,15 +356,19 @@ section{position:relative}
 .hours li:last-child{border:0}
 .hday{display:inline-flex;align-items:center;gap:.5rem}
 .hday .ico{width:1.15rem;height:1.15rem;color:var(--cyan-d)}
-.wx-now{display:flex;align-items:center;gap:.85rem;margin:1rem 0 0;padding:.9rem 1rem;border-radius:18px;background:#0B1520;color:#fff}
-.wx-now[hidden]{display:none}
-.wx-now .ico{width:2.15rem;height:2.15rem}
-.wx-now.sun .ico{color:#F5C518}
-.wx-now.cloud .ico{color:#9EC9E8}
-.wx-now.rain .ico{color:#5BB4FF}
-.wx-now.storm .ico{color:#FFD700}
-.wx-now b{display:block;font:800 1.25rem/1 var(--fh)}
-.wx-now small{display:block;margin-top:.2rem;font:600 .78rem/1.3 var(--fb);color:rgba(255,255,255,.72)}
+.wx-chip{display:none;align-items:center;justify-content:center;gap:.28rem;height:46px;min-height:46px;padding:0 .62rem 0 .48rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;flex:none;text-decoration:none;line-height:1}
+.wx-chip:not([hidden]){display:inline-flex}
+.wx-chip .ico{width:1.15rem;height:1.15rem;flex:none}
+.wx-chip.sun .ico{color:#E6A800}
+.wx-chip.cloud .ico{color:#3D7EA8}
+.wx-chip.rain .ico{color:#0077C2}
+.wx-chip.storm .ico{color:#8A6D00}
+.wx-chip b{font:800 .82rem/1 var(--fh);letter-spacing:.01em;white-space:nowrap}
+@media(max-width:360px){
+  .wx-chip{height:42px;min-height:42px;padding-inline:.45rem .5rem}
+  .wx-chip .ico{width:1.05rem;height:1.05rem}
+  .wx-chip b{font-size:.76rem}
+}
 .g-ico-lab{display:inline-flex;align-items:center;gap:.4rem}
 .g-ico-lab .ico{width:1rem;height:1rem;color:var(--cyan-d)}
 .payopt{grid-template-columns:1.5rem 1fr;align-items:center;column-gap:.7rem}
@@ -401,7 +405,14 @@ input:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 
   .footer ul{gap:.55rem}
   .wm{font-size:clamp(1.6rem,14vw,2.6rem);padding:.15rem 0 0}
 }
-@media(min-width:768px){.f-grid{grid-template-columns:1.6fr 1fr}.legal{flex-direction:row;justify-content:space-between;padding-bottom:1.4rem}}
+@media(min-width:768px){.f-grid{grid-template-columns:1.4fr 1fr 1.3fr}.legal{flex-direction:row;justify-content:space-between;padding-bottom:1.4rem}}
+.legal-ids{display:grid;gap:.35rem;margin:0;max-width:none;color:rgba(255,255,255,.78);font:600 .82rem/1.45 var(--fb)}
+.legal-ids b{color:#fff;font:800 .78rem/1.3 var(--fh);letter-spacing:.04em;text-transform:uppercase}
+.legal-ids a{color:var(--yellow)}
+.osum li.tax{border:0;font:650 .86rem var(--fb);color:#334}
+.tax-line{margin:.15rem 0 0;color:var(--muted);font:650 .82rem/1.4 var(--fb);max-width:none}
+.osum li.doc-note{display:block;border:0;margin-top:.45rem;padding:.55rem .7rem;border-radius:10px;background:#FFF4C4;color:#3a2a00;font:700 .78rem/1.4 var(--fb)}
+.doc-note{margin:.45rem 0 0;padding:.55rem .7rem;border-radius:10px;background:#FFF4C4;color:#3a2a00;font:700 .78rem/1.4 var(--fb);max-width:none}
 
 
 /* ===== padrões inspirados nas referências ===== */
@@ -669,9 +680,13 @@ input,select,textarea{border-radius:14px}
 .mesa-step b{min-width:3.2rem;text-align:center;font:800 1.35rem/1 var(--fh);letter-spacing:-.03em}
 .mesa-step input{width:4.6rem;height:48px;border:2px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:center;font:800 1.35rem/1 var(--fh);letter-spacing:-.03em;-moz-appearance:textfield}
 .mesa-step input::-webkit-outer-spin-button,.mesa-step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.book-rules{margin:.75rem 0 0;padding:.85rem .95rem;border-radius:14px;background:var(--yellow);color:#000;font:700 .86rem/1.45 var(--fb)}
-.book-rules p{margin:0 0 .45rem}.book-rules p:last-child{margin:0}
-.book-until,.book-pay{margin:.45rem 0 0;font:800 .9rem var(--fh)}
+.book-panel{margin:.85rem 0 0;padding:1rem 1.05rem 1.1rem;border-radius:18px;background:var(--yellow);color:#000;display:grid;gap:.7rem;min-width:0}
+.book-panel .book-kicker{margin:0;font:800 .72rem/1.2 var(--fh);letter-spacing:.1em;text-transform:uppercase}
+.book-pay{margin:0;padding:.55rem .7rem;border-radius:12px;background:rgba(255,255,255,.5);font:800 .95rem/1.3 var(--fh)}
+.book-until{margin:0;padding:.55rem .7rem;border-radius:12px;background:rgba(0,0,0,.08);font:800 .88rem/1.35 var(--fh)}
+.book-rules{list-style:none;margin:0;padding:0;display:grid;gap:.45rem}
+.book-rules li{display:grid;grid-template-columns:1.15rem 1fr;gap:.45rem;align-items:start;margin:0;font:650 .88rem/1.4 var(--fb);overflow-wrap:anywhere}
+.book-rules li::before{content:"";width:.55rem;height:.55rem;margin-top:.42rem;border-radius:50%;background:#000;flex:none}
 .fee-bands{display:grid;gap:.5rem}
 .fee-band{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.85rem 1rem;border:2px solid var(--cyan-line);border-radius:16px;background:#fff;cursor:pointer;text-align:left}
 .fee-band.on{border-color:var(--cyan);background:var(--cyan-soft)}
@@ -779,7 +794,7 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 #espacos .sh.center .display{font-size:clamp(1.85rem,6.15cqi,3.9rem)}
 #espacos .sh.center .bar2{width:80px;height:4px;margin:1.15rem auto 0}
 #espacos .sh.center p{width:100%;max-width:min(46rem,100%);margin:1.35rem auto 0;padding-inline:.15rem;font-size:clamp(1.06rem,2.6vw,1.22rem);line-height:1.55;letter-spacing:.01em;text-align:center;text-wrap:balance}
-.mcard{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto;align-items:stretch;align-content:start;background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;overflow:hidden;min-width:0;box-shadow:0 14px 30px -22px rgba(0,105,168,.6);transition:transform var(--ease),box-shadow var(--ease),border-color var(--ease)}
+.mcard{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto;align-items:stretch;align-content:start;background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;overflow:hidden;min-width:0;box-shadow:0 14px 30px -22px rgba(0,105,168,.6);transition:transform var(--ease),box-shadow var(--ease),border-color var(--ease);content-visibility:auto;contain-intrinsic-size:140px}
 .mcard:hover{transform:translateY(-4px);border-color:var(--cyan);box-shadow:0 24px 40px -22px rgba(0,168,255,.7)}
 @keyframes mcat-fade{from{opacity:0}to{opacity:1}}
 @keyframes mcard-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -855,6 +870,9 @@ html:not(.staff-chrome) .fabs{bottom:max(.75rem, env(safe-area-inset-bottom,0px)
 .guest-msg.ok{color:#0f7a3a}
 .guest-note{margin:.2rem 0 0;font-size:.8rem;color:var(--muted);text-align:center}
 .guest-hint{margin:0;font:600 .78rem/1.35 var(--fb);color:#223}
+.guest-wait{display:grid;gap:.7rem;padding:.35rem 0 .2rem;text-align:center}
+.guest-wait p{margin:0;font:600 .9rem/1.45 var(--fb);color:#223}
+.guest-wait b{word-break:break-all}
 .dlg::backdrop{background:rgba(0,20,35,.62);backdrop-filter:blur(3px)}
 .dlg[open]{animation:sheet .35s ease}
 @keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
@@ -977,9 +995,9 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .wall-panel h3{font-size:1.7rem;color:#fff}
 .wall-panel>p{margin:.4rem 0 0;font-size:.92rem;color:rgba(255,255,255,.8)}
 .wall{position:relative;height:440px;margin-top:1.2rem;display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent)}
-.wcol{display:flex;flex-direction:column;min-height:0;animation:wall-up 5s linear infinite;will-change:transform;backface-visibility:hidden;contain:layout style}
-.wcol.rev{animation-name:wall-down;animation-duration:9s}
-.wcol:nth-child(3){animation-duration:5s}
+.wcol{display:flex;flex-direction:column;min-height:0;animation:wall-up 22s linear infinite;animation-play-state:paused;backface-visibility:hidden;contain:layout style;transform:translateZ(0)}
+.wcol.rev{animation-name:wall-down;animation-duration:28s}
+.wcol:nth-child(3){animation-duration:24s}
 @media(hover:hover) and (pointer:fine){.wall:hover .wcol,.wall:focus-within .wcol{animation-play-state:paused}}
 .wset{display:flex;flex-direction:column;gap:.55rem;flex:none;padding-bottom:.55rem}
 @keyframes wall-up{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
@@ -991,9 +1009,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .wk-t b{font:800 .66rem var(--fh);letter-spacing:.05em;text-transform:uppercase;line-height:1.2}
 .wk-t i{font:700 .74rem var(--fh);font-style:normal;color:var(--yellow)}
 .wcard.ill{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--cyan),#8ADBFF);color:#000}
-.wcard.ill .ico{width:42px;height:42px;margin-top:-1.4rem;stroke-width:1.2px;opacity:.9;animation:ico-float 4.8s ease-in-out infinite}
-@keyframes ico-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@media(hover:hover) and (pointer:fine){.wcard.ill:hover .ico{animation:none;transform:scale(1.08) translateY(-2px);transition:transform .35s cubic-bezier(.22,1,.36,1)}}
+.wcard.ill .ico{width:42px;height:42px;margin-top:-1.4rem;stroke-width:1.2px;opacity:.9}
+@media(hover:hover) and (pointer:fine){.wcard.ill:hover .ico{transform:scale(1.06);transition:transform .25s ease}}
 .wcard.ill .wk-t{background:linear-gradient(0deg,rgba(255,255,255,.65),transparent);text-align:center}
 .wcard.ill .wk-t i{color:#000}
 .wall-cta{margin-top:1.1rem;display:flex;justify-content:center}
@@ -1131,7 +1148,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops58">
+<link rel="stylesheet" href="garcom.css?v=ops64">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1223,6 +1240,10 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       </ul>
     </nav>
     <div class="head-right">
+      <a class="wx-chip" id="wxNow" href="#horarios" hidden>
+        <svg class="ico" id="wxIco" aria-hidden="true"><use href="#i-sun"/></svg>
+        <b id="wxTemp"></b>
+      </a>
       <button type="button" class="acc-chip" id="accChip" data-acc="open" hidden>
         <svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>
         <span id="accChipName">Conta</span>
@@ -1409,10 +1430,6 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
           <li><span class="hday"><svg class="ico" aria-hidden="true"><use href="#i-cloud-sun"/></svg><span data-i18n="hours.sat">Sábados</span></span><strong>09:00 – 19:00</strong></li>
           <li><span class="hday"><svg class="ico" aria-hidden="true"><use href="#i-cloud"/></svg><span data-i18n="hours.sun">Domingos e Feriados</span></span><strong>09:00 – 19:00</strong></li>
         </ul>
-        <div class="wx-now" id="wxNow" hidden>
-          <svg class="ico" id="wxIco" aria-hidden="true"><use href="#i-sun"/></svg>
-          <div><b id="wxTemp"></b><small id="wxLab"></small></div>
-        </div>
       </div>
       <div class="card reveal r-right" id="bilhetes" style="--d:120ms">
         <h3 class="display" data-i18n="hours.bookT">Reserve o seu dia</h3>
@@ -1421,12 +1438,18 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
           <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-cal"/></svg><span data-i18n="hours.date">Data da visita</span></span><input type="date" name="data" required></label>
           <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-group"/></svg><span data-i18n="hours.people">Número de pessoas</span></span><input type="number" name="pessoas" min="1" max="200" value="2" inputmode="numeric" required></label>
           <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg><span data-i18n="hours.hora">Hora de chegada</span></span><input type="time" name="hora" required></label>
-          <p class="book-until" id="bookUntil" hidden></p>
-          <p class="book-pay" id="bookPay"></p>
-          <div class="book-rules">
-            <p data-i18n="hours.rules">Reserva de espaço: +1000 MT por pessoa, tudo consumível. 30 minutos de tolerância de atraso. Se faltar, perde o valor. Máximo 3 horas e meia — a hora de saída é marcada automaticamente.</p>
-          </div>
           <label><span class="g-ico-lab"><svg class="ico ico-fill" aria-hidden="true"><use href="#i-apps"/></svg><span data-i18n="hours.type">Tipo de experiência</span></span><select name="tipo"><option value="Piscina &amp; Sol" data-i18n="exp.geral">Piscina &amp; Sol</option><option value="Dia em Família" data-i18n="exp.fam">Dia em Família</option><option value="Almoço ou Jantar" data-i18n="exp.vip">Almoço ou Jantar</option><option value="Grupo &amp; Amigos" data-i18n="exp.grp">Grupo &amp; Amigos</option></select></label>
+          <aside class="book-panel" aria-labelledby="bookRulesT">
+            <p class="book-kicker" id="bookRulesT" data-i18n="hours.rulesTitle">Reserva de espaço</p>
+            <p class="book-pay" id="bookPay"></p>
+            <p class="book-until" id="bookUntil" hidden></p>
+            <ul class="book-rules">
+              <li data-i18n="hours.rulePrice">+1000 MT por pessoa, tudo consumível no Aqua Club</li>
+              <li data-i18n="hours.ruleLate">30 minutos de tolerância após a hora marcada</li>
+              <li data-i18n="hours.ruleMiss">Se faltar, perde o valor da reserva</li>
+              <li data-i18n="hours.ruleMax">Máximo 3 horas e meia — a hora de saída é marcada automaticamente</li>
+            </ul>
+          </aside>
           <button class="btn btn-cyan btn-block" type="submit" data-i18n="hours.send">Enviar pedido por WhatsApp</button>
           <p class="msg" id="msg" role="status" aria-live="polite"></p>
         </form>
@@ -1485,10 +1508,18 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
         <a href="#" data-social="whatsapp" aria-label="WhatsApp"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg></a>
       </div>
     </div>
-    <nav class="reveal" style="--d:100ms" data-i18n-aria="foot.links"><h2 data-i18n="foot.links">Links rápidos</h2><ul><li><a href="#inicio" data-i18n="nav.home">Início</a></li><li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li><li><a href="#menu" data-i18n="nav.menu">Menu</a></li><li><a href="#experiencias" data-i18n="nav.experiences">Experiências</a></li><li><a href="#bilhetes" data-i18n="nav.booking">Reservas</a></li><li><a href="#faq" data-i18n="nav.faq">Perguntas frequentes</a></li></ul></nav>
+    <nav class="reveal" style="--d:100ms" data-i18n-aria="foot.links"><h2 data-i18n="foot.links">Links rápidos</h2><ul><li><a href="#inicio" data-i18n="nav.home">Início</a></li><li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li><li><a href="#menu" data-i18n="nav.menu">Menu</a></li><li><a href="#experiencias" data-i18n="nav.experiences">Experiências</a></li><li><a href="#bilhetes" data-i18n="nav.booking">Reservas</a></li><li><a href="legal.html" data-i18n="foot.legal">Termos e privacidade</a></li></ul></nav>
+    <div class="legal-ids reveal" style="--d:160ms">
+      <b>Aqua Club — Complexo Aquático</b>
+      <span>NUIT 400788103</span>
+      <span>Alvará comercial 018/07/13/RE/2026</span>
+      <span>Rua Capitães de Sena, Centro Recreativo Banco de Moçambique, Beira</span>
+      <span><a href="tel:+258879501491">87 950 1491</a> · <a href="tel:+258863586932">86 358 6932</a></span>
+      <span data-i18n="legal.doc">Documento de conferência — Não serve de fatura fiscal</span>
+    </div>
   </div>
   <div class="wm" aria-hidden="true">AQUA CLUB</div>
-  <div class="legal"><div class="wrap" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem"><p style="margin:0;max-width:none">© <span id="year"></span> <span data-i18n="foot.copy">Aqua Club. Todos os direitos reservados.</span></p><p style="margin:0;max-width:none"><span data-i18n="foot.mz">Beira, Moçambique ·</span> <a href="#equipa" data-open-staff="orders" style="color:inherit;opacity:.7" data-i18n="foot.staff">Área da equipa</a></p></div></div>
+  <div class="legal"><div class="wrap" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem"><p style="margin:0;max-width:none">© <span id="year"></span> <span data-i18n="foot.copy">Aqua Club. Todos os direitos reservados.</span></p><p style="margin:0;max-width:none"><a href="legal.html" data-i18n="foot.legal">Termos e privacidade</a> · <a href="#equipa" data-open-staff="orders" style="color:inherit;opacity:.7" data-i18n="foot.staff">Área da equipa</a></p></div></div>
 </footer>
 
 <dialog class="story-dlg" id="storyDlg" aria-labelledby="storyT">
@@ -1611,6 +1642,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <div class="cart-picked" id="cartCheckout">
     <div id="cartBody"></div>
       <p class="dtotal"><span data-i18n="cart.total">Total</span> <b id="cartTotal"></b></p>
+      <p class="tax-line" id="cartVat" hidden></p>
+      <p class="doc-note" data-i18n="legal.doc">Documento de conferência — Não serve de fatura fiscal</p>
     </div>
     <div class="cart-id" id="cartId">
     <fieldset class="idbox"><legend data-i18n="cart.who">Quem faz o pedido</legend>
@@ -1638,6 +1671,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <div class="ocode"><small data-i18n="cart.bill">N.º da conta</small><b id="ocode"></b><span class="chip2" id="opay"></span></div>
     <p class="ometa" id="ometa"></p>
     <ul class="osum" id="osum"></ul>
+    <p class="doc-note" data-i18n="legal.doc">Documento de conferência — Não serve de fatura fiscal</p>
     <div class="odetail" id="odetail"></div>
     <ol class="otrack" id="otrack"><li data-i18n="st.review">Em análise</li><li data-i18n="cart.prep">Em preparação</li><li data-i18n="st.ready">Pronto</li><li data-i18n="cart.del">Entregue</li></ol>
     <a class="wafall" data-wa href="#" target="_blank" rel="noopener noreferrer" hidden data-i18n="cart.waFall">Não abriu? Toque aqui para abrir o WhatsApp</a>
@@ -1673,6 +1707,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <li data-i18n="terms.t3">A conta deve ser paga antes de sair. Pode pagar no local ou por transferência móvel e declarar o pagamento; o restaurante confirma.</li>
     <li data-i18n="terms.t4">Os dados (nome e telemóvel) servem apenas para registar o pedido e a conta e para contactar o cliente sobre o pedido.</li>
     <li data-i18n="terms.t5">Informe o garçom de qualquer alergia ou restrição alimentar antes de pedir.</li>
+    <li data-i18n="terms.t6">Este site emite só notas de conferência. Não serve de fatura fiscal. O comprovativo fiscal oficial é emitido no caixa certificado do restaurante.</li>
+    <li data-i18n="legal.privacy">Nome, e-mail e contacto servem só para reservas, atendimento e histórico de pedidos no Aqua Club.</li>
   </ul>
   <button class="btn btn-cyan btn-block" type="button" data-close data-i18n="terms.ok">Percebi</button>
 </div></dialog>
@@ -1739,7 +1775,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Confirmar palavra-passe</span><input name="password2" id="gPass2" type="password" autocomplete="new-password" required minlength="6" placeholder="Repita a palavra-passe"></label>
       <button class="btn btn-cyan btn-block" type="submit">Criar conta e continuar</button>
       <p class="guest-msg" id="gMsgUp" role="alert"></p>
-      <p class="guest-note">Ao criar conta aceita que o Aqua Club use estes dados só para pedidos e atendimento.</p>
+      <p class="guest-note"><span data-i18n="legal.accept">Ao criar conta aceita os termos e a privacidade: os dados servem só para reservas, atendimento e histórico de pedidos.</span> <a href="legal.html" data-i18n="foot.legal">Termos e privacidade</a></p>
     </form>
     <form class="guest-form" id="guestFormIn" hidden novalidate>
       <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</span><input name="email" id="gEmailIn" type="email" autocomplete="username" required placeholder="nome@email.com"></label>
@@ -1747,6 +1783,12 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <button class="btn btn-cyan btn-block" type="submit">Entrar</button>
       <p class="guest-msg" id="gMsgIn" role="alert"></p>
     </form>
+    <div class="guest-wait" id="guestWaitMail" hidden>
+      <p>Enviámos um e-mail para <b id="guestWaitTo"></b>.</p>
+      <p>Abra essa mensagem neste telemóvel e toque em confirmar. Volta automaticamente a este ecrã com a conta já ligada.</p>
+      <button class="btn btn-cyan btn-block" type="button" id="guestWaitIn">Já confirmei — entrar</button>
+      <button class="btn btn-line btn-block" type="button" id="guestWaitBack">Voltar</button>
+    </div>
   </div>
 </dialog>
 
@@ -1812,12 +1854,36 @@ const TABLES = Array.from({ length: MAX_TABLE }, (_, i) => ({ code: String(i + 1
 
 /* ===== CONFIGURAÇÃO — altere aqui os dados reais do Aqua Club ===== */
 const CONTACT = {
-  address: 'Palmeiras 2, Beira, Sofala, Moçambique',
+  address: 'Rua Capitães de Sena, Centro Recreativo Banco de Moçambique, Beira, Sofala, Moçambique',
   phone: '+258 87 950 1491',
+  phone2: '+258 86 358 6932',
   whatsapp: '258879501491',
   whatsappGroup: 'https://chat.whatsapp.com/AquaClubBeiraCRBM',
   email: 'info@aquaclub.co.mz',
   social: { instagram: 'https://instagram.com/', facebook: 'https://facebook.com/' }
+};
+const LEGAL = {
+  name: 'Aqua Club — Complexo Aquático',
+  entity: 'Centro Recreativo Banco de Moçambique',
+  nuit: '400788103',
+  alvara: '018/07/13/RE/2026',
+  address: CONTACT.address,
+  phones: ['879501491', '863586932'],
+  /* geral = preços com IVA 16% incluído; simplified = ISPC/isento, sem 16% */
+  vatRegime: 'geral',
+  vatRate: 0.16
+};
+window.AQUA_LEGAL = LEGAL;
+window.aquaVat = function (gross) {
+  const L = window.AQUA_LEGAL || {};
+  const total = Math.round(Number(gross) || 0);
+  if (L.vatRegime !== 'geral') return { total: total, base: total, iva: 0, rate: 0, geral: false };
+  const rate = Number(L.vatRate) || 0.16;
+  const base = Math.round(total / (1 + rate));
+  return { total: total, base: base, iva: total - base, rate: rate, geral: true };
+};
+window.aquaDocNotice = function () {
+  return 'Documento de conferência — Não serve de fatura fiscal';
 };
 const SLIDE_MS = 7000;
 /* Depoimentos reais de clientes (com autorização). Ex.: { nome: 'Ana M.', estrelas: 5, texto: 'Dia fantástico!' } */
@@ -1906,34 +1972,35 @@ const REVIEWS = [];
     if (/assets\/.+\.(jpe?g|png)$/i.test(src)) setImg(im, src);
   });
   if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+  let heroPinned = false;
   function pinHero() {
+    if (heroPinned) return;
+    heroPinned = true;
     const html = document.documentElement;
     const prev = html.style.scrollBehavior;
     html.style.scrollBehavior = 'auto';
     const se = document.scrollingElement || html;
     se.scrollTop = 0;
-    html.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
     try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (e) { window.scrollTo(0, 0); }
     html.style.scrollBehavior = prev;
   }
+  function authReturnPending() {
+    const h = String(location.hash || '');
+    const s = String(location.search || '');
+    return /access_token=|refresh_token=|type=signup|type=email|type=magiclink|type=invite/.test(h)
+      || /(?:^|[?&])(?:aq=confirm|code=)/.test(s);
+  }
   function landHome() {
+    if (authReturnPending()) return;
     $$('dialog').forEach((d) => { try { if (d.open) d.close(); } catch (e) { /* */ } });
     try {
-      if (location.hash) window.history.replaceState(null, '', location.pathname + location.search);
+      if (location.hash && !authReturnPending()) window.history.replaceState(null, '', location.pathname + location.search);
     } catch (e) { /* */ }
     pinHero();
   }
   landHome();
-  window.addEventListener('pageshow', () => { landHome(); pinHero(); });
+  window.addEventListener('pageshow', (e) => { if (!e.persisted) landHome(); });
   window.addEventListener('DOMContentLoaded', landHome);
-  window.addEventListener('load', () => {
-    landHome();
-    pinHero();
-    requestAnimationFrame(pinHero);
-    setTimeout(pinHero, 60);
-    setTimeout(pinHero, 220);
-  });
   const tr = (k, v) => (window.AquaI18n ? AquaI18n.t(k, v) : k);
   const loc = (o) => (window.AquaI18n ? AquaI18n.loc(o) : (o && (o.pt || o.name)) || o || '');
 
@@ -2149,6 +2216,38 @@ const REVIEWS = [];
   /* ===== menu, pedido, conta e chamada de garçom ===== */
   const asset = imgUrl;
   const money = (n) => n.toLocaleString(window.AquaI18n ? AquaI18n.locale() : 'pt-PT') + ' MT';
+  function vatLis(total) {
+    const v = window.aquaVat(total);
+    if (!v.geral) {
+      return '<li class="tax"><span>' + esc(tr('legal.exempt')) + '</span></li>' +
+        '<li class="tot"><span>' + esc(tr('cart.total')) + '</span><b>' + money(v.total) + '</b></li>';
+    }
+    return '<li class="tax"><span>' + esc(tr('legal.base')) + '</span><b>' + money(v.base) + '</b></li>' +
+      '<li class="tax"><span>' + esc(tr('legal.iva')) + '</span><b>' + money(v.iva) + '</b></li>' +
+      '<li class="tot"><span>' + esc(tr('cart.total')) + '</span><b>' + money(v.total) + '</b></li>';
+  }
+  function vatPdfRows(total) {
+    const v = window.aquaVat(total);
+    const note = '<p class="note">' + esc(window.aquaDocNotice()) + '</p>';
+    const ids = window.AQUA_LEGAL ? ('<p class="meta">NUIT ' + esc(AQUA_LEGAL.nuit) + ' · Alvará ' + esc(AQUA_LEGAL.alvara) + '<br>' + esc(AQUA_LEGAL.address) + '</p>') : '';
+    if (!v.geral) {
+      return '<tr class="tot"><td>' + esc(tr('cart.total')) + '</td><td class="r">' + money(v.total) + '</td></tr></table>' +
+        '<p class="meta">' + esc(tr('legal.exempt')) + '</p>' + note + ids;
+    }
+    return '<tr><td>' + esc(tr('legal.base')) + '</td><td class="r">' + money(v.base) + '</td></tr>' +
+      '<tr><td>' + esc(tr('legal.iva')) + '</td><td class="r">' + money(v.iva) + '</td></tr>' +
+      '<tr class="tot"><td>' + esc(tr('cart.total')) + '</td><td class="r">' + money(v.total) + '</td></tr></table>' + note + ids;
+  }
+  function fillCartVat() {
+    const el = $('#cartVat');
+    if (!el) return;
+    const v = window.aquaVat(grandTotal());
+    if (!cart.length) { el.hidden = true; return; }
+    el.hidden = false;
+    el.textContent = v.geral
+      ? (tr('legal.base') + ' ' + money(v.base) + ' · ' + tr('legal.iva') + ' ' + money(v.iva))
+      : tr('legal.exempt');
+  }
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const nice = (c) => String(c).replace(/-/g, ' ');
   const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
@@ -2244,10 +2343,15 @@ const REVIEWS = [];
             s.onload = ok; s.onerror = no; document.head.appendChild(s);
           });
         }
-        sb = window.supabase.createClient(url, key, { auth: { storageKey: 'aq-guest-auth', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+        sb = window.supabase.createClient(url, key, { auth: { storageKey: 'aq-guest-auth', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' } });
+        sb.auth.onAuthStateChange((ev) => {
+          if (ev === 'SIGNED_IN' || ev === 'TOKEN_REFRESHED' || ev === 'USER_UPDATED') loadGuest();
+          if (ev === 'SIGNED_OUT') { guest = null; paintAccountBox(); paintAccountUi(); }
+        });
       const { data, error } = await sb.from('tables').select('id,code,zone').order('code');
         if (!error && data && data.length) { dbTables = data; tables = data.map((r) => ({ code: r.code, zone: r.zone })); }
         await loadGuest();
+        await handleGuestReturn();
       } catch (e) {
         console.warn('Sistema indisponível; a usar WhatsApp.', e);
         sb = null;
@@ -2258,6 +2362,114 @@ const REVIEWS = [];
   }
   let guest = null, pendingGuestFn = null;
   const emailOk = (v) => /^\S+@\S+\.\S+$/.test(String(v || '').trim());
+  const PENDING_KEY = 'aq-guest-pending';
+  function guestRedirect() {
+    const path = location.pathname || '/';
+    return location.origin + path + (path.indexOf('?') >= 0 ? '&' : '?') + 'aq=confirm';
+  }
+  function readPending() {
+    try {
+      const raw = sessionStorage.getItem(PENDING_KEY) || localStorage.getItem(PENDING_KEY) || '';
+      const o = raw ? JSON.parse(raw) : null;
+      if (!o || !o.email || !o.password) return null;
+      if (o.at && Date.now() - o.at > 36e5 * 24) return null;
+      return o;
+    } catch (e) { return null; }
+  }
+  function writePending(row) {
+    try {
+      const payload = JSON.stringify(Object.assign({ at: Date.now() }, row));
+      sessionStorage.setItem(PENDING_KEY, payload);
+      localStorage.setItem(PENDING_KEY, payload);
+    } catch (e) { /* */ }
+  }
+  function clearPending() {
+    try { sessionStorage.removeItem(PENDING_KEY); } catch (e) { /* */ }
+    try { localStorage.removeItem(PENDING_KEY); } catch (e) { /* */ }
+  }
+  async function rememberOnPhone(email, password, name) {
+    try { store.set('aq-guest-email', email); } catch (e) { /* */ }
+    try {
+      if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+        await navigator.credentials.store(new PasswordCredential({ id: email, password, name: name || 'Aqua Club' }));
+      }
+    } catch (e) { /* */ }
+  }
+  function showGuestWait(email) {
+    const w = $('#guestWaitMail');
+    if (w) w.hidden = false;
+    const to = $('#guestWaitTo');
+    if (to) to.textContent = email || '';
+    const up = $('#guestFormUp'), inn = $('#guestFormIn'), seg = document.querySelector('.guest-seg');
+    if (up) up.hidden = true;
+    if (inn) inn.hidden = true;
+    if (seg) seg.hidden = true;
+  }
+  function hideGuestWait() {
+    const w = $('#guestWaitMail');
+    if (w) w.hidden = true;
+    const seg = document.querySelector('.guest-seg');
+    if (seg) seg.hidden = false;
+  }
+  function cleanAuthUrl() {
+    try {
+      const u = new URL(location.href);
+      u.searchParams.delete('aq');
+      u.searchParams.delete('code');
+      u.hash = '';
+      history.replaceState(null, '', u.pathname + (u.search || ''));
+    } catch (e) { /* */ }
+  }
+  async function enterWithPending() {
+    const p = readPending();
+    if (!sb || !p) return false;
+    const inn = await sb.auth.signInWithPassword({ email: p.email, password: p.password });
+    if (inn.error) throw inn.error;
+    await upsertCustomerRow(inn.data.user, p);
+    await loadGuest();
+    return !!(guest && guest.id);
+  }
+  function welcomeGuest() {
+    guestMsg('ok', 'Conta confirmada. Já está ligado' + (guest && guest.name ? ', ' + guest.name.split(' ')[0] : '') + '.');
+    setTimeout(() => {
+      finishGuestAuth();
+      openAccount();
+    }, 500);
+  }
+  async function handleGuestReturn() {
+    if (!sb) return;
+    const fromMail = authReturnPending();
+    await loadGuest();
+    if (guest && guest.id) {
+      clearPending();
+      if (fromMail) {
+        openGuestAuth('in');
+        hideGuestWait();
+        welcomeGuest();
+      }
+      cleanAuthUrl();
+      return;
+    }
+    if (fromMail || readPending()) {
+      try {
+        if (await enterWithPending()) {
+          hideGuestWait();
+          openGuestAuth('in');
+          welcomeGuest();
+          cleanAuthUrl();
+          return;
+        }
+      } catch (e) { /* ainda não confirmou */ }
+    }
+    if (fromMail) {
+      const p = readPending();
+      openGuestAuth(p ? 'up' : 'in');
+      if (p) showGuestWait(p.email);
+      guestMsg(p ? '' : 'err', p ? 'Ainda a confirmar. Toque no e-mail e volte.' : 'Confirme o e-mail e entre com a palavra-passe.');
+      const em = $('#gEmailIn');
+      if (em && p) em.value = p.email;
+    }
+  }
   async function upsertCustomerRow(user, extra) {
     if (!sb || !user) return null;
     const name = String((extra && extra.name) || user.user_metadata && user.user_metadata.name || '').trim().slice(0, 80);
@@ -2330,6 +2542,7 @@ const REVIEWS = [];
   }
   async function logoutGuest() {
     pendingGuestFn = null;
+    clearPending();
     try { if (sb) await sb.auth.signOut(); } catch (e) { /* */ }
     guest = null;
     if (guestPulse) { clearInterval(guestPulse); guestPulse = 0; }
@@ -2396,12 +2609,15 @@ const REVIEWS = [];
     el.textContent = text || '';
   }
   function showGuestTab(which) {
+    hideGuestWait();
     const up = which === 'up';
     $('#guestTabUp').setAttribute('aria-selected', up ? 'true' : 'false');
     $('#guestTabIn').setAttribute('aria-selected', up ? 'false' : 'true');
     $('#guestFormUp').hidden = !up;
     $('#guestFormIn').hidden = up;
     guestMsg('', '');
+    const saved = store.get('aq-guest-email');
+    if (!up && saved && !$('#gEmailIn').value) $('#gEmailIn').value = saved;
   }
   function openGuestAuth(tab) {
     showGuestTab(tab || 'up');
@@ -2436,6 +2652,17 @@ const REVIEWS = [];
   }
   $('#guestTabUp')?.addEventListener('click', () => showGuestTab('up'));
   $('#guestTabIn')?.addEventListener('click', () => showGuestTab('in'));
+  $('#guestWaitIn')?.addEventListener('click', async () => {
+    guestMsg('', 'A confirmar…');
+    try {
+      await initBackend();
+      if (await enterWithPending()) { hideGuestWait(); welcomeGuest(); }
+      else guestMsg('err', 'Ainda não confirmou o e-mail. Abra a mensagem e toque no link.');
+    } catch (err) {
+      guestMsg('err', authErr(err));
+    }
+  });
+  $('#guestWaitBack')?.addEventListener('click', () => showGuestTab('up'));
   $('#guestFormUp')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     guestMsg('', '');
@@ -2455,16 +2682,19 @@ const REVIEWS = [];
     if (btn) btn.disabled = true;
     guestMsg('', 'A criar a sua conta…');
     try {
+      writePending({ email, password: pass, name, phone });
+      await rememberOnPhone(email, pass, name);
       const { data, error } = await sb.auth.signUp({
         email, password: pass,
-        options: { data: { name, phone }, emailRedirectTo: location.origin + location.pathname }
+        options: { data: { name, phone }, emailRedirectTo: guestRedirect() }
       });
       if (error) throw error;
       let user = data.user;
       if (!data.session) {
         const inn = await sb.auth.signInWithPassword({ email, password: pass });
         if (inn.error && /Email not confirmed/i.test(inn.error.message || '')) {
-          guestMsg('err', 'Conta criada. Confirme o e-mail e depois entre.');
+          showGuestWait(email);
+          guestMsg('ok', 'Conta criada. Abra o e-mail neste telemóvel e toque em confirmar.');
           return;
         }
         if (inn.error) throw inn.error;
@@ -2472,9 +2702,14 @@ const REVIEWS = [];
       }
       await upsertCustomerRow(user, { name, phone });
       await loadGuest();
-      if (!guest || !guest.id) throw new Error('Conta criada. Entre com o e-mail e a palavra-passe.');
+      if (!guest || !guest.id) {
+        showGuestWait(email);
+        guestMsg('ok', 'Conta criada. Confirme o e-mail para entrar automaticamente.');
+        return;
+      }
+      clearPending();
       guestMsg('ok', 'Conta criada. Bem-vindo, ' + guest.name.split(' ')[0] + '.');
-      setTimeout(finishGuestAuth, 350);
+      setTimeout(() => { finishGuestAuth(); openAccount(); }, 350);
     } catch (err) {
       guestMsg('err', authErr(err));
     } finally {
@@ -2494,12 +2729,16 @@ const REVIEWS = [];
     if (btn) btn.disabled = true;
     guestMsg('', 'A entrar…');
     try {
+      await rememberOnPhone(email, pass);
       const { error } = await sb.auth.signInWithPassword({ email, password: pass });
       if (error) throw error;
+      const p = readPending();
+      await upsertCustomerRow((await sb.auth.getUser()).data.user, p || {});
       await loadGuest();
       if (!guest || !guest.id) throw new Error('Esta conta não existe como cliente na base de dados.');
-      guestMsg('ok', 'Sessão iniciada.');
-      setTimeout(finishGuestAuth, 250);
+      clearPending();
+      guestMsg('ok', 'Sessão iniciada. A conta fica neste telemóvel até sair.');
+      setTimeout(() => { finishGuestAuth(); openAccount(); }, 250);
     } catch (err) {
       guestMsg('err', authErr(err));
     } finally {
@@ -3625,6 +3864,7 @@ const REVIEWS = [];
       cartBody.appendChild(row);
     }
     $('#cartTotal').textContent = money(grandTotal());
+    fillCartVat();
     const st = $('#cartStickyT'), sn = $('#cartStickyN');
     if (st) st.textContent = money(grandTotal());
     if (sn) sn.textContent = cartCount() ? tr('cart.nItems', { n: cartCount() }) : '';
@@ -3845,7 +4085,7 @@ const REVIEWS = [];
     $('#osum').innerHTML = ov.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${lineNote(l)}</span>${priceCell((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('') +
       (!archived && ov.deliveryFee ? `<li><span>${esc(tr('place.feeLine', { b: tr('place.' + (ov.deliveryBand || 'city')) }))}</span>${priceCell(ov.deliveryFee)}</li>` : '') +
       (!archived && ov.pizzaTakeFee && !(ov.lines || []).some((l) => l.itemId === 'fee-pizza-take' || l.menuItemId === 'fee-pizza-take') ? `<li><span>${esc(tr('place.pizzaTake'))}</span>${priceCell(ov.pizzaTakeFee)}</li>` : '') +
-      (archived ? '' : `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(ov.total)}</b></li>`);
+      (archived ? '' : vatLis(ov.total));
     const bits = [];
     bits.push('<div><b>' + esc(stTxt(liveStatus(ov.status))) + '</b>' + (archived ? '' : ' · ' + esc(payTxt(ov.pay, ov))) + '</div>');
     if (ov.fulfillment === 'takeaway') bits.push('<div><b>' + esc(tr('place.take')) + '</b> ' + esc(ov.take === 'delivery' ? tr('place.delivery') : tr('place.pickup')) + '</div>');
@@ -3914,15 +4154,16 @@ const REVIEWS = [];
     }).join('');
     const whenTxt = order.ts ? new Date(Number(order.ts) || Date.parse(order.ts) || Date.now()).toLocaleString('pt-PT') : '';
     const bits = [contaLabel(order), order.code, whenTxt, order.placeLabel || placeLabel(place) || order.place_label || '', order.name || order.customer_name || '', order.phone ? showPhone(order.phone) : '', stTxt(liveStatus(order.status)), payTxt(order.pay, order) + (order.method ? ' · ' + payMethodLabel(order.method) : '')].filter(Boolean);
-    return '<section class="page"><h1>Aqua Club — ' + esc(contaLabel(order)) + '</h1><p class="meta">' + bits.map(esc).join('<br>') + '</p><table>' +
+    return '<section class="page"><h1>Aqua Club — ' + esc(tr('legal.sheet')) + '</h1><p class="meta">' + bits.map(esc).join('<br>') + '</p><table>' +
       (rows || '<tr><td>Sem linhas</td><td></td></tr>') +
-      '<tr class="tot"><td>' + esc(tr('cart.total')) + '</td><td class="r">' + money(order.total) + '</td></tr></table><p><small>Palmeiras 2, Beira</small></p></section>';
+      vatPdfRows(order.total) + '</section>';
   }
   function printAquaPdf(title, inner) {
     const css = 'body{font-family:system-ui,sans-serif;max-width:480px;margin:24px auto;color:#111;padding:0 16px}' +
       'h1{font-size:1.15rem;margin:0 0 .5rem}.meta{color:#444;font-size:.9rem;line-height:1.45;margin:0 0 .8rem}' +
       'table{width:100%;border-collapse:collapse}td{padding:.4rem 0;border-bottom:1px solid #eee;vertical-align:top}' +
       'td.r{text-align:right;white-space:nowrap}.tot td{font-weight:800;border:0;padding-top:.7rem}' +
+      '.note{margin:.8rem 0 0;padding:.55rem .7rem;background:#FFF4C4;font-weight:700;font-size:.82rem}' +
       '.page{page-break-after:always}.page:last-child{page-break-after:auto}@media print{body{margin:10mm}}';
     const html = '<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"><title>' + esc(title) + '</title><style>' + css + '</style></head><body>' + inner + '</body></html>';
     const iframe = document.createElement('iframe');
@@ -3997,7 +4238,7 @@ const REVIEWS = [];
       const qty = (l) => l.quantity || l.qty || 1;
       el.innerHTML = `<div class="hrow"><b>${esc(tr('st.draft'))}</b><span>${when(d.ts)}</span></div><p class="hmeta">${esc(d.placeLabel || tr('place.set'))}${d.name ? ' · ' + esc(d.name) : ''}</p>
         <div class="chips"><span class="chip2 st-review">${esc(tr('st.draft'))}</span></div>
-        <ul class="osum">${(d.lines || []).map((l) => `<li><span>${qty(l)}× ${esc(l.name)}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('')}<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(d.total)}</b></li></ul>
+        <ul class="osum">${(d.lines || []).map((l) => `<li><span>${qty(l)}× ${esc(l.name)}</span><b>${money((l.unitPriceMzn || l.price || 0) * qty(l))}</b></li>`).join('')}${vatLis(d.total)}</ul>
         <p class="hpeek">${esc(tr('cart.resumeDraft'))}</p>`;
       el.addEventListener('click', () => restoreDraft(d));
       list.appendChild(el);
@@ -4010,7 +4251,7 @@ const REVIEWS = [];
       const prices = (amount) => done ? '' : `<b>${money(amount)}</b>`;
       el.innerHTML = `<div class="hrow"><b>${esc(contaLabel(o))}</b><span>${when(o.ts)}</span></div><p class="hmeta">${esc(o.code)} · ${esc(o.placeLabel || nice(o.table))} · ${esc(o.name)} · ${esc(showPhone(o.phone))}</p>
         <div class="chips"><span class="chip2 st-${liveStatus(o.status)}">${esc(stTxt(liveStatus(o.status)))}</span>${done ? `<span class="chip2 pay-paid">${esc(tr('cart.record'))}</span>` : `<span class="chip2 pay-${o.method === 'pos' && o.pay !== 'paid' ? 'unpaid' : o.pay}">${esc(payTxt(o.pay, o))}</span>`}${!done && o.method ? `<span class="chip2">${esc(payMethodLabel(o.method))}</span>` : ''}</div>
-        <ul class="osum">${orderLines(o).map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span>${prices((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('')}${done ? '' : `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(o.total)}</b></li>`}</ul>
+        <ul class="osum">${orderLines(o).map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span>${prices((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('')}${done ? '' : vatLis(o.total)}</ul>
         <p class="hpeek">${esc(tr('cart.viewHintShort'))}</p>`;
       el.addEventListener('click', (e) => {
         if (e.target.closest('[data-recv]')) {
@@ -4608,21 +4849,10 @@ const REVIEWS = [];
       wallIO = new IntersectionObserver((ents) => {
         ents.forEach((e) => {
           e.target.querySelectorAll('.wcol').forEach((c) => {
-            if (e.isIntersecting) {
-              if (c.dataset.wallOn !== '1') {
-                c.dataset.wallOn = '1';
-                c.style.animation = 'none';
-                void c.offsetWidth;
-                c.style.animation = '';
-              }
-              c.style.animationPlayState = '';
-            } else {
-              c.dataset.wallOn = '';
-              c.style.animationPlayState = 'paused';
-            }
+            c.style.animationPlayState = e.isIntersecting ? 'running' : 'paused';
           });
         });
-      }, { rootMargin: '40px 0px', threshold: 0.08 });
+      }, { rootMargin: '80px 0px', threshold: 0.01 });
     }
     wallIO.disconnect();
     wallIO.observe(box);
@@ -4643,8 +4873,10 @@ const REVIEWS = [];
     const lang = document.documentElement.lang || 'pt';
     const sorted = wallPool().slice().sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), lang, { sensitivity: 'base', numeric: true }));
     const nCols = matchMedia('(min-width:720px)').matches ? 3 : 2;
+    const perCol = 6;
+    const pool = sorted.slice(0, nCols * perCol);
     const cols = Array.from({ length: nCols }, () => []);
-    sorted.forEach((m, i) => cols[i % nCols].push(m));
+    pool.forEach((m, i) => cols[i % nCols].push(m));
     box.innerHTML = '';
     box.style.gridTemplateColumns = 'repeat(' + nCols + ', 1fr)';
     cols.forEach((col, ci) => {
@@ -4896,6 +5128,7 @@ const REVIEWS = [];
   form.elements.hora.addEventListener('input', paintBooking);
   form.elements.hora.addEventListener('change', paintBooking);
   paintBooking();
+  if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(paintBooking);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const f = new FormData(form), nome = String(f.get('nome') || '').trim(), data = String(f.get('data') || ''), pessoas = Number(f.get('pessoas')), hora = String(f.get('hora') || '');
@@ -4926,11 +5159,11 @@ const REVIEWS = [];
     else if (code === 0) { id = 'i-sun'; cls = 'sun'; lab = tx('hours.wxSun'); }
     const use = box.querySelector('use');
     if (use) use.setAttribute('href', '#' + id);
-    box.className = 'wx-now ' + cls;
+    box.className = 'wx-chip ' + cls;
     const tEl = document.getElementById('wxTemp');
-    const lEl = document.getElementById('wxLab');
-    if (tEl) tEl.textContent = Math.round(temp) + ' °C';
-    if (lEl) lEl.textContent = lab + ' · ' + tx('hours.wxBeira');
+    if (tEl) tEl.textContent = Math.round(temp) + '°';
+    box.title = lab + ' · ' + tx('hours.wxBeira');
+    box.setAttribute('aria-label', Math.round(temp) + ' °C, ' + lab);
     box.hidden = false;
   };
   try {
@@ -4949,8 +5182,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops58"></script>
-<script src="garcom.js?v=ops58"></script>
-<script src="os-bridge.js?v=ops58"></script>
+<script src="os-config.js?v=ops64"></script>
+<script src="garcom.js?v=ops64"></script>
+<script src="os-bridge.js?v=ops64"></script>
 </body>
 </html>

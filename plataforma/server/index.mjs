@@ -622,7 +622,7 @@ app.post('/api/staff/password', (req, res) => {
   if (!me || !me.can_change_passwords) return res.status(403).json({ error: 'forbidden', message: 'Só o IT pode alterar códigos de acesso.' });
   const body = req.body || {};
   const next = String(body.pin || body.code || body.password || '');
-  if (next.length < 5) return res.status(400).json({ error: 'pin', message: 'O código precisa de pelo menos 5 dígitos.' });
+  if (next.length < 8) return res.status(400).json({ error: 'pin', message: 'A palavra-passe precisa de pelo menos 8 caracteres.' });
   let target = null;
   if (body.phone) target = findWaiterByPhone(body.phone);
   else if (body.waiterId) target = db.prepare('SELECT * FROM waiters WHERE id=?').get(Number(body.waiterId));
