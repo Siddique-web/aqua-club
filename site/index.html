@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops29"></script>
+<script src="i18n.js?v=ops46"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -622,9 +622,14 @@ input,select,textarea{border-radius:14px}
 .zones button{padding:.55rem .9rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;font:800 .78rem var(--fh);cursor:pointer}
 .zones button.on{background:var(--cyan);border-color:var(--cyan)}
 .mesa-step{display:flex;align-items:center;justify-content:center;gap:.55rem;margin-top:.45rem}
-.mesa-step button{width:48px;height:48px;border:2px solid var(--cyan-line);border-radius:16px;background:#fff;font:800 1.35rem/1 var(--fh);cursor:pointer;color:#111}
+.mesa-step button{width:48px;height:48px;border:2px solid var(--cyan-line);border-radius:16px;background:#fff;font:800 1.35rem/1 var(--fh);cursor:pointer;color:#111;flex:none}
 .mesa-step button:active{background:var(--cyan)}
 .mesa-step b{min-width:3.2rem;text-align:center;font:800 1.35rem/1 var(--fh);letter-spacing:-.03em}
+.mesa-step input{width:4.6rem;height:48px;border:2px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:center;font:800 1.35rem/1 var(--fh);letter-spacing:-.03em;-moz-appearance:textfield}
+.mesa-step input::-webkit-outer-spin-button,.mesa-step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.book-rules{margin:.75rem 0 0;padding:.85rem .95rem;border-radius:14px;background:var(--yellow);color:#000;font:700 .86rem/1.45 var(--fb)}
+.book-rules p{margin:0 0 .45rem}.book-rules p:last-child{margin:0}
+.book-until,.book-pay{margin:.45rem 0 0;font:800 .9rem var(--fh)}
 .fee-bands{display:grid;gap:.5rem}
 .fee-band{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.85rem 1rem;border:2px solid var(--cyan-line);border-radius:16px;background:#fff;cursor:pointer;text-align:left}
 .fee-band.on{border-color:var(--cyan);background:var(--cyan-soft)}
@@ -673,6 +678,8 @@ input,select,textarea{border-radius:14px}
 .cart-id .idbox legend{grid-column:1/-1}
 .cart-id .idbox .chk{grid-column:1/-1}
 .cart-id .idbox input{min-height:44px;padding:.4rem .65rem}
+.cart-id .idbox input[readonly]{background:#F3F7FB;border-color:#E4EEF5;color:#111;pointer-events:none;cursor:default}
+.cart-id .idbox .acct-lock{grid-column:1/-1;margin:0;font:600 .75rem/1.35 var(--fb);color:var(--muted)}
 .cart-id .chk{font-size:.8rem!important;line-height:1.4!important;align-items:flex-start}
 .cart-id .cs-time,.cart-id .demo,.cart-id .msg:empty{display:none}
 .cart-edit.checkout .cart-id p.cs-time:has(#cartBackMenu){display:block}
@@ -805,6 +812,7 @@ html:not(.staff-chrome) .fabs{bottom:max(.75rem, env(safe-area-inset-bottom,0px)
 .guest-msg.err{color:#b42318}
 .guest-msg.ok{color:#0f7a3a}
 .guest-note{margin:.2rem 0 0;font-size:.8rem;color:var(--muted);text-align:center}
+.guest-hint{margin:0;font:600 .78rem/1.35 var(--fb);color:#223}
 .dlg::backdrop{background:rgba(0,20,35,.62);backdrop-filter:blur(3px)}
 .dlg[open]{animation:sheet .35s ease}
 @keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
@@ -1057,6 +1065,14 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .payopt b{font:800 1rem var(--fh)}.payopt small{color:var(--muted)}
 .payopt:hover{border-color:var(--cyan);transform:translateX(4px)}
 .payopt[aria-checked=true]{border-color:var(--cyan);background:var(--cyan-soft)}
+.payopt.pay-mpesa{border-color:#E60000;background:#fff1f1}
+.payopt.pay-mpesa small{color:#9b0000}
+.payopt.pay-mpesa:hover,.payopt.pay-mpesa[aria-checked=true]{border-color:#E60000;background:#E60000;color:#fff}
+.payopt.pay-mpesa[aria-checked=true] small,.payopt.pay-mpesa:hover small{color:rgba(255,255,255,.9)}
+.payopt.pay-emola{border-color:#FF6A00;background:#fff4eb}
+.payopt.pay-emola small{color:#b34a00}
+.payopt.pay-emola:hover,.payopt.pay-emola[aria-checked=true]{border-color:#FF6A00;background:#FF6A00;color:#fff}
+.payopt.pay-emola[aria-checked=true] small,.payopt.pay-emola:hover small{color:rgba(255,255,255,.9)}
 .payinfo{margin:0;padding:.9rem 1rem;border-radius:16px;background:var(--cyan-soft);font-size:.95rem}
 .terms{margin:0;padding-left:1.2rem;display:grid;gap:.7rem;font-size:.95rem}
 .fab.cart.owe{background:var(--yellow)}
@@ -1071,7 +1087,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops42">
+<link rel="stylesheet" href="garcom.css?v=ops46">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1322,6 +1338,12 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
           <label data-i18n-label="hours.name">Nome completo<input type="text" name="nome" autocomplete="name" required></label>
           <label data-i18n-label="hours.date">Data da visita<input type="date" name="data" required></label>
           <label data-i18n-label="hours.people">Número de pessoas<input type="number" name="pessoas" min="1" max="200" value="2" inputmode="numeric" required></label>
+          <label data-i18n-label="hours.hora">Hora de chegada<input type="time" name="hora" required></label>
+          <p class="book-until" id="bookUntil" hidden></p>
+          <p class="book-pay" id="bookPay"></p>
+          <div class="book-rules">
+            <p data-i18n="hours.rules">Reserva de espaço: +1000 MT por pessoa, tudo consumível. 30 minutos de tolerância de atraso. Se faltar, perde o valor. Máximo 3 horas e meia — a hora de saída é marcada automaticamente.</p>
+          </div>
           <label data-i18n-label="hours.type">Tipo de experiência<select name="tipo"><option value="Piscina &amp; Sol" data-i18n="exp.geral">Piscina &amp; Sol</option><option value="Dia em Família" data-i18n="exp.fam">Dia em Família</option><option value="Almoço ou Jantar" data-i18n="exp.vip">Almoço ou Jantar</option><option value="Grupo &amp; Amigos" data-i18n="exp.grp">Grupo &amp; Amigos</option></select></label>
           <button class="btn btn-cyan btn-block" type="submit" data-i18n="hours.send">Enviar pedido por WhatsApp</button>
           <p class="msg" id="msg" role="status" aria-live="polite"></p>
@@ -1333,7 +1355,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <!-- PERGUNTAS FREQUENTES -->
 <section class="band sand" id="faq" aria-labelledby="faq-t"><div class="wrap">
   <div class="sh center"><span class="eyebrow" data-i18n="faq.eye">Perguntas frequentes</span><h2 class="display" id="faq-t" data-i18n="faq.title">Tudo o que precisa de saber</h2><div class="bar2" aria-hidden="true"></div></div>
-  <div class="faq"><details><summary data-i18n="faq.q1">Como faço um pedido da mesa?</summary><p data-i18n="faq.a1">Leia o QR Code da sua mesa (ou escolha a mesa no menu), adicione os pratos, indique o seu nome e telemóvel e envie. O pedido fica registado em seu nome.</p></details><details><summary data-i18n="faq.q2">Como chamo o garçom?</summary><p data-i18n="faq.a2">Toque no botão preto «Chamar garçom», sempre visível, escolha o motivo (conta, dúvida, novo pedido ou urgente) e envie.</p></details><details><summary data-i18n="faq.q3">Posso cancelar um pedido depois de enviado?</summary><p data-i18n="faq.a3">Não. Depois de enviado, o pedido segue para a cozinha e fica registado. Se precisar de alterar algo, chame o garçom.</p></details><details><summary data-i18n="faq.q4">Como pago a conta?</summary><p data-i18n="faq.a4">Em «Os meus pedidos» veja o que está por pagar e toque em «Pagar». Pode pagar no local (dinheiro ou cartão) ou por transferência móvel e declarar o pagamento; o restaurante confirma.</p></details><details><summary data-i18n="faq.q5">Preciso de instalar alguma aplicação?</summary><p data-i18n="faq.a5">Não. Tudo funciona no navegador do telemóvel.</p></details><details><summary data-i18n="faq.q6">Como reservo o meu dia?</summary><p data-i18n="faq.a6">Use o formulário «Reserve o seu dia»: o pedido abre no WhatsApp já escrito e é só enviar.</p></details><details><summary data-i18n="faq.q7">Qual é o horário?</summary><p data-i18n="faq.a7">Segunda a sexta, das 09:00 às 18:00. Sábados, domingos e feriados, das 09:00 às 19:00.</p></details><details><summary data-i18n="faq.q8">E as crianças?</summary><p data-i18n="faq.a8">Crianças até 12 anos devem estar sempre acompanhadas por um adulto.</p></details><details><summary data-i18n="faq.q9">Tenho uma alergia. O que faço?</summary><p data-i18n="faq.a9">Informe o garçom antes de pedir. A informação de alergénios de cada prato é confirmada pela equipa.</p></details></div>
+  <div class="faq"><details><summary data-i18n="faq.q1">Como faço um pedido da mesa?</summary><p data-i18n="faq.a1">Leia o QR Code da sua mesa (ou escolha a mesa no menu), adicione os pratos, indique o seu nome e telemóvel e envie. O pedido fica registado em seu nome.</p></details><details><summary data-i18n="faq.q2">Como chamo o garçom?</summary><p data-i18n="faq.a2">Toque no botão preto «Chamar garçom», sempre visível, escolha o motivo (conta, dúvida, novo pedido ou urgente) e envie.</p></details><details><summary data-i18n="faq.q3">Posso cancelar um pedido depois de enviado?</summary><p data-i18n="faq.a3">Não. Depois de enviado, o pedido segue para a cozinha e fica registado. Se precisar de alterar algo, chame o garçom.</p></details><details><summary data-i18n="faq.q4">Como pago a conta?</summary><p data-i18n="faq.a4">Em «Os meus pedidos» veja o que está por pagar e toque em «Pagar». Pode pagar no local (dinheiro ou cartão) ou por transferência móvel e declarar o pagamento; o restaurante confirma.</p></details><details><summary data-i18n="faq.q5">Preciso de instalar alguma aplicação?</summary><p data-i18n="faq.a5">Não. Tudo funciona no navegador do telemóvel.</p></details><details><summary data-i18n="faq.q6">Como reservo o meu dia?</summary><p data-i18n="faq.a6">Use o formulário «Reserve o seu dia». A reserva de espaço acresce 1000 MT por pessoa (tudo consumível), tem 30 min de tolerância de atraso, máximo 3 h 30 com hora de saída automática. Se faltar, perde o valor. O pedido abre no WhatsApp já escrito.</p></details><details><summary data-i18n="faq.q7">Qual é o horário?</summary><p data-i18n="faq.a7">Segunda a sexta, das 09:00 às 18:00. Sábados, domingos e feriados, das 09:00 às 19:00.</p></details><details><summary data-i18n="faq.q8">E as crianças?</summary><p data-i18n="faq.a8">Crianças até 12 anos devem estar sempre acompanhadas por um adulto.</p></details><details><summary data-i18n="faq.q9">Tenho uma alergia. O que faço?</summary><p data-i18n="faq.a9">Informe o garçom antes de pedir. A informação de alergénios de cada prato é confirmada pela equipa.</p></details></div>
 </div></section>
 
 <!-- COMO CHEGAR + CONTACTO -->
@@ -1433,8 +1455,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <p style="margin:1rem 0 0;font:800 .78rem var(--fh)" data-i18n="place.mesa">Número da mesa</p>
     <div class="mesa-step" role="group" aria-label="Número da mesa">
       <button type="button" id="placeMesaMinus" aria-label="Mesa anterior">‹</button>
-      <b id="placeMesaView">1</b>
-      <input type="hidden" id="placeMesa" value="1">
+      <input type="number" id="placeMesa" min="1" max="200" inputmode="numeric" value="1" aria-label="Número da mesa">
       <button type="button" id="placeMesaPlus" aria-label="Mesa seguinte">›</button>
     </div>
   </div>
@@ -1444,6 +1465,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <button type="button" class="pick" data-take="pickup" aria-pressed="false"><span data-i18n="place.pickup">Vou buscar</span><small data-i18n="place.pickupH">Retira no Aqua Club</small></button>
       <button type="button" class="pick" data-take="delivery" aria-pressed="false"><span data-i18n="place.delivery">Delivery</span><small data-i18n="place.deliveryH">Levamos até si</small></button>
     </div>
+    <p class="place-must" style="margin:.75rem 0 0" data-i18n="place.pizzaTake">Pizza para levar: acresce 50 MT por cada pizza.</p>
     <div id="placeDeliv" hidden>
       <p style="margin:1rem 0 .5rem;font:800 .85rem var(--fh)" data-i18n="place.pinT">Entrega só na sua localização actual</p>
       <p class="menu-note" style="margin:0 0 .6rem;text-align:left" data-i18n="place.pinH">Toque em «Estou aqui» (GPS). A entrega é só neste ponto — não se escolhe outro sítio no mapa. Serve em toda a Beira. A taxa sai automaticamente.</p>
@@ -1470,6 +1492,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div class="dhead"><h2 id="itName"></h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
   <div class="dimg" id="itImg"></div>
   <p class="dprice" id="itPrice"></p>
+  <p class="menu-note" id="itPizzaFee" hidden style="text-align:left">Pizza para levar: +50 MT por pizza.</p>
   <p id="itDesc" style="margin:0"></p>
   <dl class="dinfo" id="itInfo"></dl>
   <div id="itDonenessWrap" hidden>
@@ -1506,8 +1529,9 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     </div>
     <div class="cart-id" id="cartId">
     <fieldset class="idbox"><legend data-i18n="cart.who">Quem faz o pedido</legend>
-      <label data-i18n-label="cart.name">Nome<input type="text" id="custName" autocomplete="name" maxlength="60" data-i18n-placeholder="cart.namePh" placeholder="O seu nome"></label>
-      <label data-i18n-label="cart.phone">Telemóvel (WhatsApp)<input type="tel" id="custPhone" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="84 000 0000"></label>
+      <label data-i18n-label="cart.name">Nome<input type="text" id="custName" autocomplete="name" maxlength="60" readonly tabindex="-1" aria-readonly="true"></label>
+      <label data-i18n-label="cart.phone">WhatsApp<input type="tel" id="custPhone" inputmode="tel" maxlength="20" readonly tabindex="-1" aria-readonly="true"></label>
+      <p class="acct-lock" data-i18n="cart.locked">Nome e WhatsApp da sua conta. Não se alteram neste pedido.</p>
       <label class="chk"><input type="checkbox" id="custTerms"><span><span data-i18n="cart.terms">Confirmo que fui eu que fiz este pedido, que não pode ser cancelado depois de enviado, e que vou pagá-lo antes de sair.</span> <a href="#" id="termsLink" data-i18n="cart.termsLink">Ver termos</a></span></label>
       <label class="chk"><input type="checkbox" id="custWaGroup"><span data-i18n="cart.waGroup">Quero ser adicionado ao grupo WhatsApp do Aqua Club (avisos e novidades).</span></label>
     </fieldset>
@@ -1578,8 +1602,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <p style="margin:.85rem 0 0;font:800 .78rem var(--fh)">Número da mesa</p>
       <div class="mesa-step" role="group" aria-label="Número da mesa">
         <button type="button" id="callMesaMinus" aria-label="Mesa anterior">‹</button>
-        <b id="callMesaView">—</b>
-        <input type="hidden" id="callMesa" value="">
+        <input type="number" id="callMesa" min="1" max="200" inputmode="numeric" value="" placeholder="—" aria-label="Número da mesa">
         <button type="button" id="callMesaPlus" aria-label="Mesa seguinte">›</button>
       </div>
       <label style="margin-top:.65rem">Ponto exacto (se não tiver mesa, descreva)<input id="callSpotNote" maxlength="80" placeholder="ex. balcão do bar, canto da esplanada"></label>
@@ -1614,7 +1637,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <div class="guest-hero">
       <img src="assets/logo.webp" alt="" width="40" height="40" onerror="this.src='assets/logo.png'">
       <h2>Bem-vindo ao Aqua Club</h2>
-      <p>Para pedir ou chamar o garçom, crie conta ou entre. Os dados ficam na nuvem da casa.</p>
+      <p>Para pedir ou chamar o garçom, crie conta ou entre. No registo use o número onde tem WhatsApp.</p>
     </div>
     <div class="guest-seg" role="tablist" aria-label="Entrar ou criar conta">
       <button type="button" role="tab" id="guestTabUp" aria-selected="true">Criar conta</button>
@@ -1625,7 +1648,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <form class="guest-form" id="guestFormUp" novalidate>
       <label>Nome completo<input name="name" id="gName" autocomplete="name" maxlength="80" required placeholder="Como no documento"></label>
       <label>E-mail válido<input name="email" id="gEmailUp" type="email" autocomplete="email" required placeholder="nome@email.com"></label>
-      <label>Contacto (telemóvel)<input name="phone" id="gPhone" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="84 000 0000" maxlength="15"></label>
+      <label>Número de WhatsApp<input name="phone" id="gPhone" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="84 000 0000" maxlength="15"></label>
+      <p class="guest-hint">Tem de ser o contacto onde tem WhatsApp. Fica gravado na sua conta e em todos os pedidos.</p>
       <label>Palavra-passe<input name="password" id="gPassUp" type="password" autocomplete="new-password" required minlength="6" placeholder="Mínimo 6 caracteres"></label>
       <label>Confirmar palavra-passe<input name="password2" id="gPass2" type="password" autocomplete="new-password" required minlength="6" placeholder="Repita a palavra-passe"></label>
       <button class="btn btn-cyan btn-block" type="submit">Criar conta e continuar</button>
@@ -2062,13 +2086,13 @@ const REVIEWS = [];
 
   /* identidade do aparelho, dados do cliente e histórico (ficam neste telemóvel) */
   const DEVICE = (() => { let d = store.get('aq.dev'); if (!d) { d = uid(); store.set('aq.dev', d); } return d; })();
-  if (!store.get('aq.cloud.reset.v1')) {
+  if (!store.get('aq.cloud.reset.v2')) {
     store.set('aq.orders', '[]');
     store.set('aq.os.bus', JSON.stringify({ orders: [], calls: [] }));
     store.set('aq.call', '');
     store.set('aq.callLog', '[]');
     try { localStorage.removeItem('aqua_api'); } catch (e) { /* */ }
-    store.set('aq.cloud.reset.v1', '1');
+    store.set('aq.cloud.reset.v2', '1');
   }
   let history = []; try { history = JSON.parse(store.get('aq.orders') || '[]'); } catch (e) { history = []; }
   history.forEach((o) => {
@@ -2159,11 +2183,34 @@ const REVIEWS = [];
     if (guest.phone) cust.phone = normPhone(guest.phone) || guest.phone;
     store.set('aq.cust', JSON.stringify(cust));
     startGuestPulse();
+    paintAccountBox();
     return guest;
+  }
+  function accountName() {
+    return String((guest && guest.name) || cust.name || '').trim().replace(/\s+/g, ' ');
+  }
+  function accountPhone() {
+    const raw = (guest && guest.phone) || cust.phone || '';
+    return normPhone(raw) || String(raw).replace(/\D/g, '');
+  }
+  function paintAccountBox() {
+    const n = $('#custName'), p = $('#custPhone');
+    if (n) {
+      n.value = accountName();
+      n.readOnly = true;
+      n.tabIndex = -1;
+      n.setAttribute('aria-readonly', 'true');
+    }
+    if (p) {
+      p.value = accountPhone() ? showPhone(accountPhone()) : '';
+      p.readOnly = true;
+      p.tabIndex = -1;
+      p.setAttribute('aria-readonly', 'true');
+    }
   }
   let guestPulse = 0;
   async function beatGuest() {
-    if (!sb || !guest || !guest.id) return;
+    if (document.hidden || !sb || !guest || !guest.id) return;
     try { await sb.rpc('heartbeat'); } catch (e) { /* */ }
   }
   function startGuestPulse() {
@@ -2229,7 +2276,7 @@ const REVIEWS = [];
     const pass2 = $('#gPass2').value;
     if (name.split(' ').filter((p) => p.length >= 2).length < 2) { guestMsg('err', 'Indique o nome completo.'); $('#gName').focus(); return; }
     if (!emailOk(email) || /@staff\.aquaclub\.mz$/i.test(email)) { guestMsg('err', 'Indique um e-mail válido de cliente.'); $('#gEmailUp').focus(); return; }
-    if (!phone) { guestMsg('err', 'Contacto inválido (ex.: 84…).'); $('#gPhone').focus(); return; }
+    if (!phone) { guestMsg('err', 'Indique o número de WhatsApp (ex.: 84…).'); $('#gPhone').focus(); return; }
     if (pass.length < 6) { guestMsg('err', 'A palavra-passe precisa de pelo menos 6 caracteres.'); $('#gPassUp').focus(); return; }
     if (pass !== pass2) { guestMsg('err', 'As palavras-passe não coincidem.'); $('#gPass2').focus(); return; }
     try { await initBackend(); } catch (err) { /* */ }
@@ -2347,6 +2394,7 @@ const REVIEWS = [];
     (o.waGroupOpt ? '\nGrupo WhatsApp: sim' : '') + '\n' +
     o.lines.map((l) => '• ' + l.quantity + '× ' + l.name + ' (' + money(l.unitPriceMzn) + ')' + (l.notes ? ' — “' + l.notes + '”' : '')).join('\n') +
     (o.deliveryFee ? '\nEntrega: ' + money(o.deliveryFee) : '') +
+    (o.pizzaTakeFee ? '\nPizza para levar: ' + money(o.pizzaTakeFee) : '') +
     '\n*Total: ' + money(o.total) + '*\nO cliente confirmou os termos e vai pagar a conta antes de sair.';
   function orderToBus(o) {
     const st = liveStatus(o.status || 'review');
@@ -2356,6 +2404,7 @@ const REVIEWS = [];
       table_number: parseInt(String(o.table || '').replace(/\D/g, ''), 10) || null,
       place_label: o.placeLabel, fulfillment: o.fulfillment, take: o.take || '',
       total: o.total, delivery_fee: o.deliveryFee || 0, deliveryFee: o.deliveryFee || 0,
+      pizza_take_fee: o.pizzaTakeFee || 0, pizzaTakeFee: o.pizzaTakeFee || 0,
       status: st, payment_status: pay, payment_method: o.method || '', pay: o.pay,
       customer_name: o.name, customer_phone: o.phone, created_at: o.ts ? new Date(o.ts).toISOString() : new Date().toISOString(),
       waGroupOpt: !!o.waGroupOpt, ts: o.ts, payment_ref: o.ref || '',
@@ -2403,7 +2452,7 @@ const REVIEWS = [];
         customer_user_id: (guest && guest.id) || null,
         fulfillment: o.fulfillment || null, take: o.take || null, address: o.address || null,
         place_label: o.placeLabel || null, lat: o.lat || null, lng: o.lng || null,
-        note: o.note || null, wa_group: !!o.waGroupOpt, delivery_fee: o.deliveryFee || 0
+        note: [o.note, o.pizzaTakeFee ? ('Pizza para levar +' + o.pizzaTakeFee + ' MT') : ''].filter(Boolean).join(' · ') || null, wa_group: !!o.waGroupOpt, delivery_fee: o.deliveryFee || 0
       };
       let { error } = await sb.from('orders').insert(payload);
       if (error && /column|schema cache/i.test(error.message || '')) {
@@ -2495,15 +2544,19 @@ const REVIEWS = [];
     (AquaBus.read().orders || []).forEach(applyRemoteOrder);
   }
   async function refreshOrdersNow() {
+    if (document.hidden || refreshOrdersNow._busy) return;
+    refreshOrdersNow._busy = true;
+    try {
     refreshFromBus();
     try { await initBackend(); } catch (e) { /* */ }
     const liveOs = window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.orderStatus;
     if (!liveOs && !isLive()) return;
+    const open = history.filter((x) => x && x.code && x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid')).slice(-8);
     if (isLive() && sb) {
       const next = [];
       let dropped = false;
-      for (const o of history) {
-        if (!o || !o.code) { dropped = true; continue; }
+      const closed = history.filter((x) => x && x.code && (x.status === 'cancelled' || (x.status === 'delivered' && x.pay === 'paid')));
+      for (const o of open) {
         try {
           const { data, error } = await sb.rpc('order_status', { p_code: o.code });
           if (error) { next.push(o); continue; }
@@ -2514,14 +2567,14 @@ const REVIEWS = [];
         } catch (e) { next.push(o); }
       }
       if (dropped) {
-        history = next;
+        history = closed.concat(next);
         if (ov && !history.some((x) => x && (x.id === ov.id || x.code === ov.code))) ov = null;
         saveHist();
         renderHist();
         updateFabs();
       }
     } else {
-      for (const o of history.filter((x) => x.status !== 'cancelled' && !(x.status === 'delivered' && x.pay === 'paid'))) {
+      for (const o of open) {
         try {
           if (liveOs && o.code) {
             const r = await AquaOS.orderStatus(o.code);
@@ -2531,6 +2584,7 @@ const REVIEWS = [];
       }
     }
     if (ov && cartDlg.open && $('#orderView') && !$('#orderView').hidden) paintOrderView();
+    } finally { refreshOrdersNow._busy = false; }
   }
   function applyRemoteCall(raw) {
     const r = raw && raw.call ? raw.call : raw;
@@ -2571,6 +2625,7 @@ const REVIEWS = [];
     syncHistToBus();
     if (pollT) return;
     pollT = setInterval(() => {
+      if (document.hidden) return;
       refreshFromBus();
       refreshCallsFromBus();
       updateFabs();
@@ -2578,7 +2633,7 @@ const REVIEWS = [];
       const viewing = cartDlg.open && $('#orderView') && !$('#orderView').hidden;
       if (!isLive() && window.AquaOS && AquaOS.socketUp && AquaOS.socketUp() && !viewing) return;
       refreshOrdersNow();
-    }, 1500);
+    }, 5000);
     refreshOrdersNow();
   }
 
@@ -2592,12 +2647,12 @@ const REVIEWS = [];
   const VENUE = [
     { id: 'sala', n: 8, from: 1 },
     { id: 'esplanada', n: 6, from: 9 },
-    { id: 'snack', n: 6, from: 15 },
-    { id: 'cafeteria', n: 4, from: 21 },
+    { id: 'cafeteria', n: 10, from: 15 },
     { id: 'rooftop', n: 6, from: 25 },
     { id: 'piscina', n: 6, from: 31 },
     { id: 'ginasio', n: 4, from: 37 }
   ];
+  const PIZZA_TAKE_FEE = 50;
   let place = {};
   try { place = JSON.parse(store.get('aq.place') || '{}') || {}; } catch (e) { place = {}; }
   function clubDay(ts) {
@@ -2655,6 +2710,7 @@ const REVIEWS = [];
     }
     store.set('aq.placeDay', day);
   })();
+  if (place.zone === 'snack') place.zone = 'cafeteria';
   if (!place.kind && table) applyPlaceFromTable(table);
   let pendingAdd = null;
   function savePending(data) {
@@ -2673,7 +2729,10 @@ const REVIEWS = [];
     return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
   }
   function bandFromKm(km) { return km <= 6 ? 'city' : km <= 15 ? 'mid' : 'far'; }
-  function zoneName(id) { return tr('place.' + id); }
+  function zoneName(id) {
+    if (id === 'snack' || id === 'cafeteria') return tr('place.cafeteria');
+    return tr('place.' + id);
+  }
   function placeLabel(p) {
     if (!p || !p.kind) return tr('place.set');
     if (p.kind === 'dine') return tr('place.atTable', { z: zoneName(p.zone), m: p.mesa });
@@ -2719,12 +2778,34 @@ const REVIEWS = [];
   }
   function paintMesaStep(which, n) {
     const inp = $('#' + which + 'Mesa');
-    const view = $('#' + which + 'MesaView');
-    if (!inp || !view) return;
+    if (!inp) return;
     const num = parseInt(n, 10);
     const ok = num >= 1 && num <= MAX_TABLE;
     inp.value = ok ? String(num) : '';
-    view.textContent = ok ? String(num) : '—';
+  }
+  function applyMesaNumber(which, raw, clampEmpty) {
+    const n = parseInt(raw, 10);
+    if (!Number.isFinite(n) || n < 1) {
+      if (which === 'place') {
+        const v = clampEmpty ? 1 : 0;
+        if (v) { place.mesa = '1'; place.tableNumber = 1; paintMesaStep('place', 1); }
+        return;
+      }
+      place.mesa = ''; place.tableNumber = null;
+      paintMesaStep('call', 0);
+      return;
+    }
+    const v = Math.min(MAX_TABLE, Math.max(1, n));
+    place.mesa = String(v); place.tableNumber = v;
+    paintMesaStep(which, v);
+  }
+  function bindMesaInput(which) {
+    const inp = $('#' + which + 'Mesa');
+    if (!inp || inp.dataset.bound) return;
+    inp.dataset.bound = '1';
+    inp.addEventListener('focus', () => { try { inp.select(); } catch (e) { /* */ } });
+    inp.addEventListener('input', () => applyMesaNumber(which, inp.value, false));
+    inp.addEventListener('change', () => applyMesaNumber(which, inp.value, which === 'place'));
   }
   function bumpMesa(which, dir) {
     const inp = $('#' + which + 'Mesa');
@@ -2802,6 +2883,7 @@ const REVIEWS = [];
   $$('#placeTakeKind .pick').forEach((b) => b.addEventListener('click', () => { place.take = b.dataset.take; paintPlaceDlg(); }));
   $('#placeMesaMinus')?.addEventListener('click', () => bumpMesa('place', -1));
   $('#placeMesaPlus')?.addEventListener('click', () => bumpMesa('place', 1));
+  bindMesaInput('place');
   $('#placeAddr').addEventListener('input', () => { place.address = $('#placeAddr').value.trim(); });
   $('#placeBairro')?.addEventListener('input', () => { place.bairro = $('#placeBairro').value.trim(); });
   let leafletMap = null, leafletMarker = null, leafletLoading = false;
@@ -3176,6 +3258,8 @@ const REVIEWS = [];
   function openItem(m) {
     curItem = m; curQty = 1;
     $('#itName').textContent = m.name; $('#itPrice').textContent = money(m.price); $('#itDesc').textContent = m.desc; $('#itNote').value = '';
+    const pz = $('#itPizzaFee');
+    if (pz) { pz.hidden = !isPizzaItem(m); pz.textContent = tr('place.pizzaTake'); }
     $('#itImg').innerHTML = media(m);
     $('#itImg').onclick = null;
     const catName = (CATS.find((c) => c[0] === m.cat) || [0, m.cat])[1];
@@ -3252,7 +3336,7 @@ const REVIEWS = [];
       id: 'draft-' + uid(), ts: Date.now(), code: tr('st.draft'), status: 'draft', pay: 'unpaid',
       lines: cartLinesForDraft(), total: grandTotal(),
       placeLabel: placeReady(place) ? placeLabel(place) : '',
-      name: ($('#custName') && $('#custName').value.trim()) || cust.name || '',
+      name: accountName(),
       phone: cust.phone || '',
       cart: cart.map((l) => Object.assign({}, l, { extras: (l.extras || []).slice() })),
       place: Object.assign({}, place)
@@ -3283,7 +3367,19 @@ const REVIEWS = [];
   const total = () => cart.reduce((s, l) => s + linePrice(l), 0);
   const cartCount = () => cart.reduce((s, l) => s + l.qty, 0);
   function deliveryFee() { return place.kind === 'takeaway' && place.take === 'delivery' ? (place.fee || FEES[place.band] || 0) : 0; }
-  function grandTotal() { return total() + deliveryFee(); }
+  function isPizzaItem(m) {
+    if (!m) return false;
+    if (String(m.cat || '').toLowerCase() === 'pizzas') return true;
+    const id = String(m.id || '').toLowerCase();
+    const name = String(m.name || '').toLowerCase();
+    return id.indexOf('pizza') >= 0 || name.indexOf('pizza') >= 0;
+  }
+  function pizzaTakeCount() {
+    if (place.kind !== 'takeaway') return 0;
+    return cart.reduce((s, l) => s + (isPizzaItem(byId(l.id) || l) ? (l.qty || 1) : 0), 0);
+  }
+  function pizzaTakeFee() { return pizzaTakeCount() * PIZZA_TAKE_FEE; }
+  function grandTotal() { return total() + deliveryFee() + pizzaTakeFee(); }
   function addToCart(id, qty, note, extras, doneness) {
     if (!placeReady(place)) {
       pendingAdd = () => addToCart(id, qty, note, extras, doneness);
@@ -3347,6 +3443,12 @@ const REVIEWS = [];
       row.innerHTML = `<div><h3>${esc(tr('place.feeLine', { b: tr('place.' + place.band) }))}</h3><small>${esc(place.address || '')}</small></div><span class="lt">${money(fee)}</span>`;
       cartBody.appendChild(row);
     }
+    const pFee = pizzaTakeFee();
+    if (pFee && cart.length) {
+      const row = document.createElement('div'); row.className = 'cline';
+      row.innerHTML = `<div><h3>${esc(tr('place.pizzaFee', { n: pizzaTakeCount() }))}</h3><small>${esc(tr('place.pizzaTake'))}</small></div><span class="lt">${money(pFee)}</span>`;
+      cartBody.appendChild(row);
+    }
     $('#cartTotal').textContent = money(grandTotal());
     const st = $('#cartStickyT'), sn = $('#cartStickyN');
     if (st) st.textContent = money(grandTotal());
@@ -3380,8 +3482,9 @@ const REVIEWS = [];
     const was = $('#cartEdit').classList.contains('checkout');
     $('#cartEdit').classList.add('checkout');
     syncCartDock();
-    const name = $('#custName');
-    if (name) name.focus({ preventScroll: true });
+    paintAccountBox();
+    const terms = $('#custTerms');
+    if (terms) terms.focus({ preventScroll: true });
     if (!was) say('A confirmar o pedido.');
   }
   function leaveCheckout() {
@@ -3418,7 +3521,7 @@ const REVIEWS = [];
     list.forEach((m) => {
       const n = cart.filter((l) => l.id === m.id).reduce((s, l) => s + l.qty, 0);
       const b = document.createElement('div'); b.className = 'shop-card';
-      b.innerHTML = `<span class="shop-ph">${media(m)}</span><span class="shop-txt"><b>${esc(m.name)}</b><small>${money(m.price)}</small></span>` +
+      b.innerHTML = `<span class="shop-ph">${media(m)}</span><span class="shop-txt"><b>${esc(m.name)}</b><small>${money(m.price)}${isPizzaItem(m) ? '<br>' + esc(tr('place.pizzaChip')) : ''}</small></span>` +
         (n ? `<span class="shop-step"><button type="button" class="shop-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${n}</b><button type="button" class="shop-plus" aria-label="${esc(tr('dlg.more'))}">+</button></span>`
           : `<button type="button" class="shop-add" aria-label="${esc(tr('dlg.more'))}">+</button>`);
       b.querySelector('.shop-add, .shop-plus')?.addEventListener('click', () => addToCart(m.id, 1, ''));
@@ -3443,7 +3546,8 @@ const REVIEWS = [];
     savePlace();
     $('#cartEdit').hidden = false; $('#orderView').hidden = true; $('#cartMsg').textContent = '';
     $('#cartEdit').classList.remove('checkout');
-    $('#custName').value = cust.name || ''; $('#custPhone').value = cust.phone ? showPhone(cust.phone) : ''; $('#custTerms').checked = false;
+    paintAccountBox();
+    $('#custTerms').checked = false;
     if ($('#custWaGroup')) $('#custWaGroup').checked = !!cust.waGroup;
     orderReadonly = false;
     paintPlaceChip();
@@ -3485,13 +3589,13 @@ const REVIEWS = [];
     if (!placeReady(place)) { msg.textContent = tr('place.set'); openPlace(); return; }
     if (!$('#cartEdit').classList.contains('checkout')) { enterCheckout(); return; }
     if (place.kind === 'dine') table = String(place.tableNumber);
-    const name = $('#custName').value.trim().replace(/\s+/g, ' '), phone = normPhone($('#custPhone').value);
+    const name = accountName(), phone = accountPhone();
     const needId = name.length < 2 || !phone || !$('#custTerms').checked;
     if (needId) {
       enterCheckout();
     }
-    if (name.length < 2) { msg.textContent = tr('cart.needName'); say(tr('cart.needName'), 'err'); $('#custName').focus({ preventScroll: false }); $('#custName').scrollIntoView({ block: 'nearest' }); return; }
-    if (!phone) { msg.textContent = tr('cart.needPhone'); say(tr('cart.needPhone'), 'err'); $('#custPhone').focus({ preventScroll: false }); $('#custPhone').scrollIntoView({ block: 'nearest' }); return; }
+    if (name.length < 2) { msg.textContent = tr('cart.needName'); say(tr('cart.needName'), 'err'); return; }
+    if (!phone) { msg.textContent = tr('cart.needPhone'); say(tr('cart.needPhone'), 'err'); return; }
     if (!$('#custTerms').checked) { msg.textContent = tr('cart.needTerms'); say(tr('cart.needTerms'), 'err'); $('#custTerms').scrollIntoView({ block: 'nearest' }); return; }
     const waGroupOpt = Boolean($('#custWaGroup') && $('#custWaGroup').checked);
     const btn = $('#sendOrder'); btn.disabled = true; msg.textContent = tr('cart.sending');
@@ -3500,12 +3604,17 @@ const REVIEWS = [];
       const m = byId(l.id) || { name: l.name, price: l.price };
       return { menuItemId: l.id, itemId: l.id, name: m.name, unitPriceMzn: lineUnit(l), quantity: l.qty, qty: l.qty, extras: l.extras || [], doneness: l.doneness, notes: l.note || undefined };
     });
+    const pQty = pizzaTakeCount();
+    const pFee = pizzaTakeFee();
+    if (pFee) {
+      lines.push({ menuItemId: 'fee-pizza-take', itemId: 'fee-pizza-take', name: tr('place.pizzaFee', { n: pQty }), unitPriceMzn: PIZZA_TAKE_FEE, quantity: pQty, qty: pQty });
+    }
     const o = {
       id: uid(), code: mkCode(), ts: Date.now(),
       table: place.kind === 'dine' ? String(place.tableNumber) : '',
       fulfillment: place.kind === 'dine' ? 'dine_in' : 'takeaway',
       take: place.take || '', km: place.km,
-      deliveryFee: deliveryFee(), deliveryBand: place.band || '', address: place.address || '',
+      deliveryFee: deliveryFee(), pizzaTakeFee: pFee, deliveryBand: place.band || '', address: place.address || '',
       bairro: place.bairro || '',
       lat: place.lat || null, lng: place.lng || null, acc: place.acc || null,
       mapsUrl: place.lat && place.lng ? mapsSearch(place.lat, place.lng) : '',
@@ -3560,6 +3669,7 @@ const REVIEWS = [];
     const priceCell = (n) => archived ? '' : '<b>' + money(n) + '</b>';
     $('#osum').innerHTML = ov.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${lineNote(l)}</span>${priceCell((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('') +
       (!archived && ov.deliveryFee ? `<li><span>${esc(tr('place.feeLine', { b: tr('place.' + (ov.deliveryBand || 'city')) }))}</span>${priceCell(ov.deliveryFee)}</li>` : '') +
+      (!archived && ov.pizzaTakeFee && !(ov.lines || []).some((l) => l.itemId === 'fee-pizza-take' || l.menuItemId === 'fee-pizza-take') ? `<li><span>${esc(tr('place.pizzaTake'))}</span>${priceCell(ov.pizzaTakeFee)}</li>` : '') +
       (archived ? '' : `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(ov.total)}</b></li>`);
     const bits = [];
     bits.push('<div><b>' + esc(stTxt(liveStatus(ov.status))) + '</b>' + (archived ? '' : ' · ' + esc(payTxt(ov.pay, ov))) + '</div>');
@@ -3812,7 +3922,7 @@ const REVIEWS = [];
       const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
       const short = m.id === 'pos' ? tr('pay.posS') : (m.network ? m.network : tr('pay.mobile'));
       const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'payopt'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.innerHTML = `<b>${esc(label)}</b><small>${esc(short)}</small>`;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'payopt' + (m.id === 'mpesa' ? ' pay-mpesa' : m.id === 'emola' ? ' pay-emola' : ''); b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.innerHTML = `<b>${esc(label)}</b><small>${esc(short)}</small>`;
       b.addEventListener('click', () => {
         paySel = Object.assign({}, m, { label, hint }); $$('.payopt', box).forEach((x) => x.setAttribute('aria-checked', String(x === b)));
         if (m.number) {
@@ -4135,6 +4245,7 @@ const REVIEWS = [];
   $('#callBackPlace').addEventListener('click', () => { showCallStep(1); $('#callMsg').textContent = ''; });
   $('#callMesaMinus')?.addEventListener('click', () => bumpMesa('call', -1));
   $('#callMesaPlus')?.addEventListener('click', () => bumpMesa('call', 1));
+  bindMesaInput('call');
   $('#fabCall').addEventListener('click', (e) => { e.preventDefault(); afterGuest(() => openCall('urgent_other')); });
 
   /* botões flutuantes */
@@ -4512,23 +4623,49 @@ const REVIEWS = [];
 
   /* reserva → WhatsApp */
   const form = $('#booking'), msg = $('#msg'), today = new Date().toISOString().slice(0, 10);
+  const BOOK_PERSON = 1000, BOOK_MAX_MIN = 210;
   form.elements.data.min = today;
+  function addMins(hhmm, mins) {
+    const p = String(hhmm || '').split(':');
+    const h = Number(p[0]), m = Number(p[1]);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return '';
+    let t = h * 60 + m + mins;
+    t = ((t % 1440) + 1440) % 1440;
+    return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
+  }
+  function paintBooking() {
+    const pessoas = Math.max(1, Number(form.elements.pessoas.value) || 1);
+    const hora = String(form.elements.hora.value || '');
+    const until = addMins(hora, BOOK_MAX_MIN);
+    const payEl = $('#bookPay'), untilEl = $('#bookUntil');
+    if (payEl) payEl.textContent = tr('hours.payLine', { n: pessoas, t: money(pessoas * BOOK_PERSON) });
+    if (untilEl) {
+      untilEl.hidden = !until;
+      if (until) untilEl.textContent = tr('hours.until', { in: hora, out: until });
+    }
+  }
+  form.elements.pessoas.addEventListener('input', paintBooking);
+  form.elements.hora.addEventListener('input', paintBooking);
+  form.elements.hora.addEventListener('change', paintBooking);
+  paintBooking();
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const f = new FormData(form), nome = String(f.get('nome') || '').trim(), data = String(f.get('data') || ''), pessoas = Number(f.get('pessoas'));
-    if (!nome || !data || !(pessoas >= 1)) { msg.textContent = tr('hours.need'); return; }
+    const f = new FormData(form), nome = String(f.get('nome') || '').trim(), data = String(f.get('data') || ''), pessoas = Number(f.get('pessoas')), hora = String(f.get('hora') || '');
+    if (!nome || !data || !(pessoas >= 1) || !hora) { msg.textContent = tr('hours.need'); return; }
     if (data < today) { msg.textContent = tr('hours.future'); return; }
     const [y, m, d] = data.split('-');
+    const saida = addMins(hora, BOOK_MAX_MIN);
+    const total = pessoas * BOOK_PERSON;
     const tipoLabel = { 'Piscina & Sol': tr('exp.geral'), 'Dia em Família': tr('exp.fam'), 'Almoço ou Jantar': tr('exp.vip'), 'Grupo & Amigos': tr('exp.grp') }[String(f.get('tipo'))] || f.get('tipo');
-    const text = tr('hours.wa', { nome, data: d + '/' + m + '/' + y, pessoas, tipo: tipoLabel });
+    const text = tr('hours.wa', { nome, data: d + '/' + m + '/' + y, pessoas, tipo: tipoLabel, hora, saida, total: money(total) });
     msg.textContent = tr('hours.opening');
     say('A abrir o WhatsApp.', 'ok');
     window.open('https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
   });
 })();
 </script>
-<script src="os-config.js?v=ops42"></script>
-<script src="garcom.js?v=ops42"></script>
-<script src="os-bridge.js?v=ops42"></script>
+<script src="os-config.js?v=ops46"></script>
+<script src="garcom.js?v=ops46"></script>
+<script src="os-bridge.js?v=ops46"></script>
 </body>
 </html>

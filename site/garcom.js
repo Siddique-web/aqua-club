@@ -41,7 +41,7 @@
   const REASONS = { request_bill: 'Pedir a conta', menu_question: 'Dúvida sobre o menu', new_order: 'Novo pedido / alterar pedido', urgent_other: 'Urgente / outro', conta: 'Pedir a conta', duvida: 'Dúvida sobre o menu', pedido: 'Novo pedido / alterar pedido', urgente: 'Urgente / outro' };
   const REASON_IC = { request_bill: 'card', menu_question: 'book', new_order: 'plus', urgent_other: 'alert', conta: 'card', duvida: 'book', pedido: 'plus', urgente: 'alert' };
   const ZONES = {
-    sala: 'Sala', esplanada: 'Esplanada', snack: 'Snack Bar', cafeteria: 'Cafeteria', rooftop: 'Rooftop',
+    sala: 'Sala', esplanada: 'Esplanada', snack: 'Cafeteria/Snack Bar', cafeteria: 'Cafeteria/Snack Bar', rooftop: 'Rooftop',
     piscina: 'Piscina', ginasio: 'Ginásio', bar: 'Bar', kids: 'Aqua Kids', bilhar: 'Bilhar',
     lounge: 'Lounge', parque: 'Parque', recepcao: 'Recepção', wc: 'WC', all: 'Recinto', 'sala-principal': 'Sala'
   };
@@ -218,7 +218,7 @@
         const c = await need();
         const [st, cu, pr] = await Promise.all([
           c.from('staff').select('user_id,name,email,phone,role,active').not('user_id', 'is', null),
-          c.from('customers').select('user_id,name,email,phone,created_at'),
+          c.from('customers').select('user_id,name,email,phone,created_at').order('created_at', { ascending: false }).limit(400),
           c.from('presence').select('user_id,kind,name,email,phone,last_seen')
         ]);
         return {
@@ -232,7 +232,8 @@
       setStaff: (id, active, role) => rpc('admin_set_staff', { p_id: id, p_active: active, p_role: role }),
       async listOrders() {
         const c = await need();
-        const { data, error } = await c.from('orders').select('*').order('created_at', { ascending: false }).limit(300);
+        const cols = 'id,code,status,payment_status,payment_method,payment_ref,total_mzn,created_at,customer_name,customer_phone,table_code,fulfillment,take,address,place_label,lat,lng,note,wa_group,driver_ok,client_ok,received_ok,delivery_fee,lines';
+        const { data, error } = await c.from('orders').select(cols).order('created_at', { ascending: false }).limit(200);
         if (error) throw fail(error);
         return (data || []).map(mapCloudOrder);
       },
@@ -625,16 +626,15 @@
     } finally { clearTimeout(t); }
   }
   async function loadOsDesk() {
+    if (S._deskBusy) return S._deskBusy;
     const countOpen = (orders) => (orders || []).filter((o) => o.status !== 'cancelled' && o.status !== 'delivered').length;
     const be = backend();
+    S._deskBusy = (async () => {
     if (be && be.mode === 'live' && be.listOrders) {
       try {
         const orders = await be.listOrders();
         S.osDesk = { orders, calls: S.calls || [], role: (S.me && S.me.role) || 'waiter' };
         S.osMsg = '';
-        if (!S.osPoll) S.osPoll = setInterval(() => {
-          if (staffLogged()) loadOsDesk().then(() => { if (S.open && S.view === 'app' && ['orders', 'team', 'dash', 'member', 'stats'].includes(S.tab)) renderTab(); }).catch(() => {});
-        }, 4000);
         setOrderBadge(countOpen(orders));
         return;
       } catch (e) {
@@ -644,9 +644,6 @@
     try {
       S.osDesk = await osFetch('/desk/board');
       S.osMsg = '';
-      if (!S.osPoll) S.osPoll = setInterval(() => {
-        if (staffLogged()) loadOsDesk().then(() => { if (S.open && S.view === 'app' && ['orders', 'team', 'dash', 'member', 'stats'].includes(S.tab)) renderTab(); }).catch(() => {});
-      }, 2000);
     } catch (e) {
       if (window.AquaBus) {
         const d = AquaBus.read();
@@ -656,6 +653,8 @@
       else if (!S.osDesk) S.osMsg = e.message || 'Sem ligação ao sistema de pedidos.';
     }
     setOrderBadge(countOpen(S.osDesk && S.osDesk.orders));
+    })().finally(() => { S._deskBusy = null; });
+    return S._deskBusy;
   }
   let root = null, pn = null, toasts = null, deb = 0;
 
@@ -931,7 +930,7 @@
   function startLiveCalls() {
     if (S.livePoll) return;
     refreshLiveCalls();
-    S.livePoll = setInterval(refreshLiveCalls, 2000);
+    S.livePoll = setInterval(() => { if (!document.hidden) refreshLiveCalls(); }, 5000);
     if (!window.__aqStaffUp) {
       window.__aqStaffUp = true;
       const bump = () => {
@@ -966,25 +965,39 @@
     }
   }
   function pulseLive() {
+    if (document.hidden) return;
     refreshCalls();
     beatPresence();
     loadOsDesk().then(() => {
-      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'calls', 'people'].includes(S.tab)) renderTab();
+      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'calls', 'people', 'tables'].includes(S.tab)) renderTab();
     }).catch(() => {});
     if (S.open && S.view === 'app' && S.tab === 'people' && S.me && S.me.role === 'admin') {
-      loadPeople().then(() => { if (S.tab === 'people') renderTab(); }).catch(() => {});
+      const now = Date.now();
+      if (!S._peopleAt || now - S._peopleAt > 5000) {
+        S._peopleAt = now;
+        loadPeople().then(() => { if (S.tab === 'people') renderTab(); }).catch(() => {});
+      }
     }
   }
   function beatPresence() {
     const be = backend();
     if (!be || !be.heartbeat || !S.me) return;
+    const now = Date.now();
+    if (S.lastBeat && now - S.lastBeat < 18000) return;
+    S.lastBeat = now;
     be.heartbeat().catch(() => {});
   }
   function startWork() {
     stopWork(); const be = backend(); if (!be) return;
-    S.unsub = be.subscribe(() => { clearTimeout(deb); deb = setTimeout(pulseLive, 200); });
-    S.pollT = setInterval(pulseLive, 2500); S.tickT = setInterval(tick, 1000);
-    S.alarmT = setInterval(nagPending, 3500); pulseLive();
+    S.unsub = be.subscribe(() => { clearTimeout(deb); deb = setTimeout(pulseLive, 180); });
+    S.pollT = setInterval(() => { if (!document.hidden) pulseLive(); }, 8000);
+    S.tickT = setInterval(() => { if (!document.hidden) tick(); }, 1000);
+    S.alarmT = setInterval(() => { if (!document.hidden) nagPending(); }, 4000);
+    if (!S._visBound) {
+      S._visBound = true;
+      document.addEventListener('visibilitychange', () => { if (!document.hidden && S.me && S.open) pulseLive(); });
+    }
+    pulseLive();
     startLiveCalls();
     beatPresence();
   }
@@ -998,8 +1011,8 @@
   function stopWork() {
     if (S.unsub) { try { S.unsub(); } catch (e) { /* */ } }
     S.unsub = null;
-    clearInterval(S.pollT); clearInterval(S.tickT); clearInterval(S.alarmT); clearInterval(S.osPoll);
-    S.pollT = 0; S.tickT = 0; S.alarmT = 0; S.osPoll = 0;
+    clearInterval(S.pollT); clearInterval(S.tickT); clearInterval(S.alarmT); clearInterval(S.osPoll); clearInterval(S.livePoll);
+    S.pollT = 0; S.tickT = 0; S.alarmT = 0; S.osPoll = 0; S.livePoll = 0;
     S.lastPend = null; setBadge(0);
   }
   const sigOf = (l) => l.map((c) => c.id + c.status + c.by + c.released).join('|');
@@ -1089,7 +1102,7 @@
   }
   function staffTabs() {
     if (S.me && S.me.role === 'admin') return [
-      ['dash', 'Painel', 'home'], ['orders', 'Pedidos', 'card'], ['calls', 'Chamados', 'bell'],
+      ['dash', 'Painel', 'home'], ['orders', 'Pedidos', 'card'], ['tables', 'Mesas', 'list'], ['calls', 'Chamados', 'bell'],
       ['team', 'Equipa', 'users'], ['people', 'Pessoas', 'users'], ['stats', 'Relatórios', 'chart'], ['profile', 'Casa', 'user']
     ];
     return [
@@ -1118,12 +1131,12 @@
   async function enterTab(t) {
     const admin = !!(S.me && S.me.role === 'admin');
     if (t === 'admin') t = 'dash';
-    if ((t === 'team' || t === 'member' || t === 'people') && !admin) t = 'dash';
+    if ((t === 'team' || t === 'member' || t === 'people' || t === 'tables') && !admin) t = 'dash';
     S.tab = t; if (S.view !== 'app') { syncNav(); return; }
     $$('.gp-tab, .gp-side-btn', root).forEach((b) => { const on = tabSelected(b.dataset.t); b.setAttribute('aria-selected', String(on)); if (on && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) { /* */ } } }); syncNav();
     const c = $('#gpc'); if (!c) return;
     try {
-      if (t === 'orders' || t === 'team' || t === 'dash' || t === 'member' || t === 'stats') { c.innerHTML = loadingHTML; await loadOsDesk(); }
+      if (t === 'orders' || t === 'team' || t === 'dash' || t === 'member' || t === 'stats' || t === 'tables') { c.innerHTML = loadingHTML; await loadOsDesk(); }
       if (['hist', 'stats', 'profile', 'dash', 'member'].includes(t) && (!S.mine || Date.now() - S.mineAt > 15000)) { if (!S.mine) c.innerHTML = loadingHTML; await loadMine(); }
       if (admin && (t === 'team' || t === 'dash' || t === 'member' || t === 'stats')) { c.innerHTML = loadingHTML; await loadTeam(); }
       if (admin && t === 'people') { c.innerHTML = loadingHTML; await loadPeople(); }
@@ -1150,7 +1163,7 @@
   }
   function renderTab() {
     const c = $('#gpc'); if (!c || S.view !== 'app') return;
-    const f = { orders: tabOrders, calls: tabCalls, hist: tabHist, stats: tabStats, profile: tabProfile, team: tabTeam, dash: tabDash, member: tabMember, people: tabPeople }[S.tab] || tabOrders;
+    const f = { orders: tabOrders, calls: tabCalls, hist: tabHist, stats: tabStats, profile: tabProfile, team: tabTeam, dash: tabDash, member: tabMember, people: tabPeople, tables: tabTables }[S.tab] || tabOrders;
     const sc = $('#gpScroll'), y = sc ? sc.scrollTop : 0; c.innerHTML = f(); if (sc) sc.scrollTop = y; tick();
     $$('.gp-tab, .gp-side-btn', root).forEach((b) => b.setAttribute('aria-selected', String(tabSelected(b.dataset.t))));
   }
@@ -1380,8 +1393,8 @@
     const weekR = moneySeries(ordersAll, 7);
     const weekC = computeStats(mergedCalls(), t0 - 6 * 864e5, 7);
     const payMix = [
-      { n: paid.filter((o) => payMethodOf(o) === 'mpesa').length, color: '#00A8FF', label: 'M-Pesa' },
-      { n: paid.filter((o) => payMethodOf(o) === 'emola').length, color: '#FFD700', label: 'e-Mola' },
+      { n: paid.filter((o) => payMethodOf(o) === 'mpesa').length, color: '#E60000', label: 'M-Pesa' },
+      { n: paid.filter((o) => payMethodOf(o) === 'emola').length, color: '#FF6A00', label: 'e-Mola' },
       { n: paid.filter((o) => payMethodOf(o) === 'pos').length, color: '#0A0A0A', label: 'POS' },
       { n: orders.filter((o) => !isPaid(o)).length, color: '#C4B59A', label: 'Por pagar' }
     ];
@@ -1432,6 +1445,9 @@
     const pend = calls.filter((c) => c.status === 'pending').length;
     const paidToday = todayO.filter(isPaid);
     const due = orders.filter((o) => !isPaid(o) && o.status !== 'delivered').length;
+    const openM = openTableMap();
+    const occN = Object.keys(openM).length;
+    const occLabs = Object.keys(openM).sort((a, b) => Number(a) - Number(b)).map((k) => 'Mesa ' + k);
     const staff = ((S.team && S.team.staff) || []).filter((m) => m.active);
     const waiters = staff.filter((m) => m.role !== 'admin');
     const hot = new Set();
@@ -1454,7 +1470,8 @@
       '<div class="gp-stat ink"><b>' + mt(revenueOf(paidToday)) + '</b><span>Receita hoje</span></div>' +
       '<div class="gp-stat cyan"><b>' + todayO.length + '</b><span>Pedidos hoje</span></div>' +
       '<div class="gp-stat"><b>' + pend + '</b><span>Chamados à espera</span></div>' +
-      '<div class="gp-stat sand"><b>' + due + '</b><span>Por cobrar</span></div></div>' +
+      '<div class="gp-stat sand"><b>' + occN + '</b><span>Mesas ocupadas</span></div>' +
+      '<div class="gp-stat"><b>' + due + '</b><span>Por cobrar</span></div></div>' +
       '<div class="gp-glass"><h3 class="gp-h">Últimos pedidos</h3><div class="gp-feed">' +
       (feed.length ? feed.map((o) => '<div class="gp-feed-row">' + avatar({ name: o.customer_name || 'Cliente', color: '#00A8FF' }) +
         '<div><b>' + esc(pedidoNo(o) ? ('Pedido ' + pedidoNo(o)) : (o.code || 'Pedido')) + '</b><small>' + esc(o.customer_name || 'Cliente') + ' · ' + esc(orderPlace(o) || '') + '</small></div>' +
@@ -1465,6 +1482,9 @@
         '<div><b>' + esc(tableName(c.tableCode) || c.place || 'Chamado') + '</b><small>' + esc(REASONS[c.reason] || c.reason) + (c.by ? ' · ' + esc(c.by) : '') + '</small></div>' +
         '<span class="gp-chip ' + (c.status === 'pending' ? 'wait' : 'ok') + '">' + (c.status === 'pending' ? 'À espera' : 'A caminho') + '</span></div>').join('') : '<p class="gp-muted">Tudo calmo no piso.</p>') +
       '</div><div class="gp-quick" style="margin-top:.8rem"><button class="gb sm line" type="button" data-act="tab" data-t="calls">Abrir chamados</button></div></div>' +
+      '<div class="gp-glass"><h3 class="gp-h">Mesas agora</h3>' +
+      (occN ? '<p class="gp-muted" style="margin:0">' + occN + ' ocupada' + (occN === 1 ? '' : 's') + ': ' + esc(occLabs.join(', ')) + '</p>' : '<p class="gp-muted" style="margin:0">Nenhuma mesa ocupada neste momento.</p>') +
+      (admin ? '<div class="gp-quick" style="margin-top:.8rem"><button class="gb sm" type="button" data-act="tab" data-t="tables">Ver mesas abertas</button></div>' : '') + '</div>' +
       '<div class="gp-glass span2"><h3 class="gp-h">Gestão da casa</h3><div class="gp-quick">' +
       '<button class="gb" type="button" data-act="tab" data-t="orders">Pedidos e pagamentos</button>' +
       '<button class="gb line" type="button" data-act="tab" data-t="calls">Chamados</button>' +
@@ -1546,10 +1566,30 @@
       return '<li><b>' + esc(qty) + '× ' + esc(name) + '</b>' + (extra ? '<small>' + esc(extra) + '</small>' : '') + '<span>' + mt(price) + '</span></li>';
     }).join('') +
       (fee ? '<li><b>Entrega</b><span>' + mt(fee) + '</span></li>' : '') +
+      (Number(o.pizza_take_fee || o.pizzaTakeFee || 0) && !(rows || []).some((i) => String(i.item_id || i.itemId || i.id || '') === 'fee-pizza-take') ? '<li><b>Pizza para levar</b><span>' + mt(o.pizza_take_fee || o.pizzaTakeFee) + '</span></li>' : '') +
       '<li class="tot"><b>Total</b><span>' + mt(o.total) + '</span></li></ul>';
   }
   function orderPlace(o) {
     return o.place_label || o.placeLabel || (o.table_number ? 'Mesa ' + o.table_number : o.fulfillment || o.address || '');
+  }
+  function dineTableNo(o) {
+    if (!o) return 0;
+    if (o.fulfillment === 'takeaway' || o.take === 'delivery' || o.take === 'pickup') return 0;
+    const n = Number(o.table_number || o.tableNumber);
+    if (n >= 1) return n;
+    const p = parseInt(String(o.place_label || o.placeLabel || o.table || o.table_code || '').replace(/\D/g, ''), 10);
+    return p >= 1 ? p : 0;
+  }
+  function openTableMap() {
+    const g = {};
+    deskOrders().forEach((o) => {
+      if (!o || o.status === 'cancelled' || isPaid(o)) return;
+      const n = dineTableNo(o);
+      if (!n) return;
+      const k = String(n);
+      (g[k] = g[k] || []).push(o);
+    });
+    return g;
   }
   function isPaid(o) { return payStatusOf(o) === 'paid'; }
   function isGot(o) { return !!(o.received_ok || (o.driver_ok && o.client_ok)); }
@@ -1841,17 +1881,17 @@
       tabTables();
   }
   function tabTables() {
-    const orders = ((S.osDesk && S.osDesk.orders) || []).filter((o) => o.status !== 'cancelled' && o.payment_status !== 'paid');
-    const g = {};
-    orders.forEach((o) => {
-      const k = orderPlace(o) || 'Sem mesa';
-      (g[k] = g[k] || []).push(o);
-    });
-    const keys = Object.keys(g);
-    if (!keys.length) return '<div class="gp-sec"><span>Pedidos em aberto por mesa</span><span class="n">0</span></div><div class="gp-card gp-empty">' + ic('card') + '<b>Nenhum pedido em aberto</b></div>';
-    return '<div class="gp-sec"><span>Pedidos em aberto por mesa</span><span class="n">' + keys.length + '</span></div><div class="gp-list">' + keys.map((k) => {
+    const g = openTableMap();
+    const keys = Object.keys(g).sort((a, b) => Number(a) - Number(b));
+    const nOpen = keys.length;
+    const nOrd = keys.reduce((s, k) => s + g[k].length, 0);
+    const head = '<div class="gp-kpis"><div class="gp-kpi hot"><b>' + nOpen + '</b><span>Mesas ocupadas</span></div><div class="gp-kpi"><b>' + nOrd + '</b><span>Pedidos nestas mesas</span></div></div>';
+    if (!keys.length) return head + '<div class="gp-card gp-empty">' + ic('card') + '<b>Nenhuma mesa ocupada</b>Mesas com pedido no local ainda por pagar aparecem aqui.</div>';
+    return head + '<div class="gp-sec"><span>Mesas abertas agora</span><span class="n">' + nOpen + '</span></div><div class="gp-list">' + keys.map((k) => {
       const list = g[k], tot = list.reduce((s, o) => s + Number(o.total || 0), 0);
-      return '<article class="gc"><div class="gc-top"><span class="gc-table">' + esc(k) + '</span><span class="gc-zone">' + mt(tot) + '</span></div>' +
+      const zone = (list[0] && (list[0].place_label || list[0].placeLabel)) || '';
+      return '<article class="gc"><div class="gc-top"><span class="gc-table">Mesa ' + esc(k) + '</span><span class="gc-zone">' + mt(tot) + '</span></div>' +
+        (zone ? '<p class="gc-note">' + esc(zone) + '</p>' : '') +
         list.map((o) => '<p class="gc-note"><b>' + esc(pedidoNo(o) ? ('Pedido ' + pedidoNo(o)) : o.code) + '</b> · ' + esc(o.customer_name || '') + ' · ' + mt(o.total) + ' · ' + esc(ST_OS[o.status] || o.status) + '</p>').join('') +
         '<div class="gc-actions"><button class="gb ok sm" type="button" data-act="closetable" data-k="' + esc(k) + '">Marcar pagos nesta mesa</button></div></article>';
     }).join('') + '</div>';
@@ -1980,7 +2020,7 @@
     if (a === 'theme') { toggleTheme(); return; }
     if (a === 'closetable') {
       const k = b.dataset.k;
-      const list = ((S.osDesk && S.osDesk.orders) || []).filter((o) => orderPlace(o) === k && o.status !== 'cancelled' && o.payment_status !== 'paid');
+      const list = deskOrders().filter((o) => String(dineTableNo(o)) === String(k) && o.status !== 'cancelled' && !isPaid(o));
       for (const o of list) {
         const body = { payment_status: 'paid' };
         await patchDeskOrder(o.id, body);

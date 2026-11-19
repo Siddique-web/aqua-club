@@ -254,8 +254,8 @@
         waGroupOpt: !!o.waGroupOpt,
         nConta: o.nConta || o.nPedido || 0,
         nPedido: o.nPedido || o.nConta || 0,
-        note: [o.nPedido || o.nConta ? ('Pedido ' + (o.nPedido || o.nConta)) : '', o.note, o.bairro, o.waGroupOpt ? 'Grupo WA: sim' : '', o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
-        lines: (o.lines || []).map((l) => ({
+        note: [o.nPedido || o.nConta ? ('Pedido ' + (o.nPedido || o.nConta)) : '', o.note, o.bairro, o.pizzaTakeFee ? ('Pizza para levar +' + o.pizzaTakeFee + ' MT') : '', o.waGroupOpt ? 'Grupo WA: sim' : '', o.navUrl ? ('Maps ' + o.navUrl) : ''].filter(Boolean).join(' · '),
+        lines: (o.lines || []).filter((l) => (l.itemId || l.menuItemId) !== 'fee-pizza-take').map((l) => ({
           itemId: l.itemId || l.menuItemId,
           qty: l.qty || l.quantity,
           extras: l.extras || [],
