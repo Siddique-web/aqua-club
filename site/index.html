@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops52"></script>
+<script src="i18n.js?v=ops54"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -115,6 +115,25 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .mmenu li a .ico,.mmenu .nav-staff .ico{width:1.2rem;height:1.2rem;color:var(--cyan-d)}
 .mmenu li a:hover,.mmenu .nav-staff:hover{transform:translateX(8px);color:var(--cyan-d)}
 .mmenu .btn{margin-top:1.5rem;width:100%}
+.acc-chip{display:none;align-items:center;gap:.35rem;min-height:46px;max-width:9.5rem;padding:.22rem .75rem .22rem .45rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:none}
+.acc-chip.on{display:inline-flex}
+.acc-chip .ico{width:1.15rem;height:1.15rem;flex:none}
+.acc-chip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc-chip:hover{background:var(--cyan);border-color:var(--cyan)}
+.acc-card{margin:0 0 1.15rem;padding:1rem 1.05rem 1.05rem;border:2.5px solid #000;border-radius:18px;background:var(--cyan-soft)}
+.acc-card .acc-lab{margin:0 0 .2rem;font:800 .7rem var(--fh);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-d)}
+.acc-card b{display:block;font:800 1.15rem/1.15 var(--fh);text-transform:uppercase;letter-spacing:.02em}
+.acc-card .acc-mail{margin:.2rem 0 .85rem;color:#334;font:600 .88rem/1.35 var(--fb);word-break:break-word}
+.acc-card .btn{width:100%;margin:0}
+.acc-card .btn + .btn{margin-top:.45rem}
+.acc-card [hidden],#accDlg [hidden],#histOut[hidden],.acc-chip[hidden]{display:none!important}
+.acc-dlg-body{display:grid;gap:.35rem;padding:.15rem 0 .4rem}
+.acc-dlg-body b{font:800 1.2rem/1.2 var(--fh)}
+.acc-dlg-body .acc-mail{margin:0 0 .5rem;color:var(--muted);word-break:break-word}
+@media(max-width:360px){
+  .acc-chip span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .acc-chip{padding-inline:.4rem;max-width:none}
+}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media(max-width:420px){
   .brand img{width:42px;height:42px}
@@ -1106,7 +1125,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops52">
+<link rel="stylesheet" href="garcom.css?v=ops54">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1165,6 +1184,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <symbol id="i-ice" viewBox="0 0 24 24"><path d="M12 11.5 8.2 21h7.6z"/><circle cx="12" cy="8" r="4.1"/></symbol>
 <symbol id="i-apps" viewBox="0 0 24 24"><circle cx="6.5" cy="6.5" r="1.55"/><circle cx="12" cy="6.5" r="1.55"/><circle cx="17.5" cy="6.5" r="1.55"/><circle cx="6.5" cy="12" r="1.55"/><circle cx="12" cy="12" r="1.55"/><circle cx="17.5" cy="12" r="1.55"/><circle cx="6.5" cy="17.5" r="1.55"/><circle cx="12" cy="17.5" r="1.55"/><circle cx="17.5" cy="17.5" r="1.55"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 19.2c.7-3.4 3.5-5.2 7-5.2s6.3 1.8 7 5.2"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/></symbol>
 <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="11" width="13" height="10" rx="2.2"/><path d="M8.2 11V8.2a3.8 3.8 0 0 1 7.6 0V11"/></symbol>
 <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12.5" rx="2.2"/><path d="M3 10.2h18M7 15h4"/></symbol>
 <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5.2" width="17" height="15.3" rx="2.2"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/></symbol>
@@ -1192,10 +1212,15 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
         <li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li>
         <li><a href="#horarios" data-i18n="nav.hours">Horários</a></li>
         <li><a href="#contactos" data-i18n="nav.contact">Contacto</a></li>
+        <li><button type="button" class="nav-staff" id="navAcc" data-acc="open" data-i18n="nav.account">Conta</button></li>
         <li><button type="button" class="nav-staff" data-open-staff="orders" data-i18n="nav.staff">Área da equipa</button></li>
       </ul>
     </nav>
     <div class="head-right">
+      <button type="button" class="acc-chip" id="accChip" data-acc="open" hidden>
+        <svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>
+        <span id="accChipName">Conta</span>
+      </button>
       <div class="langpick" id="langBar">
         <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="langPick">
           <span class="flag" id="langFlag" data-flag="pt" aria-hidden="true"></span>
@@ -1216,12 +1241,20 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     </div>
   </div>
   <nav class="mmenu" id="mmenu" data-i18n-aria="nav.mobile">
+    <div class="acc-card" id="mAcc">
+      <p class="acc-lab" data-i18n="acc.title">A sua conta</p>
+      <b id="mAccWho">—</b>
+      <p class="acc-mail" id="mAccMail"></p>
+      <button class="btn btn-dark" type="button" id="mAccOut" data-acc="out" hidden data-i18n="acc.out">Sair da conta</button>
+      <button class="btn btn-cyan" type="button" id="mAccIn" data-acc="in" data-i18n="acc.in">Entrar na conta</button>
+    </div>
     <ul>
       <li><a href="#inicio"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="nav.home">Início</span></a></li>
       <li><a href="#menu"><svg class="ico ico-fill" aria-hidden="true"><use href="#i-apps"/></svg><span data-i18n="nav.menu">Menu</span></a></li>
       <li><a href="#espacos"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span data-i18n="nav.spaces">Espaços</span></a></li>
       <li><a href="#horarios"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg><span data-i18n="nav.hours">Horários</span></a></li>
       <li><a href="#contactos"><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg><span data-i18n="nav.contact">Contacto</span></a></li>
+      <li><button type="button" class="nav-staff" data-acc="open"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg><span data-i18n="nav.account">Conta</span></button></li>
       <li><button type="button" class="nav-staff" data-open-staff="orders"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg><span data-i18n="nav.staff">Área da equipa</span></button></li>
     </ul>
     <a class="btn btn-cyan" href="#bilhetes" data-i18n="bookDay">Reservar Dia</a>
@@ -1598,7 +1631,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <a class="wafall" data-wa href="#" target="_blank" rel="noopener noreferrer" hidden data-i18n="cart.waFall">Não abriu? Toque aqui para abrir o WhatsApp</a>
     <p class="menu-note" style="margin:.2rem 0 0" data-i18n="cart.noCancel">Este pedido não pode ser cancelado. Para alterar algo, chame o garçom.</p>
     <div class="dfoot" id="ovActs"><button class="btn btn-cyan" type="button" id="orderPay" hidden></button><button class="btn btn-cyan" type="button" id="orderGot" hidden data-i18n="cart.got">Confirmar que recebi</button></div>
-    <div class="dfoot"><button class="linkbtn" type="button" id="orderPdf">Exportar PDF</button><button class="linkbtn" type="button" id="orderBack" hidden data-i18n="cart.backHist">Voltar aos pedidos</button><button class="linkbtn" type="button" id="orderHist" data-i18n="fab.my">Os meus pedidos</button><button class="linkbtn" type="button" id="orderNew" data-i18n="cart.another">Fazer outro pedido</button></div>
+    <div class="dfoot"><button class="linkbtn" type="button" id="orderPdf" data-i18n="cart.pdf">Exportar PDF</button><button class="linkbtn" type="button" id="orderBack" hidden data-i18n="cart.backHist">Voltar aos pedidos</button><button class="linkbtn" type="button" id="orderHist" data-i18n="fab.my">Os meus pedidos</button><button class="linkbtn" type="button" id="orderNew" data-i18n="cart.another">Fazer outro pedido</button></div>
   </div>
 </div></dialog>
 
@@ -1608,7 +1641,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   <div id="hlist"></div>
   <p class="menu-note" style="margin:0" data-i18n="cart.viewHint">Toque num pedido para ver todos os detalhes. Os pedidos antigos ficam só para consulta.</p>
   <p class="menu-note" style="margin:0" data-i18n="pay.histNote">Os pedidos ficam registados em seu nome e não podem ser cancelados depois de enviados. Para alterar algo, chame o garçom.</p>
-  <div class="dfoot"><button class="btn btn-line" type="button" id="histMenu" data-i18n="cart.another">Fazer outro pedido</button></div>
+  <div class="dfoot"><button class="linkbtn" type="button" id="histPdf" data-i18n="cart.pdfAll">Exportar pedidos em PDF</button><button class="linkbtn" type="button" id="histOut" data-acc="out" hidden data-i18n="acc.out">Sair da conta</button><button class="btn btn-line" type="button" id="histMenu" data-i18n="cart.another">Fazer outro pedido</button></div>
 </div></dialog>
 
 <dialog class="dlg" id="payDlg" aria-labelledby="payT"><div class="dpad">
@@ -1702,6 +1735,22 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <button class="btn btn-cyan btn-block" type="submit">Entrar</button>
       <p class="guest-msg" id="gMsgIn" role="alert"></p>
     </form>
+  </div>
+</dialog>
+
+<dialog class="dlg guest-dlg" id="accDlg" aria-labelledby="accT">
+  <div class="dpad">
+    <div class="dhead"><h2 id="accT" data-i18n="acc.title">A sua conta</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
+    <div class="acc-dlg-body">
+      <p class="acc-lab" id="accDlgLab" data-i18n="acc.linked">Ligado como</p>
+      <b id="accDlgWho">—</b>
+      <p class="acc-mail" id="accDlgMail"></p>
+      <p class="menu-note" id="accDlgNone" hidden data-i18n="acc.none">Não está ligado. Entre para pedir ou chamar o garçom.</p>
+    </div>
+    <div class="dfoot">
+      <button class="btn btn-dark btn-block" type="button" id="accDlgOut" data-acc="out" hidden data-i18n="acc.out">Sair da conta</button>
+      <button class="btn btn-cyan btn-block" type="button" id="accDlgIn" data-acc="in" data-i18n="acc.in">Entrar na conta</button>
+    </div>
   </div>
 </dialog>
 
@@ -1897,7 +1946,7 @@ const REVIEWS = [];
     burger.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#' + (open ? 'i-close' : 'i-menu') + '"/></svg>';
   };
   burger.addEventListener('click', () => setMenu(!header.classList.contains('open')));
-  $$('#mmenu a, #mmenu .nav-staff').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  $$('#mmenu a, #mmenu .nav-staff, #mmenu [data-acc]').forEach((a) => a.addEventListener('click', () => setMenu(false)));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
   matchMedia('(min-width:1100px)').addEventListener('change', (m) => { if (m.matches) setMenu(false); });
 
@@ -2206,26 +2255,91 @@ const REVIEWS = [];
   function splitMail(email) { return String(email || 'Cliente').split('@')[0]; }
   async function loadGuest() {
     guest = null;
-    if (!sb) return null;
-    const { data } = await sb.auth.getSession();
-    const user = data && data.session && data.session.user;
-    if (!user) return null;
-    if (/@staff\.aquaclub\.mz$/i.test(user.email || '')) {
-      await sb.auth.signOut();
-      return null;
+    try {
+      if (!sb) return null;
+      const { data } = await sb.auth.getSession();
+      const user = data && data.session && data.session.user;
+      if (!user) return null;
+      if (/@staff\.aquaclub\.mz$/i.test(user.email || '')) {
+        await sb.auth.signOut();
+        return null;
+      }
+      let row = null;
+      const q = await sb.from('customers').select('*').eq('user_id', user.id).maybeSingle();
+      row = q.data;
+      if (!row) row = await upsertCustomerRow(user);
+      guest = { id: user.id, name: (row && row.name) || '', email: user.email, phone: (row && row.phone) || '' };
+      if (guest.name) cust.name = guest.name;
+      if (guest.phone) cust.phone = normPhone(guest.phone) || guest.phone;
+      store.set('aq.cust', JSON.stringify(cust));
+      startGuestPulse();
+      return guest;
+    } finally {
+      paintAccountBox();
+      paintAccountUi();
     }
-    let row = null;
-    const q = await sb.from('customers').select('*').eq('user_id', user.id).maybeSingle();
-    row = q.data;
-    if (!row) row = await upsertCustomerRow(user);
-    guest = { id: user.id, name: (row && row.name) || '', email: user.email, phone: (row && row.phone) || '' };
-    if (guest.name) cust.name = guest.name;
-    if (guest.phone) cust.phone = normPhone(guest.phone) || guest.phone;
-    store.set('aq.cust', JSON.stringify(cust));
-    startGuestPulse();
-    paintAccountBox();
-    return guest;
   }
+  function firstNameOf() {
+    const n = accountName();
+    return n.split(' ')[0] || n;
+  }
+  function paintAccountUi() {
+    const on = !!(guest && guest.id);
+    const who = on ? (accountName() || guest.email || 'Cliente') : tr('acc.none');
+    const mail = on ? (guest.email || '') : '';
+    const chip = $('#accChip');
+    const chipN = $('#accChipName');
+    if (chip) {
+      chip.hidden = !on;
+      chip.classList.toggle('on', on);
+      chip.setAttribute('aria-label', on ? tr('acc.open') : tr('nav.account'));
+    }
+    if (chipN) chipN.textContent = on ? firstNameOf() : tr('nav.account');
+    const setTxt = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    setTxt('#mAccWho', on ? tr('acc.hello', { n: firstNameOf() }) : tr('acc.title'));
+    setTxt('#mAccMail', on ? mail : tr('acc.none'));
+    setTxt('#accDlgWho', on ? who : tr('acc.title'));
+    setTxt('#accDlgMail', mail);
+    const none = $('#accDlgNone');
+    if (none) none.hidden = on;
+    const lab = $('#accDlgLab');
+    if (lab) lab.hidden = !on;
+    ['#mAccOut', '#accDlgOut', '#histOut'].forEach((id) => { const el = $(id); if (el) el.hidden = !on; });
+    ['#mAccIn', '#accDlgIn'].forEach((id) => { const el = $(id); if (el) el.hidden = on; });
+  }
+  function openAccount() {
+    paintAccountUi();
+    const dlg = $('#accDlg');
+    if (dlg && !dlg.open) dlg.showModal();
+  }
+  async function logoutGuest() {
+    pendingGuestFn = null;
+    try { if (sb) await sb.auth.signOut(); } catch (e) { /* */ }
+    guest = null;
+    if (guestPulse) { clearInterval(guestPulse); guestPulse = 0; }
+    cust = {};
+    try { store.set('aq.cust', '{}'); } catch (e) { /* */ }
+    paintAccountBox();
+    paintAccountUi();
+    try { $('#accDlg')?.close(); } catch (e) { /* */ }
+    try { $('#guestDlg')?.close(); } catch (e) { /* */ }
+    try { $('#histDlg')?.close(); } catch (e) { /* */ }
+    try { setMenu(false); } catch (e) { /* */ }
+    say(tr('acc.gone'), 'ok');
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-acc]');
+    if (!b) return;
+    const a = b.dataset.acc;
+    if (a === 'open') { e.preventDefault(); openAccount(); }
+    if (a === 'out') { e.preventDefault(); logoutGuest(); }
+    if (a === 'in') {
+      e.preventDefault();
+      try { $('#accDlg')?.close(); } catch (err) { /* */ }
+      openGuestAuth('in');
+    }
+  });
+  paintAccountUi();
   function accountName() {
     return String((guest && guest.name) || cust.name || '').trim().replace(/\s+/g, ' ');
   }
@@ -3762,29 +3876,68 @@ const REVIEWS = [];
     if (histDlg.open) histDlg.close();
     cartDlg.showModal();
   }
+  function orderLines(o) {
+    return (o && (o.lines || o.items)) || [];
+  }
+  function orderPdfSheet(order) {
+    const qty = (l) => l.quantity || l.qty || 1;
+    const unit = (l) => l.unitPriceMzn || l.unit_price || l.price || 0;
+    const lineTot = (l) => l.line_total != null ? l.line_total : unit(l) * qty(l);
+    const extra = (l) => {
+      const bits = [];
+      if (l.doneness != null && l.doneness !== '') bits.push('Ponto ' + l.doneness + '%');
+      const ex = l.extras;
+      if (Array.isArray(ex) && ex.length) bits.push(ex.map((x) => (typeof x === 'string' ? x : (x && (x.name || x.id)) || '')).filter(Boolean).join(', '));
+      else if (typeof ex === 'string' && ex) bits.push(ex);
+      if (l.notes || l.note) bits.push(l.notes || l.note);
+      return bits.join(' · ');
+    };
+    const rows = orderLines(order).map((l) => {
+      const bit = extra(l);
+      return '<tr><td>' + qty(l) + '× ' + esc(l.name || l.item_id || 'Item') + (bit ? '<br><small>' + esc(bit) + '</small>' : '') + '</td><td class="r">' + money(lineTot(l)) + '</td></tr>';
+    }).join('');
+    const whenTxt = order.ts ? new Date(Number(order.ts) || Date.parse(order.ts) || Date.now()).toLocaleString('pt-PT') : '';
+    const bits = [contaLabel(order), order.code, whenTxt, order.placeLabel || placeLabel(place) || order.place_label || '', order.name || order.customer_name || '', order.phone ? showPhone(order.phone) : '', stTxt(liveStatus(order.status)), payTxt(order.pay, order) + (order.method ? ' · ' + payMethodLabel(order.method) : '')].filter(Boolean);
+    return '<section class="page"><h1>Aqua Club — ' + esc(contaLabel(order)) + '</h1><p class="meta">' + bits.map(esc).join('<br>') + '</p><table>' +
+      (rows || '<tr><td>Sem linhas</td><td></td></tr>') +
+      '<tr class="tot"><td>' + esc(tr('cart.total')) + '</td><td class="r">' + money(order.total) + '</td></tr></table><p><small>Palmeiras 2, Beira</small></p></section>';
+  }
+  function printAquaPdf(title, inner) {
+    const css = 'body{font-family:system-ui,sans-serif;max-width:480px;margin:24px auto;color:#111;padding:0 16px}' +
+      'h1{font-size:1.15rem;margin:0 0 .5rem}.meta{color:#444;font-size:.9rem;line-height:1.45;margin:0 0 .8rem}' +
+      'table{width:100%;border-collapse:collapse}td{padding:.4rem 0;border-bottom:1px solid #eee;vertical-align:top}' +
+      'td.r{text-align:right;white-space:nowrap}.tot td{font-weight:800;border:0;padding-top:.7rem}' +
+      '.page{page-break-after:always}.page:last-child{page-break-after:auto}@media print{body{margin:10mm}}';
+    const html = '<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"><title>' + esc(title) + '</title><style>' + css + '</style></head><body>' + inner + '</body></html>';
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    document.body.appendChild(iframe);
+    iframe.contentDocument.open();
+    iframe.contentDocument.write(html);
+    iframe.contentDocument.close();
+    let done = false;
+    const go = () => {
+      if (done) return; done = true;
+      try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch (e) { /* */ }
+      setTimeout(() => iframe.remove(), 5000);
+    };
+    iframe.onload = go;
+    setTimeout(go, 280);
+    say(tr('cart.pdfHint'));
+  }
   function exportOrderPdf(o) {
     const order = o || ov;
     if (!order) { say('Sem pedido para exportar.'); return; }
-    const qty = (l) => l.quantity || l.qty || 1;
-    const unit = (l) => l.unitPriceMzn || l.price || 0;
-    const rows = (order.lines || []).map((l) => {
-      const q = qty(l);
-      return '<tr><td>' + q + '× ' + esc(l.name) + '</td><td style="text-align:right">' + money(unit(l) * q) + '</td></tr>';
-    }).join('');
-    const html = '<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Pedido ' + esc(order.code || '') + '</title>' +
-      '<style>body{font-family:system-ui,sans-serif;max-width:420px;margin:24px auto;color:#111;padding:0 16px}h1{font-size:1.15rem;margin:0 0 .6rem}table{width:100%;border-collapse:collapse}td{padding:.4rem 0;border-bottom:1px solid #eee}.tot td{font-weight:800;border:0;padding-top:.7rem}</style></head><body>' +
-      '<h1>Aqua Club — Pedido</h1><p>' + esc(contaLabel(order)) + '<br>' + esc(order.code || '') + '<br>' + esc(order.placeLabel || placeLabel(place)) + '<br>' +
-      esc(order.name || '') + (order.phone ? ' · ' + esc(showPhone(order.phone)) : '') + '</p><table>' + rows +
-      '<tr class="tot"><td>Total</td><td style="text-align:right">' + money(order.total) + '</td></tr></table>' +
-      '<p>' + esc(payTxt(order.pay, order)) + (order.method ? ' · ' + esc(payMethodLabel(order.method)) : '') + '</p>' +
-      '<p><small>Palmeiras 2, Beira</small></p><script>window.onload=function(){window.print();}<\/script></body></html>';
-    const w = window.open('', '_blank');
-    if (!w) { say('Permita janelas para guardar o PDF.'); return; }
-    w.document.write(html);
-    w.document.close();
-    say('Escolha Guardar em PDF.');
+    printAquaPdf(contaLabel(order) + ' ' + (order.code || ''), orderPdfSheet(order));
+  }
+  function exportHistPdf() {
+    const list = history.filter((o) => o && o.status !== 'cancelled');
+    if (!list.length) { say('Ainda não há pedidos para exportar.'); return; }
+    printAquaPdf(tr('fab.my'), list.slice().reverse().map(orderPdfSheet).join(''));
   }
   $('#orderPdf')?.addEventListener('click', () => exportOrderPdf(ov));
+  $('#histPdf')?.addEventListener('click', exportHistPdf);
   $('#orderPay').addEventListener('click', () => {
     if (!ov) return;
     askBill(ov);
@@ -3841,7 +3994,7 @@ const REVIEWS = [];
       const prices = (amount) => done ? '' : `<b>${money(amount)}</b>`;
       el.innerHTML = `<div class="hrow"><b>${esc(contaLabel(o))}</b><span>${when(o.ts)}</span></div><p class="hmeta">${esc(o.code)} · ${esc(o.placeLabel || nice(o.table))} · ${esc(o.name)} · ${esc(showPhone(o.phone))}</p>
         <div class="chips"><span class="chip2 st-${liveStatus(o.status)}">${esc(stTxt(liveStatus(o.status)))}</span>${done ? `<span class="chip2 pay-paid">${esc(tr('cart.record'))}</span>` : `<span class="chip2 pay-${o.method === 'pos' && o.pay !== 'paid' ? 'unpaid' : o.pay}">${esc(payTxt(o.pay, o))}</span>`}${!done && o.method ? `<span class="chip2">${esc(payMethodLabel(o.method))}</span>` : ''}</div>
-        <ul class="osum">${o.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span>${prices((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('')}${done ? '' : `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(o.total)}</b></li>`}</ul>
+        <ul class="osum">${orderLines(o).map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${l.notes ? ` <small>“${esc(l.notes)}”</small>` : ''}</span>${prices((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('')}${done ? '' : `<li class="tot"><span>${esc(tr('cart.total'))}</span><b>${money(o.total)}</b></li>`}</ul>
         <p class="hpeek">${esc(tr('cart.viewHintShort'))}</p>`;
       el.addEventListener('click', (e) => {
         if (e.target.closest('[data-recv]')) {
@@ -4597,6 +4750,7 @@ const REVIEWS = [];
       renderHist();
       paintOrderView();
       updateFabs();
+      paintAccountUi();
       rebuildWall();
       syncSlideDom();
       $$('#stars button').forEach((b, i) => {
@@ -4779,8 +4933,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops52"></script>
-<script src="garcom.js?v=ops52"></script>
-<script src="os-bridge.js?v=ops52"></script>
+<script src="os-config.js?v=ops54"></script>
+<script src="garcom.js?v=ops54"></script>
+<script src="os-bridge.js?v=ops54"></script>
 </body>
 </html>

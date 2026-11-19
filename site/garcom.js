@@ -1466,6 +1466,69 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     toast('Exportado: ' + name, 'check', 'ok');
   }
+  function printHtml(title, inner) {
+    const css = 'body{font-family:Segoe UI,system-ui,sans-serif;color:#111;margin:18px;max-width:720px}' +
+      'h1{font-size:1.15rem;margin:0 0 .35rem}h2{font-size:1rem;margin:0 0 .4rem}' +
+      '.meta{color:#444;font-size:.88rem;margin:0 0 .75rem;line-height:1.45}' +
+      'table{width:100%;border-collapse:collapse;font-size:.92rem}' +
+      'td,th{padding:.38rem 0;border-bottom:1px solid #e8e8e8;vertical-align:top}' +
+      'td.r,th.r{text-align:right;white-space:nowrap}' +
+      '.tot td{font-weight:800;border:0;padding-top:.7rem}' +
+      '.page{page-break-after:always;padding-bottom:8px}' +
+      '.page:last-child{page-break-after:auto}' +
+      '@media print{body{margin:10mm}}';
+    const html = '<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"><title>' + esc(title) + '</title><style>' + css + '</style></head><body>' + inner + '</body></html>';
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument;
+    doc.open(); doc.write(html); doc.close();
+    let done = false;
+    const go = () => {
+      if (done) return; done = true;
+      try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch (e) { /* */ }
+      setTimeout(() => iframe.remove(), 5000);
+    };
+    iframe.onload = go;
+    setTimeout(go, 280);
+    toast('Na impressão, escolha Guardar como PDF.', 'check', 'ok');
+  }
+  function orderSheetHtml(o) {
+    const n = pedidoNo(o);
+    const title = n ? ('Pedido ' + n) : (o.code || 'Pedido');
+    const ms = orderMs(o);
+    const when = ms ? new Date(ms).toLocaleString('pt-PT') : '';
+    const name = o.customer_name || (o.customer && o.customer.name) || o.name || '';
+    const phone = o.customer_phone || (o.customer && o.customer.phone) || o.phone || '';
+    const rows = o.items || o.lines || [];
+    const fee = Number(o.delivery_fee || o.deliveryFee || 0);
+    const pizza = Number(o.pizza_take_fee || o.pizzaTakeFee || 0);
+    const hasPizzaLine = rows.some((i) => String(i.item_id || i.itemId || i.id || '') === 'fee-pizza-take');
+    const trs = rows.map((i) => {
+      const qty = i.qty || i.quantity || 1;
+      const extra = lineBits(i);
+      const price = i.line_total != null ? i.line_total : (i.unit_price || i.unitPriceMzn || i.price || 0) * qty;
+      return '<tr><td>' + esc(qty) + '× ' + esc(i.name || i.item_id || 'Item') + (extra ? '<br><small>' + esc(extra) + '</small>' : '') + '</td><td class="r">' + esc(mt(price)) + '</td></tr>';
+    }).join('');
+    const extraRows = (fee ? '<tr><td>Entrega</td><td class="r">' + esc(mt(fee)) + '</td></tr>' : '') +
+      (pizza && !hasPizzaLine ? '<tr><td>Pizza para levar</td><td class="r">' + esc(mt(pizza)) + '</td></tr>' : '');
+    const bits = [title, o.code, when, name, phone, orderPlace(o), o.address || o.bairro || '', ST_OS[o.status] || o.status, payLabel(o), o.payment_ref || o.ref || '', o.note || ''].filter(Boolean);
+    return '<section class="page"><h1>Aqua Club — ' + esc(title) + '</h1><p class="meta">' + bits.map(esc).join('<br>') + '</p>' +
+      '<table><thead><tr><th>Itens</th><th class="r">Valor</th></tr></thead><tbody>' + (trs || '<tr><td>Sem linhas</td><td></td></tr>') + extraRows +
+      '<tr class="tot"><td>Total</td><td class="r">' + esc(mt(o.total)) + '</td></tr></tbody></table></section>';
+  }
+  function filteredDeskOrders() {
+    const src = deskOrders();
+    assignPedidoNumbers(src);
+    return filterOrders(src);
+  }
+  function exportOrdersPdf(one) {
+    const list = one ? [one] : filteredDeskOrders();
+    if (!list.length) { toast('Não há pedidos para exportar.', 'alert', 'err'); return; }
+    const title = one ? ('Pedido ' + (one.code || pedidoNo(one) || '')) : ('Pedidos Aqua Club · ' + list.length);
+    printHtml(title, list.map(orderSheetHtml).join(''));
+  }
   function waiterBoard(calls, since) {
     const map = {};
     (calls || []).forEach((c) => {
@@ -1594,7 +1657,7 @@
       '<button class="gb line" type="button" data-act="tab" data-t="calls">Chamados</button>' +
       (admin ? '<button class="gb line" type="button" data-act="tab" data-t="team">Equipa e PINs</button>' : '') +
       '<button class="gb dark" type="button" data-act="tab" data-t="stats">Relatórios</button>' +
-      '<button class="gb sm line" type="button" data-act="export" data-kind="orders">Exportar pedidos</button>' +
+      '<button class="gb sm line" type="button" data-act="export" data-kind="orders-pdf">Exportar pedidos (PDF)</button>' +
       '<button class="gb sm line" type="button" data-act="export" data-kind="calls">Exportar chamados</button></div></div></div>';
   }
   function tabMember() {
@@ -1747,6 +1810,7 @@
       if (isDelivery(o) && (o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok && !got) acts.push('<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="driver">Saiu para entrega</button>');
       if (!got) acts.push('<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="receive">Marcar entregue</button>');
     }
+    acts.push('<button class="gb sm line" type="button" data-act="pdf" data-id="' + esc(o.id || o.code || '') + '">PDF</button>');
     return '<article class="gc' + cls + '"><div class="gc-top"><span class="gc-table">' + esc(title) + '</span>' +
       '<span class="gc-zone">' + esc(kind || orderPlace(o) || 'Pedido') + '</span></div>' +
       '<div class="gc-chips">' +
@@ -1767,7 +1831,8 @@
       kv('Notas', esc(o.note || '')) +
       '</div>' +
       itemsHtml(o) +
-      (acts.length ? '<div class="gc-actions">' + acts.join('') + '</div>' : (done ? '<p class="gp-muted" style="margin:0">Pedido cumprido: pago e recebido.</p>' : '')) +
+      (acts.length ? '<div class="gc-actions">' + acts.join('') + '</div>' : '') +
+      (done ? '<p class="gp-muted" style="margin:0">Pedido cumprido: pago e recebido.</p>' : '') +
       '</article>';
   }
   function hourOpts(cur) {
@@ -1793,7 +1858,8 @@
       '<label>Estado<select name="st">' + selOpts(f.st, [['', 'Activos'], ['review', 'Em análise'], ['preparing', 'A preparar'], ['ready', 'Pronto'], ['on_the_way', 'A caminho'], ['delivered', 'Entregue'], ['paid', 'Pagos'], ['unpaid', 'Por pagar'], ['cancelled', 'Cancelados']]) + '</select></label>' +
       '<label>Local<input name="place" value="' + esc(f.place) + '" placeholder="Mesa, zona…"></label></div>' +
       '<div class="gp-quick"><button class="gb sm" type="submit">Aplicar</button><button class="gb sm line" type="button" data-act="freset" data-k="of">Limpar</button>' +
-      '<button class="gb sm dark" type="button" data-act="export" data-kind="orders">Exportar CSV</button></div></form>';
+      '<button class="gb sm dark" type="button" data-act="export" data-kind="orders-pdf">Exportar PDF</button>' +
+      '<button class="gb sm line" type="button" data-act="export" data-kind="orders">Exportar CSV</button></div></form>';
   }
   function callFilterBar(all) {
     const f = S.cf || emptyCf();
@@ -2162,7 +2228,20 @@
     }
     if (a === 'tab') return enterTab(b.dataset.t);
     if (a === 'memberview') { S.viewMember = b.dataset.id; return enterTab('member'); }
-    if (a === 'export') { doExport(b.dataset.kind); return; }
+    if (a === 'pdf') {
+      const src = deskOrders();
+      assignPedidoNumbers(src);
+      const id = String(b.dataset.id || '');
+      const o = src.find((x) => String(x.id) === id || String(x.code) === id);
+      if (!o) { toast('Pedido não encontrado.', 'alert', 'err'); return; }
+      exportOrdersPdf(o);
+      return;
+    }
+    if (a === 'export') {
+      if (b.dataset.kind === 'orders-pdf') { exportOrdersPdf(); return; }
+      doExport(b.dataset.kind);
+      return;
+    }
     if (a === 'freset') {
       if (b.dataset.k === 'cf') { S.cf = emptyCf(); S.zone = 'all'; } else S.of = emptyOf();
       return renderTab();
