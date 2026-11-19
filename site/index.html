@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops50"></script>
+<script src="i18n.js?v=ops51"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1106,7 +1106,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops50">
+<link rel="stylesheet" href="garcom.css?v=ops51">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1296,7 +1296,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <button type="button" class="mtab mtab-more" id="mtabsMore" hidden aria-expanded="false" aria-controls="mcatDlg"><svg class="ico ico-fill" aria-hidden="true"><use href="#i-apps"/></svg> Mais</button>
       <button type="button" class="mtab-cart" id="menuCartBtn" aria-label="Ver o que já escolheu"><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span class="n" id="menuCartN">0</span></button>
     </div>
-    <button type="button" class="place-chip" id="placeChip"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span><b id="placeChipT" data-i18n="place.set">Definir onde está</b><small id="placeChipS"></small></span></button>
+    <button type="button" class="place-chip" id="placeChip"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span><b id="placeChipT" data-i18n="place.set">Escolher onde está</b><small id="placeChipS"></small></span></button>
     <label class="mtable" hidden>Mesa<select id="menuTable"></select></label>
   </div>
   <dialog class="dlg mcat-dlg" id="mcatDlg" aria-labelledby="mcatDlgT">
@@ -1495,7 +1495,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <p style="margin:1rem 0 0;font:800 .78rem var(--fh)" data-i18n="place.mesa">Número da mesa</p>
     <div class="mesa-step" role="group" aria-label="Número da mesa">
       <button type="button" id="placeMesaMinus" aria-label="Mesa anterior">‹</button>
-      <input type="number" id="placeMesa" min="1" max="200" inputmode="numeric" value="1" aria-label="Número da mesa">
+      <input type="number" id="placeMesa" min="1" max="200" inputmode="numeric" value="" placeholder="—" aria-label="Número da mesa">
       <button type="button" id="placeMesaPlus" aria-label="Mesa seguinte">›</button>
     </div>
   </div>
@@ -2695,6 +2695,11 @@ const REVIEWS = [];
   const PIZZA_TAKE_FEE = 50;
   let place = {};
   try { place = JSON.parse(store.get('aq.place') || '{}') || {}; } catch (e) { place = {}; }
+  if (store.get('aq.placeV') !== '2') {
+    if (place.kind === 'dine') place = {};
+    store.set('aq.placeV', '2');
+    store.set('aq.place', '');
+  }
   function clubDay(ts) {
     try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Maputo' }).format(ts ? new Date(ts) : new Date()); }
     catch (e) { const d = ts ? new Date(ts) : new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -2751,7 +2756,10 @@ const REVIEWS = [];
     store.set('aq.placeDay', day);
   })();
   if (place.zone === 'snack') place.zone = 'cafeteria';
-  if (!place.kind && table) applyPlaceFromTable(table);
+  if (!place.kind) {
+    const qr = new URLSearchParams(location.search).get('mesa');
+    if (qr) applyPlaceFromTable(qr);
+  }
   let pendingAdd = null;
   function savePending(data) {
     if (data) store.set('aq.pending', JSON.stringify(data));
@@ -2794,6 +2802,7 @@ const REVIEWS = [];
   }
   function savePlace() {
     store.set('aq.placeDay', clubDay());
+    store.set('aq.placeV', '2');
     store.set('aq.place', JSON.stringify(place));
     if (place.kind === 'dine' && place.tableNumber) {
       table = String(place.tableNumber);
@@ -2827,8 +2836,8 @@ const REVIEWS = [];
     const n = parseInt(raw, 10);
     if (!Number.isFinite(n) || n < 1) {
       if (which === 'place') {
-        const v = clampEmpty ? 1 : 0;
-        if (v) { place.mesa = '1'; place.tableNumber = 1; paintMesaStep('place', 1); }
+        place.mesa = ''; place.tableNumber = null;
+        paintMesaStep('place', 0);
         return;
       }
       place.mesa = ''; place.tableNumber = null;
@@ -2845,19 +2854,20 @@ const REVIEWS = [];
     inp.dataset.bound = '1';
     inp.addEventListener('focus', () => { try { inp.select(); } catch (e) { /* */ } });
     inp.addEventListener('input', () => applyMesaNumber(which, inp.value, false));
-    inp.addEventListener('change', () => applyMesaNumber(which, inp.value, which === 'place'));
+    inp.addEventListener('change', () => applyMesaNumber(which, inp.value, false));
   }
   function bumpMesa(which, dir) {
     const inp = $('#' + which + 'Mesa');
     if (!inp) return;
     const cur = parseInt(inp.value, 10);
-    let n = Number.isFinite(cur) ? cur : (which === 'place' ? 0 : 0);
+    let n = Number.isFinite(cur) ? cur : 0;
     n += dir;
-    if (which === 'place') n = Math.min(MAX_TABLE, Math.max(1, n || 1));
+    if (which === 'place') n = Math.min(MAX_TABLE, Math.max(0, n));
     else n = Math.min(MAX_TABLE, Math.max(0, Number.isFinite(n) ? n : 0));
     paintMesaStep(which, n);
     if (which === 'place') {
-      place.mesa = String(n); place.tableNumber = n;
+      if (n >= 1) { place.mesa = String(n); place.tableNumber = n; }
+      else { place.mesa = ''; place.tableNumber = null; }
     } else if (n >= 1) {
       place.mesa = String(n); place.tableNumber = n;
     } else {
@@ -2865,8 +2875,8 @@ const REVIEWS = [];
     }
   }
   function fillMesaSelect() {
-    const n = Number(place.tableNumber || place.mesa) || 1;
-    paintMesaStep('place', n);
+    const n = Number(place.tableNumber || place.mesa);
+    paintMesaStep('place', n >= 1 ? n : 0);
   }
   function paintPlaceDlg() {
     $$('#placeKind .pick').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kind === place.kind)));
@@ -2895,7 +2905,6 @@ const REVIEWS = [];
   }
   function openPlace() {
     if (!place.kind) place.kind = 'dine';
-    if (place.kind === 'dine' && !(Number(place.tableNumber) >= 1)) { place.tableNumber = 1; place.mesa = '1'; }
     const box = $('#placeZones');
     if (box && !box.dataset.ready) {
       box.dataset.ready = '1';
@@ -2903,7 +2912,6 @@ const REVIEWS = [];
         const b = document.createElement('button'); b.type = 'button'; b.dataset.zone = v.id; b.textContent = zoneName(v.id);
         b.addEventListener('click', () => {
           place.zone = v.id;
-          if (!(place.tableNumber >= 1)) { place.mesa = '1'; place.tableNumber = 1; }
           paintPlaceDlg();
         });
         box.appendChild(b);
@@ -2917,7 +2925,6 @@ const REVIEWS = [];
   }
   $$('#placeKind .pick').forEach((b) => b.addEventListener('click', () => {
     place.kind = b.dataset.kind;
-    if (place.kind === 'dine' && !(Number(place.tableNumber) >= 1)) { place.tableNumber = 1; place.mesa = '1'; }
     paintPlaceDlg();
   }));
   $$('#placeTakeKind .pick').forEach((b) => b.addEventListener('click', () => { place.take = b.dataset.take; paintPlaceDlg(); }));
@@ -3012,11 +3019,11 @@ const REVIEWS = [];
     const err = $('#placeErr');
     if (!place.kind) { err.textContent = tr('place.needKind'); return; }
     if (place.kind === 'dine') {
-      const n = parseInt($('#placeMesa').value, 10) || Number(place.tableNumber) || 1;
-      place.mesa = (n >= 1 && n <= MAX_TABLE) ? String(n) : '1';
-      place.tableNumber = (n >= 1 && n <= MAX_TABLE) ? n : 1;
+      const n = parseInt($('#placeMesa').value, 10) || Number(place.tableNumber);
+      place.mesa = (n >= 1 && n <= MAX_TABLE) ? String(n) : '';
+      place.tableNumber = (n >= 1 && n <= MAX_TABLE) ? n : null;
       if (!place.zone) { err.textContent = tr('place.needZone'); return; }
-      if (!place.tableNumber) { err.textContent = tr('place.needZone'); return; }
+      if (!(place.tableNumber >= 1)) { err.textContent = tr('place.needZone'); return; }
       if (!placeReady(place)) { err.textContent = tr('place.needZone'); return; }
     } else if (place.take === 'delivery') {
       place.bairro = ($('#placeBairro') && $('#placeBairro').value.trim()) || place.bairro || '';
@@ -3047,8 +3054,6 @@ const REVIEWS = [];
   });
   $('#placeChip').addEventListener('click', () => openPlace());
   $('#fabOrder').addEventListener('click', () => afterGuest(() => {
-    if (!place.kind) place.kind = 'dine';
-    if (place.kind === 'dine' && !(Number(place.tableNumber) >= 1)) { place.tableNumber = 1; place.mesa = '1'; }
     pendingAdd = null;
     openPlace();
   }));
@@ -4774,8 +4779,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops50"></script>
-<script src="garcom.js?v=ops50"></script>
-<script src="os-bridge.js?v=ops50"></script>
+<script src="os-config.js?v=ops51"></script>
+<script src="garcom.js?v=ops51"></script>
+<script src="os-bridge.js?v=ops51"></script>
 </body>
 </html>
