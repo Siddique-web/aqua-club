@@ -49,7 +49,7 @@ html.gp-open .fabs { visibility: hidden !important; pointer-events: none !import
 @keyframes gp-in { from { opacity: 0; transform: translateY(14px); } }
 .gp *, .gp *::before, .gp *::after { box-sizing: border-box; }
 .gp button { font-family: inherit; }
-.gi { width: 20px; height: 20px; flex: none; }
+.gi { width: 20px; height: 20px; flex: none; overflow: visible; vector-effect: non-scaling-stroke; }
 #gpc { display: grid; gap: 1rem; }
 
 .gp-top {
