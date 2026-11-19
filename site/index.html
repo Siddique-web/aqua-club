@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops46"></script>
+<script src="i18n.js?v=ops49"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,6 +38,7 @@ h1,h2,h3,p{margin:0}
 .skip:focus{left:8px}
 .wrap{width:100%;max-width:1280px;margin-inline:auto;padding-inline:max(.85rem, env(safe-area-inset-left,0px)) max(.85rem, env(safe-area-inset-right,0px))}
 .ico{width:1.4em;height:1.4em;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ico-fill{fill:currentColor;stroke:none}
 .display{font-family:var(--fh);font-weight:800;text-transform:uppercase;line-height:.98;letter-spacing:-.01em;color:#000}
 
 /* botões */
@@ -110,7 +111,8 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .header.open .mmenu{display:block}
 .mmenu ul{list-style:none;margin:0;padding:0}
 .mmenu li{border-bottom:1px solid rgba(0,0,0,.1)}
-.mmenu li a,.mmenu .nav-staff{display:block;width:100%;padding:1rem 0;font:800 1.5rem var(--fh);text-transform:uppercase;color:#000;text-decoration:none;text-align:left;background:none;border:0;cursor:pointer;transition:transform var(--ease),color var(--ease)}
+.mmenu li a,.mmenu .nav-staff{display:flex;align-items:center;gap:.75rem;width:100%;padding:1rem 0;font:800 1.5rem var(--fh);text-transform:uppercase;color:#000;text-decoration:none;text-align:left;background:none;border:0;cursor:pointer;transition:transform var(--ease),color var(--ease)}
+.mmenu li a .ico,.mmenu .nav-staff .ico{width:1.2rem;height:1.2rem;color:var(--cyan-d)}
 .mmenu li a:hover,.mmenu .nav-staff:hover{transform:translateX(8px);color:var(--cyan-d)}
 .mmenu .btn{margin-top:1.5rem;width:100%}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -327,8 +329,24 @@ section{position:relative}
 .pano{height:190px;margin:-1.75rem -1.75rem 1.4rem;background:var(--cyan) center/cover}
 .pano img{width:100%;height:100%;object-fit:cover}
 .hours{list-style:none;margin:0;padding:0}
-.hours li{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.35rem 1rem;padding:.7rem 0;border-bottom:1px dashed var(--cyan-line)}
+.hours li{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.35rem 1rem;padding:.7rem 0;border-bottom:1px dashed var(--cyan-line)}
 .hours li:last-child{border:0}
+.hday{display:inline-flex;align-items:center;gap:.5rem}
+.hday .ico{width:1.15rem;height:1.15rem;color:var(--cyan-d)}
+.wx-now{display:flex;align-items:center;gap:.85rem;margin:1rem 0 0;padding:.9rem 1rem;border-radius:18px;background:#0B1520;color:#fff}
+.wx-now[hidden]{display:none}
+.wx-now .ico{width:2.15rem;height:2.15rem}
+.wx-now.sun .ico{color:#F5C518}
+.wx-now.cloud .ico{color:#9EC9E8}
+.wx-now.rain .ico{color:#5BB4FF}
+.wx-now.storm .ico{color:#FFD700}
+.wx-now b{display:block;font:800 1.25rem/1 var(--fh)}
+.wx-now small{display:block;margin-top:.2rem;font:600 .78rem/1.3 var(--fb);color:rgba(255,255,255,.72)}
+.g-ico-lab{display:inline-flex;align-items:center;gap:.4rem}
+.g-ico-lab .ico{width:1rem;height:1rem;color:var(--cyan-d)}
+.payopt{grid-template-columns:1.5rem 1fr;align-items:center;column-gap:.7rem}
+.payopt .ico{width:1.25rem;height:1.25rem;grid-row:1/span 2}
+.payopt b,.payopt small{grid-column:2}
 .notice{display:flex;gap:.7rem;align-items:flex-start;background:var(--yellow);padding:.9rem 1rem;margin-top:1.2rem;font-weight:500}
 form{display:grid;gap:1rem}
 label{display:grid;gap:.35rem;font:600 .9rem var(--fh)}
@@ -593,6 +611,7 @@ input,select,textarea{border-radius:14px}
 .mtab:hover{border-color:var(--cyan);transform:translateY(-2px)}
 .mtab[aria-selected=true]{background:var(--cyan);border-color:var(--cyan)}
 .mtab-more{display:none!important}
+.mtab-more .ico{width:.85rem;height:.85rem;margin-right:.15rem;vertical-align:-.1rem}
 .mtab-more[aria-expanded=true]{background:var(--yellow);color:#000;border-color:var(--yellow)}
 .mtab-cart{flex:none;position:relative;width:40px;height:40px;border-radius:50%;border:2px solid #000;background:var(--yellow);color:#000;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 16px -10px rgba(0,0,0,.4)}
 .mtab-cart .ico{width:1.2rem;height:1.2rem}
@@ -1087,7 +1106,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops46">
+<link rel="stylesheet" href="garcom.css?v=ops49">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1144,6 +1163,19 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 <symbol id="i-fries" viewBox="0 0 24 24"><path d="M7 11h10l-1.2 9.2H8.2z"/><path d="M9 11V6.2M12 11V5M15 11V7"/></symbol>
 <symbol id="i-burger" viewBox="0 0 24 24"><path d="M6 11c0-3.8 2.5-6.2 6-6.2S18 7.2 18 11H6z"/><path d="M5 13.2h14"/><path d="M6 16h12a2 2 0 0 1-2 2.2H8A2 2 0 0 1 6 16z"/></symbol>
 <symbol id="i-ice" viewBox="0 0 24 24"><path d="M12 11.5 8.2 21h7.6z"/><circle cx="12" cy="8" r="4.1"/></symbol>
+<symbol id="i-apps" viewBox="0 0 24 24"><circle cx="6.5" cy="6.5" r="1.55"/><circle cx="12" cy="6.5" r="1.55"/><circle cx="17.5" cy="6.5" r="1.55"/><circle cx="6.5" cy="12" r="1.55"/><circle cx="12" cy="12" r="1.55"/><circle cx="17.5" cy="12" r="1.55"/><circle cx="6.5" cy="17.5" r="1.55"/><circle cx="12" cy="17.5" r="1.55"/><circle cx="17.5" cy="17.5" r="1.55"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 19.2c.7-3.4 3.5-5.2 7-5.2s6.3 1.8 7 5.2"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="11" width="13" height="10" rx="2.2"/><path d="M8.2 11V8.2a3.8 3.8 0 0 1 7.6 0V11"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12.5" rx="2.2"/><path d="M3 10.2h18M7 15h4"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5.2" width="17" height="15.3" rx="2.2"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4.2l8 7"/><path d="M6.5 10.2V20h11V10.2"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.6"/><path d="M12 3.2v2.2M12 18.6v2.2M3.2 12h2.2M18.6 12h2.2M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6"/></symbol>
+<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7.2 17.5h10.2a3.6 3.6 0 0 0 .4-7.2 5.2 5.2 0 0 0-10-1.5A3.8 3.8 0 0 0 7.2 17.5z"/></symbol>
+<symbol id="i-cloud-sun" viewBox="0 0 24 24"><circle cx="16.2" cy="7.4" r="2.4"/><path d="M16.2 3.4v1.2M20.8 7.4h1.2M19.6 4.2l-.8.8"/><path d="M6.8 18h10a3.4 3.4 0 0 0 .3-6.8 4.8 4.8 0 0 0-9.4-1.2A3.6 3.6 0 0 0 6.8 18z"/></symbol>
+<symbol id="i-rain" viewBox="0 0 24 24"><path d="M7.2 14.2h10.2a3.6 3.6 0 0 0 .4-7.2 5.2 5.2 0 0 0-10-1.5A3.8 3.8 0 0 0 7.2 14.2z"/><path d="M8.5 17.2v2.4M12 16.6v3.2M15.5 17.2v2.4"/></symbol>
+<symbol id="i-storm" viewBox="0 0 24 24"><path d="M7.2 14h10.2a3.6 3.6 0 0 0 .4-7.2 5.2 5.2 0 0 0-10-1.5A3.8 3.8 0 0 0 7.2 14z"/><path d="m11 14.4 2.2 3.2h-2.1L13.4 21"/></symbol>
+<symbol id="i-wind" viewBox="0 0 24 24"><path d="M4 9.2h11.2A2.4 2.4 0 1 0 13 6.4"/><path d="M4 13h14.2A2.4 2.4 0 1 1 16 16"/><path d="M4 16.8h7.2"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.2 5 6.2v5.4c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6.2z"/></symbol>
 </defs></svg>
 
 <!-- CABEÇALHO -->
@@ -1185,12 +1217,12 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
   </div>
   <nav class="mmenu" id="mmenu" data-i18n-aria="nav.mobile">
     <ul>
-      <li><a href="#inicio" data-i18n="nav.home">Início</a></li>
-      <li><a href="#menu" data-i18n="nav.menu">Menu</a></li>
-      <li><a href="#espacos" data-i18n="nav.spaces">Espaços</a></li>
-      <li><a href="#horarios" data-i18n="nav.hours">Horários</a></li>
-      <li><a href="#contactos" data-i18n="nav.contact">Contacto</a></li>
-      <li><button type="button" class="nav-staff" data-open-staff="orders" data-i18n="nav.staff">Área da equipa</button></li>
+      <li><a href="#inicio"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="nav.home">Início</span></a></li>
+      <li><a href="#menu"><svg class="ico ico-fill" aria-hidden="true"><use href="#i-apps"/></svg><span data-i18n="nav.menu">Menu</span></a></li>
+      <li><a href="#espacos"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span data-i18n="nav.spaces">Espaços</span></a></li>
+      <li><a href="#horarios"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg><span data-i18n="nav.hours">Horários</span></a></li>
+      <li><a href="#contactos"><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg><span data-i18n="nav.contact">Contacto</span></a></li>
+      <li><button type="button" class="nav-staff" data-open-staff="orders"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg><span data-i18n="nav.staff">Área da equipa</span></button></li>
     </ul>
     <a class="btn btn-cyan" href="#bilhetes" data-i18n="bookDay">Reservar Dia</a>
   </nav>
@@ -1261,7 +1293,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     </div>
     <div class="mtabs-row">
       <div class="mtabs" id="mtabs" role="tablist" data-i18n-aria="menu.cats"></div>
-      <button type="button" class="mtab mtab-more" id="mtabsMore" hidden aria-expanded="false" aria-controls="mcatDlg">+ Mais</button>
+      <button type="button" class="mtab mtab-more" id="mtabsMore" hidden aria-expanded="false" aria-controls="mcatDlg"><svg class="ico ico-fill" aria-hidden="true"><use href="#i-apps"/></svg> Mais</button>
       <button type="button" class="mtab-cart" id="menuCartBtn" aria-label="Ver o que já escolheu"><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span class="n" id="menuCartN">0</span></button>
     </div>
     <button type="button" class="place-chip" id="placeChip"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span><b id="placeChipT" data-i18n="place.set">Definir onde está</b><small id="placeChipS"></small></span></button>
@@ -1330,21 +1362,29 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <div class="card reveal r-left">
         <div class="pano"><img src="assets/panorama.jpg" alt="Piscina e espaço exterior do Aqua Club" data-i18n-aria="hours.pano" loading="lazy"></div>
         <h3 class="display" data-i18n="hours.open">Horário de funcionamento</h3>
-        <ul class="hours"><li><span data-i18n="hours.wd">Segunda a Sexta</span><strong>09:00 – 18:00</strong></li><li><span data-i18n="hours.sat">Sábados</span><strong>09:00 – 19:00</strong></li><li><span data-i18n="hours.sun">Domingos e Feriados</span><strong>09:00 – 19:00</strong></li></ul>
+        <ul class="hours">
+          <li><span class="hday"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg><span data-i18n="hours.wd">Segunda a Sexta</span></span><strong>09:00 – 18:00</strong></li>
+          <li><span class="hday"><svg class="ico" aria-hidden="true"><use href="#i-cloud-sun"/></svg><span data-i18n="hours.sat">Sábados</span></span><strong>09:00 – 19:00</strong></li>
+          <li><span class="hday"><svg class="ico" aria-hidden="true"><use href="#i-cloud"/></svg><span data-i18n="hours.sun">Domingos e Feriados</span></span><strong>09:00 – 19:00</strong></li>
+        </ul>
+        <div class="wx-now" id="wxNow" hidden>
+          <svg class="ico" id="wxIco" aria-hidden="true"><use href="#i-sun"/></svg>
+          <div><b id="wxTemp"></b><small id="wxLab"></small></div>
+        </div>
       </div>
       <div class="card reveal r-right" id="bilhetes" style="--d:120ms">
         <h3 class="display" data-i18n="hours.bookT">Reserve o seu dia</h3>
         <form id="booking" novalidate>
-          <label data-i18n-label="hours.name">Nome completo<input type="text" name="nome" autocomplete="name" required></label>
-          <label data-i18n-label="hours.date">Data da visita<input type="date" name="data" required></label>
-          <label data-i18n-label="hours.people">Número de pessoas<input type="number" name="pessoas" min="1" max="200" value="2" inputmode="numeric" required></label>
-          <label data-i18n-label="hours.hora">Hora de chegada<input type="time" name="hora" required></label>
+          <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg><span data-i18n="hours.name">Nome completo</span></span><input type="text" name="nome" autocomplete="name" required></label>
+          <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-cal"/></svg><span data-i18n="hours.date">Data da visita</span></span><input type="date" name="data" required></label>
+          <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-group"/></svg><span data-i18n="hours.people">Número de pessoas</span></span><input type="number" name="pessoas" min="1" max="200" value="2" inputmode="numeric" required></label>
+          <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg><span data-i18n="hours.hora">Hora de chegada</span></span><input type="time" name="hora" required></label>
           <p class="book-until" id="bookUntil" hidden></p>
           <p class="book-pay" id="bookPay"></p>
           <div class="book-rules">
             <p data-i18n="hours.rules">Reserva de espaço: +1000 MT por pessoa, tudo consumível. 30 minutos de tolerância de atraso. Se faltar, perde o valor. Máximo 3 horas e meia — a hora de saída é marcada automaticamente.</p>
           </div>
-          <label data-i18n-label="hours.type">Tipo de experiência<select name="tipo"><option value="Piscina &amp; Sol" data-i18n="exp.geral">Piscina &amp; Sol</option><option value="Dia em Família" data-i18n="exp.fam">Dia em Família</option><option value="Almoço ou Jantar" data-i18n="exp.vip">Almoço ou Jantar</option><option value="Grupo &amp; Amigos" data-i18n="exp.grp">Grupo &amp; Amigos</option></select></label>
+          <label><span class="g-ico-lab"><svg class="ico ico-fill" aria-hidden="true"><use href="#i-apps"/></svg><span data-i18n="hours.type">Tipo de experiência</span></span><select name="tipo"><option value="Piscina &amp; Sol" data-i18n="exp.geral">Piscina &amp; Sol</option><option value="Dia em Família" data-i18n="exp.fam">Dia em Família</option><option value="Almoço ou Jantar" data-i18n="exp.vip">Almoço ou Jantar</option><option value="Grupo &amp; Amigos" data-i18n="exp.grp">Grupo &amp; Amigos</option></select></label>
           <button class="btn btn-cyan btn-block" type="submit" data-i18n="hours.send">Enviar pedido por WhatsApp</button>
           <p class="msg" id="msg" role="status" aria-live="polite"></p>
         </form>
@@ -1646,19 +1686,19 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <p class="guest-msg" id="gMsgBanner" role="status"></p>
     </div>
     <form class="guest-form" id="guestFormUp" novalidate>
-      <label>Nome completo<input name="name" id="gName" autocomplete="name" maxlength="80" required placeholder="Como no documento"></label>
-      <label>E-mail válido<input name="email" id="gEmailUp" type="email" autocomplete="email" required placeholder="nome@email.com"></label>
-      <label>Número de WhatsApp<input name="phone" id="gPhone" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="84 000 0000" maxlength="15"></label>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg>Nome completo</span><input name="name" id="gName" autocomplete="name" maxlength="80" required placeholder="Como no documento"></label>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail válido</span><input name="email" id="gEmailUp" type="email" autocomplete="email" required placeholder="nome@email.com"></label>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>Número de WhatsApp</span><input name="phone" id="gPhone" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="84 000 0000" maxlength="15"></label>
       <p class="guest-hint">Tem de ser o contacto onde tem WhatsApp. Fica gravado na sua conta e em todos os pedidos.</p>
-      <label>Palavra-passe<input name="password" id="gPassUp" type="password" autocomplete="new-password" required minlength="6" placeholder="Mínimo 6 caracteres"></label>
-      <label>Confirmar palavra-passe<input name="password2" id="gPass2" type="password" autocomplete="new-password" required minlength="6" placeholder="Repita a palavra-passe"></label>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>Palavra-passe</span><input name="password" id="gPassUp" type="password" autocomplete="new-password" required minlength="6" placeholder="Mínimo 6 caracteres"></label>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Confirmar palavra-passe</span><input name="password2" id="gPass2" type="password" autocomplete="new-password" required minlength="6" placeholder="Repita a palavra-passe"></label>
       <button class="btn btn-cyan btn-block" type="submit">Criar conta e continuar</button>
       <p class="guest-msg" id="gMsgUp" role="alert"></p>
       <p class="guest-note">Ao criar conta aceita que o Aqua Club use estes dados só para pedidos e atendimento.</p>
     </form>
     <form class="guest-form" id="guestFormIn" hidden novalidate>
-      <label>E-mail<input name="email" id="gEmailIn" type="email" autocomplete="username" required placeholder="nome@email.com"></label>
-      <label>Palavra-passe<input name="password" id="gPassIn" type="password" autocomplete="current-password" required minlength="6"></label>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</span><input name="email" id="gEmailIn" type="email" autocomplete="username" required placeholder="nome@email.com"></label>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>Palavra-passe</span><input name="password" id="gPassIn" type="password" autocomplete="current-password" required minlength="6"></label>
       <button class="btn btn-cyan btn-block" type="submit">Entrar</button>
       <p class="guest-msg" id="gMsgIn" role="alert"></p>
     </form>
@@ -2368,7 +2408,7 @@ const REVIEWS = [];
       try { await initBackend(); } catch (e) { /* */ }
       if (callsLive() && AquaCalls.mode && AquaCalls.mode() === 'live') {
         const sid = await AquaCalls.createCall(String(code), reason, loc, DEVICE);
-        if (sid && window.AquaBus) AquaBus.patchCall(localId, { serverId: sid, id: sid });
+        if (sid && window.AquaBus) AquaBus.patchCall(localId, { serverId: sid });
         return sid || localId;
       }
       if (window.AquaOS && AquaOS.live && AquaOS.live()) {
@@ -3922,7 +3962,8 @@ const REVIEWS = [];
       const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
       const short = m.id === 'pos' ? tr('pay.posS') : (m.network ? m.network : tr('pay.mobile'));
       const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'payopt' + (m.id === 'mpesa' ? ' pay-mpesa' : m.id === 'emola' ? ' pay-emola' : ''); b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.innerHTML = `<b>${esc(label)}</b><small>${esc(short)}</small>`;
+      const icn = m.id === 'pos' ? 'i-card' : 'i-phone';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'payopt' + (m.id === 'mpesa' ? ' pay-mpesa' : m.id === 'emola' ? ' pay-emola' : ''); b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${icn}"/></svg><b>${esc(label)}</b><small>${esc(short)}</small>`;
       b.addEventListener('click', () => {
         paySel = Object.assign({}, m, { label, hint }); $$('.payopt', box).forEach((x) => x.setAttribute('aria-checked', String(x === b)));
         if (m.number) {
@@ -4663,9 +4704,46 @@ const REVIEWS = [];
     window.open('https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
   });
 })();
+(function loadWx() {
+  const box = document.getElementById('wxNow');
+  if (!box) return;
+  const tx = (k) => (window.AquaI18n ? AquaI18n.t(k) : k);
+  let last = null;
+  const paint = (temp, code) => {
+    last = { temp, code };
+    let id = 'i-sun', cls = 'sun', lab = tx('hours.wxSun');
+    if (code >= 95) { id = 'i-storm'; cls = 'storm'; lab = tx('hours.wxStorm'); }
+    else if (code >= 51) { id = 'i-rain'; cls = 'rain'; lab = tx('hours.wxRain'); }
+    else if (code >= 3) { id = 'i-cloud'; cls = 'cloud'; lab = tx('hours.wxCloud'); }
+    else if (code >= 1) { id = 'i-cloud-sun'; cls = 'sun'; lab = tx('hours.wxPart'); }
+    else if (code === 0) { id = 'i-sun'; cls = 'sun'; lab = tx('hours.wxSun'); }
+    const use = box.querySelector('use');
+    if (use) use.setAttribute('href', '#' + id);
+    box.className = 'wx-now ' + cls;
+    const tEl = document.getElementById('wxTemp');
+    const lEl = document.getElementById('wxLab');
+    if (tEl) tEl.textContent = Math.round(temp) + ' °C';
+    if (lEl) lEl.textContent = lab + ' · ' + tx('hours.wxBeira');
+    box.hidden = false;
+  };
+  try {
+    const cached = JSON.parse(sessionStorage.getItem('aq.wx') || 'null');
+    if (cached && Date.now() - cached.at < 18e5) paint(cached.temp, cached.code);
+  } catch (e) { /* ignore */ }
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=-19.8436&longitude=34.8389&current=temperature_2m,weather_code&timezone=Africa%2FMaputo')
+    .then((r) => r.json())
+    .then((d) => {
+      const temp = d && d.current && d.current.temperature_2m;
+      const code = d && d.current && d.current.weather_code;
+      if (temp == null) return;
+      try { sessionStorage.setItem('aq.wx', JSON.stringify({ at: Date.now(), temp, code })); } catch (e) { /* ignore */ }
+      paint(temp, code);
+    }).catch(() => {});
+  if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
+})();
 </script>
-<script src="os-config.js?v=ops46"></script>
-<script src="garcom.js?v=ops46"></script>
-<script src="os-bridge.js?v=ops46"></script>
+<script src="os-config.js?v=ops49"></script>
+<script src="garcom.js?v=ops49"></script>
+<script src="os-bridge.js?v=ops49"></script>
 </body>
 </html>

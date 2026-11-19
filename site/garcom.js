@@ -270,7 +270,17 @@
         need().then((c) => {
           if (dead) return;
           ch = c.channel('gp-live-' + Math.random().toString(36).slice(2, 7))
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'waiter_calls' }, () => cb())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'waiter_calls' }, (payload) => {
+              const row = payload && payload.new;
+              if (row && row.id) {
+                const n = norm(row);
+                const i = (S.calls || []).findIndex((c) => String(c.id) === String(n.id));
+                if (i >= 0) S.calls[i] = Object.assign({}, S.calls[i], n);
+                else S.calls = (S.calls || []).concat([n]);
+                if (S.open && S.view === 'app' && S.tab === 'calls') renderTab();
+              }
+              cb();
+            })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => cb())
             .on('postgres_changes', { event: '*', schema: 'public', table: 'presence' }, () => cb())
             .subscribe();
@@ -603,7 +613,8 @@
   const emptyCf = () => ({ q: '', from: '', to: '', hour: '', wday: '', reason: '', zone: 'all', st: '', waiter: '' });
   const S = { open: false, view: 'boot', authTab: 'in', tab: 'orders', me: null, calls: [], mine: null, mineAt: 0, team: null,
     period: 7, hper: 7, zone: 'all', of: emptyOf(), cf: emptyCf(), msg: '', msgType: '', unsub: null, pollT: 0, tickT: 0, lastPend: null, pendingN: 0, soundOn: store.get('aq.gp.sound') !== '0', recovery: false,
-    osDesk: null, osStaff: store.get('aq.os.staff') || '', osMsg: '', osN: 0, osPoll: 0, livePoll: 0, liveCalls: [], lastLive: null };
+    osDesk: null, osStaff: store.get('aq.os.staff') || '', osMsg: '', osN: 0, osPoll: 0, livePoll: 0, liveCalls: [], lastLive: null,
+    heard: new Set(), alertCalls: false, alertOrders: false };
   const mt = (n) => Number(n || 0).toLocaleString('pt-PT') + ' MT';
   function hasOsApi() {
     return !!(window.AquaOS && AquaOS.live && AquaOS.live() && AquaOS.origin && AquaOS.origin());
@@ -636,6 +647,7 @@
         S.osDesk = { orders, calls: S.calls || [], role: (S.me && S.me.role) || 'waiter' };
         S.osMsg = '';
         setOrderBadge(countOpen(orders));
+        pingNewOrders(orders);
         return;
       } catch (e) {
         S.osMsg = e.message || 'Sem ligação aos pedidos na nuvem.';
@@ -653,6 +665,7 @@
       else if (!S.osDesk) S.osMsg = e.message || 'Sem ligação ao sistema de pedidos.';
     }
     setOrderBadge(countOpen(S.osDesk && S.osDesk.orders));
+    pingNewOrders(S.osDesk && S.osDesk.orders);
     })().finally(() => { S._deskBusy = null; });
     return S._deskBusy;
   }
@@ -680,13 +693,41 @@
     const t = document.createElement('div'); t.className = 'gp-toast' + (type ? ' ' + type : ''); t.innerHTML = ic(icon || 'bell') + '<span>' + html + '</span>';
     toasts.appendChild(t); setTimeout(() => { t.style.transition = 'opacity .3s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 320); }, 5500);
   }
-  function alertNew(fresh) {
-    const c = fresh[0];
-    toast('<b>Novo chamado</b> · ' + esc(tableName(c.tableCode)) + ' — ' + esc(REASONS[c.reason] || c.reason) + (fresh.length > 1 ? ' (+' + (fresh.length - 1) + ')' : ''), 'bell');
+  function heardKey(kind, row) {
+    if (kind === 'call') return 'c:' + callMergeKey(row);
+    return 'o:' + String((row && (row.id || row.code)) || '');
+  }
+  function ringOnce(kind, rows, title, body) {
+    if (!S.heard) S.heard = new Set();
+    const list = (rows || []).filter(Boolean);
+    const flag = kind === 'call' ? 'alertCalls' : 'alertOrders';
+    if (!S[flag]) {
+      list.forEach((r) => S.heard.add(heardKey(kind, r)));
+      S[flag] = true;
+      return [];
+    }
+    const fresh = list.filter((r) => !S.heard.has(heardKey(kind, r)));
+    list.forEach((r) => S.heard.add(heardKey(kind, r)));
+    if (!fresh.length) return [];
     if (S.soundOn) beep();
     try { if (navigator.vibrate) navigator.vibrate([180, 80, 180]); } catch (e) { /* */ }
     flashTitle(fresh.length);
-    if (document.hidden && 'Notification' in window && Notification.permission === 'granted') { try { new Notification('Novo chamado — ' + tableName(c.tableCode), { body: REASONS[c.reason] || '', tag: 'aq-call' }); } catch (e) { /* */ } }
+    if (title) toast(title, 'bell');
+    if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+      try { new Notification(String(title || 'Aqua Club').replace(/<[^>]+>/g, ''), { body: body || '', tag: 'aq-' + kind }); } catch (e) { /* */ }
+    }
+    return fresh;
+  }
+  function pingNewCalls(pending) {
+    const pend = pending || [];
+    const c = pend[0];
+    ringOnce('call', pend, c
+      ? '<b>Novo chamado</b> · ' + esc(tableName(c.tableCode)) + ' — ' + esc(REASONS[c.reason] || c.reason) + (pend.length > 1 ? ' (+' + (pend.length - 1) + ')' : '')
+      : '', c ? (REASONS[c.reason] || '') : '');
+  }
+  function pingNewOrders(orders) {
+    const open = (orders || []).filter((o) => o && o.status !== 'cancelled');
+    ringOnce('order', open, open[0] ? '<b>Novo pedido</b> · ' + esc(open[0].code || open[0].customer_name || 'Cliente') : '', 'Pedido novo no Aqua Club');
   }
 
   /* ====================================================================== BARRA INFERIOR */
@@ -827,9 +868,7 @@
     };
   }
   function mergeLiveIntoCalls() {
-    const live = S.liveCalls || [];
-    const demo = (S.calls || []).filter((c) => !c.live && !String(c.id).startsWith('os-'));
-    S.calls = live.concat(demo);
+    S.calls = foldCalls([].concat(S.calls || [], S.liveCalls || []));
   }
   function busCalls() {
     try {
@@ -856,45 +895,71 @@
         const prev = seen.get(k);
         if (!prev || statusRank(c.status) > statusRank(prev.status)) seen.set(k, c);
       });
-      mapped = Array.from(seen.values());
+      mapped = foldCalls(Array.from(seen.values()));
       const prev = sigOf(S.liveCalls || []);
       S.liveCalls = mapped;
       mergeLiveIntoCalls();
-      const pend = mapped.filter((c) => c.status === 'pending');
-      setBadge(pend.length);
-      if (S.lastLive) {
-        const fresh = pend.filter((c) => !S.lastLive.has(c.id));
-        if (fresh.length) alertNew(fresh);
-      }
-      S.lastLive = new Set(pend.map((c) => c.id));
-      if (S.open && S.view === 'app' && ['calls', 'orders', 'dash', 'member', 'team'].includes(S.tab) && sigOf(mapped) !== prev) renderTab();
+      paintCallBadge();
+      if (!document.hidden && S.open && S.view === 'app' && ['calls', 'orders', 'dash', 'member', 'team'].includes(S.tab) && sigOf(mapped) !== prev) renderTab();
     } catch (e) { /* */ }
   }
   function applyCallLists(osId, patch) {
     const st = patch.status === 'closed' ? 'completed' : patch.status;
+    const key = String(osId).replace(/^os-/, '');
     const touch = (c) => {
       if (!c) return;
-      const key = String(osId).replace(/^os-/, '');
-      if (callMergeKey(c).replace(/^os-/, '') !== key && String(c.id) !== String(osId)) return;
+      const ck = callMergeKey(c);
+      const want = callMergeKey({ id: osId, osId: osId, serverId: osId });
+      if (ck !== want && String(c.id) !== String(osId) && String(c.id) !== key && String(c.osId || '') !== key) return;
       c.status = st;
       if (patch.accepted_at) { c.acceptedAt = patch.accepted_at; c.accepted_at = patch.accepted_at; }
+      else if (st === 'pending') { c.acceptedAt = null; c.accepted_at = null; }
       if (patch.closed_at) { c.completedAt = patch.closed_at; c.closed_at = patch.closed_at; }
-      if (patch.waiterName) { c.by = patch.waiterName; c.waiterName = patch.waiterName; }
+      if (patch.waiterName != null) { c.by = patch.waiterName; c.waiterName = patch.waiterName; }
+      if (patch.byUser != null) c.byUser = patch.byUser;
+      if (st === 'pending') { c.by = ''; c.waiterName = ''; c.byUser = null; }
     };
     (S.liveCalls || []).forEach(touch);
     (S.calls || []).forEach(touch);
     (S.mine || []).forEach(touch);
     if (S.osDesk && S.osDesk.calls) S.osDesk.calls.forEach(touch);
   }
+  function isUuid(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id || '')); }
+  function cloudCallId(id) {
+    const raw = String(id || '').replace(/^os-/, '');
+    if (isUuid(raw)) return raw;
+    const hit = mergedCalls().find((c) => {
+      const a = String(c.id || '').replace(/^os-/, '');
+      const b = String(c.osId || c.serverId || '').replace(/^os-/, '');
+      return a === String(id) || a === raw || b === raw || callMergeKey(c) === callMergeKey({ id: raw, osId: raw });
+    });
+    const cand = hit && String(hit.osId || hit.serverId || hit.id || '').replace(/^os-/, '');
+    return isUuid(cand) ? cand : raw;
+  }
+  async function persistCloudCall(id, action) {
+    const raw = cloudCallId(id);
+    const be = backend();
+    if (!be || !be.acceptCall) return true;
+    if (be.mode === 'live' && !isUuid(raw)) return true;
+    try {
+      if (action === 'accept') return !!(await be.acceptCall(raw));
+      if (action === 'complete') return !!(await be.completeCall(raw));
+      if (action === 'release') return !!(await be.releaseCall(raw));
+    } catch (e) { return false; }
+    return true;
+  }
   async function finishStaffCall(id, action) {
     const osId = String(id).replace(/^os-/, '');
     const now = new Date().toISOString();
     const name = (S.me && S.me.name) || 'Garçom';
+    const uid = (S.me && (S.me.user_id || S.me.id)) || null;
+    const saved = await persistCloudCall(id, action);
+    if (!saved) return false;
     const patch = action === 'accept'
-      ? { status: 'accepted', accepted_at: now, waiterName: name }
+      ? { status: 'accepted', accepted_at: now, waiterName: name, byUser: uid }
       : action === 'complete'
-        ? { status: 'closed', closed_at: now }
-        : { status: 'pending', accepted_at: null, waiterName: '', waiter_id: null };
+        ? { status: 'closed', closed_at: now, waiterName: name, byUser: uid }
+        : { status: 'pending', accepted_at: null, waiterName: '', waiter_id: null, byUser: null };
     const path = action === 'accept' ? '/live/calls/' + osId + '/accept'
       : action === 'release' ? '/live/calls/' + osId + '/release'
         : '/live/calls/' + osId + '/close';
@@ -908,7 +973,11 @@
       if (remote.call.closed_at) patch.closed_at = remote.call.closed_at;
       if (remote.call.waiterName) patch.waiterName = remote.call.waiterName;
     }
-    if (window.AquaBus) AquaBus.patchCall(osId, patch);
+    if (window.AquaBus) {
+      AquaBus.patchCall(osId, patch);
+      const cloud = cloudCallId(id);
+      if (cloud !== osId) AquaBus.patchCall(cloud, patch);
+    }
     applyCallLists(osId, patch);
     try {
       window.dispatchEvent(new CustomEvent('aq-call', { detail: Object.assign({ id: osId, serverId: osId }, patch) }));
@@ -921,16 +990,21 @@
       action === 'release' ? '' : 'ok'
     );
     S.mineAt = 0;
+    if (action === 'accept' && S.tab !== 'calls') S.tab = 'calls';
     await refreshLiveCalls();
     try { await loadOsDesk(); } catch (e) { /* */ }
     await refreshCalls();
     renderTab();
+    try {
+      const card = root && root.querySelector('.gc.mine[data-id="' + CSS.escape(String(id)) + '"], .gc.mine');
+      if (card) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    } catch (e) { /* */ }
     return true;
   }
   function startLiveCalls() {
     if (S.livePoll) return;
     refreshLiveCalls();
-    S.livePoll = setInterval(() => { if (!document.hidden) refreshLiveCalls(); }, 5000);
+    S.livePoll = setInterval(() => { refreshLiveCalls(); }, 5000);
     if (!window.__aqStaffUp) {
       window.__aqStaffUp = true;
       const bump = () => {
@@ -951,9 +1025,9 @@
     const origin = (window.AquaOS && AquaOS.origin && AquaOS.origin()) || '';
     if (window.io && !S.osSock) {
       S.osSock = window.io(origin || undefined, { transports: ['websocket', 'polling'], withCredentials: true });
-      S.osSock.on('call:new', () => refreshLiveCalls());
-      S.osSock.on('call:updated', () => refreshLiveCalls());
-      S.osSock.on('order:new', () => { if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) loadOsDesk().then(() => renderTab()); });
+      S.osSock.on('call:new', () => { refreshLiveCalls(); refreshCalls(); });
+      S.osSock.on('call:updated', () => { refreshLiveCalls(); refreshCalls(); });
+      S.osSock.on('order:new', () => { loadOsDesk().then(() => { pingNewOrders(S.osDesk && S.osDesk.orders); if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) renderTab(); }); });
       return;
     }
     if (!window.io && origin && !document.querySelector('script[data-aq-io]')) {
@@ -965,11 +1039,11 @@
     }
   }
   function pulseLive() {
-    if (document.hidden) return;
     refreshCalls();
+    if (document.hidden) return;
     beatPresence();
     loadOsDesk().then(() => {
-      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'calls', 'people', 'tables'].includes(S.tab)) renderTab();
+      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'people', 'tables'].includes(S.tab)) renderTab();
     }).catch(() => {});
     if (S.open && S.view === 'app' && S.tab === 'people' && S.me && S.me.role === 'admin') {
       const now = Date.now();
@@ -990,9 +1064,8 @@
   function startWork() {
     stopWork(); const be = backend(); if (!be) return;
     S.unsub = be.subscribe(() => { clearTimeout(deb); deb = setTimeout(pulseLive, 180); });
-    S.pollT = setInterval(() => { if (!document.hidden) pulseLive(); }, 8000);
+    S.pollT = setInterval(() => { pulseLive(); }, 8000);
     S.tickT = setInterval(() => { if (!document.hidden) tick(); }, 1000);
-    S.alarmT = setInterval(() => { if (!document.hidden) nagPending(); }, 4000);
     if (!S._visBound) {
       S._visBound = true;
       document.addEventListener('visibilitychange', () => { if (!document.hidden && S.me && S.open) pulseLive(); });
@@ -1000,13 +1073,6 @@
     pulseLive();
     startLiveCalls();
     beatPresence();
-  }
-  function nagPending() {
-    if (!S.soundOn || !S.me || !S.me.active) return;
-    const pend = [].concat(S.calls || [], S.liveCalls || []).filter((c) => c && c.status === 'pending');
-    if (!pend.length) return;
-    beep();
-    try { if (navigator.vibrate) navigator.vibrate([160, 70, 160]); } catch (e) { /* */ }
   }
   function stopWork() {
     if (S.unsub) { try { S.unsub(); } catch (e) { /* */ } }
@@ -1022,10 +1088,10 @@
     try {
       const list = await be.listCalls(Date.now() - 864e5), prev = sigOf(S.calls); S.calls = list;
       mergeLiveIntoCalls();
-      const pend = S.calls.filter((c) => c.status === 'pending'); setBadge(pend.length);
-      if (S.lastPend) { const fresh = pend.filter((c) => !S.lastPend.has(c.id)); if (fresh.length) alertNew(fresh); }
-      S.lastPend = new Set(pend.map((c) => c.id));
-      if (S.open && S.view === 'app' && ['calls', 'dash', 'member', 'team', 'stats'].includes(S.tab) && sigOf(list) !== prev) renderTab();
+      const pend = mergedCalls().filter((c) => c.status === 'pending');
+      paintCallBadge();
+      pingNewCalls(pend);
+      if (!document.hidden && S.open && S.view === 'app' && ['calls', 'dash', 'member', 'team', 'stats'].includes(S.tab) && sigOf(S.calls) !== prev) renderTab();
     } catch (e) { /* offline: tenta no próximo ciclo */ }
   }
   function tick() {
@@ -1170,10 +1236,24 @@
 
   /* ====================================================================== DASHBOARD ADMIN */
   const ZONE_CYCLE = ['rooftop', 'piscina', 'sala-principal'];
+  function callIsMine(c, me) {
+    if (!c || !me) return false;
+    const uid = String(me.user_id || me.id || '');
+    const byU = String(c.byUser || c.accepted_by_user || c.waiter_id || '');
+    if (uid && byU && (byU === uid || byU === 'os-w-' + uid || byU === String(me.id))) return true;
+    const name = String(me.name || '').trim().toLowerCase();
+    const by = String(c.by || c.waiterName || '').trim().toLowerCase();
+    return !!(name && by && by === name);
+  }
   function callMergeKey(c) {
-    const raw = String(c.osId || c.serverId || c.id || '').replace(/^os-/, '');
-    if (/^\d+$/.test(raw)) return 'os-' + raw;
-    return String(c.id || '');
+    if (!c) return '';
+    const sid = String(c.osId || c.serverId || '').replace(/^os-/, '');
+    const id = String(c.id || '').replace(/^os-/, '');
+    if (isUuid(sid)) return 'sb-' + sid.toLowerCase();
+    if (isUuid(id)) return 'sb-' + id.toLowerCase();
+    if (/^\d+$/.test(sid)) return 'os-' + sid;
+    if (/^\d+$/.test(id)) return 'os-' + id;
+    return String(c.id || id || '');
   }
   function statusRank(s) {
     if (s === 'cancelled') return 4;
@@ -1182,16 +1262,19 @@
     if (s === 'pending') return 1;
     return 0;
   }
-  function mergedCalls() {
+  function foldCalls(list) {
     const cmap = new Map();
-    [].concat(S.calls || [], S.liveCalls || [], S.mine || [], (S.osDesk && S.osDesk.calls) || [], (S.team && S.team.calls) || []).forEach((row) => {
+    (list || []).forEach((row) => {
       if (!row) return;
       const c = row.tableCode || row.live || row.osId ? row : mapOsCall(row);
       const id = callMergeKey(c);
       if (!id) return;
       const st = c.status === 'closed' ? 'completed' : c.status;
       const prev = cmap.get(id);
-      if (prev && statusRank(prev.status) > statusRank(st)) return;
+      if (prev && statusRank(prev.status) > statusRank(st)) {
+        cmap.set(id, Object.assign({}, c, prev, { id, status: prev.status }));
+        return;
+      }
       cmap.set(id, Object.assign({}, prev || {}, c, {
         id,
         status: st,
@@ -1199,10 +1282,17 @@
         acceptedAt: c.acceptedAt || c.accepted_at || (prev && prev.acceptedAt),
         completedAt: c.completedAt || c.closed_at || (prev && prev.completedAt),
         by: c.by || c.waiterName || (prev && prev.by) || '',
-        byUser: c.byUser || c.waiter_id || (prev && prev.byUser) || null
+        byUser: c.byUser || c.accepted_by_user || (prev && prev.byUser) || null,
+        osId: c.osId || c.serverId || (prev && prev.osId) || null
       }));
     });
     return Array.from(cmap.values());
+  }
+  function mergedCalls() {
+    return foldCalls([].concat(S.calls || [], S.liveCalls || [], S.mine || [], (S.osDesk && S.osDesk.calls) || [], (S.team && S.team.calls) || []));
+  }
+  function paintCallBadge() {
+    setBadge(mergedCalls().filter((c) => c.status === 'pending').length);
   }
   function orderMs(o) { return Date.parse(o.created_at || o.ts || 0) || Number(o.ts) || 0; }
   function deskOrders() { return ((S.osDesk && S.osDesk.orders) || []).filter((o) => o && o.status !== 'cancelled'); }
@@ -1770,7 +1860,7 @@
   function tabCalls() {
     const me = S.me, t0 = startOfDay(Date.now()), raw = mergedCalls(), admin = me.role === 'admin';
     const all = filterCalls(raw);
-    const isMine = (c) => c.byUser === me.user_id || c.by === me.name || (admin && (c.byUser === 'live' || !c.by));
+    const isMine = (c) => callIsMine(c, me);
     const zf = () => true;
     const pendAll = all.filter((c) => c.status === 'pending'), pend = pendAll.filter(zf).sort((a, b) => ts(a.createdAt) - ts(b.createdAt));
     const mine = all.filter((c) => c.status === 'accepted' && isMine(c)).sort((a, b) => ts(a.acceptedAt) - ts(b.acceptedAt));
@@ -1782,7 +1872,9 @@
       '<div class="gp-sec"><span>Por atender</span><span class="n">' + pend.length + '</span></div>' +
       (pend.length ? '<div class="gp-list">' + pend.map(cardPending).join('') + '</div>'
         : '<div class="gp-card gp-empty">' + ic('spark') + '<b>Tudo calmo</b>Nenhum chamado à espera' + (S.zone !== 'all' ? ' nesta zona' : '') + '. Avisamos assim que alguém chamar.</div>') +
-      (mine.length ? '<div class="gp-sec"><span>Em curso comigo</span><span class="n">' + mine.length + '</span></div><div class="gp-list">' + mine.map((c) => cardActive(c, true, admin)).join('') + '</div>' : '') +
+      '<div class="gp-sec"><span>Em curso comigo</span><span class="n">' + mine.length + '</span></div>' +
+      (mine.length ? '<div class="gp-list">' + mine.map((c) => cardActive(c, true, admin)).join('') + '</div>'
+        : '<div class="gp-card gp-empty">' + ic('check') + '<b>Nada em curso</b>Quando aceitar um chamado, fica aqui até concluir.</div>') +
       (others.length ? '<div class="gp-sec"><span>Em curso (colegas)</span><span class="n">' + others.length + '</span></div><div class="gp-list">' + others.map((c) => cardActive(c, false, admin)).join('') + '</div>' : '') +
       (doneT.length ? '<div class="gp-sec"><span>Concluídos por mim hoje</span><span class="n">' + doneT.length + '</span></div><div class="gp-list">' + doneT.slice(0, 6).map((c) =>
         '<article class="gc done"><div class="gc-top"><span class="gc-table">' + esc(tableName(c.tableCode)) + '</span><span class="gp-chip ok">' + hhmm(ts(c.completedAt)) + '</span></div><small class="gp-muted">' + esc(REASONS[c.reason] || c.reason) +
