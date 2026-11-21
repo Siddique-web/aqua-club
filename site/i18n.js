@@ -2842,6 +2842,10 @@
       const toggle = bar.querySelector('.lang-btn');
       if (toggle) toggle.setAttribute('aria-expanded', 'false');
     });
+    document.querySelectorAll('.lang-menu').forEach((menu) => {
+      menu.classList.remove('open');
+      if (menu.close && menu.open) { try { menu.close(); } catch (e) { /* */ } }
+    });
     document.documentElement.classList.remove('lang-open');
   }
   function setLang(next) {
@@ -2853,32 +2857,66 @@
   }
   function bootBar() {
     const bars = Array.from(document.querySelectorAll('.langpick'));
+    const menus = [];
+    let watching = false;
+    const onWin = () => { bars.forEach(placeMenu); };
+    const watch = (on) => {
+      if (on === watching) return;
+      watching = on;
+      if (on) {
+        window.addEventListener('resize', onWin);
+        window.addEventListener('scroll', onWin, { passive: true, capture: true });
+      } else {
+        window.removeEventListener('resize', onWin);
+        window.removeEventListener('scroll', onWin, { capture: true });
+      }
+    };
+    const hideMenu = (menu) => {
+      menu.classList.remove('open');
+      if (menu.close && menu.open) { try { menu.close(); } catch (e) { /* */ } }
+    };
     const closeAll = () => {
       bars.forEach((bar) => {
         bar.classList.remove('open');
         const b = bar.querySelector('.lang-btn');
         if (b) b.setAttribute('aria-expanded', 'false');
       });
+      menus.forEach(hideMenu);
       document.documentElement.classList.remove('lang-open');
+      watch(false);
     };
     const placeMenu = (bar) => {
       const btn = bar.querySelector('.lang-btn');
-      const menu = bar.querySelector('.lang-menu');
+      const menu = bar._langMenu;
       if (!btn || !menu || !bar.classList.contains('open')) return;
       const r = btn.getBoundingClientRect();
       const vw = window.innerWidth;
+      const vh = window.innerHeight;
       const width = Math.min(280, Math.max(220, vw - 16));
       let left = Math.round(r.right - width);
       if (left < 8) left = 8;
       if (left + width > vw - 8) left = Math.max(8, vw - width - 8);
-      menu.style.top = Math.round(r.bottom + 8) + 'px';
-      menu.style.left = left + 'px';
+      const mh = menu.offsetHeight || 320;
+      let top = Math.round(r.bottom + 8);
+      if (top + mh > vh - 8) top = Math.max(8, Math.round(r.top - mh - 8));
+      menu.style.position = 'fixed';
+      menu.style.zIndex = '10000';
       menu.style.right = 'auto';
+      menu.style.bottom = 'auto';
+      menu.style.margin = '0';
+      menu.style.top = top + 'px';
+      menu.style.left = left + 'px';
       menu.style.width = width + 'px';
     };
-    bars.forEach((bar) => {
+    bars.forEach((bar, i) => {
       const btn = bar.querySelector('.lang-btn');
-      if (!btn) return;
+      const menu = bar.querySelector('.lang-menu') || bar._langMenu;
+      if (!btn || !menu) return;
+      if (!menu.id) menu.id = 'langMenu-' + i;
+      btn.setAttribute('aria-controls', menu.id);
+      if (document.body && menu.parentElement !== document.body) document.body.appendChild(menu);
+      bar._langMenu = menu;
+      menus.push(menu);
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -2886,12 +2924,24 @@
         closeAll();
         if (!was) {
           bar.classList.add('open');
+          menu.classList.add('open');
           document.documentElement.classList.add('lang-open');
           btn.setAttribute('aria-expanded', 'true');
+          if (typeof menu.showModal === 'function' && !menu.open) {
+            try { menu.showModal(); } catch (err) {
+              try { menu.show(); } catch (e2) { /* */ }
+            }
+          }
           placeMenu(bar);
+          watch(true);
         }
       });
-      bar.querySelectorAll('[data-lang]').forEach((opt) => {
+      menu.addEventListener('cancel', (e) => { e.preventDefault(); closeAll(); });
+      menu.addEventListener('click', (e) => {
+        const box = menu.getBoundingClientRect();
+        if (e.clientX < box.left || e.clientX > box.right || e.clientY < box.top || e.clientY > box.bottom) closeAll();
+      });
+      menu.querySelectorAll('[data-lang]').forEach((opt) => {
         opt.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -2900,11 +2950,11 @@
       });
     });
     document.addEventListener('pointerdown', (e) => {
-      if (![...bars].some((bar) => bar.contains(e.target))) closeAll();
+      const t = e.target;
+      if (bars.some((bar) => bar.contains(t)) || menus.some((m) => m.contains(t))) return;
+      closeAll();
     });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
-    window.addEventListener('resize', () => bars.forEach(placeMenu));
-    window.addEventListener('scroll', () => bars.forEach(placeMenu), { passive: true });
     applyDom();
   }
 

@@ -6,9 +6,10 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops69"></script>
+<script src="i18n.js?v=ops70"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/story-01.webp" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -23,10 +24,11 @@
   --ease:.3s ease;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-html{scroll-behavior:smooth;scroll-padding-top:calc(var(--head-bar) + 16px);background:#fff;max-width:100%;overflow-x:clip}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--head-bar) + 16px);background:#fff;max-width:100%;overflow-x:hidden}
+html.lang-open,html.lang-open body{overflow:visible}
 #inicio{scroll-margin-top:0}
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;max-width:100%;overflow-x:clip;background:#fff;color:var(--ink);font:400 1rem/1.65 var(--fb);-webkit-font-smoothing:antialiased}
+body{margin:0;max-width:100%;overflow-x:hidden;background:#fff;color:var(--ink);font:400 1rem/1.65 var(--fb);-webkit-font-smoothing:antialiased}
 img,svg,video{display:block;max-width:100%}
 .wrap,.header,.band,.cta,.cta-stack,.brand-grid,.row,.mgrid,.bk-grid,.menu-intro,.wall-panel,.cf-wrap,.shop-card{min-width:0;max-width:100%}
 a{color:var(--cyan-d)}
@@ -82,7 +84,7 @@ html.lang-open .header{z-index:240}
 .lang-btn:hover,.langpick.open .lang-btn{background:var(--cyan);border-color:var(--cyan)}
 .lang-btn .chev{width:.85rem;height:.85rem;transition:transform var(--ease)}
 .langpick.open .lang-btn .chev{transform:rotate(180deg)}
-.flag{--s:1.7rem;position:relative;display:inline-block;width:var(--s);height:var(--s);flex:none;border-radius:50%;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.12);background:#ccc}
+.flag{--s:1.7rem;position:relative;display:inline-block;width:var(--s);height:var(--s);flex:none;border-radius:50%;overflow:hidden;isolation:isolate;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.12);background:#ccc}
 .lang-btn .flag{--s:1.85rem;box-shadow:0 0 0 2px #fff,0 0 0 3px #000,0 2px 6px rgba(0,0,0,.18)}
 .lang-btn:hover .flag,.langpick.open .lang-btn .flag{box-shadow:0 0 0 2px var(--cyan),0 0 0 3px #000,0 2px 6px rgba(0,0,0,.18)}
 .flag.pop{animation:flagpop .38s cubic-bezier(.2,1.4,.3,1)}
@@ -95,8 +97,9 @@ html.lang-open .header{z-index:240}
 .flag[data-flag=it]{background:linear-gradient(90deg,#009246 0 33.4%,#fff 33.4% 66.6%,#CE2B37 66.6%)}
 .flag[data-flag=zh]{background:#DE2910}
 .flag[data-flag=zh]::after{content:"";position:absolute;left:22%;top:24%;width:32%;height:32%;background:#FFDE00;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
-.lang-menu{display:none;position:fixed;z-index:250;min-width:min(280px,calc(100vw - 1.2rem));max-width:calc(100vw - 1rem);max-height:min(70dvh,28rem);overflow:auto;-webkit-overflow-scrolling:touch;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px;box-shadow:0 22px 44px -18px rgba(0,40,80,.45)}
-.langpick.open .lang-menu{display:grid;gap:.15rem}
+dialog.lang-menu{display:none;position:fixed;inset:auto;top:0;left:0;margin:0;padding:.4rem;z-index:10000;box-sizing:border-box;width:min(280px,calc(100vw - 1.2rem));max-width:calc(100vw - 1rem);max-height:min(70dvh,28rem);overflow:auto;-webkit-overflow-scrolling:touch;background:#fff;color:#000;border:2px solid #000;border-radius:16px;box-shadow:0 22px 44px -18px rgba(0,40,80,.45)}
+dialog.lang-menu[open]{display:grid;gap:.15rem}
+dialog.lang-menu::backdrop{background:transparent}
 .lang-menu button{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;width:100%;min-height:48px;padding:.4rem .7rem;border:0;border-radius:11px;background:transparent;color:#000;font:600 .95rem var(--fb);text-align:left;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .lang-menu button .flag{--s:1.55rem}
 .lang-menu button b{font:800 .68rem var(--fh);letter-spacing:.08em;color:var(--muted)}
@@ -403,7 +406,7 @@ input:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 
 @media(min-width:900px){.info-grid{grid-template-columns:1fr 1fr}}
 
 /* rodapé */
-.footer{background:#000;color:#fff;border-top:4px solid var(--cyan)}
+.footer{background:#000;color:#fff;border-top:4px solid var(--cyan);content-visibility:auto;contain-intrinsic-size:1px 520px}
 .f-grid{display:grid;gap:3rem;padding:4rem 0}
 .footer h2{font:800 1.15rem var(--fh);text-transform:uppercase;color:#fff}
 .footer .brand span{color:#fff}
@@ -1172,7 +1175,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops69">
+<link rel="stylesheet" href="garcom.css?v=ops70">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1273,20 +1276,20 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
         <span id="accChipName">Conta</span>
       </button>
       <div class="langpick" id="langBar">
-        <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="langPick">
+        <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="langMenuHead" data-i18n-aria="langPick">
           <span class="flag" id="langFlag" data-flag="pt" aria-hidden="true"></span>
           <span data-i18n="lang">Língua</span>
           <svg class="ico chev" aria-hidden="true"><use href="#i-chev"/></svg>
         </button>
-        <div class="lang-menu" role="listbox" data-i18n-aria="langPick">
+        <dialog class="lang-menu" id="langMenuHead" role="listbox" data-i18n-aria="langPick">
           <button type="button" role="option" data-lang="pt" class="on"><span class="flag" data-flag="pt" aria-hidden="true"></span>Português <b>PT</b></button>
           <button type="button" role="option" data-lang="en"><span class="flag" data-flag="en" aria-hidden="true"></span>English <b>EN</b></button>
           <button type="button" role="option" data-lang="es"><span class="flag" data-flag="es" aria-hidden="true"></span>Español <b>ES</b></button>
           <button type="button" role="option" data-lang="fr"><span class="flag" data-flag="fr" aria-hidden="true"></span>Français <b>FR</b></button>
           <button type="button" role="option" data-lang="it"><span class="flag" data-flag="it" aria-hidden="true"></span>Italiano <b>IT</b></button>
           <button type="button" role="option" data-lang="zh"><span class="flag" data-flag="zh" aria-hidden="true"></span>中文 <b>中</b></button>
-    </div>
-  </div>
+        </dialog>
+      </div>
       <a class="btn btn-cyan" href="#bilhetes" data-i18n="bookDay">Reservar Dia</a>
       <button class="burger" id="burger" type="button" data-i18n-aria="openMenu" aria-expanded="false" aria-controls="mmenu"><svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg></button>
     </div>
@@ -1305,19 +1308,19 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
         <b id="wxTempM"></b>
       </a>
       <div class="langpick m-lang">
-        <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="langPick">
+        <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="langMenuMobile" data-i18n-aria="langPick">
           <span class="flag" data-flag="pt" aria-hidden="true"></span>
           <span data-i18n="lang">Língua</span>
           <svg class="ico chev" aria-hidden="true"><use href="#i-chev"/></svg>
         </button>
-        <div class="lang-menu" role="listbox" data-i18n-aria="langPick">
+        <dialog class="lang-menu" id="langMenuMobile" role="listbox" data-i18n-aria="langPick">
           <button type="button" role="option" data-lang="pt" class="on"><span class="flag" data-flag="pt" aria-hidden="true"></span>Português <b>PT</b></button>
           <button type="button" role="option" data-lang="en"><span class="flag" data-flag="en" aria-hidden="true"></span>English <b>EN</b></button>
           <button type="button" role="option" data-lang="es"><span class="flag" data-flag="es" aria-hidden="true"></span>Español <b>ES</b></button>
           <button type="button" role="option" data-lang="fr"><span class="flag" data-flag="fr" aria-hidden="true"></span>Français <b>FR</b></button>
           <button type="button" role="option" data-lang="it"><span class="flag" data-flag="it" aria-hidden="true"></span>Italiano <b>IT</b></button>
           <button type="button" role="option" data-lang="zh"><span class="flag" data-flag="zh" aria-hidden="true"></span>中文 <b>中</b></button>
-        </div>
+        </dialog>
       </div>
     </div>
     <ul>
@@ -5234,8 +5237,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops69"></script>
-<script src="garcom.js?v=ops69"></script>
-<script src="os-bridge.js?v=ops69"></script>
+<script src="os-config.js?v=ops70"></script>
+<script src="garcom.js?v=ops70"></script>
+<script src="os-bridge.js?v=ops70"></script>
 </body>
 </html>

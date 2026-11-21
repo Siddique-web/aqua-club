@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Termos de uso e privacidade do Aqua Club — notas de conferência, identificação fiscal e tratamento de dados na Beira.">
 <title data-i18n="legal.title">Termos de uso e privacidade — Aqua Club</title>
-<script src="i18n.js?v=ops69"></script>
+<script src="i18n.js?v=ops70"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,8 +37,9 @@ html.lang-open .header{z-index:240}
 .flag[data-flag=fr]{background:linear-gradient(90deg,#0055A4 0 33.4%,#fff 33.4% 66.6%,#EF4135 66.6%)}
 .flag[data-flag=it]{background:linear-gradient(90deg,#009246 0 33.4%,#fff 33.4% 66.6%,#CE2B37 66.6%)}
 .flag[data-flag=zh]{background:#DE2910}
-.lang-menu{display:none;position:fixed;z-index:250;min-width:min(280px,calc(100vw - 1.2rem));max-height:min(70dvh,28rem);overflow:auto;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px}
-.langpick.open .lang-menu{display:grid;gap:.15rem}
+dialog.lang-menu{display:none;position:fixed;inset:auto;top:0;left:0;margin:0;padding:.4rem;z-index:10000;box-sizing:border-box;width:min(280px,calc(100vw - 1.2rem));max-height:min(70dvh,28rem);overflow:auto;background:#fff;border:2px solid #000;border-radius:16px}
+dialog.lang-menu[open]{display:grid;gap:.15rem}
+dialog.lang-menu::backdrop{background:transparent}
 .lang-menu button{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;width:100%;min-height:44px;padding:.4rem .7rem;border:0;border-radius:11px;background:transparent;cursor:pointer;font:600 .95rem var(--fb);text-align:left}
 .lang-menu button.on,.lang-menu button:hover{background:var(--cyan-soft)}
 .main{padding:1.4rem 0 3rem}
@@ -61,18 +62,18 @@ h2{font:800 .95rem var(--fh);letter-spacing:.04em;text-transform:uppercase}
   </a>
   <div class="head-right">
     <div class="langpick" id="langBar">
-      <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="langPick">
+      <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="langMenuHead" data-i18n-aria="langPick">
         <span class="flag" id="langFlag" data-flag="pt" aria-hidden="true"></span>
         <span data-i18n="lang">Língua</span>
       </button>
-      <div class="lang-menu" role="listbox">
+      <dialog class="lang-menu" id="langMenuHead" role="listbox">
         <button type="button" role="option" data-lang="pt" class="on"><span class="flag" data-flag="pt"></span>Português <b>PT</b></button>
         <button type="button" role="option" data-lang="en"><span class="flag" data-flag="en"></span>English <b>EN</b></button>
         <button type="button" role="option" data-lang="es"><span class="flag" data-flag="es"></span>Español <b>ES</b></button>
         <button type="button" role="option" data-lang="fr"><span class="flag" data-flag="fr"></span>Français <b>FR</b></button>
         <button type="button" role="option" data-lang="it"><span class="flag" data-flag="it"></span>Italiano <b>IT</b></button>
         <button type="button" role="option" data-lang="zh"><span class="flag" data-flag="zh"></span>中文 <b>中</b></button>
-      </div>
+      </dialog>
     </div>
     <a href="index.html" data-i18n="legal.back">Voltar ao site</a>
   </div>
