@@ -10,12 +10,35 @@
  * Minimum password length ≥ 6. Código: variável AQUA_STAFF_BOOTSTRAP_CODE.
  * Ficha da casa: plataforma/data/staff.json (não vai para o Git).
  */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { CASA_STAFF, STAFF_BOOTSTRAP_CODE, mzDigits, staffEmail } from '../server/casa-staff.mjs';
+
+function loadDotEnv() {
+  const p = path.join(path.dirname(fileURLToPath(import.meta.url)), '../.env');
+  try {
+    if (!fs.existsSync(p)) return;
+    for (const line of fs.readFileSync(p, 'utf8').split(/\r?\n/)) {
+      const t = line.trim();
+      if (!t || t.startsWith('#')) continue;
+      const i = t.indexOf('=');
+      if (i < 1) continue;
+      const k = t.slice(0, i).trim();
+      let v = t.slice(i + 1).trim();
+      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1);
+      if (k && process.env[k] == null) process.env[k] = v;
+    }
+  } catch { /* */ }
+}
+loadDotEnv();
 
 const URL = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || '';
 const CODE = STAFF_BOOTSTRAP_CODE;
 const ADMIN_CODE = String(process.env.AQUA_ADMIN_PASSWORD || CODE).trim();
+const FORCE = new Set(String(process.env.AQUA_STAFF_FORCE_PHONES || '').split(/[,\s]+/).map(mzDigits).filter(Boolean));
+const ANON = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 
 if (!URL || !KEY) {
   console.error('Defina SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.');
@@ -67,7 +90,7 @@ for (const [i, s] of CASA_STAFF.entries()) {
   const phone = mzDigits(s.phone);
   const email = staffEmail(phone);
   const meta = { name: s.name, phone, job: s.job, title: s.title };
-  const pass = s.role === 'admin' ? ADMIN_CODE : CODE;
+  const pass = (s.role === 'admin' || s.job === 'manager' || s.job === 'it') ? ADMIN_CODE : CODE;
   let userId = await findUserId(email);
   if (!userId) {
     try {
@@ -88,7 +111,7 @@ for (const [i, s] of CASA_STAFF.entries()) {
     }
   } else {
     const body = { email_confirm: true, user_metadata: meta };
-    if (process.env.AQUA_STAFF_RESET_CODES === '1') body.password = pass;
+    if (process.env.AQUA_STAFF_RESET_CODES === '1' || FORCE.has(phone)) body.password = pass;
     await api('/auth/v1/admin/users/' + userId, 'PUT', body);
     console.log('Auth já existia:', s.name, email);
   }
@@ -114,6 +137,24 @@ for (const [i, s] of CASA_STAFF.entries()) {
   } else {
     await api('/rest/v1/staff', 'POST', profile);
     console.log('Perfil criado:', s.name);
+  }
+}
+
+if (FORCE.size && ANON) {
+  console.log('\nA verificar login na nuvem…');
+  for (const s of CASA_STAFF) {
+    const phone = mzDigits(s.phone);
+    if (!FORCE.has(phone)) continue;
+    const email = staffEmail(phone);
+    const pass = (s.role === 'admin' || s.job === 'manager' || s.job === 'it') ? ADMIN_CODE : CODE;
+    const res = await fetch(URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const ok = res.ok;
+    if (!ok) console.error('Login falhou:', s.name, res.status);
+    else console.log('Login OK:', s.name);
   }
 }
 

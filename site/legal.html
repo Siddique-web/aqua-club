@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Termos de uso e privacidade do Aqua Club — notas de conferência, identificação fiscal e tratamento de dados na Beira.">
 <title data-i18n="legal.title">Termos de uso e privacidade — Aqua Club</title>
-<script src="i18n.js?v=ops64"></script>
+<script src="i18n.js?v=ops68"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,8 +19,9 @@
 *{box-sizing:border-box} html,body{margin:0;background:#fff;color:var(--ink);font:400 1rem/1.65 var(--fb)}
 a{color:var(--cyan-d)} h1,h2,p{margin:0}
 .wrap{width:100%;max-width:760px;margin-inline:auto;padding-inline:1rem}
-.header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:4px solid var(--cyan)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:var(--head)}
+.header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:4px solid var(--cyan);overflow:visible}
+html.lang-open .header{z-index:240}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:var(--head);overflow:visible}
 .brand{display:flex;align-items:center;gap:.5rem;text-decoration:none;min-width:0}
 .brand img{width:44px;height:44px;border-radius:50%;object-fit:cover}
 .brand span{display:flex;flex-direction:column;font-family:var(--fh);text-transform:uppercase;color:var(--cyan-d);line-height:1.05}
@@ -36,7 +37,7 @@ a{color:var(--cyan-d)} h1,h2,p{margin:0}
 .flag[data-flag=fr]{background:linear-gradient(90deg,#0055A4 0 33.4%,#fff 33.4% 66.6%,#EF4135 66.6%)}
 .flag[data-flag=it]{background:linear-gradient(90deg,#009246 0 33.4%,#fff 33.4% 66.6%,#CE2B37 66.6%)}
 .flag[data-flag=zh]{background:#DE2910}
-.lang-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:30;min-width:240px;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px}
+.lang-menu{display:none;position:fixed;z-index:250;min-width:min(280px,calc(100vw - 1.2rem));max-height:min(70dvh,28rem);overflow:auto;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px}
 .langpick.open .lang-menu{display:grid;gap:.15rem}
 .lang-menu button{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;width:100%;min-height:44px;padding:.4rem .7rem;border:0;border-radius:11px;background:transparent;cursor:pointer;font:600 .95rem var(--fb);text-align:left}
 .lang-menu button.on,.lang-menu button:hover{background:var(--cyan-soft)}

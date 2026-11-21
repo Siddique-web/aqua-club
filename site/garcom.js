@@ -178,7 +178,12 @@
         if (nine.length < 8) throw new Error('Indique o telemóvel da ficha (9 dígitos).');
         const pw = String(code || '');
         if (pw.length < 8) throw new Error('A palavra-passe precisa de pelo menos 8 caracteres.');
-        return api.signIn(nine + '@staff.aquaclub.mz', pw);
+        const emails = [nine + '@staff.aquaclub.mz', nine + '@aquaclub.co.mz'];
+        let last = null;
+        for (const email of emails) {
+          try { await api.signIn(email, pw); return; } catch (e) { last = e; }
+        }
+        throw last || new Error('Não foi possível entrar.');
       },
       async setStaffCode(phone, code) {
         const pw = String(code || '').trim();
@@ -1856,7 +1861,7 @@
     return '<article class="gc' + cls + '"><div class="gc-top"><span class="gc-table">' + esc(title) + '</span>' +
       '<span class="gc-zone">' + esc(kind || orderPlace(o) || 'Pedido') + '</span></div>' +
       '<div class="gc-chips">' +
-      '<span class="gp-chip">' + esc(ST_OS[o.status] || o.status) + '</span>' +
+      '<span class="gp-chip' + (o.status === 'ready' ? ' ok' : '') + '">' + esc(ST_OS[o.status] || o.status) + '</span>' +
       '<span class="gp-chip ' + (paid ? 'ok' : (xfer ? 'wait' : '')) + '">' + esc(payLabel(o)) + '</span>' +
       (got && !paid ? '<span class="gp-chip wait">Recebido · falta pagamento</span>' : '') +
       (done ? '<span class="gp-chip ok">Entregue e pago</span>' : '') +

@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops64"></script>
+<script src="i18n.js?v=ops68"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,25 +58,27 @@ picture.aq-pic{display:contents}
 @keyframes splash-logo{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
 
 /* header */
-.header{position:fixed;inset:0 0 auto 0;z-index:90;background:#fff;border-bottom:4px solid var(--cyan);padding-top:env(safe-area-inset-top,0px);transition:box-shadow var(--ease)}
+.header{position:fixed;inset:0 0 auto 0;z-index:90;background:#fff;border-bottom:4px solid var(--cyan);padding-top:env(safe-area-inset-top,0px);overflow:visible;transition:box-shadow var(--ease)}
+html.lang-open .header{z-index:240}
 .header.scrolled,.header.open{box-shadow:0 8px 24px rgba(0,0,0,.12)}
-.header .wrap{padding-inline:.85rem;max-width:1280px}
-.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:var(--head);grid-auto-flow:dense;align-items:center;gap:.45rem .5rem;min-height:var(--head);height:var(--head);padding:0;overflow:hidden}
+.header .wrap{padding-inline:.85rem;max-width:1280px;overflow:visible}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:var(--head);grid-auto-flow:dense;align-items:center;gap:.45rem .5rem;min-height:var(--head);height:var(--head);padding:0;overflow:visible}
 .brand,.head-right,.nav,.burger{grid-row:1}
 .brand{display:flex;align-items:center;gap:.5rem;min-width:0;text-decoration:none;overflow:hidden}
 .brand img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none;background:#e8f6ff}
 .brand span{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-width:0;font-family:var(--fh);text-transform:uppercase;color:var(--cyan-d);line-height:1.05}
-.brand b{font-size:clamp(.98rem,4vw,1.38rem);font-weight:800;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.brand small{display:block;margin-top:.22rem;font-size:clamp(.5rem,2.15vw,.62rem);font-weight:700;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.brand b{font-size:clamp(.98rem,4vw,1.38rem);font-weight:800;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%}
+.brand small{display:block;margin-top:.22rem;font-size:clamp(.5rem,2.15vw,.62rem);font-weight:700;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%}
 .nav{display:none;min-width:0;max-width:100%;justify-self:end}
 .nav ul{display:flex;flex-wrap:nowrap;gap:.1rem;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
 .nav ul::-webkit-scrollbar{display:none}
 .nav a,.nav .nav-staff{position:relative;display:block;padding:.45rem .5rem;font:800 .7rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:#000;text-decoration:none;white-space:nowrap;transition:color var(--ease);background:none;border:0;cursor:pointer}
 .nav a::after,.nav .nav-staff::after{content:"";position:absolute;left:.5rem;right:.5rem;bottom:-2px;height:3px;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform var(--ease)}
 .nav a:hover,.nav .nav-staff:hover{color:var(--cyan-d)} .nav a:hover::after,.nav .nav-staff:hover::after{transform:scaleX(1)}
-.head-right{display:flex;align-items:center;gap:.4rem;flex:none;justify-self:end;min-width:0}
-.langpick{position:relative;flex:none}
-.lang-btn{display:inline-flex;align-items:center;gap:.42rem;min-height:46px;padding:.22rem .72rem .22rem .26rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background-color var(--ease),border-color var(--ease)}
+.head-right{display:flex;align-items:center;gap:.4rem;flex:none;justify-self:end;min-width:0;overflow:visible}
+.langpick{position:relative;flex:none;z-index:5}
+.langpick.open{z-index:20}
+.lang-btn{display:inline-flex;align-items:center;gap:.42rem;min-height:46px;padding:.22rem .72rem .22rem .26rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:background-color var(--ease),border-color var(--ease)}
 .lang-btn:hover,.langpick.open .lang-btn{background:var(--cyan);border-color:var(--cyan)}
 .lang-btn .chev{width:.85rem;height:.85rem;transition:transform var(--ease)}
 .langpick.open .lang-btn .chev{transform:rotate(180deg)}
@@ -93,9 +95,9 @@ picture.aq-pic{display:contents}
 .flag[data-flag=it]{background:linear-gradient(90deg,#009246 0 33.4%,#fff 33.4% 66.6%,#CE2B37 66.6%)}
 .flag[data-flag=zh]{background:#DE2910}
 .flag[data-flag=zh]::after{content:"";position:absolute;left:22%;top:24%;width:32%;height:32%;background:#FFDE00;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
-.lang-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:130;min-width:248px;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px;box-shadow:0 22px 44px -18px rgba(0,40,80,.45)}
+.lang-menu{display:none;position:fixed;z-index:250;min-width:min(280px,calc(100vw - 1.2rem));max-width:calc(100vw - 1rem);max-height:min(70dvh,28rem);overflow:auto;-webkit-overflow-scrolling:touch;padding:.4rem;background:#fff;border:2px solid #000;border-radius:16px;box-shadow:0 22px 44px -18px rgba(0,40,80,.45)}
 .langpick.open .lang-menu{display:grid;gap:.15rem}
-.lang-menu button{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;width:100%;min-height:46px;padding:.4rem .7rem;border:0;border-radius:11px;background:transparent;color:#000;font:600 .95rem var(--fb);text-align:left;cursor:pointer}
+.lang-menu button{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;width:100%;min-height:48px;padding:.4rem .7rem;border:0;border-radius:11px;background:transparent;color:#000;font:600 .95rem var(--fb);text-align:left;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .lang-menu button .flag{--s:1.55rem}
 .lang-menu button b{font:800 .68rem var(--fh);letter-spacing:.08em;color:var(--muted)}
 .lang-menu button:hover{background:var(--cyan-soft)}
@@ -116,6 +118,9 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .mmenu li a .ico,.mmenu .nav-staff .ico{width:1.2rem;height:1.2rem;color:var(--cyan-d)}
 .mmenu li a:hover,.mmenu .nav-staff:hover{transform:translateX(8px);color:var(--cyan-d)}
 .mmenu .btn{margin-top:1.5rem;width:100%}
+.m-tools{display:grid;gap:.65rem;margin:0 0 1.15rem}
+.m-tools .wx-chip{width:fit-content;height:44px;min-height:44px}
+.m-lang .lang-btn{width:100%;justify-content:flex-start;min-height:48px}
 .acc-chip{display:none;align-items:center;justify-content:center;gap:0;width:50px;height:50px;min-height:50px;padding:0;border:2.5px solid #000;border-radius:4px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:none}
 .acc-chip.on{display:inline-flex}
 .acc-chip .ico{width:1.2rem;height:1.2rem;flex:none}
@@ -141,15 +146,28 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
   .brand b{font-size:1.02rem;letter-spacing:.02em}
   .brand small{display:block;font-size:.52rem;letter-spacing:.06em;margin-top:.18rem}
 }
+@media(max-width:520px){
+  .head-right .lang-btn > span:not(.flag){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .head-right .lang-btn{padding-inline:.3rem;min-height:44px;min-width:44px;justify-content:center}
+}
 @media(max-width:360px){
   :root{--head:64px;--fab-w:9.8rem}
-  .lang-btn > span:not(.flag){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
   .lang-btn{padding-inline:.28rem;min-height:42px}
   .burger{width:44px;height:44px}
   .bar{gap:.4rem}
 }
 @media(min-width:720px) and (max-width:1099px){
   .head-right .btn{display:inline-flex;padding:.5rem .85rem;font-size:.7rem;min-height:44px}
+}
+@media(max-width:1099px){
+  .head-right .wx-chip,
+  .head-right .acc-chip,
+  .head-right .acc-chip.on,
+  .head-right .langpick,
+  .head-right .btn{display:none!important}
+  .brand{min-width:0;overflow:visible}
+  .brand span{overflow:visible;max-width:100%}
+  .brand b,.brand small{overflow:visible;text-overflow:unset;white-space:nowrap}
 }
 @media(min-width:1100px){
   .header .wrap,.wrap{padding-inline:2rem}
@@ -160,6 +178,7 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
   .burger{display:none}
   .acc-chip{display:none!important}
   .head-right .btn{display:inline-flex}
+  .m-tools{display:none}
   .brand img{width:56px;height:56px}
   .brand b{font-size:1.45rem}
   .brand small{font-size:.62rem;letter-spacing:.12em}
@@ -833,6 +852,8 @@ html:not(.staff-chrome) .fabs{bottom:max(.75rem, env(safe-area-inset-bottom,0px)
 .fab[hidden]{display:none}
 .fab.cart{background:var(--cyan)}
 .fab.cart.live{animation:fabp 1.8s ease-in-out infinite}
+.fab.cart.ready{background:#16A34A;color:#fff}
+.fab.cart.ready .ico{color:#fff}
 .fab.order{background:var(--yellow);color:#000}
 .fab.call{background:#000;color:#fff}
 .fab.call .ico{color:var(--yellow)}
@@ -940,6 +961,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .otrack li.done::before{background:var(--cyan);border-color:var(--cyan)}.otrack li.done::after{background:var(--cyan)}
 .otrack li.now{color:#000;font-weight:700}
 .otrack li.now::before{background:var(--yellow);border-color:#000;box-shadow:0 0 0 5px rgba(255,215,0,.4)}
+.otrack li.now.ready{color:#0d6b32}
+.otrack li.now.ready::before{background:#16A34A;border-color:#0d6b32;box-shadow:0 0 0 5px rgba(22,163,74,.32)}
 .omsg{margin:0;padding:.8rem 1rem;border-radius:14px;background:var(--cyan-soft);font-weight:600}
 
 
@@ -1116,6 +1139,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.4rem}
 .chip2{display:inline-block;padding:.25rem .7rem;border-radius:999px;background:#EEF3F6;font:700 .72rem var(--fh);letter-spacing:.04em}
 .chip2.st-delivered,.chip2.pay-paid{background:#CFF3DF}
+.chip2.st-ready{background:#16A34A;color:#fff}
 .chip2.st-sent,.chip2.st-received,.chip2.st-preparing,.chip2.st-on_the_way,.chip2.st-review{background:var(--cyan-soft)}
 .chip2.pay-unpaid,.chip2.pay-pay_requested{background:var(--yellow)}
 .chip2.pay-paid_declared{background:var(--cyan-soft)}
@@ -1148,7 +1172,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops64">
+<link rel="stylesheet" href="garcom.css?v=ops68">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1274,6 +1298,27 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
       <p class="acc-mail" id="mAccMail"></p>
       <button class="btn btn-dark" type="button" id="mAccOut" data-acc="out" hidden data-i18n="acc.out">Sair da conta</button>
       <button class="btn btn-cyan" type="button" id="mAccIn" data-acc="in" data-i18n="acc.in">Entrar na conta</button>
+    </div>
+    <div class="m-tools">
+      <a class="wx-chip" id="wxNowM" href="#horarios" hidden>
+        <svg class="ico" id="wxIcoM" aria-hidden="true"><use href="#i-sun"/></svg>
+        <b id="wxTempM"></b>
+      </a>
+      <div class="langpick m-lang">
+        <button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="langPick">
+          <span class="flag" data-flag="pt" aria-hidden="true"></span>
+          <span data-i18n="lang">Língua</span>
+          <svg class="ico chev" aria-hidden="true"><use href="#i-chev"/></svg>
+        </button>
+        <div class="lang-menu" role="listbox" data-i18n-aria="langPick">
+          <button type="button" role="option" data-lang="pt" class="on"><span class="flag" data-flag="pt" aria-hidden="true"></span>Português <b>PT</b></button>
+          <button type="button" role="option" data-lang="en"><span class="flag" data-flag="en" aria-hidden="true"></span>English <b>EN</b></button>
+          <button type="button" role="option" data-lang="es"><span class="flag" data-flag="es" aria-hidden="true"></span>Español <b>ES</b></button>
+          <button type="button" role="option" data-lang="fr"><span class="flag" data-flag="fr" aria-hidden="true"></span>Français <b>FR</b></button>
+          <button type="button" role="option" data-lang="it"><span class="flag" data-flag="it" aria-hidden="true"></span>Italiano <b>IT</b></button>
+          <button type="button" role="option" data-lang="zh"><span class="flag" data-flag="zh" aria-hidden="true"></span>中文 <b>中</b></button>
+        </div>
+      </div>
     </div>
     <ul>
       <li><a href="#inicio"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="nav.home">Início</span></a></li>
@@ -4103,6 +4148,7 @@ const REVIEWS = [];
     steps.forEach((li, i) => {
       li.classList.toggle('done', i < s || archived);
       li.classList.toggle('now', !archived && i === s);
+      li.classList.toggle('ready', !archived && i === s && liveStatus(ov.status) === 'ready');
       li.setAttribute('aria-current', !archived && i === s ? 'step' : 'false');
     });
     const waitDel = !canc && ov.status !== 'delivered' && (ov.status === 'ready' || ov.status === 'on_the_way' || ov.driver_ok);
@@ -4758,6 +4804,7 @@ const REVIEWS = [];
     if (n) $('#fabCartTxt').textContent = n + (n === 1 ? ' item' : ' itens');
     fc.classList.toggle('owe', false);
     fc.classList.toggle('live', showStatus);
+    fc.classList.toggle('ready', showStatus && liveStatus(liveO.status) === 'ready');
     const f = $('#fabCall'), txt = $('#fabCallTxt');
     f.classList.toggle('pending', Boolean(call && (call.status === 'pending' || call.status === 'sent'))); f.classList.toggle('accepted', Boolean(call && call.status === 'accepted'));
     txt.textContent = !call ? tr('fab.call') : call.status === 'pending' ? tr('fab.wait') : call.status === 'sent' ? tr('fab.sent') : call.status === 'accepted' ? tr('fab.coming') : tr('fab.call');
@@ -5145,8 +5192,8 @@ const REVIEWS = [];
   });
 })();
 (function loadWx() {
-  const box = document.getElementById('wxNow');
-  if (!box) return;
+  const boxes = [document.getElementById('wxNow'), document.getElementById('wxNowM')].filter(Boolean);
+  if (!boxes.length) return;
   const tx = (k) => (window.AquaI18n ? AquaI18n.t(k) : k);
   let last = null;
   const paint = (temp, code) => {
@@ -5157,14 +5204,18 @@ const REVIEWS = [];
     else if (code >= 3) { id = 'i-cloud'; cls = 'cloud'; lab = tx('hours.wxCloud'); }
     else if (code >= 1) { id = 'i-cloud-sun'; cls = 'sun'; lab = tx('hours.wxPart'); }
     else if (code === 0) { id = 'i-sun'; cls = 'sun'; lab = tx('hours.wxSun'); }
-    const use = box.querySelector('use');
-    if (use) use.setAttribute('href', '#' + id);
-    box.className = 'wx-chip ' + cls;
-    const tEl = document.getElementById('wxTemp');
-    if (tEl) tEl.textContent = Math.round(temp) + '°';
-    box.title = lab + ' · ' + tx('hours.wxBeira');
-    box.setAttribute('aria-label', Math.round(temp) + ' °C, ' + lab);
-    box.hidden = false;
+    const deg = Math.round(temp) + '°';
+    const aria = Math.round(temp) + ' °C, ' + lab;
+    boxes.forEach((box) => {
+      const use = box.querySelector('use');
+      if (use) use.setAttribute('href', '#' + id);
+      box.className = 'wx-chip ' + cls;
+      const tEl = box.querySelector('b');
+      if (tEl) tEl.textContent = deg;
+      box.title = lab + ' · ' + tx('hours.wxBeira');
+      box.setAttribute('aria-label', aria);
+      box.hidden = false;
+    });
   };
   try {
     const cached = JSON.parse(sessionStorage.getItem('aq.wx') || 'null');
@@ -5182,8 +5233,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops64"></script>
-<script src="garcom.js?v=ops64"></script>
-<script src="os-bridge.js?v=ops64"></script>
+<script src="os-config.js?v=ops68"></script>
+<script src="garcom.js?v=ops68"></script>
+<script src="os-bridge.js?v=ops68"></script>
 </body>
 </html>

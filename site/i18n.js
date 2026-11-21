@@ -2827,9 +2827,8 @@
       const img = el.querySelector('img');
       if (img) img.alt = title;
     });
-    document.querySelectorAll('#langBar [data-lang]').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
-    const flag = document.getElementById('langFlag');
-    if (flag) {
+    document.querySelectorAll('.langpick [data-lang]').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
+    document.querySelectorAll('.lang-btn .flag').forEach((flag) => {
       const changed = flag.dataset.flag !== lang;
       flag.dataset.flag = lang;
       if (changed) {
@@ -2837,11 +2836,13 @@
         void flag.offsetWidth;
         flag.classList.add('pop');
       }
-    }
-    const bar = document.getElementById('langBar');
-    if (bar) bar.classList.remove('open');
-    const toggle = bar && bar.querySelector('.lang-btn');
-    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    });
+    document.querySelectorAll('.langpick').forEach((bar) => {
+      bar.classList.remove('open');
+      const toggle = bar.querySelector('.lang-btn');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    });
+    document.documentElement.classList.remove('lang-open');
   }
   function setLang(next) {
     if (!LANGS.includes(next)) return;
@@ -2851,29 +2852,59 @@
     listeners.forEach((fn) => fn(lang));
   }
   function bootBar() {
-    const bar = document.getElementById('langBar');
-    const btn = bar && bar.querySelector('.lang-btn');
-    const close = () => {
-      if (!bar) return;
-      bar.classList.remove('open');
-      if (btn) btn.setAttribute('aria-expanded', 'false');
-    };
-    const open = () => {
-      if (!bar) return;
-      bar.classList.add('open');
-      if (btn) btn.setAttribute('aria-expanded', 'true');
-    };
-    if (btn) {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        bar.classList.contains('open') ? close() : open();
+    const bars = Array.from(document.querySelectorAll('.langpick'));
+    const closeAll = () => {
+      bars.forEach((bar) => {
+        bar.classList.remove('open');
+        const b = bar.querySelector('.lang-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
       });
-      document.addEventListener('click', (e) => { if (!bar.contains(e.target)) close(); });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-    }
-    document.querySelectorAll('#langBar [data-lang]').forEach((b) => {
-      b.addEventListener('click', () => setLang(b.dataset.lang));
+      document.documentElement.classList.remove('lang-open');
+    };
+    const placeMenu = (bar) => {
+      const btn = bar.querySelector('.lang-btn');
+      const menu = bar.querySelector('.lang-menu');
+      if (!btn || !menu || !bar.classList.contains('open')) return;
+      const r = btn.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const width = Math.min(280, Math.max(220, vw - 16));
+      let left = Math.round(r.right - width);
+      if (left < 8) left = 8;
+      if (left + width > vw - 8) left = Math.max(8, vw - width - 8);
+      menu.style.top = Math.round(r.bottom + 8) + 'px';
+      menu.style.left = left + 'px';
+      menu.style.right = 'auto';
+      menu.style.width = width + 'px';
+    };
+    bars.forEach((bar) => {
+      const btn = bar.querySelector('.lang-btn');
+      if (!btn) return;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const was = bar.classList.contains('open');
+        closeAll();
+        if (!was) {
+          bar.classList.add('open');
+          document.documentElement.classList.add('lang-open');
+          btn.setAttribute('aria-expanded', 'true');
+          placeMenu(bar);
+        }
+      });
+      bar.querySelectorAll('[data-lang]').forEach((opt) => {
+        opt.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setLang(opt.dataset.lang);
+        });
+      });
     });
+    document.addEventListener('pointerdown', (e) => {
+      if (![...bars].some((bar) => bar.contains(e.target))) closeAll();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
+    window.addEventListener('resize', () => bars.forEach(placeMenu));
+    window.addEventListener('scroll', () => bars.forEach(placeMenu), { passive: true });
     applyDom();
   }
 
