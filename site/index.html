@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops68"></script>
+<script src="i18n.js?v=ops69"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1172,7 +1172,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops68">
+<link rel="stylesheet" href="garcom.css?v=ops69">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1573,7 +1573,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
     <button class="story-x" type="button" id="storyClose" data-i18n-aria="dlg.close">✕</button>
     <picture>
       <source type="image/webp" srcset="assets/story-01.webp">
-      <img id="storyImg" src="assets/story-01.jpg" alt="Menu executivo">
+      <img id="storyImg" src="assets/story-01.jpg" alt="Jam Session — Chinho e amigos">
     </picture>
     <button class="story-nav prev" type="button" id="storyPrev" data-i18n-aria="dlg.prev"> </button>
     <button class="story-nav next" type="button" id="storyNext" data-i18n-aria="dlg.next"> </button>
@@ -5067,7 +5067,8 @@ const REVIEWS = [];
     const img = $('#storyImg'), bars = $('#storyBars'), hint = $('#storyHint');
     if (!btn || !dlg || !img || !bars) return;
     const STORIES = [
-      { img: 'assets/story-01.jpg', t: 'Menu executivo' }
+      { img: 'assets/story-01.jpg', t: 'Jam Session — Chinho e amigos' },
+      { img: 'assets/story-02.jpg', t: 'Aniversários no Aqua Club' }
     ];
     STORIES.forEach((s) => { const pre = new Image(); pre.src = pickSrc(s.img); });
     bars.innerHTML = STORIES.map(() => '<i></i>').join('');
@@ -5233,8 +5234,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops68"></script>
-<script src="garcom.js?v=ops68"></script>
-<script src="os-bridge.js?v=ops68"></script>
+<script src="os-config.js?v=ops69"></script>
+<script src="garcom.js?v=ops69"></script>
+<script src="os-bridge.js?v=ops69"></script>
 </body>
 </html>
