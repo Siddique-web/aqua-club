@@ -2,7 +2,7 @@
 (function () {
   const P = (pt, en, es, fr, zh, it) => ({ pt, en, es, fr, zh, it });
   const LANGS = ['pt', 'en', 'es', 'fr', 'it', 'zh'];
-  const LOCALES = { pt: 'pt-PT', en: 'en-GB', es: 'es-ES', fr: 'fr-FR', it: 'it-IT', zh: 'zh-CN' };
+  const LOCALES = { pt: 'pt-MZ', en: 'en-GB', es: 'es-ES', fr: 'fr-FR', it: 'it-IT', zh: 'zh-CN' };
   let lang = localStorage.getItem('aqua_lang') || 'pt';
   if (!LANGS.includes(lang)) lang = 'pt';
   const listeners = [];
@@ -18,16 +18,16 @@
       'Cargando el sitio de Aqua Club',
       'Chargement du site Aqua Club',
       '正在加载 Aqua Club 网站', 'Caricamento del sito Aqua Club'),
-    title: P('Aqua Club — Complexo de Lazer Aquático',
-      'Aqua Club — Aquatic Leisure Complex',
-      'Aqua Club — Complejo de ocio acuático',
-      'Aqua Club — Complexe de loisirs aquatiques',
-      'Aqua Club — 水上休闲综合体', 'Aqua Club — Complesso di svago acquatico'),
-    desc: P('Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.',
-      'Aqua Club — aquatic leisure complex in Beira: pools, slides, lazy river, kids area, bar and VIP cabanas.',
-      'Aqua Club — complejo de ocio acuático en Beira: piscinas, toboganes, río lento, zona kids, bar y cabañas VIP.',
-      'Aqua Club — complexe de loisirs aquatiques à Beira : piscines, toboggans, rivière lente, espace kids, bar et cabanes VIP.',
-      'Aqua Club — 贝拉水上休闲综合体：泳池、滑水道、缓流河、儿童区、酒吧和 VIP 凉亭。', 'Aqua Club — complesso di svago acquatico a Beira: piscine, scivoli, fiume lento, area kids, bar e cabane VIP.'),
+    title: P('Aqua Club Beira — Restaurante, Lounge & Ementa Digital',
+      'Aqua Club Beira — Restaurant, Lounge & Digital Menu',
+      'Aqua Club Beira — Restaurante, Lounge y Carta Digital',
+      'Aqua Club Beira — Restaurant, Lounge et Carte Digitale',
+      'Aqua Club Beira — 餐厅、Lounge 与电子菜单', 'Aqua Club Beira — Ristorante, Lounge e Menu Digitale'),
+    desc: P('Aqua Club na Beira, Moçambique. Consulta a ementa interativa, faz pedidos diretamente na mesa e acompanha novidades em aquaclub.co.mz.',
+      'Aqua Club in Beira, Mozambique. Browse the interactive menu, order from your table and follow news at aquaclub.co.mz.',
+      'Aqua Club en Beira, Mozambique. Consulta la carta interactiva, pide en la mesa y sigue las novedades en aquaclub.co.mz.',
+      'Aqua Club à Beira, Mozambique. Consultez la carte interactive, commandez à table et suivez les actualités sur aquaclub.co.mz.',
+      '莫桑比克贝拉 Aqua Club。浏览互动菜单、在餐桌点餐，并在 aquaclub.co.mz 查看最新消息。', 'Aqua Club a Beira, Mozambico. Consulta il menu interattivo, ordina al tavolo e segui le novità su aquaclub.co.mz.'),
     brand: P('Aqua Club — início',
       'Aqua Club — home',
       'Aqua Club — inicio',

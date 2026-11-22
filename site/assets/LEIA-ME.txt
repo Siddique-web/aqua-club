@@ -1,6 +1,7 @@
 Fotografias e logótipo usados pelo site (substitua pelos originais quando quiser, mantendo os nomes):
 
 logo.png / favicon.png        logótipo circular
+../logo-aquaclub.png          PNG quadrado 512×512 (fundo branco) para Google/SEO — substitua por exportação do logótipo final (512×512, sem transparência)
 hero-aerea.jpg                vista aérea
 piscina.jpg, piscina-guarda-sois.jpg, piscina-edificio.jpg, panorama.jpg   piscina e espaço exterior
 kids.jpg, parque.jpg, parque-jogos.jpg                                      área kids, parque e ténis de mesa

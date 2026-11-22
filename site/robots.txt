@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /painel
+Disallow: /painel.html
+
+Sitemap: https://www.aquaclub.co.mz/sitemap.xml

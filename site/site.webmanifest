@@ -1,0 +1,30 @@
+{
+  "name": "Aqua Club",
+  "short_name": "Aqua Club",
+  "description": "Aqua Club na Beira, Moçambique. Ementa digital, pedidos na mesa e atendimento.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "lang": "pt-MZ",
+  "background_color": "#00A8FF",
+  "theme_color": "#00A8FF",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-aquaclub.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
