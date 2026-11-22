@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops74"></script>
+<script src="i18n.js?v=ops77"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-01.webp" type="image/webp">
@@ -151,13 +151,9 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
   .brand b{font-size:1.02rem;letter-spacing:.02em}
   .brand small{display:block;font-size:.52rem;letter-spacing:.06em;margin-top:.18rem}
 }
-@media(max-width:520px){
-  .head-right .lang-btn > span:not(.flag){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-  .head-right .lang-btn{padding-inline:.3rem;min-height:44px;min-width:44px;justify-content:center}
-}
 @media(max-width:360px){
   :root{--head:64px;--fab-w:9.8rem}
-  .lang-btn{padding-inline:.28rem;min-height:42px}
+  .head-right .lang-btn{padding:.16rem .48rem .16rem .2rem;font-size:.58rem;min-height:42px}
   .burger{width:44px;height:44px}
   .bar{gap:.4rem}
 }
@@ -170,9 +166,9 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
   .head-right .acc-chip.on,
   .head-right .btn{display:none!important}
   .head-right .langpick{display:flex!important;align-items:center}
-  .head-right .lang-btn{min-width:44px;min-height:44px;padding:.18rem .32rem;gap:.2rem}
-  .head-right .lang-btn > span:not(.flag){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-  .head-right .lang-btn .chev{width:.7rem;height:.7rem}
+  .head-right .lang-btn{min-height:44px;padding:.18rem .58rem .18rem .22rem;gap:.35rem;font-size:.62rem;letter-spacing:.08em}
+  .head-right .lang-btn > span:not(.flag){position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:nowrap}
+  .head-right .lang-btn .chev{width:.75rem;height:.75rem}
   .m-lang{display:none!important}
   .brand{min-width:0;overflow:visible}
   .brand span{overflow:visible;max-width:100%}
@@ -847,9 +843,13 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .mcat-now.m-in{animation:mcat-fade .38s ease both}
 .mcard.m-in{animation:mcard-in .5s cubic-bezier(.22,.72,.2,1) both;animation-delay:var(--d,0ms)}
 @media(prefers-reduced-motion:reduce){.mcat-now.m-in,.mcard.m-in{animation:none}}
-.mimg{position:relative;border:0;padding:0;width:100%;aspect-ratio:4/3;height:auto;min-height:0;max-height:none;min-width:0;cursor:pointer;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);color:#000;overflow:hidden;flex:none}
+.mimg-wrap{position:relative;flex:none}
+.mimg{position:relative;border:0;padding:0;width:100%;aspect-ratio:4/3;height:auto;min-height:0;max-height:none;min-width:0;cursor:pointer;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);color:#000;overflow:hidden}
 .mimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 46%;transform:none}
 .mimg .ico{width:64px;height:64px;opacity:.88;stroke-width:1.25px}
+.mimg-plus{position:absolute;left:.55rem;bottom:.55rem;z-index:1;width:38px;height:38px;border-radius:50%;background:var(--yellow);border:2px solid #000;display:grid;place-items:center;font:800 1.35rem/1 var(--fh);pointer-events:none;box-shadow:0 8px 16px -8px rgba(0,0,0,.45)}
+.mdet{position:absolute;right:.5rem;bottom:.55rem;z-index:2;min-height:36px;padding:.35rem .7rem;border:2px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 16px -10px rgba(0,0,0,.4)}
+.mdet:hover{background:var(--cyan)}
 .mbody{display:grid;gap:.55rem;align-content:start;padding:.85rem .95rem 1rem;min-width:0;flex:1}
 .mbody h3{font:800 .98rem/1.2 var(--fh);overflow-wrap:anywhere;color:#1a1a1a}
 .mhead-row{display:flex;justify-content:space-between;align-items:flex-start;gap:.7rem}
@@ -870,6 +870,17 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .menu-note{margin:1.6rem auto 0;max-width:46rem;text-align:center;font-size:.88rem;color:var(--muted)}
 @media(min-width:900px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mimg{aspect-ratio:5/4}}
 @media(min-width:1200px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{aspect-ratio:4/3}}
+.menu-scrub{position:fixed;z-index:118;left:max(.2rem, env(safe-area-inset-left,0px));top:calc(var(--head-bar) + .5rem);bottom:max(1rem, env(safe-area-inset-bottom,0px));width:44px;display:flex;justify-content:center;pointer-events:none}
+.menu-scrub[hidden]{display:none!important}
+.menu-scrub-track{pointer-events:auto;position:relative;width:5px;align-self:stretch;margin:1.1rem 0;border-radius:999px;background:rgba(20,30,40,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);touch-action:none;-webkit-tap-highlight-color:transparent}
+.menu-scrub-track::before{content:"";position:absolute;inset:-.2rem -1.15rem;border-radius:18px}
+.menu-scrub-knob{position:absolute;left:50%;top:0;width:40px;height:48px;margin-left:-20px;border:2.5px solid #000;border-radius:18px;background:var(--yellow);color:#000;box-shadow:0 10px 22px -10px rgba(0,0,0,.5),0 0 0 2px rgba(255,255,255,.75);display:grid;place-items:center;padding:0;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
+.menu-scrub-knob:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.menu-scrub.dragging .menu-scrub-knob,.menu-scrub-knob:active{cursor:grabbing;background:var(--cyan);transform:scale(1.05)}
+.menu-scrub-knob .ico{width:1.15rem;height:1.15rem}
+.menu-scrub-pct{position:absolute;left:calc(100% + .55rem);top:50%;transform:translateY(-50%);background:#111;color:#fff;font:800 .62rem/1 var(--fh);letter-spacing:.04em;padding:.32rem .48rem;border-radius:999px;white-space:nowrap;opacity:0;pointer-events:none;box-shadow:0 8px 16px -10px rgba(0,0,0,.5)}
+.menu-scrub.dragging .menu-scrub-pct{opacity:1}
+@media(min-width:720px){.menu-scrub{left:max(.55rem, env(safe-area-inset-left,0px))}.menu-scrub-knob{width:42px;height:50px;margin-left:-21px}}
 /* botões flutuantes */
 .fabs{position:fixed;left:auto;right:max(.5rem, env(safe-area-inset-right,0px));bottom:max(.7rem, env(safe-area-inset-bottom,0px));z-index:125;display:grid;gap:.38rem;justify-items:stretch;width:var(--fab-w);max-width:calc(100% - 1rem);pointer-events:none;overflow:visible}
 .fabs .fab,.fabs .fab-hint{pointer-events:auto}
@@ -949,8 +960,8 @@ dialog:not([open]){display:none!important}
 .cart-dlg #orderView:not([hidden]){flex:1;min-height:0;overflow:auto}
 html:has(dialog[open]),html.dlg-open{overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
 html.dlg-open body{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll-behavior:none}
-html:has(dialog[open]) .fabs,html:has(dialog[open]) .pn,
-html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events:none!important}
+html:has(dialog[open]) .fabs,html:has(dialog[open]) .pn,html:has(dialog[open]) .menu-scrub,
+html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidden!important;pointer-events:none!important}
 #placeDlg.place-dlg[open]{height:100dvh;max-height:100dvh;overflow:hidden;animation:none;transform:none}
 #placeDlg > .place-pad{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;gap:.55rem;padding:1rem .9rem calc(.85rem + env(safe-area-inset-bottom,0px));pointer-events:auto}
 #placeDlg .place-scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:grid;gap:.7rem;align-content:start}
@@ -963,7 +974,11 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .dhead h2{font:800 clamp(1.05rem,5vw,1.4rem)/1.15 var(--fh);text-transform:uppercase;min-width:0;overflow-wrap:anywhere}
 .dx{flex:none;width:42px;height:42px;border:2px solid #000;border-radius:50%;background:#fff;font-size:1.1rem;cursor:pointer;transition:background-color var(--ease),color var(--ease)}
 .dx:hover{background:#000;color:#fff}
-.dimg{position:relative;width:100%;height:min(42svh,320px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);cursor:default}
+.dimg{position:relative;width:100%;height:min(42svh,320px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);cursor:pointer}
+.dimg-hint{position:absolute;left:.7rem;bottom:.7rem;z-index:2;background:rgba(10,18,28,.78);color:#fff;font:800 .68rem var(--fh);letter-spacing:.04em;text-transform:uppercase;padding:.38rem .7rem;border-radius:999px;pointer-events:none}
+#itDonenessWrap{margin:.15rem 0 .35rem}
+#itDonenessWrap .doneness-row{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;margin:0 0 .35rem;font:800 .78rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:var(--cyan-d)}
+#itDonenessWrap input[type=range]{width:100%;margin:0;accent-color:var(--cyan-d)}
 .dimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
 .dimg .ico{width:84px;height:84px;opacity:.86;stroke-width:1.2px}
 .dprice{font:800 1.6rem var(--fh);color:var(--cyan-d);margin:0}
@@ -1216,7 +1231,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops74">
+<link rel="stylesheet" href="garcom.css?v=ops77">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1643,6 +1658,14 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
 </div></dialog>
 
 <div class="aq-toasts" id="aqToasts" role="status" aria-live="polite" popover="manual"></div>
+<div class="menu-scrub" id="menuScrub" hidden>
+  <div class="menu-scrub-track" id="menuScrubTrack">
+    <button type="button" class="menu-scrub-knob" id="menuScrubKnob" role="slider" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria="menu.scrub">
+      <svg class="ico" aria-hidden="true" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7 9 12 4l5 5M7 15l5 5 5-5"/></svg>
+      <span class="menu-scrub-pct" id="menuScrubPct">0%</span>
+    </button>
+  </div>
+</div>
 <div class="fabs" id="fabs">
   <button class="fab cart" id="fabCart" type="button" hidden><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span id="fabCartTxt" data-i18n="fab.see">Ver pedido</span></button>
   <button class="fab-hint" id="fabHint" type="button" hidden data-i18n="fab.hint">Precisa de ajuda? Chame o garçom aqui ↓</button>
@@ -1706,10 +1729,9 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
   <p id="itDesc" style="margin:0"></p>
   <dl class="dinfo" id="itInfo"></dl>
   <div id="itDonenessWrap" hidden>
-    <label><span data-i18n="menu.donenessLab">Ponto da carne</span> (<span id="itDpct">60</span>%)
-      <input type="range" id="itDoneness" min="0" max="100" value="60">
-      <small id="itDlab"></small>
-    </label>
+    <p class="doneness-row"><span data-i18n="menu.donenessLab">Ponto da carne</span><b>(<span id="itDpct">60</span>%)</b></p>
+    <input type="range" id="itDoneness" min="0" max="100" value="60">
+    <small id="itDlab"></small>
   </div>
   <div id="itExtras"></div>
   <label data-i18n-label="menu.notes">Notas para a cozinha<input type="text" id="itNote" maxlength="120" data-i18n-placeholder="menu.notesPh" placeholder="Ex.: sem cebola, molho à parte"></label>
@@ -3862,8 +3884,13 @@ const REVIEWS = [];
     return cart.filter((l) => l.id === id).reduce((s, l) => s + l.qty, 0);
   }
   function addFromCard(m) {
-    if (needsOptions(m)) openItem(m);
-    else addToCart(m.id, 1, '');
+    let note = '';
+    let doneness = null;
+    if (m && m.doneness) {
+      doneness = 60;
+      note = tr('menu.ponto', { n: 60 });
+    }
+    addToCart(m.id, 1, note, [], doneness);
   }
   function listedMenu(which, q) {
     const id = which || cat;
@@ -3885,19 +3912,126 @@ const REVIEWS = [];
     title.setAttribute('aria-live', 'polite');
     title.textContent = catLabel(cat) + ' · ' + items.length;
     mgrid.appendChild(title);
-    if (!items.length) { mgrid.insertAdjacentHTML('beforeend', '<p class="mempty">' + esc(tr('menu.empty')) + '</p>'); if (wrap) wrap.scrollTop = 0; return; }
+    if (!items.length) { mgrid.insertAdjacentHTML('beforeend', '<p class="mempty">' + esc(tr('menu.empty')) + '</p>'); if (wrap) wrap.scrollTop = 0; requestAnimationFrame(paintMenuScrub); setTimeout(paintMenuScrub, 120); return; }
     items.forEach((m, i) => {
       const el = document.createElement('article'); el.className = 'mcard m-in'; el.dataset.id = m.id; el.style.setProperty('--d', Math.min(i, 10) * 42 + 'ms');
       const q = qtyOf(m.id);
-      el.innerHTML = `<button class="mimg" type="button" aria-label="${esc(tr('menu.details', { n: m.name }))}">${media(m, i < 6)}</button><div class="mbody"><div class="mhead-row"><h3>${esc(m.name)}</h3><b class="price">${money(m.price)}</b></div><p>${esc(m.desc || '')}</p><div class="mfoot"><div class="mqty"><button type="button" class="mq-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${q}</b><button type="button" class="mq-plus" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="madd" type="button">${esc(tr('menu.addCart'))}</button></div></div>`;
-      $('.mimg', el).addEventListener('click', () => openItem(m));
+      el.innerHTML = `<div class="mimg-wrap"><button class="mimg" type="button" aria-label="${esc(tr('menu.addAria', { n: m.name }))}">${media(m, i < 6)}<span class="mimg-plus" aria-hidden="true">+</span></button><button class="mdet" type="button">${esc(tr('menu.more'))}</button></div><div class="mbody"><div class="mhead-row"><h3>${esc(m.name)}</h3><b class="price">${money(m.price)}</b></div><p>${esc(m.desc || '')}</p><div class="mfoot"><div class="mqty"><button type="button" class="mq-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${q}</b><button type="button" class="mq-plus" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="madd" type="button">${esc(tr('menu.addCart'))}</button></div></div>`;
+      $('.mimg', el).addEventListener('click', () => addFromCard(m));
+      $('.mdet', el).addEventListener('click', (e) => { e.stopPropagation(); openItem(m); });
       $('.madd', el).addEventListener('click', () => addFromCard(m));
       $('.mq-plus', el).addEventListener('click', () => addFromCard(m));
       $('.mq-minus', el).addEventListener('click', () => takeFromCart(m.id));
       mgrid.appendChild(el);
     });
     if (wrap) wrap.scrollTop = 0;
+    requestAnimationFrame(() => { paintMenuScrub(); requestAnimationFrame(paintMenuScrub); });
+    setTimeout(paintMenuScrub, 120);
+    setTimeout(paintMenuScrub, 360);
   }
+  let menuScrubbing = false, menuScrubBound = false;
+  function menuHeadPad() {
+    const header = document.querySelector('.header');
+    const tool = document.querySelector('#menu .mtool');
+    const headH = header ? header.getBoundingClientRect().height : 72;
+    return headH + 8 + (tool ? tool.getBoundingClientRect().height : 0);
+  }
+  function menuScrollRange() {
+    const menu = $('#menu'), grid = $('#mgrid') || menu;
+    if (!menu || !grid) return null;
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    const start = Math.round(grid.getBoundingClientRect().top + y - menuHeadPad());
+    const endRaw = Math.round(menu.getBoundingClientRect().bottom + y - innerHeight + 24);
+    const max = Math.max(0, endRaw - start);
+    return { start, max, end: start + max };
+  }
+  function setMenuScrubKnob(ratio) {
+    const track = $('#menuScrubTrack'), knob = $('#menuScrubKnob'), pct = $('#menuScrubPct');
+    if (!track || !knob) return;
+    const r = Math.min(1, Math.max(0, Number(ratio) || 0));
+    const usable = Math.max(0, track.clientHeight - knob.offsetHeight);
+    knob.style.top = (r * usable) + 'px';
+    const n = Math.round(r * 100);
+    knob.setAttribute('aria-valuenow', String(n));
+    if (pct) pct.textContent = n + '%';
+  }
+  function jumpMenuScrub(ratio) {
+    const range = menuScrollRange();
+    if (!range || !range.max) return;
+    const r = Math.min(1, Math.max(0, Number(ratio) || 0));
+    const top = range.start + r * range.max;
+    window.scrollTo(0, top);
+    setMenuScrubKnob(r);
+  }
+  function ratioFromPointer(clientY) {
+    const track = $('#menuScrubTrack'), knob = $('#menuScrubKnob');
+    if (!track || !knob) return 0;
+    const rect = track.getBoundingClientRect();
+    const kh = knob.offsetHeight || 48;
+    const usable = Math.max(1, rect.height - kh);
+    return Math.min(1, Math.max(0, (clientY - rect.top - kh / 2) / usable));
+  }
+  function paintMenuScrub() {
+    const box = $('#menuScrub');
+    if (!box) return;
+    const menu = $('#menu');
+    const range = menuScrollRange();
+    const rect = menu ? menu.getBoundingClientRect() : null;
+    const inMenu = !!(rect && rect.bottom > 110 && rect.top < innerHeight - 70);
+    const long = !!(range && range.max > 140);
+    const dlg = document.querySelector('dialog[open]') || document.documentElement.classList.contains('dlg-open');
+    const show = inMenu && long && !dlg;
+    box.hidden = !show;
+    if (!show) return;
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    const r = range.max ? Math.min(1, Math.max(0, (y - range.start) / range.max)) : 0;
+    if (!menuScrubbing) setMenuScrubKnob(r);
+  }
+  function bindMenuScrub() {
+    if (menuScrubBound) return;
+    const track = $('#menuScrubTrack'), knob = $('#menuScrubKnob');
+    if (!track || !knob) return;
+    menuScrubBound = true;
+    const onMove = (e) => {
+      if (!menuScrubbing) return;
+      if (e.cancelable) e.preventDefault();
+      jumpMenuScrub(ratioFromPointer(e.clientY));
+    };
+    const onUp = (e) => {
+      if (!menuScrubbing) return;
+      menuScrubbing = false;
+      $('#menuScrub') && $('#menuScrub').classList.remove('dragging');
+      try { if (e && e.pointerId != null) knob.releasePointerCapture(e.pointerId); } catch (err) { /* */ }
+      removeEventListener('pointermove', onMove, { capture: true });
+    };
+    const onDown = (e) => {
+      if (e.button != null && e.button !== 0) return;
+      menuScrubbing = true;
+      $('#menuScrub') && $('#menuScrub').classList.add('dragging');
+      try { knob.setPointerCapture(e.pointerId); } catch (err) { /* */ }
+      addEventListener('pointermove', onMove, { passive: false, capture: true });
+      if (e.cancelable) e.preventDefault();
+      jumpMenuScrub(ratioFromPointer(e.clientY));
+    };
+    track.addEventListener('pointerdown', onDown);
+    addEventListener('pointerup', onUp);
+    addEventListener('pointercancel', onUp);
+    knob.addEventListener('keydown', (e) => {
+      const now = Number(knob.getAttribute('aria-valuenow') || 0) / 100;
+      let next = now;
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') next = now + (e.key === 'PageDown' ? 0.18 : 0.08);
+      else if (e.key === 'ArrowUp' || e.key === 'PageUp') next = now - (e.key === 'PageUp' ? 0.18 : 0.08);
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = 1;
+      else return;
+      e.preventDefault();
+      jumpMenuScrub(next);
+    });
+    addEventListener('scroll', () => { if (!menuScrubbing) paintMenuScrub(); }, { passive: true });
+    addEventListener('resize', paintMenuScrub);
+  }
+  bindMenuScrub();
+  addEventListener('load', paintMenuScrub);
   function toast(name) { say('Adicionou ' + name + '.', 'ok'); }
 
   /* janela do prato */
@@ -3912,8 +4046,8 @@ const REVIEWS = [];
     $('#itName').textContent = m.name; $('#itPrice').textContent = money(m.price); $('#itDesc').textContent = m.desc; $('#itNote').value = '';
     const pz = $('#itPizzaFee');
     if (pz) { pz.hidden = !isPizzaItem(m); pz.textContent = tr('place.pizzaTake'); }
-    $('#itImg').innerHTML = media(m, true);
-    $('#itImg').onclick = null;
+    $('#itImg').innerHTML = media(m, true) + `<span class="dimg-hint">${esc(tr('menu.tapAdd'))}</span>`;
+    $('#itImg').onclick = () => confirmItemAdd();
     const catName = (CATS.find((c) => c[0] === m.cat) || [0, m.cat])[1];
     $('#itInfo').innerHTML = `<div><dt>${esc(tr('menu.cat'))}</dt><dd>${esc(catName)}</dd></div>` +
       (m.ingredients && m.ingredients.length ? `<div><dt>${esc(tr('menu.ing'))}</dt><dd>${esc(m.ingredients.join(', '))}</dd></div>` : '') +
@@ -3931,7 +4065,8 @@ const REVIEWS = [];
   }
   $('#itMinus').addEventListener('click', () => { curQty = Math.max(1, curQty - 1); paintItem(); });
   $('#itPlus').addEventListener('click', () => { curQty = Math.min(20, curQty + 1); paintItem(); });
-  $('#itAdd').addEventListener('click', () => {
+  function confirmItemAdd() {
+    if (!curItem) return;
     const extras = $$('#itExtras [data-ex]:checked').map((x) => x.dataset.ex);
     const doneness = curItem.doneness ? Number($('#itDoneness').value) : null;
     let note = $('#itNote').value.trim();
@@ -3939,7 +4074,8 @@ const REVIEWS = [];
     if (extras.length) note = (note ? note + ' · ' : '') + extraNames(extras);
     addToCart(curItem.id, curQty, note, extras, doneness);
     if (placeReady(place)) itemDlg.close();
-  });
+  }
+  $('#itAdd').addEventListener('click', () => confirmItemAdd());
   $('#itDoneness')?.addEventListener('input', () => { $('#itDpct').textContent = $('#itDoneness').value; });
 
   /* pedido (carrinho) */
@@ -5474,8 +5610,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops74"></script>
-<script src="garcom.js?v=ops74"></script>
-<script src="os-bridge.js?v=ops74"></script>
+<script src="os-config.js?v=ops77"></script>
+<script src="garcom.js?v=ops77"></script>
+<script src="os-bridge.js?v=ops77"></script>
 </body>
 </html>
