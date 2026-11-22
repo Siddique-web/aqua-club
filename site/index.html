@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops70"></script>
+<script src="i18n.js?v=ops71"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-01.webp" type="image/webp">
@@ -24,7 +24,8 @@
   --ease:.3s ease;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-html{scroll-behavior:smooth;scroll-padding-top:calc(var(--head-bar) + 16px);background:#fff;max-width:100%;overflow-x:hidden}
+html{scroll-behavior:auto;scroll-padding-top:calc(var(--head-bar) + 16px);background:#fff;max-width:100%;overflow-x:hidden}
+@media(prefers-reduced-motion:no-preference){html.aq-smooth{scroll-behavior:smooth}}
 html.lang-open,html.lang-open body{overflow:visible}
 #inicio{scroll-margin-top:0}
 *,*::before,*::after{box-sizing:border-box}
@@ -173,6 +174,8 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
   .brand b,.brand small{overflow:visible;text-overflow:unset;white-space:nowrap}
 }
 @media(min-width:1100px){
+  .head-right .wx-chip[hidden]{display:inline-flex!important;visibility:hidden;pointer-events:none}
+  .head-right .wx-chip:not([hidden]){visibility:visible}
   .header .wrap,.wrap{padding-inline:2rem}
   .bar{grid-template-columns:auto auto minmax(0,1fr);grid-template-rows:var(--head);height:var(--head);gap:.8rem 1rem}
   .brand{grid-column:1;grid-row:1}
@@ -190,8 +193,8 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 /* hero slideshow */
 .hero{position:relative;z-index:4;isolation:isolate;overflow-x:clip;overflow-y:visible;background:#fff}
 .hero-bg{position:absolute;inset:0;z-index:-1;overflow:hidden}
-.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(48px) saturate(1.7);opacity:0;transform:scale(1.5);transition:opacity 1s,transform 1s}
-.hero-bg img.on{opacity:.9;transform:scale(1.25)}
+.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:none;filter:none;transition:opacity .6s ease}
+.hero-bg img.on{opacity:.35}
 .hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(230,246,255,.38) 50%,rgba(255,255,255,.9))}
 .hero-grid{display:grid;min-height:100svh;max-width:1280px;margin-inline:auto;padding:7.5rem 1rem 6rem}
 .slide{grid-area:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;opacity:0;transform:translateX(40px) scale(.97);pointer-events:none;transition:opacity .7s ease-out,transform .7s ease-out}
@@ -378,7 +381,7 @@ section{position:relative}
 .hours li:last-child{border:0}
 .hday{display:inline-flex;align-items:center;gap:.5rem}
 .hday .ico{width:1.15rem;height:1.15rem;color:var(--cyan-d)}
-.wx-chip{display:none;align-items:center;justify-content:center;gap:.28rem;height:46px;min-height:46px;padding:0 .62rem 0 .48rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;flex:none;text-decoration:none;line-height:1}
+.wx-chip{display:none;align-items:center;justify-content:center;gap:.28rem;height:46px;min-height:46px;min-width:4.5rem;padding:0 .62rem 0 .48rem;border:2.5px solid #000;border-radius:999px;background:#fff;color:#000;flex:none;text-decoration:none;line-height:1}
 .wx-chip:not([hidden]){display:inline-flex}
 .wx-chip .ico{width:1.15rem;height:1.15rem;flex:none}
 .wx-chip.sun .ico{color:#E6A800}
@@ -972,18 +975,16 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 /* ===== galeria 3D (coverflow) ===== */
 .cf-wrap{position:relative;display:grid;gap:.4rem;justify-items:center;min-width:0;width:100%}
 .cf-stage{position:relative;display:grid;justify-items:center;width:100%;gap:.35rem;padding:.2rem .15rem 0;box-sizing:border-box}
-.cf{position:relative;width:100%;max-width:100%;height:auto;min-height:180px;margin-inline:auto;perspective:1800px;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px;transition:width .45s ease}
-.cfi{--cw:100%;position:absolute;left:50%;top:0;width:var(--cw);height:100%;display:flex;flex-direction:column;border:2px solid rgba(255,255,255,.88);border-radius:26px;overflow:hidden;background:#071824;cursor:pointer;box-sizing:border-box;
-  transform:translateX(-50%);
-  transform-origin:top center;
-  z-index:1;opacity:0;visibility:hidden;pointer-events:none;
-  box-shadow:0 28px 54px -18px rgba(0,40,80,.55);transition:opacity .45s ease}
-.cfi.on{cursor:default;position:relative;left:0;width:100%;height:auto;transform:none;opacity:1;visibility:visible;pointer-events:auto;z-index:12}
+.cf{position:relative;width:100%;max-width:100%;aspect-ratio:4/3;height:auto;min-height:200px;margin-inline:auto;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px;contain:layout paint;background:#071824}
+.cfi{--cw:100%;position:absolute;inset:0;width:100%;height:100%;display:flex;flex-direction:column;border:2px solid rgba(255,255,255,.88);border-radius:26px;overflow:hidden;background:#071824;cursor:pointer;box-sizing:border-box;
+  transform:none;z-index:1;opacity:0;visibility:hidden;pointer-events:none;
+  box-shadow:0 28px 54px -18px rgba(0,40,80,.55);transition:opacity .4s ease}
+.cfi.on{cursor:default;opacity:1;visibility:visible;pointer-events:auto;z-index:12}
 .cfi.on .cfi-media{cursor:zoom-in}
 .cfi.out{opacity:0;visibility:hidden;pointer-events:none}
-.cfi-media{position:relative;flex:none;flex-shrink:0;width:100%;height:auto;overflow:hidden;background:#041018;display:grid;place-items:center}
-.cfi-fill{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;filter:blur(28px) saturate(1.2);transform:scale(1.12);pointer-events:none;opacity:.55}
-.cfi-photo{position:relative;z-index:1;display:block;width:auto;height:auto;max-width:100%;max-height:var(--media-h,68svh);object-fit:contain;object-position:center center}
+.cfi-media{position:relative;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;background:#041018;display:grid;place-items:center}
+.cfi-fill{display:none}
+.cfi-photo{position:relative;z-index:1;display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center center}
 .cfi::after{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:100%;background:rgb(0 18 32 / calc(var(--ad) * .22));pointer-events:none;transition:background .6s}
 .cf-cap{position:relative;z-index:2;flex:none;display:grid;gap:.18rem;padding:.55rem .9rem .65rem;color:#fff;background:#04283F;transition:opacity .5s}
 .cf-row{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem}
@@ -1011,7 +1012,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .lbdlg{width:min(980px,100%)}
 .lbdlg .dfoot{flex-wrap:nowrap}.lbdlg .dfoot .btn{padding-inline:1rem;min-height:44px}
 .lbdlg img{width:100%;max-height:68dvh;object-fit:contain;border-radius:18px;background:#0a3a58}
-@media(max-width:560px){.cfi{--cw:100%;border-radius:18px}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{padding:.5rem .75rem .55rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
+@media(max-width:560px){.cf{aspect-ratio:3/4}.cfi{--cw:100%;border-radius:18px}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{padding:.5rem .75rem .55rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
 
 
 /* ===== menu: introdução + mural de pratos e bebidas ===== */
@@ -1174,8 +1175,9 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .r-up{transform:translateY(36px)}.r-left{transform:translateX(-44px)}.r-right{transform:translateX(44px)}.r-zoom{transform:scale(.94)}
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
+html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops70">
+<link rel="stylesheet" href="garcom.css?v=ops71">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -2047,8 +2049,10 @@ const REVIEWS = [];
     pinHero();
   }
   landHome();
-  window.addEventListener('pageshow', (e) => { if (!e.persisted) landHome(); });
-  window.addEventListener('DOMContentLoaded', landHome);
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted || heroPinned) return;
+    landHome();
+  });
   const tr = (k, v) => (window.AquaI18n ? AquaI18n.t(k, v) : k);
   const loc = (o) => (window.AquaI18n ? AquaI18n.loc(o) : (o && (o.pt || o.name)) || o || '');
 
@@ -2069,6 +2073,15 @@ const REVIEWS = [];
   const header = $('#header'), burger = $('#burger');
   const onScroll = () => header.classList.toggle('scrolled', scrollY > 8);
   onScroll(); addEventListener('scroll', onScroll, { passive: true });
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a || a.getAttribute('href') === '#') return;
+    document.documentElement.classList.add('aq-smooth');
+    setTimeout(() => document.documentElement.classList.remove('aq-smooth'), 900);
+  });
+  document.addEventListener('visibilitychange', () => {
+    document.documentElement.classList.toggle('aq-pause', document.hidden);
+  });
   const setMenu = (open) => {
     header.classList.toggle('open', open);
     document.body.style.overflow = open ? 'hidden' : '';
@@ -2115,7 +2128,7 @@ const REVIEWS = [];
   const items = SL.map((s, i) => {
     const el = document.createElement('article'); el.className = 'cfi out';
     el.setAttribute('role', 'group'); el.setAttribute('aria-roledescription', 'slide'); el.setAttribute('aria-label', tr('hero.of', { a: i + 1, b: SL.length, t: s.t }));
-    el.innerHTML = `<div class="cfi-media"><img class="cfi-fill" alt="" aria-hidden="true" decoding="async"><img class="cfi-photo" alt="${safe(s.t)}" decoding="async"></div>
+    el.innerHTML = `<div class="cfi-media"><img class="cfi-photo" alt="${safe(s.t)}" decoding="async" width="1200" height="900"></div>
       <div class="cf-top"><button class="cfb" type="button" data-act="play" aria-label="${safe(tr('hero.pause'))}"><svg class="ico" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
       <div class="cf-cap"><div class="cf-row"><b class="cf-t">${safe(s.t)}</b><span class="cf-tag">${safe(s.tag)}</span></div><p class="cf-q">“${safe(s.q)}”</p><p class="cf-m">${safe(s.m)}</p></div>`;
     el.addEventListener('click', (e) => {
@@ -2138,17 +2151,15 @@ const REVIEWS = [];
         near = Math.abs(d) <= 1;
       }
       if (!near) return;
-      el.querySelectorAll('.cfi-fill, .cfi-photo').forEach((im) => {
-        setImg(im, SL[i].img);
-        if (im.classList.contains('cfi-photo') && !im.dataset.lay) {
-          im.dataset.lay = '1';
-          im.addEventListener('load', () => { if (view[cur] === i) layout(); });
-        }
-      });
+      const im = el.querySelector('.cfi-photo');
+      if (im) setImg(im, SL[i].img);
     });
     const idx = view[cur];
     if (idx == null) return;
-    setImg(bgIm, SL[idx].img);
+    if (bgIm.dataset.src !== SL[idx].img) {
+      bgIm.dataset.src = SL[idx].img;
+      setImg(bgIm, SL[idx].img);
+    }
     bgIm.classList.add('on');
   }
   function layout() {
@@ -2161,28 +2172,15 @@ const REVIEWS = [];
       el.style.setProperty('--d', d); el.style.setProperty('--ad', ad); el.style.setProperty('--s', Math.sign(d));
       el.classList.toggle('out', ad > 2); el.classList.toggle('on', d === 0); el.setAttribute('aria-hidden', String(d !== 0));
       $$('button', el).forEach((b) => { b.tabIndex = d === 0 ? 0 : -1; });
-      const pb = $('[data-act=play]', el); pb.setAttribute('aria-label', playing ? tr('hero.pause') : tr('hero.play')); pb.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${playing ? 'i-pause' : 'i-play'}"/></svg>`;
+      const pb = $('[data-act=play]', el);
+      if (pb.dataset.playing !== String(playing)) {
+        pb.dataset.playing = String(playing);
+        pb.setAttribute('aria-label', playing ? tr('hero.pause') : tr('hero.play'));
+        pb.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${playing ? 'i-pause' : 'i-play'}"/></svg>`;
+      }
     });
     fillNear();
-    const idx = view[cur];
     $$('.dot2', cdots).forEach((d, i) => d.classList.toggle('on', i === cur));
-    const onEl = items[idx];
-    const onImg = onEl && onEl.querySelector('.cfi-photo');
-    if (onImg && onImg.naturalWidth) {
-      const wrapW = (cfwrap && cfwrap.clientWidth) || cf.parentElement.clientWidth;
-      const maxMedia = Math.max(160, Math.min(window.innerHeight * 0.68, window.innerHeight - 200));
-      const natW = onImg.naturalWidth;
-      const natH = onImg.naturalHeight;
-      let mediaW = wrapW;
-      let mediaH = mediaW * (natH / natW);
-      if (mediaH > maxMedia) {
-        mediaH = maxMedia;
-        mediaW = mediaH * (natW / natH);
-      }
-      cf.style.setProperty('--media-h', Math.round(mediaH) + 'px');
-      cf.style.width = Math.round(mediaW) + 'px';
-      cf.style.height = 'auto';
-    }
   }
   function buildDots() {
     cdots.innerHTML = '';
@@ -2219,15 +2217,19 @@ const REVIEWS = [];
   $('#lbPrev').addEventListener('click', () => go(cur - 1));
   $('#lbNext').addEventListener('click', () => go(cur + 1));
   $$('[data-p-img]').forEach((b) => b.addEventListener('click', () => openPhoto({ img: b.dataset.pImg, t: b.dataset.pT, q: b.dataset.pQ })));
-  items.forEach((el) => {
-    const im = el.querySelector('.cfi-photo');
-    if (!im) return;
-    im.addEventListener('load', layout);
-    if (im.complete) layout();
-  });
-  addEventListener('resize', layout);
-  SL.forEach((s) => { const pre = new Image(); pre.decoding = 'async'; pre.src = pickSrc(s.img); });
+  let resizeT = 0;
+  addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(layout, 140);
+  }, { passive: true });
   buildDots(); layout(); plan();
+  if ('IntersectionObserver' in window && cfwrap) {
+    new IntersectionObserver((ents) => {
+      const on = ents.some((e) => e.isIntersecting);
+      if (!on) clearTimeout(cfTimer);
+      else if (playing && !document.hidden) plan();
+    }, { threshold: 0.15 }).observe(cfwrap);
+  }
 
   /* fade-in sempre que se desce na página */
   const FX = '.sh,.acard,.exp,.card-w,.card-c,.wc,.vlabel,.how li,.menu-note,.mtool,.bk-text,.wb-in,.info-grid>*,.footer .f-grid>*,.sp-media,.sp-text,.faq details,.hcard';
@@ -2240,9 +2242,10 @@ const REVIEWS = [];
   let io = null;
   if ('IntersectionObserver' in window && !reduce) {
     io = new IntersectionObserver((es) => es.forEach((e) => {
-      if (e.isIntersecting) e.target.classList.add('in');
-      else if (e.boundingClientRect.top > 0) e.target.classList.remove('in');   /* está abaixo: volta a aparecer ao descer */
-    }), { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }), { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
   }
   const fx = (el) => { if (io) io.observe(el); else el.classList.add('in'); };
   $$('.reveal').forEach(fx);
@@ -3090,7 +3093,7 @@ const REVIEWS = [];
       const viewing = cartDlg.open && $('#orderView') && !$('#orderView').hidden;
       if (!isLive() && window.AquaOS && AquaOS.socketUp && AquaOS.socketUp() && !viewing) return;
       refreshOrdersNow();
-    }, 5000);
+    }, 12000);
     refreshOrdersNow();
   }
 
@@ -4871,15 +4874,25 @@ const REVIEWS = [];
     document.body.style.width = '';
     const y = pendingMenuY != null ? pendingMenuY : lockY;
     pendingMenuY = null;
-    window.scrollTo(0, y);
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    try { window.scrollTo({ top: y, left: 0, behavior: 'instant' }); }
+    catch (e) { window.scrollTo(0, y); }
+    html.style.scrollBehavior = prev;
   }
   const origShowModal = HTMLDialogElement.prototype.showModal;
   HTMLDialogElement.prototype.showModal = function () {
+    if (this.classList.contains('lang-menu')) {
+      try { return origShowModal.call(this); }
+      catch (err) { throw err; }
+    }
     lockPage();
     try { return origShowModal.call(this); }
     catch (err) { unlockPage(); throw err; }
   };
   $$('dialog').forEach((d) => {
+    if (d.classList.contains('lang-menu')) return;
     d.addEventListener('click', (e) => { if (e.target === d) d.close(); });
     $$('[data-close]', d).forEach((b) => b.addEventListener('click', () => d.close()));
     d.addEventListener('close', () => { requestAnimationFrame(unlockPage); });
@@ -5237,8 +5250,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops70"></script>
-<script src="garcom.js?v=ops70"></script>
-<script src="os-bridge.js?v=ops70"></script>
+<script src="os-config.js?v=ops71"></script>
+<script src="garcom.js?v=ops71"></script>
+<script src="os-bridge.js?v=ops71"></script>
 </body>
 </html>
