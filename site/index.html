@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops78"></script>
+<script src="i18n.js?v=ops80"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-03.webp" type="image/webp">
@@ -722,9 +722,11 @@ input,select,textarea{border-radius:14px}
 .shop-tools{flex:none;min-width:0;display:grid;gap:.4rem}
 .shop-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:.55rem;margin:.4rem 0 0;padding:0 .1rem .35rem;width:100%;min-width:0;flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .shop-card{display:grid;grid-template-columns:4.5rem minmax(0,1fr) auto;align-items:center;gap:.55rem .65rem;padding:.45rem .5rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:left;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
-.shop-card .shop-ph{display:grid;place-items:center;width:4.5rem;height:4.5rem;border-radius:12px;overflow:hidden;background:linear-gradient(150deg,var(--cyan),#9EDCFF);color:#000}
+.shop-card .shop-ph{position:relative;display:grid;place-items:center;width:4.5rem;height:4.5rem;border-radius:12px;overflow:hidden;background:var(--sand);color:var(--mic-fg,#0069A8)}
 .shop-card .shop-ph img{width:100%;height:100%;max-width:none;object-fit:cover;display:block}
-.shop-card .shop-ph svg{width:2.2rem;height:2.2rem;max-width:none;object-fit:contain;display:block}
+.shop-card .shop-ph .mic{position:absolute;inset:0}
+.shop-card .shop-ph .mic::before{width:min(58%,2.2rem)}
+.shop-card .shop-ph .mic .ico,.shop-card .shop-ph svg{width:1.85rem;height:1.85rem;max-width:none;object-fit:contain;display:block}
 .shop-card .shop-txt{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:.2rem;min-width:0}
 .shop-card b{display:block;width:100%;font:800 .88rem/1.25 var(--fh);overflow-wrap:anywhere;word-break:break-word;color:#000}
 .shop-card small{display:block;color:var(--cyan-d);font:800 .92rem/1.2 var(--fh)}
@@ -809,8 +811,11 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .menu-aside-lines{display:grid;gap:.65rem;max-height:min(52vh,28rem);overflow:auto}
 .menu-aside-empty{margin:0;padding:.7rem .2rem 1rem;color:var(--muted);font:600 .88rem var(--fb)}
 .menu-aside-line{display:grid;grid-template-columns:3.4rem minmax(0,1fr) auto;gap:.55rem;align-items:center}
-.menu-aside-ph{width:3.4rem;height:3.4rem;border-radius:12px;overflow:hidden;background:var(--cyan-soft);display:grid;place-items:center}
+.menu-aside-ph{position:relative;width:3.4rem;height:3.4rem;border-radius:12px;overflow:hidden;background:var(--sand);color:var(--mic-fg,#0069A8);display:grid;place-items:center}
 .menu-aside-ph img{width:100%;height:100%;object-fit:cover}
+.menu-aside-ph .mic{position:absolute;inset:0}
+.menu-aside-ph .mic::before{width:min(58%,1.6rem)}
+.menu-aside-ph .mic .ico{width:1.45rem;height:1.45rem}
 .menu-aside-line b{display:block;font:800 .78rem/1.2 var(--fh);overflow-wrap:anywhere}
 .menu-aside-line small{display:block;color:var(--cyan-d);font:800 .78rem var(--fh)}
 .menu-aside-tot{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;margin:.9rem 0 .75rem;padding-top:.75rem;border-top:1px dashed rgba(0,0,0,.12);font:800 .82rem var(--fh)}
@@ -844,9 +849,19 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .mcard.m-in{animation:mcard-in .5s cubic-bezier(.22,.72,.2,1) both;animation-delay:var(--d,0ms)}
 @media(prefers-reduced-motion:reduce){.mcat-now.m-in,.mcard.m-in{animation:none}}
 .mimg-wrap{position:relative;flex:none}
-.mimg{position:relative;border:0;padding:0;width:100%;aspect-ratio:4/3;height:auto;min-height:0;max-height:none;min-width:0;cursor:pointer;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);color:#000;overflow:hidden}
+.mimg{position:relative;border:0;padding:0;width:100%;aspect-ratio:4/3;height:auto;min-height:0;max-height:none;min-width:0;cursor:pointer;display:grid;place-items:center;background:var(--sand);color:var(--mic-fg,#0069A8);overflow:hidden}
 .mimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 46%;transform:none}
-.mimg .ico{width:64px;height:64px;opacity:.88;stroke-width:1.25px}
+.mic{position:absolute;inset:0;display:grid;place-items:center;color:var(--mic-fg,#0069A8);background:
+  radial-gradient(90% 70% at 12% 8%,rgba(255,255,255,.55),transparent 52%),
+  radial-gradient(70% 80% at 92% 88%,rgba(0,0,0,.08),transparent 46%),
+  linear-gradient(155deg,var(--mic-a,#E6F6FF),var(--mic-b,#BFE7FF) 52%,var(--mic-c,#7EE0FF));
+  pointer-events:none}
+.mic::before{content:"";position:absolute;width:min(48%,8rem);aspect-ratio:1;border-radius:32%;background:rgba(255,255,255,.42);box-shadow:0 18px 36px -20px rgba(20,40,70,.45);animation:mic-orb 6.4s ease-in-out infinite}
+.mic .ico{position:relative;z-index:1;width:min(38%,5.6rem);height:min(38%,5.6rem);opacity:1;stroke-width:1.4px;filter:drop-shadow(0 6px 10px rgba(0,40,80,.12));animation:mic-float 4.6s ease-in-out infinite}
+@keyframes mic-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.05)}}
+@keyframes mic-orb{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.08) translate(4%,-3%)}}
+@media(prefers-reduced-motion:reduce){.mic .ico,.mic::before{animation:none}}
+.mimg .ico{width:min(38%,5.6rem);height:min(38%,5.6rem);opacity:1;stroke-width:1.4px}
 .mimg-plus{position:absolute;left:.55rem;bottom:.55rem;z-index:1;width:38px;height:38px;border-radius:50%;background:var(--yellow);border:2px solid #000;display:grid;place-items:center;font:800 1.35rem/1 var(--fh);pointer-events:none;box-shadow:0 8px 16px -8px rgba(0,0,0,.45)}
 .mdet{position:absolute;right:.5rem;bottom:.55rem;z-index:2;min-height:36px;padding:.35rem .7rem;border:2px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 16px -10px rgba(0,0,0,.4)}
 .mdet:hover{background:var(--cyan)}
@@ -974,13 +989,13 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .dhead h2{font:800 clamp(1.05rem,5vw,1.4rem)/1.15 var(--fh);text-transform:uppercase;min-width:0;overflow-wrap:anywhere}
 .dx{flex:none;width:42px;height:42px;border:2px solid #000;border-radius:50%;background:#fff;font-size:1.1rem;cursor:pointer;transition:background-color var(--ease),color var(--ease)}
 .dx:hover{background:#000;color:#fff}
-.dimg{position:relative;width:100%;height:min(42svh,320px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);cursor:pointer}
+.dimg{position:relative;width:100%;height:min(42svh,320px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:var(--sand);color:var(--mic-fg,#0069A8);cursor:pointer}
 .dimg-hint{position:absolute;left:.7rem;bottom:.7rem;z-index:2;background:rgba(10,18,28,.78);color:#fff;font:800 .68rem var(--fh);letter-spacing:.04em;text-transform:uppercase;padding:.38rem .7rem;border-radius:999px;pointer-events:none}
 #itDonenessWrap{margin:.15rem 0 .35rem}
 #itDonenessWrap .doneness-row{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;margin:0 0 .35rem;font:800 .78rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:var(--cyan-d)}
 #itDonenessWrap input[type=range]{width:100%;margin:0;accent-color:var(--cyan-d)}
 .dimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
-.dimg .ico{width:84px;height:84px;opacity:.86;stroke-width:1.2px}
+.dimg .mic .ico,.dimg .ico{width:min(42%,6.4rem);height:min(42%,6.4rem);opacity:1;stroke-width:1.35px}
 .dprice{font:800 1.6rem var(--fh);color:var(--cyan-d);margin:0}
 .dinfo{display:grid;gap:.5rem;margin:0}
 .dinfo div{display:grid;grid-template-columns:7.5rem 1fr;gap:.6rem;font-size:.92rem}
@@ -1231,7 +1246,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops78">
+<link rel="stylesheet" href="garcom.css?v=ops80">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -3842,40 +3857,51 @@ const REVIEWS = [];
     if (/peixe|marisco|camar[aã]o|lula|atum|am[eê]ijoa|ostra/.test(n)) return 'i-fish';
     if (/hamb|burger/.test(n)) return 'i-burger';
     if (/sandu|tosta/.test(n)) return 'i-sandwich';
-    if (/carne|bife|frango|estrogano|grelhad|costeleta/.test(n)) return 'i-steak';
+    if (/carne|bife|frango|estrogano|grelhad|costeleta|bitoque|porco|vaca/.test(n)) return 'i-steak';
     if (/bruschett|pão|pao|toast/.test(n)) return 'i-bread';
     if (/gelado|ice cream/.test(n)) return 'i-ice';
     if (/mousse|bolo|sobremesa|doce|cupcake/.test(n)) return 'i-dessert';
-    if (/cocktail|mojito|caipir/.test(n)) return 'i-drink';
-    if (/sumo|suco|limonada/.test(n)) return 'i-juice';
+    if (/cocktail|mojito|caipir|spritz|margarita|negroni|daiquiri/.test(n)) return 'i-drink';
+    if (/sumo|suco|limonada|refrigerant|coca|fanta|sprite/.test(n)) return 'i-juice';
     if (/cerveja|beer/.test(n)) return 'i-beer';
-    if (/vinho|wine|sangria/.test(n)) return 'i-wine';
-    if (/whisky|whiskey|gin|vodka|rum/.test(n)) return 'i-bottle';
-    if (/café|cafe|chá|cha|espresso/.test(n)) return 'i-coffee';
-    if (/batata|fries/.test(n)) return 'i-fries';
-    if (/água|agua/.test(n)) return 'i-juice';
+    if (/vinho|wine|sangria|espumante|champanhe/.test(n)) return 'i-wine';
+    if (/whisky|whiskey|gin|vodka|rum|tequila|licor/.test(n)) return 'i-bottle';
+    if (/café|cafe|chá|cha|espresso|cappuccino|latte/.test(n)) return 'i-coffee';
+    if (/batata|fries|chips/.test(n)) return 'i-fries';
+    if (/água|agua|mineral/.test(n)) return 'i-juice';
     return (m && CAT_ICON[m.cat]) || 'i-snacks';
   }
-  const PIC_FOOD = ['assets/prato-petiscos.webp','assets/prato-petiscos-d1.webp','assets/prato-petiscos-d2.webp','assets/petiscos.webp'];
-  const PIC_SWEET = ['assets/prato-mousse.webp','assets/prato-mousse-d1.webp','assets/prato-mousse-d2.webp','assets/sobremesas.webp'];
-  function hashPic(s) {
-    let h = 0;
-    const t = String(s || '');
-    for (let i = 0; i < t.length; i++) h = ((h << 5) - h) + t.charCodeAt(i) | 0;
-    return Math.abs(h);
+  const ICON_TONE = {
+    'i-pizza': ['#FFF7EC', '#FFD7A0', '#F0A24A', '#8A3A08'],
+    'i-soup': ['#FFF3E8', '#F3C8A0', '#DE8A4A', '#7A3510'],
+    'i-salad': ['#EEF9EC', '#C6E8B4', '#6FBF6A', '#1C6A30'],
+    'i-veg': ['#EEF9EC', '#C6E8B4', '#6FBF6A', '#1C6A30'],
+    'i-steak': ['#FBECEA', '#EFB4AC', '#D25C50', '#7A1E16'],
+    'i-fish': ['#E8F4FF', '#B6DBFF', '#4A9EE0', '#0A4A80'],
+    'i-pasta': ['#FFF6E4', '#F0D48A', '#DDB03A', '#6F520C'],
+    'i-sandwich': ['#FFF4E0', '#E8C888', '#C9953A', '#6A4A12'],
+    'i-bread': ['#FFF4E0', '#E8C888', '#C9953A', '#6A4A12'],
+    'i-burger': ['#FFF1D8', '#E8B86A', '#C47A22', '#6A3A0C'],
+    'i-snacks': ['#FFF0E4', '#E8C4A0', '#D4925A', '#6B3A18'],
+    'i-board': ['#FFF0E4', '#E8C4A0', '#D4925A', '#6B3A18'],
+    'i-dessert': ['#FFF0F5', '#F3C0D6', '#E07AA8', '#8A2458'],
+    'i-ice': ['#F3F8FF', '#D2E4FF', '#8AB4F0', '#2A4A88'],
+    'i-drink': ['#EEFBF3', '#B4E8C6', '#42C484', '#0C6B40'],
+    'i-juice': ['#FFF6DC', '#FFE08A', '#F0B400', '#7A5A00'],
+    'i-beer': ['#FFF6D8', '#F0D060', '#E0A820', '#6B5200'],
+    'i-wine': ['#F8E8F0', '#E0A0B8', '#B44A70', '#6B1238'],
+    'i-bottle': ['#F3EEE8', '#D4C4B0', '#A88868', '#4A3020'],
+    'i-coffee': ['#F4EDE6', '#D2B48C', '#A67C52', '#4A2E18'],
+    'i-fries': ['#FFF8D6', '#FFE27A', '#F0C430', '#7A5C00'],
+    'i-group': ['#E8F4FF', '#BFD8F5', '#7AA8D8', '#1A4A7A']
+  };
+  function toneFor(m) {
+    return ICON_TONE[iconFor(m)] || ICON_TONE['i-snacks'];
   }
-  function picFor(m) {
-    if (m && m.img) return m.img;
-    const catId = (m && m.cat) || '';
-    const n = String((m && (m.name || m.id)) || '').toLowerCase();
-    const sweet = /mousse|gelado|bolo|sobremesa|doce|cupcake|ice/.test(n) || catId === 'sobremesas';
-    const pool = sweet ? PIC_SWEET : PIC_FOOD;
-    return pool[hashPic((m && m.id) || n) % pool.length];
-  }
-  function media(m, eager) {
-    const src = picFor(m);
-    const load = eager ? 'eager' : 'lazy';
-    return `<img alt="" src="${src}" loading="${load}" decoding="async"${eager ? ' fetchpriority="low"' : ''}>`;
+  function media(m) {
+    const ic = iconFor(m);
+    const t = toneFor(m);
+    return `<span class="mic" style="--mic-a:${t[0]};--mic-b:${t[1]};--mic-c:${t[2]};--mic-fg:${t[3]}"><svg class="ico" aria-hidden="true"><use href="#${ic}"/></svg></span>`;
   }
   function needsOptions(m) {
     return Boolean(m && ((m.extras && m.extras.length) || m.doneness));
@@ -3916,7 +3942,7 @@ const REVIEWS = [];
     items.forEach((m, i) => {
       const el = document.createElement('article'); el.className = 'mcard m-in'; el.dataset.id = m.id; el.style.setProperty('--d', Math.min(i, 10) * 42 + 'ms');
       const q = qtyOf(m.id);
-      el.innerHTML = `<div class="mimg-wrap"><button class="mimg" type="button" aria-label="${esc(tr('menu.addAria', { n: m.name }))}">${media(m, i < 6)}<span class="mimg-plus" aria-hidden="true">+</span></button><button class="mdet" type="button">${esc(tr('menu.more'))}</button></div><div class="mbody"><div class="mhead-row"><h3>${esc(m.name)}</h3><b class="price">${money(m.price)}</b></div><p>${esc(m.desc || '')}</p><div class="mfoot"><div class="mqty"><button type="button" class="mq-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${q}</b><button type="button" class="mq-plus" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="madd" type="button">${esc(tr('menu.addCart'))}</button></div></div>`;
+      el.innerHTML = `<div class="mimg-wrap"><button class="mimg" type="button" aria-label="${esc(tr('menu.addAria', { n: m.name }))}">${media(m)}<span class="mimg-plus" aria-hidden="true">+</span></button><button class="mdet" type="button">${esc(tr('menu.more'))}</button></div><div class="mbody"><div class="mhead-row"><h3>${esc(m.name)}</h3><b class="price">${money(m.price)}</b></div><p>${esc(m.desc || '')}</p><div class="mfoot"><div class="mqty"><button type="button" class="mq-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${q}</b><button type="button" class="mq-plus" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="madd" type="button">${esc(tr('menu.addCart'))}</button></div></div>`;
       $('.mimg', el).addEventListener('click', () => addFromCard(m));
       $('.mdet', el).addEventListener('click', (e) => { e.stopPropagation(); openItem(m); });
       $('.madd', el).addEventListener('click', () => addFromCard(m));
@@ -4046,7 +4072,7 @@ const REVIEWS = [];
     $('#itName').textContent = m.name; $('#itPrice').textContent = money(m.price); $('#itDesc').textContent = m.desc; $('#itNote').value = '';
     const pz = $('#itPizzaFee');
     if (pz) { pz.hidden = !isPizzaItem(m); pz.textContent = tr('place.pizzaTake'); }
-    $('#itImg').innerHTML = media(m, true) + `<span class="dimg-hint">${esc(tr('menu.tapAdd'))}</span>`;
+    $('#itImg').innerHTML = media(m) + `<span class="dimg-hint">${esc(tr('menu.tapAdd'))}</span>`;
     $('#itImg').onclick = () => confirmItemAdd();
     const catName = (CATS.find((c) => c[0] === m.cat) || [0, m.cat])[1];
     $('#itInfo').innerHTML = `<div><dt>${esc(tr('menu.cat'))}</dt><dd>${esc(catName)}</dd></div>` +
@@ -5611,8 +5637,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops78"></script>
-<script src="garcom.js?v=ops78"></script>
-<script src="os-bridge.js?v=ops78"></script>
+<script src="os-config.js?v=ops80"></script>
+<script src="garcom.js?v=ops80"></script>
+<script src="os-bridge.js?v=ops80"></script>
 </body>
 </html>
