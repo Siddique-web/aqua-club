@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops71"></script>
+<script src="i18n.js?v=ops72"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-01.webp" type="image/webp">
@@ -975,18 +975,18 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 /* ===== galeria 3D (coverflow) ===== */
 .cf-wrap{position:relative;display:grid;gap:.4rem;justify-items:center;min-width:0;width:100%}
 .cf-stage{position:relative;display:grid;justify-items:center;width:100%;gap:.35rem;padding:.2rem .15rem 0;box-sizing:border-box}
-.cf{position:relative;width:100%;max-width:100%;aspect-ratio:4/3;height:auto;min-height:200px;margin-inline:auto;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px;contain:layout paint;background:#071824}
-.cfi{--cw:100%;position:absolute;inset:0;width:100%;height:100%;display:flex;flex-direction:column;border:2px solid rgba(255,255,255,.88);border-radius:26px;overflow:hidden;background:#071824;cursor:pointer;box-sizing:border-box;
+.cf{position:relative;width:100%;max-width:100%;aspect-ratio:16/10;height:auto;min-height:0;margin-inline:auto;overflow:hidden;touch-action:pan-y;outline-offset:4px;border-radius:22px;contain:layout paint;background:#0a2233}
+.cfi{--cw:100%;position:absolute;inset:0;width:100%;height:100%;display:block;border:2px solid rgba(255,255,255,.88);border-radius:26px;overflow:hidden;background:#0a2233;cursor:pointer;box-sizing:border-box;
   transform:none;z-index:1;opacity:0;visibility:hidden;pointer-events:none;
   box-shadow:0 28px 54px -18px rgba(0,40,80,.55);transition:opacity .4s ease}
 .cfi.on{cursor:default;opacity:1;visibility:visible;pointer-events:auto;z-index:12}
 .cfi.on .cfi-media{cursor:zoom-in}
 .cfi.out{opacity:0;visibility:hidden;pointer-events:none}
-.cfi-media{position:relative;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;background:#041018;display:grid;place-items:center}
+.cfi-media{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#0a2233}
 .cfi-fill{display:none}
-.cfi-photo{position:relative;z-index:1;display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center center}
+.cfi-photo{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center center}
 .cfi::after{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:100%;background:rgb(0 18 32 / calc(var(--ad) * .22));pointer-events:none;transition:background .6s}
-.cf-cap{position:relative;z-index:2;flex:none;display:grid;gap:.18rem;padding:.55rem .9rem .65rem;color:#fff;background:#04283F;transition:opacity .5s}
+.cf-cap{position:absolute;left:0;right:0;bottom:0;z-index:2;display:grid;gap:.18rem;padding:2.2rem .9rem .7rem;color:#fff;background:linear-gradient(0deg,rgba(4,24,40,.92) 0%,rgba(4,24,40,.55) 55%,transparent);transition:opacity .5s}
 .cf-row{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem}
 .cf-t{font:700 1.02rem/1.2 var(--fh)}
 .cf-tag{flex:none;font:700 .64rem var(--fh);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}
@@ -1012,7 +1012,8 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .lbdlg{width:min(980px,100%)}
 .lbdlg .dfoot{flex-wrap:nowrap}.lbdlg .dfoot .btn{padding-inline:1rem;min-height:44px}
 .lbdlg img{width:100%;max-height:68dvh;object-fit:contain;border-radius:18px;background:#0a3a58}
-@media(max-width:560px){.cf{aspect-ratio:3/4}.cfi{--cw:100%;border-radius:18px}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{padding:.5rem .75rem .55rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
+@media(max-width:760px){.cf{aspect-ratio:4/3}}
+@media(max-width:560px){.cfi{--cw:100%;border-radius:18px}.story-orb{--s:clamp(5rem,20vw,6.5rem)}.cf-m{display:none}.cf-q{font-size:.84rem;-webkit-line-clamp:2}.cf-t{font-size:.95rem}.cf-cap{padding:1.65rem .75rem .6rem}.cfx{padding:.45rem .7rem}.cf-dots{gap:.3rem;padding:.3rem .55rem}.dot2{width:7px;height:7px}.dot2.on{width:16px}}
 
 
 /* ===== menu: introdução + mural de pratos e bebidas ===== */
@@ -1177,7 +1178,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops71">
+<link rel="stylesheet" href="garcom.css?v=ops72">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -5250,8 +5251,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops71"></script>
-<script src="garcom.js?v=ops71"></script>
-<script src="os-bridge.js?v=ops71"></script>
+<script src="os-config.js?v=ops72"></script>
+<script src="garcom.js?v=ops72"></script>
+<script src="os-bridge.js?v=ops72"></script>
 </body>
 </html>
