@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops81"></script>
+<script src="i18n.js?v=ops82"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-03.webp" type="image/webp">
@@ -890,8 +890,10 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .menu-note{margin:1.6rem auto 0;max-width:46rem;text-align:center;font-size:.88rem;color:var(--muted)}
 @media(min-width:900px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mimg{aspect-ratio:5/4}}
 @media(min-width:1200px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{aspect-ratio:4/3}}
-.menu-scrub{position:fixed;z-index:118;left:max(.2rem, env(safe-area-inset-left,0px));top:calc(var(--head-bar) + .5rem);bottom:max(1rem, env(safe-area-inset-bottom,0px));width:44px;display:flex;justify-content:center;pointer-events:none}
-.menu-scrub[hidden]{display:none!important}
+.menu-scrub{position:fixed;z-index:118;left:max(.2rem, env(safe-area-inset-left,0px));top:calc(var(--head-bar) + .5rem);bottom:max(1rem, env(safe-area-inset-bottom,0px));width:44px;display:flex;justify-content:center;pointer-events:none;opacity:0;visibility:hidden;transform:translate3d(-130%,0,0);transition:opacity .48s ease,transform .55s cubic-bezier(.22,.72,.2,1),visibility 0s linear .5s}
+.menu-scrub.is-on{opacity:1;visibility:visible;transform:translate3d(0,0,0);transition:opacity .48s ease,transform .55s cubic-bezier(.22,.72,.2,1),visibility 0s}
+.menu-scrub[hidden]:not(.is-on){display:flex!important}
+@media(prefers-reduced-motion:reduce){.menu-scrub,.menu-scrub.is-on{transition:none;transform:none}}
 .menu-scrub-track{pointer-events:auto;position:relative;width:5px;align-self:stretch;margin:1.1rem 0;border-radius:999px;background:rgba(20,30,40,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);touch-action:none;-webkit-tap-highlight-color:transparent}
 .menu-scrub-track::before{content:"";position:absolute;inset:-.2rem -1.15rem;border-radius:18px}
 .menu-scrub-knob{position:absolute;left:50%;top:0;width:40px;height:48px;margin-left:-20px;border:2.5px solid #000;border-radius:18px;background:var(--yellow);color:#000;box-shadow:0 10px 22px -10px rgba(0,0,0,.5),0 0 0 2px rgba(255,255,255,.75);display:grid;place-items:center;padding:0;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
@@ -1259,7 +1261,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops81">
+<link rel="stylesheet" href="garcom.css?v=ops82">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -4050,15 +4052,20 @@ const REVIEWS = [];
   function paintMenuScrub() {
     const box = $('#menuScrub');
     if (!box) return;
-    const menu = $('#menu');
+    const tool = $('#menu .mtool');
+    const grid = $('#mgrid');
     const range = menuScrollRange();
-    const rect = menu ? menu.getBoundingClientRect() : null;
-    const inMenu = !!(rect && rect.bottom > 110 && rect.top < innerHeight - 70);
     const long = !!(range && range.max > 140);
     const dlg = document.querySelector('dialog[open]') || document.documentElement.classList.contains('dlg-open');
-    const show = inMenu && long && !dlg;
-    box.hidden = !show;
-    if (!show) return;
+    const headH = (document.querySelector('.header') || {}).getBoundingClientRect?.().height || 72;
+    const t = tool ? tool.getBoundingClientRect() : null;
+    const g = grid ? grid.getBoundingClientRect() : null;
+    const arrived = !!(t && g && t.top <= headH + 14 && g.bottom > headH + 96);
+    const show = (arrived && long && !dlg) || (menuScrubbing && long && !dlg);
+    if (show) box.removeAttribute('hidden');
+    box.classList.toggle('is-on', show);
+    box.setAttribute('aria-hidden', show ? 'false' : 'true');
+    if (!range) return;
     const y = window.scrollY || document.documentElement.scrollTop || 0;
     const r = range.max ? Math.min(1, Math.max(0, (y - range.start) / range.max)) : 0;
     if (!menuScrubbing) setMenuScrubKnob(r);
@@ -5734,8 +5741,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops81"></script>
-<script src="garcom.js?v=ops81"></script>
-<script src="os-bridge.js?v=ops81"></script>
+<script src="os-config.js?v=ops82"></script>
+<script src="garcom.js?v=ops82"></script>
+<script src="os-bridge.js?v=ops82"></script>
 </body>
 </html>
