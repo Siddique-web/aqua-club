@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops82"></script>
+<script src="i18n.js?v=ops83"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-03.webp" type="image/webp">
@@ -721,7 +721,7 @@ input,select,textarea{border-radius:14px}
 .shop-lead{margin:0 0 .35rem;font:800 .85rem var(--fh)}
 .shop-tools{flex:none;min-width:0;display:grid;gap:.4rem}
 .shop-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:.55rem;margin:.4rem 0 0;padding:0 .1rem .35rem;width:100%;min-width:0;flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.shop-card{display:grid;grid-template-columns:4.5rem minmax(0,1fr) auto;align-items:center;gap:.55rem .65rem;padding:.45rem .5rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:left;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+.shop-card{display:grid;grid-template-columns:4.5rem minmax(0,1fr) auto;align-items:center;gap:.55rem .65rem;padding:.45rem .5rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:left;min-width:0;width:100%;max-width:100%;box-sizing:border-box;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .shop-card .shop-ph{position:relative;display:grid;place-items:center;width:4.5rem;height:4.5rem;border-radius:12px;overflow:hidden;background:var(--sand);color:var(--mic-fg,#0069A8)}
 .shop-card .shop-ph img{width:100%;height:100%;max-width:none;object-fit:cover;display:block}
 .shop-card .shop-ph .mic{position:absolute;inset:0}
@@ -740,6 +740,7 @@ input,select,textarea{border-radius:14px}
   .shop-card .shop-ph{width:5.5rem;height:5.5rem}
 }
 .shop-card:hover{border-color:var(--cyan);background:var(--cyan-soft)}
+.shop-card:active{transform:scale(.99);background:var(--cyan-soft)}
 #shopWrap{flex:1 1 auto;min-height:0;min-width:0;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 #shopCats.mtabs,#cartDlg .mtabs{width:100%;max-width:100%;min-width:0;padding-inline:0;overflow-x:auto}
 #cartBody{min-width:0;min-height:0}
@@ -1261,7 +1262,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops82">
+<link rel="stylesheet" href="garcom.css?v=ops83">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -3995,11 +3996,12 @@ const REVIEWS = [];
       const el = document.createElement('article'); el.className = 'mcard m-in'; el.dataset.id = m.id; el.style.setProperty('--d', Math.min(i, 10) * 42 + 'ms');
       const q = qtyOf(m.id);
       el.innerHTML = `<div class="mimg-wrap"><button class="mimg" type="button" aria-label="${esc(tr('menu.addAria', { n: m.name }))}">${media(m)}<span class="mimg-plus" aria-hidden="true">+</span></button><button class="mdet" type="button">${esc(tr('menu.more'))}</button></div><div class="mbody"><div class="mhead-row"><h3>${esc(m.name)}</h3><b class="price">${money(m.price)}</b></div><p>${esc(m.desc || '')}</p><div class="mfoot"><div class="mqty"><button type="button" class="mq-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${q}</b><button type="button" class="mq-plus" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="madd" type="button">${esc(tr('menu.addCart'))}</button></div></div>`;
-      $('.mimg', el).addEventListener('click', () => addFromCard(m));
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.mdet, .mq-minus')) return;
+        addFromCard(m);
+      });
       $('.mdet', el).addEventListener('click', (e) => { e.stopPropagation(); openItem(m); });
-      $('.madd', el).addEventListener('click', () => addFromCard(m));
-      $('.mq-plus', el).addEventListener('click', () => addFromCard(m));
-      $('.mq-minus', el).addEventListener('click', () => takeFromCart(m.id));
+      $('.mq-minus', el).addEventListener('click', (e) => { e.stopPropagation(); takeFromCart(m.id); });
       mgrid.appendChild(el);
     });
     if (wrap) wrap.scrollTop = 0;
@@ -4469,11 +4471,20 @@ const REVIEWS = [];
     list.forEach((m) => {
       const n = cart.filter((l) => l.id === m.id).reduce((s, l) => s + l.qty, 0);
       const b = document.createElement('div'); b.className = 'shop-card';
+      b.setAttribute('role', 'button');
+      b.setAttribute('tabindex', '0');
+      b.setAttribute('aria-label', tr('menu.addAria', { n: m.name }));
       b.innerHTML = `<span class="shop-ph">${media(m)}</span><span class="shop-txt"><b>${esc(m.name)}</b><small>${money(m.price)}${isPizzaItem(m) ? '<br>' + esc(tr('place.pizzaChip')) : ''}</small></span>` +
         (n ? `<span class="shop-step"><button type="button" class="shop-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${n}</b><button type="button" class="shop-plus" aria-label="${esc(tr('dlg.more'))}">+</button></span>`
           : `<button type="button" class="shop-add" aria-label="${esc(tr('dlg.more'))}">+</button>`);
-      b.querySelector('.shop-add, .shop-plus')?.addEventListener('click', () => addToCart(m.id, 1, ''));
-      b.querySelector('.shop-minus')?.addEventListener('click', () => takeFromCart(m.id));
+      b.addEventListener('click', (e) => {
+        if (e.target.closest('.shop-minus')) return;
+        addFromCard(m);
+      });
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); addFromCard(m); }
+      });
+      b.querySelector('.shop-minus')?.addEventListener('click', (e) => { e.stopPropagation(); takeFromCart(m.id); });
       grid.appendChild(b);
     });
     grid.scrollTop = resetTop ? 0 : keepY;
@@ -5741,8 +5752,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops82"></script>
-<script src="garcom.js?v=ops82"></script>
-<script src="os-bridge.js?v=ops82"></script>
+<script src="os-config.js?v=ops83"></script>
+<script src="garcom.js?v=ops83"></script>
+<script src="os-bridge.js?v=ops83"></script>
 </body>
 </html>
