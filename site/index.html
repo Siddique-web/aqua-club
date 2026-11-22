@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops72"></script>
+<script src="i18n.js?v=ops74"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-01.webp" type="image/webp">
@@ -109,6 +109,7 @@ dialog.lang-menu::backdrop{background:transparent}
 .lang-menu button.on b{color:#000}
 html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lang^="zh"] .mtab,html[lang^="zh"] .chip,html[lang^="zh"] .tag,html[lang^="zh"] .mtable,html[lang^="zh"] .fab,html[lang^="zh"] .lang-btn{letter-spacing:0;text-transform:none}
 .waiter-box{display:flex;gap:1rem;align-items:center;background:var(--cyan-soft);padding:1rem;border-radius:12px;margin:1rem 0}
+.waiter-box[hidden]{display:none!important}
 .waiter-box img{width:64px;height:64px;border-radius:50%;object-fit:cover}
 .head-right .btn{display:none;padding:.55rem 1.05rem;min-height:46px;border-radius:999px;white-space:nowrap}
 .burger{width:50px;height:50px;border:2.5px solid #000;border-radius:4px;background:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:background-color var(--ease),color var(--ease)}
@@ -167,8 +168,12 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
   .head-right .wx-chip,
   .head-right .acc-chip,
   .head-right .acc-chip.on,
-  .head-right .langpick,
   .head-right .btn{display:none!important}
+  .head-right .langpick{display:flex!important;align-items:center}
+  .head-right .lang-btn{min-width:44px;min-height:44px;padding:.18rem .32rem;gap:.2rem}
+  .head-right .lang-btn > span:not(.flag){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .head-right .lang-btn .chev{width:.7rem;height:.7rem}
+  .m-lang{display:none!important}
   .brand{min-width:0;overflow:visible}
   .brand span{overflow:visible;max-width:100%}
   .brand b,.brand small{overflow:visible;text-overflow:unset;white-space:nowrap}
@@ -279,26 +284,23 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 /* secções */
 section{position:relative}
 .band{padding:5rem 0}
-#menu.band{padding:2.6rem 0 3.4rem;overflow:visible;z-index:4}
-#menu .menu-head{margin:0 0 1.35rem;display:grid;gap:.35rem;position:relative;z-index:2}
-#menu .menu-head .sh{display:grid;justify-items:start;gap:.45rem}
-#menu .menu-head .eyebrow{margin:0;font:800 clamp(1rem,4.6vw,1.55rem)/1.15 var(--fh);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-d);white-space:normal}
-#menu .menu-head .display,#menu .sh h2{font-size:clamp(2.05rem,7.2vw,3.35rem);line-height:.92;letter-spacing:-.02em;margin:.1rem 0 0;color:var(--cyan-d)}
-#menu .sh .bar2{margin-top:.2rem;height:6px;width:72px}
-#menu .menu-head .sh p{max-width:40rem;margin-top:.45rem;font-size:1rem}
-#menu .how-inline{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin:.55rem 0 0;padding:0;list-style:none;counter-reset:step}
-#menu .how-inline li{display:flex;align-items:center;gap:.4rem;font:700 .82rem var(--fh);color:var(--muted)}
-#menu .how-inline li::before{counter-increment:step;content:counter(step);width:1.35rem;height:1.35rem;border-radius:50%;background:var(--cyan);color:#04283F;display:grid;place-items:center;font-size:.72rem;flex:none}
-#menu .mtool{position:sticky;top:var(--head);z-index:22;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.45rem .55rem;align-items:center;background:rgba(255,248,236,.96);backdrop-filter:blur(12px);padding:.4rem 0 .5rem;margin-top:.35rem;border-bottom:1px solid rgba(0,0,0,.06)}
+#menu.band{padding:1.6rem 0 3.2rem;overflow:visible;z-index:4;background:var(--sand)}
+#menu .menu-head{margin:0 0 1.05rem;display:grid;gap:.35rem;position:relative;z-index:2}
+#menu .menu-head .sh{display:grid;justify-items:start;gap:.35rem}
+#menu .menu-head .eyebrow{margin:0;font:800 clamp(.82rem,3.4vw,1.05rem)/1.15 var(--fh);letter-spacing:.14em;text-transform:uppercase;color:var(--cyan-d);white-space:normal}
+#menu .menu-head .display,#menu .sh h2{font-size:clamp(1.85rem,6.2vw,2.85rem);line-height:.92;letter-spacing:-.03em;margin:.05rem 0 0;color:#1a1a1a}
+#menu .sh .bar2{margin-top:.15rem;height:5px;width:56px}
+#menu .menu-head .sh p{max-width:38rem;margin-top:.35rem;font-size:.95rem}
+#menu .how-inline{display:flex;flex-wrap:wrap;gap:.45rem .8rem;margin:.4rem 0 0;padding:0;list-style:none;counter-reset:step}
+#menu .how-inline li{display:flex;align-items:center;gap:.4rem;font:700 .78rem var(--fh);color:var(--muted)}
+#menu .how-inline li::before{counter-increment:step;content:counter(step);width:1.25rem;height:1.25rem;border-radius:50%;background:var(--cyan);color:#04283F;display:grid;place-items:center;font-size:.68rem;flex:none}
+#menu .mtool{position:sticky;top:var(--head-bar);z-index:22;display:grid;gap:.55rem;align-items:center;background:color-mix(in srgb,var(--sand) 94%,#fff);backdrop-filter:blur(14px);padding:.55rem 0 .65rem;margin:0;border-bottom:1px solid rgba(0,0,0,.05);box-shadow:0 10px 18px -16px rgba(20,40,70,.5)}
 #menu,#menu .wrap{max-width:100%}
-#menu .mstick{display:contents}
+#menu .mstick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.45rem;align-items:center}
 #menu .mtabs{grid-column:1/-1}
-#menu .wall-panel{margin:0 0 1.1rem}
-#menu .wall{height:min(52svh,420px)}
-@media(max-width:900px){#menu .how-inline,#menu .menu-head .sh p{display:none}}
-#menu .place-chip{grid-column:1/-1;max-width:none;width:100%}
-@media(min-width:720px){#menu .wall{height:min(58svh,520px);grid-template-columns:repeat(3,1fr)}}
-@media(min-width:1000px){#menu .wall{height:min(64svh,580px)}#menu .mtool{grid-template-columns:minmax(0,1fr) auto}#menu .place-chip{grid-column:auto;width:auto;max-width:min(100%,380px)}}
+@media(max-width:900px){#menu .how-inline{display:none}}
+#menu .place-chip{max-width:none;width:100%}
+@media(min-width:720px){#menu .place-chip{width:auto;max-width:min(100%,380px);justify-self:start}}
 .paper{background:var(--cyan-soft)}
 .sh h2{font-size:clamp(2.2rem,6vw,3.75rem);color:var(--cyan-d)}
 .sh .bar2{width:80px;height:6px;background:#000;margin-top:1rem}
@@ -666,9 +668,9 @@ input,select,textarea{border-radius:14px}
 .mtabs-row{display:flex;align-items:center;gap:.35rem;min-width:0;width:100%;max-width:100%}
 .mtabs{display:flex;flex-wrap:nowrap;gap:.32rem;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;padding:.1rem .1rem .3rem;max-width:100%;min-width:0;flex:1 1 auto;touch-action:pan-x;scroll-padding-inline:10px}
 .mtabs::-webkit-scrollbar{display:none}
-.mtab{flex:none;padding:.42rem .68rem;border:2px solid var(--cyan-line);border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);white-space:nowrap;cursor:pointer;transition:transform var(--ease),border-color var(--ease),background-color var(--ease)}
-.mtab:hover{border-color:var(--cyan);transform:translateY(-2px)}
-.mtab[aria-selected=true]{background:var(--cyan);border-color:var(--cyan)}
+.mtab{flex:none;padding:.48rem .9rem;border:0;border-radius:999px;background:#fff;color:#5a4a3a;font:800 .72rem var(--fh);white-space:nowrap;cursor:pointer;box-shadow:0 4px 14px -10px rgba(20,40,70,.35);transition:transform var(--ease),background-color var(--ease),color var(--ease)}
+.mtab:hover{background:var(--cyan-soft);transform:translateY(-1px)}
+.mtab[aria-selected=true]{background:#E89A3C;color:#fff;box-shadow:0 8px 18px -10px rgba(232,154,60,.7)}
 .mtab-more{display:none!important}
 .mtab-more .ico{width:.85rem;height:.85rem;margin-right:.15rem;vertical-align:-.1rem}
 .mtab-more[aria-expanded=true]{background:var(--yellow);color:#000;border-color:var(--yellow)}
@@ -682,7 +684,7 @@ input,select,textarea{border-radius:14px}
 .mcat-all{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem;padding:.4rem 1.15rem 1.5rem}
 .mcat-all .mtab{width:100%;text-align:center;white-space:normal;line-height:1.25;padding:.7rem .6rem}
 @media(min-width:720px){.mcat-dlg{margin:auto;border-radius:28px}.mcat-all{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.msearch{display:flex;align-items:center;gap:.5rem;background:#fff;border:2px solid var(--cyan-line);border-radius:999px;padding:0 1rem;transition:border-color var(--ease),box-shadow var(--ease)}
+.msearch{display:flex;align-items:center;gap:.5rem;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:999px;padding:0 1rem;box-shadow:0 8px 22px -18px rgba(20,40,70,.35);transition:border-color var(--ease),box-shadow var(--ease)}
 .msearch:focus-within{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,168,255,.25)}
 .msearch input{border:0;background:transparent;min-height:46px;padding:0;box-shadow:none!important}
 .msearch input:focus{outline:none}
@@ -725,7 +727,8 @@ input,select,textarea{border-radius:14px}
 .shop-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:.55rem;margin:.4rem 0 0;padding:0 .1rem .35rem;width:100%;min-width:0;flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .shop-card{display:grid;grid-template-columns:4.5rem minmax(0,1fr) auto;align-items:center;gap:.55rem .65rem;padding:.45rem .5rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#fff;text-align:left;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
 .shop-card .shop-ph{display:grid;place-items:center;width:4.5rem;height:4.5rem;border-radius:12px;overflow:hidden;background:linear-gradient(150deg,var(--cyan),#9EDCFF);color:#000}
-.shop-card .shop-ph img,.shop-card .shop-ph svg{width:2.2rem;height:2.2rem;max-width:none;object-fit:contain;display:block}
+.shop-card .shop-ph img{width:100%;height:100%;max-width:none;object-fit:cover;display:block}
+.shop-card .shop-ph svg{width:2.2rem;height:2.2rem;max-width:none;object-fit:contain;display:block}
 .shop-card .shop-txt{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:.2rem;min-width:0}
 .shop-card b{display:block;width:100%;font:800 .88rem/1.25 var(--fh);overflow-wrap:anywhere;word-break:break-word;color:#000}
 .shop-card small{display:block;color:var(--cyan-d);font:800 .92rem/1.2 var(--fh)}
@@ -802,9 +805,27 @@ input,select,textarea{border-radius:14px}
 .fee-bands,.bands{display:none!important}
 section.band{display:block;border:0;border-radius:0;background:transparent;cursor:auto;text-align:initial}
 .mtable select{max-width:240px}
-@media(min-width:900px){.mtool{grid-template-columns:1fr auto auto;align-items:center}}
-.mgrid-wrap{max-height:min(78svh,52rem);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;overflow-anchor:none;scroll-padding-top:.5rem;margin-top:.7rem;padding:.55rem .45rem .7rem;border:1.5px solid var(--cyan-line);border-radius:22px;background:rgba(255,255,255,.55)}
-.mgrid{display:grid;grid-template-columns:1fr;gap:.85rem;margin-top:0;width:100%;max-width:100%;overflow-x:clip;align-items:start}
+@media(min-width:900px){.mtool{grid-template-columns:1fr auto auto;align-items:center}#menu .mtool{grid-template-columns:minmax(0,1fr)}}
+.menu-stage{display:grid;gap:1.15rem;align-items:start;margin-top:.15rem}
+.menu-main{min-width:0}
+.menu-aside{display:none;background:#fff;border-radius:24px;padding:1.05rem 1rem 1.15rem;box-shadow:0 18px 40px -24px rgba(20,40,70,.45);min-width:0}
+.menu-aside h3{margin:0 0 .75rem;font:800 1.05rem/1.2 var(--fh)}
+.menu-aside-lines{display:grid;gap:.65rem;max-height:min(52vh,28rem);overflow:auto}
+.menu-aside-empty{margin:0;padding:.7rem .2rem 1rem;color:var(--muted);font:600 .88rem var(--fb)}
+.menu-aside-line{display:grid;grid-template-columns:3.4rem minmax(0,1fr) auto;gap:.55rem;align-items:center}
+.menu-aside-ph{width:3.4rem;height:3.4rem;border-radius:12px;overflow:hidden;background:var(--cyan-soft);display:grid;place-items:center}
+.menu-aside-ph img{width:100%;height:100%;object-fit:cover}
+.menu-aside-line b{display:block;font:800 .78rem/1.2 var(--fh);overflow-wrap:anywhere}
+.menu-aside-line small{display:block;color:var(--cyan-d);font:800 .78rem var(--fh)}
+.menu-aside-tot{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;margin:.9rem 0 .75rem;padding-top:.75rem;border-top:1px dashed rgba(0,0,0,.12);font:800 .82rem var(--fh)}
+.menu-aside-tot b{font-size:1.2rem;color:#1a1a1a}
+.menu-aside .btn{width:100%}
+@media(min-width:1100px){
+  .menu-stage{grid-template-columns:minmax(0,1fr) 300px;gap:1.35rem}
+  .menu-aside{display:block;position:sticky;top:calc(var(--head-bar) + .55rem)}
+}
+.mgrid-wrap{margin-top:.15rem;padding:0;border:0;border-radius:0;background:transparent;max-height:none;overflow:visible}
+.mgrid{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:0;width:100%;max-width:100%;overflow:visible;align-items:stretch}
 .menu-skip{margin:.9rem 0 0;text-align:center}
 .menu-skip a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.4rem 1.1rem;border-radius:999px;background:var(--cyan);color:#000;font:800 .82rem var(--fh);text-decoration:none;letter-spacing:.04em;text-transform:uppercase}
 .menu-skip a:hover{background:var(--yellow)}
@@ -819,28 +840,36 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 #espacos .sh.center .display{font-size:clamp(1.85rem,6.15cqi,3.9rem)}
 #espacos .sh.center .bar2{width:80px;height:4px;margin:1.15rem auto 0}
 #espacos .sh.center p{width:100%;max-width:min(46rem,100%);margin:1.35rem auto 0;padding-inline:.15rem;font-size:clamp(1.06rem,2.6vw,1.22rem);line-height:1.55;letter-spacing:.01em;text-align:center;text-wrap:balance}
-.mcard{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto;align-items:stretch;align-content:start;background:#fff;border:1.5px solid var(--cyan-line);border-radius:24px;overflow:hidden;min-width:0;box-shadow:0 14px 30px -22px rgba(0,105,168,.6);transition:transform var(--ease),box-shadow var(--ease),border-color var(--ease);content-visibility:auto;contain-intrinsic-size:140px}
-.mcard:hover{transform:translateY(-4px);border-color:var(--cyan);box-shadow:0 24px 40px -22px rgba(0,168,255,.7)}
+.mcard{display:flex;flex-direction:column;background:#fff;border:0;border-radius:22px;overflow:hidden;min-width:0;box-shadow:0 14px 32px -20px rgba(20,40,70,.42);transition:transform var(--ease),box-shadow var(--ease);content-visibility:auto;contain-intrinsic-size:380px}
+.mcard:hover{transform:translateY(-4px);box-shadow:0 22px 40px -18px rgba(20,40,70,.48)}
 @keyframes mcat-fade{from{opacity:0}to{opacity:1}}
 @keyframes mcard-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .mcat-now.m-in{animation:mcat-fade .38s ease both}
 .mcard.m-in{animation:mcard-in .5s cubic-bezier(.22,.72,.2,1) both;animation-delay:var(--d,0ms)}
 @media(prefers-reduced-motion:reduce){.mcat-now.m-in,.mcard.m-in{animation:none}}
-.mimg{position:relative;border:0;padding:0;width:112px;height:112px;min-height:112px;max-height:112px;min-width:112px;cursor:pointer;display:grid;place-items:center;background:linear-gradient(150deg,var(--cyan),#9EDCFF);color:#000;overflow:hidden;align-self:start;flex:none}
-.mimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 42%;transform:none}
-.mimg .ico{width:52px;height:52px;opacity:.9;stroke-width:1.25px}
-.mbody{display:grid;gap:.5rem;align-content:space-between;padding:.9rem 1rem;min-width:0}
-.mbody h3{font:800 1.02rem/1.2 var(--fh);overflow-wrap:anywhere}
-.mbody p{margin:.25rem 0 0;font-size:.88rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.mfoot{display:flex;justify-content:space-between;align-items:center;gap:.6rem}
+.mimg{position:relative;border:0;padding:0;width:100%;aspect-ratio:4/3;height:auto;min-height:0;max-height:none;min-width:0;cursor:pointer;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);color:#000;overflow:hidden;flex:none}
+.mimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 46%;transform:none}
+.mimg .ico{width:64px;height:64px;opacity:.88;stroke-width:1.25px}
+.mbody{display:grid;gap:.55rem;align-content:start;padding:.85rem .95rem 1rem;min-width:0;flex:1}
+.mbody h3{font:800 .98rem/1.2 var(--fh);overflow-wrap:anywhere;color:#1a1a1a}
+.mhead-row{display:flex;justify-content:space-between;align-items:flex-start;gap:.7rem}
+.mhead-row .price{flex:none;font:800 1.05rem var(--fh);color:#1a1a1a;white-space:nowrap}
+.mbody p{margin:0;font-size:.82rem;line-height:1.4;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.3em}
+.mfoot{display:flex;align-items:center;gap:.5rem;margin-top:.15rem}
 .price{font:800 1.2rem var(--fh);color:var(--cyan-d)}
 .add{width:44px;height:44px;border:0;border-radius:50%;background:var(--yellow);color:#000;font:800 1.5rem/1 var(--fh);cursor:pointer;transition:transform var(--ease),background-color var(--ease)}
-.add:hover{background:var(--cyan);transform:scale(1.14) rotate(90deg)}
-.mcat-now{grid-column:1/-1;margin:0;padding:.25rem .15rem .5rem;font:800 .92rem var(--fh);letter-spacing:.04em;color:var(--cyan-d);position:sticky;top:0;z-index:2;background:linear-gradient(#fff 82%,rgba(255,255,255,0))}
+.add:hover{background:var(--cyan);transform:scale(1.08)}
+.mqty{display:inline-flex;align-items:center;gap:.05rem;border:1.5px solid rgba(0,0,0,.08);border-radius:999px;padding:.12rem;background:#fff;flex:none}
+.mqty button{width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#1a1a1a;font:800 1.15rem/1 var(--fh);cursor:pointer}
+.mqty button:hover{background:var(--sand)}
+.mqty b{min-width:1.1rem;text-align:center;font:800 .88rem var(--fh)}
+.madd{flex:1;min-height:42px;border:0;border-radius:999px;background:#C48A4A;color:#fff;font:800 .78rem var(--fh);letter-spacing:.02em;cursor:pointer;padding:.45rem .7rem;transition:background-color var(--ease),transform var(--ease)}
+.madd:hover{background:#a87338;transform:translateY(-1px)}
+.mcat-now{grid-column:1/-1;margin:0;padding:.15rem .1rem .2rem;font:800 .92rem var(--fh);letter-spacing:.04em;color:#5a4a3a;position:static;background:transparent}
 .mempty{grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem}
 .menu-note{margin:1.6rem auto 0;max-width:46rem;text-align:center;font-size:.88rem;color:var(--muted)}
-@media(min-width:720px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard{grid-template-columns:1fr;grid-template-rows:auto auto}.mimg{width:100%;height:188px;min-height:188px;max-height:188px;min-width:0}.mimg .ico{width:72px;height:72px}}
-@media(min-width:1100px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{height:220px;min-height:220px;max-height:220px}.mimg .ico{width:80px;height:80px}}
+@media(min-width:900px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mimg{aspect-ratio:5/4}}
+@media(min-width:1200px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.mimg{aspect-ratio:4/3}}
 /* botões flutuantes */
 .fabs{position:fixed;left:auto;right:max(.5rem, env(safe-area-inset-right,0px));bottom:max(.7rem, env(safe-area-inset-bottom,0px));z-index:125;display:grid;gap:.38rem;justify-items:stretch;width:var(--fab-w);max-width:calc(100% - 1rem);pointer-events:none;overflow:visible}
 .fabs .fab,.fabs .fab-hint{pointer-events:auto}
@@ -895,6 +924,15 @@ html:not(.staff-chrome) .fabs{bottom:max(.75rem, env(safe-area-inset-bottom,0px)
 #gMsgUp,#gMsgIn{display:none}
 .guest-msg.err{color:#b42318}
 .guest-msg.ok{color:#0f7a3a}
+.guest-keep{display:flex!important;flex-direction:row!important;align-items:flex-start;gap:.55rem;margin:.1rem 0 0;font:600 .8rem/1.35 var(--fb)!important;color:#223;cursor:pointer}
+.guest-keep input{width:1.15rem;height:1.15rem;margin:.12rem 0 0;flex:none;accent-color:#111}
+.guest-saved{display:grid;gap:.4rem;margin:.1rem 0 .15rem}
+.guest-saved[hidden]{display:none!important}
+.guest-saved .btn{margin:0;min-height:44px;font-size:.72rem}
+.guest-saved-list{display:grid;gap:.3rem}
+.guest-chip{display:flex;align-items:center;justify-content:space-between;gap:.5rem;width:100%;min-height:44px;padding:.45rem .75rem;border:1.5px solid #000;border-radius:14px;background:#fff;font:700 .82rem var(--fb);text-align:left;cursor:pointer}
+.guest-chip:hover{background:var(--cyan-soft)}
+.guest-chip small{display:block;font:600 .72rem var(--fb);color:var(--muted)}
 .guest-note{margin:.2rem 0 0;font-size:.8rem;color:var(--muted);text-align:center}
 .guest-hint{margin:0;font:600 .78rem/1.35 var(--fb);color:#223}
 .guest-wait{display:grid;gap:.7rem;padding:.35rem 0 .2rem;text-align:center}
@@ -925,7 +963,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 .dhead h2{font:800 clamp(1.05rem,5vw,1.4rem)/1.15 var(--fh);text-transform:uppercase;min-width:0;overflow-wrap:anywhere}
 .dx{flex:none;width:42px;height:42px;border:2px solid #000;border-radius:50%;background:#fff;font-size:1.1rem;cursor:pointer;transition:background-color var(--ease),color var(--ease)}
 .dx:hover{background:#000;color:#fff}
-.dimg{position:relative;width:100%;height:min(38svh,280px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(150deg,var(--cyan),#9EDCFF);cursor:default}
+.dimg{position:relative;width:100%;height:min(42svh,320px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(150deg,#f3e6d4,#ead7bf);cursor:default}
 .dimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
 .dimg .ico{width:84px;height:84px;opacity:.86;stroke-width:1.2px}
 .dprice{font:800 1.6rem var(--fh);color:var(--cyan-d);margin:0}
@@ -1178,7 +1216,7 @@ html.dlg-open .fabs,html.dlg-open .pn{visibility:hidden!important;pointer-events
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops72">
+<link rel="stylesheet" href="garcom.css?v=ops74">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1395,11 +1433,6 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
     <div class="sh"><span class="eyebrow" data-i18n="menu.eye">Gastronomia &amp; Bar</span><h2 class="display" id="menu-t" data-i18n="menu.title">O nosso menu</h2><div class="bar2" aria-hidden="true"></div><p data-i18n="menu.lead">Escolha a categoria, junte ao pedido e levamos à mesa. Preços em meticais (MT).</p></div>
     <ol class="how-inline"><li data-i18n="menu.s1">Onde está</li><li data-i18n="menu.s2">Filtre e adicione</li><li data-i18n="menu.s3">Envie o pedido</li></ol>
       </div>
-  <div class="wall-panel reveal">
-    <h3 class="display" data-i18n="menu.wallT">Os pratos do Aqua Club</h3>
-    <p data-i18n="menu.wallP">Toque num prato para ver detalhes, extras e o ponto da carne.</p>
-    <div class="wall" id="wall" role="group" data-i18n-aria="menu.wallAria"></div>
-  </div>
   <div class="mtool">
     <div class="mstick">
       <label class="msearch"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg><span class="sr" data-i18n="menu.search">Procurar no menu</span><input type="search" id="mq" data-i18n-placeholder="menu.search" placeholder="Procurar no menu" autocomplete="off"></label>
@@ -1419,8 +1452,18 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
     <div class="mcat-all" id="mcatAll"></div>
   </dialog>
   <div class="waiter-box" id="waiterBox" hidden></div>
-  <div class="mgrid-wrap" id="mgridWrap">
-    <div class="mgrid" id="mgrid"></div>
+  <div class="menu-stage">
+    <div class="menu-main">
+      <div class="mgrid-wrap" id="mgridWrap">
+        <div class="mgrid" id="mgrid"></div>
+      </div>
+    </div>
+    <aside class="menu-aside" id="menuAside" aria-label="Resumo do pedido">
+      <h3 data-i18n="cart.title">O seu pedido</h3>
+      <div class="menu-aside-lines" id="menuAsideLines"></div>
+      <div class="menu-aside-tot"><span data-i18n="cart.total">Total</span><b id="menuAsideTot">0 MT</b></div>
+      <button type="button" class="btn" id="menuAsideSend" data-i18n="cart.send">Enviar pedido</button>
+    </aside>
   </div>
   <p class="menu-skip"><a href="#espacos" data-i18n="menu.skip">Seguir para os espaços ↓</a></p>
   <p class="menu-note" data-i18n="menu.note">Tem alguma alergia ou restrição alimentar? Informe o garçom antes de pedir. Os preços e a disponibilidade podem mudar.</p>
@@ -1824,13 +1867,19 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
       <p class="guest-hint">Tem de ser o contacto onde tem WhatsApp. Fica gravado na sua conta e em todos os pedidos.</p>
       <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>Palavra-passe</span><input name="password" id="gPassUp" type="password" autocomplete="new-password" required minlength="6" placeholder="Mínimo 6 caracteres"></label>
       <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>Confirmar palavra-passe</span><input name="password2" id="gPass2" type="password" autocomplete="new-password" required minlength="6" placeholder="Repita a palavra-passe"></label>
+      <label class="guest-keep"><input type="checkbox" id="gKeepUp" checked> Guardar esta conta neste telemóvel (entrar sem voltar a escrever)</label>
       <button class="btn btn-cyan btn-block" type="submit">Criar conta e continuar</button>
       <p class="guest-msg" id="gMsgUp" role="alert"></p>
       <p class="guest-note"><span data-i18n="legal.accept">Ao criar conta aceita os termos e a privacidade: os dados servem só para reservas, atendimento e histórico de pedidos.</span> <a href="legal.html" data-i18n="foot.legal">Termos e privacidade</a></p>
     </form>
     <form class="guest-form" id="guestFormIn" hidden novalidate>
-      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</span><input name="email" id="gEmailIn" type="email" autocomplete="username" required placeholder="nome@email.com"></label>
+      <div class="guest-saved" id="gSavedBox" hidden>
+        <button class="btn btn-line btn-block" type="button" id="gUseSaved">Usar conta guardada neste telemóvel</button>
+        <div class="guest-saved-list" id="gSavedList"></div>
+      </div>
+      <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</span><input name="username" id="gEmailIn" type="email" autocomplete="username" required placeholder="nome@email.com"></label>
       <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>Palavra-passe</span><input name="password" id="gPassIn" type="password" autocomplete="current-password" required minlength="6"></label>
+      <label class="guest-keep"><input type="checkbox" id="gKeepIn" checked> Manter-me ligado neste telemóvel</label>
       <button class="btn btn-cyan btn-block" type="submit">Entrar</button>
       <p class="guest-msg" id="gMsgIn" role="alert"></p>
     </form>
@@ -2412,9 +2461,10 @@ const REVIEWS = [];
     })();
     return sbBoot;
   }
-  let guest = null, pendingGuestFn = null;
+  let guest = null, pendingGuestFn = null, guestBusy = false;
   const emailOk = (v) => /^\S+@\S+\.\S+$/.test(String(v || '').trim());
   const PENDING_KEY = 'aq-guest-pending';
+  const VAULT_KEY = 'aq-guest-vault';
   function guestRedirect() {
     const path = location.pathname || '/';
     return location.origin + path + (path.indexOf('?') >= 0 ? '&' : '?') + 'aq=confirm';
@@ -2439,13 +2489,90 @@ const REVIEWS = [];
     try { sessionStorage.removeItem(PENDING_KEY); } catch (e) { /* */ }
     try { localStorage.removeItem(PENDING_KEY); } catch (e) { /* */ }
   }
-  async function rememberOnPhone(email, password, name) {
-    try { store.set('aq-guest-email', email); } catch (e) { /* */ }
+  function readVault() {
+    try {
+      const raw = store.get(VAULT_KEY) || '[]';
+      const list = JSON.parse(raw);
+      return Array.isArray(list) ? list.filter((x) => x && emailOk(x.email) && x.password) : [];
+    } catch (e) { return []; }
+  }
+  function saveVault(email, password, name) {
+    const em = String(email || '').trim().toLowerCase();
+    if (!emailOk(em) || !password) return;
+    const list = readVault().filter((x) => String(x.email).toLowerCase() !== em);
+    list.unshift({ email: em, password, name: String(name || '').trim(), at: Date.now() });
+    try { store.set(VAULT_KEY, JSON.stringify(list.slice(0, 6))); } catch (e) { /* */ }
+    try { store.set('aq-guest-email', em); } catch (e) { /* */ }
+  }
+  function wantKeep(id) {
+    const el = $(id);
+    return !el || el.checked;
+  }
+  function rememberOnPhone(email, password, name) {
+    saveVault(email, password, name);
     try {
       if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
-        await navigator.credentials.store(new PasswordCredential({ id: email, password, name: name || 'Aqua Club' }));
+        navigator.credentials.store(new PasswordCredential({ id: email, password, name: name || 'Aqua Club' })).catch(() => {});
       }
     } catch (e) { /* */ }
+  }
+  async function pickPhoneCredentials(forcePrompt) {
+    try {
+      if (navigator.credentials && navigator.credentials.get) {
+        const cred = await navigator.credentials.get({
+          password: true,
+          mediation: forcePrompt ? 'required' : 'optional'
+        });
+        if (cred && cred.id && cred.password) {
+          return { email: String(cred.id).trim().toLowerCase(), password: cred.password, name: cred.name || '' };
+        }
+      }
+    } catch (e) { /* cancelado ou sem suporte */ }
+    const v = readVault();
+    return v[0] || null;
+  }
+  function fillLogin(email, password) {
+    const em = $('#gEmailIn'), pw = $('#gPassIn');
+    if (em && email) em.value = email;
+    if (pw && password) pw.value = password;
+  }
+  function paintSavedAccounts() {
+    const box = $('#gSavedBox'), list = $('#gSavedList');
+    if (!box) return;
+    const vault = readVault();
+    const pending = readPending();
+    const rows = [];
+    const seen = {};
+    [pending, ...vault].forEach((x) => {
+      if (!x || !x.email || seen[x.email]) return;
+      seen[x.email] = true;
+      rows.push(x);
+    });
+    box.hidden = !rows.length;
+    if (list) {
+      list.innerHTML = rows.map((x) => {
+        const label = x.name ? '<b>' + String(x.name).split(' ')[0] + '</b><small>' + x.email + '</small>' : '<b>' + x.email + '</b>';
+        return '<button type="button" class="guest-chip" data-saved-mail="' + x.email.replace(/"/g, '') + '">' + label + '</button>';
+      }).join('');
+    }
+  }
+  async function applySavedAccount(email) {
+    const em = String(email || '').trim().toLowerCase();
+    const row = readVault().find((x) => String(x.email).toLowerCase() === em) || (readPending() && String(readPending().email).toLowerCase() === em ? readPending() : null);
+    if (row && row.password) {
+      fillLogin(row.email, row.password);
+      guestMsg('', 'Conta guardada. A entrar…');
+      $('#guestFormIn')?.requestSubmit();
+      return;
+    }
+    const cred = await pickPhoneCredentials(true);
+    if (cred) {
+      fillLogin(cred.email, cred.password);
+      guestMsg('', 'Conta do telemóvel. A entrar…');
+      $('#guestFormIn')?.requestSubmit();
+      return;
+    }
+    guestMsg('err', 'Não há palavra-passe guardada. Escreva-a uma vez e marque «Manter-me ligado».');
   }
   function showGuestWait(email) {
     const w = $('#guestWaitMail');
@@ -2668,11 +2795,19 @@ const REVIEWS = [];
     $('#guestFormUp').hidden = !up;
     $('#guestFormIn').hidden = up;
     guestMsg('', '');
-    const saved = store.get('aq-guest-email');
-    if (!up && saved && !$('#gEmailIn').value) $('#gEmailIn').value = saved;
+    if (!up) {
+      paintSavedAccounts();
+      const saved = (readVault()[0] && readVault()[0].email) || store.get('aq-guest-email') || (readPending() && readPending().email);
+      if (saved && !$('#gEmailIn').value) $('#gEmailIn').value = saved;
+      pickPhoneCredentials(false).then((c) => {
+        if (!c || $('#guestFormIn')?.hidden) return;
+        if (!$('#gEmailIn').value || String($('#gEmailIn').value).toLowerCase() === c.email) fillLogin(c.email, c.password);
+      });
+    }
   }
   function openGuestAuth(tab) {
-    showGuestTab(tab || 'up');
+    const hasSaved = !!(readVault().length || store.get('aq-guest-email') || readPending());
+    showGuestTab(tab || (hasSaved ? 'in' : 'up'));
     $('#guestDlg').showModal();
   }
   async function afterGuest(fn) {
@@ -2681,7 +2816,9 @@ const REVIEWS = [];
     await loadGuest();
     if (guest && guest.id) return fn();
     pendingGuestFn = fn;
-    openGuestAuth('up');
+    const vault = readVault();
+    openGuestAuth(vault.length || store.get('aq-guest-email') ? 'in' : 'up');
+    if (vault[0] && vault[0].password && !$('#gPassIn').value) fillLogin(vault[0].email, vault[0].password);
   }
   function finishGuestAuth() {
     const fn = pendingGuestFn; pendingGuestFn = null;
@@ -2704,6 +2841,11 @@ const REVIEWS = [];
   }
   $('#guestTabUp')?.addEventListener('click', () => showGuestTab('up'));
   $('#guestTabIn')?.addEventListener('click', () => showGuestTab('in'));
+  $('#gUseSaved')?.addEventListener('click', () => applySavedAccount($('#gEmailIn')?.value || (readVault()[0] && readVault()[0].email)));
+  $('#gSavedList')?.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-saved-mail]');
+    if (b) applySavedAccount(b.getAttribute('data-saved-mail'));
+  });
   $('#guestWaitIn')?.addEventListener('click', async () => {
     guestMsg('', 'A confirmar…');
     try {
@@ -2731,11 +2873,13 @@ const REVIEWS = [];
     try { await initBackend(); } catch (err) { /* */ }
     if (!sb) { guestMsg('err', 'Sem ligação à nuvem.'); return; }
     const btn = e.submitter || $('#guestFormUp button[type=submit]');
+    if (guestBusy) return;
+    guestBusy = true;
     if (btn) btn.disabled = true;
     guestMsg('', 'A criar a sua conta…');
     try {
       writePending({ email, password: pass, name, phone });
-      await rememberOnPhone(email, pass, name);
+      if (wantKeep('#gKeepUp')) rememberOnPhone(email, pass, name);
       const { data, error } = await sb.auth.signUp({
         email, password: pass,
         options: { data: { name, phone }, emailRedirectTo: guestRedirect() }
@@ -2756,15 +2900,23 @@ const REVIEWS = [];
       await loadGuest();
       if (!guest || !guest.id) {
         showGuestWait(email);
-        guestMsg('ok', 'Conta criada. Confirme o e-mail para entrar automaticamente.');
+        guestMsg('ok', 'Conta criada. Confirme o e-mail; depois entram os dados já guardados neste telemóvel.');
         return;
       }
-      clearPending();
-      guestMsg('ok', 'Conta criada. Bem-vindo, ' + guest.name.split(' ')[0] + '.');
+      if (wantKeep('#gKeepUp')) rememberOnPhone(email, pass, name);
+      else clearPending();
+      guestMsg('ok', 'Conta criada e ligada. Bem-vindo, ' + guest.name.split(' ')[0] + '.');
       setTimeout(() => { finishGuestAuth(); openAccount(); }, 350);
     } catch (err) {
-      guestMsg('err', authErr(err));
+      const msg = authErr(err);
+      guestMsg('err', msg);
+      if (/já tem conta|already registered/i.test(msg)) {
+        fillLogin(email, pass);
+        showGuestTab('in');
+        guestMsg('ok', 'Esta conta já existe. Toque em Entrar — os dados estão preenchidos.');
+      }
     } finally {
+      guestBusy = false;
       if (btn) btn.disabled = false;
     }
   });
@@ -2778,22 +2930,25 @@ const REVIEWS = [];
     try { await initBackend(); } catch (err) { /* */ }
     if (!sb) { guestMsg('err', 'Sem ligação à nuvem.'); return; }
     const btn = e.submitter || $('#guestFormIn button[type=submit]');
+    if (guestBusy) return;
+    guestBusy = true;
     if (btn) btn.disabled = true;
     guestMsg('', 'A entrar…');
     try {
-      await rememberOnPhone(email, pass);
       const { error } = await sb.auth.signInWithPassword({ email, password: pass });
       if (error) throw error;
       const p = readPending();
       await upsertCustomerRow((await sb.auth.getUser()).data.user, p || {});
       await loadGuest();
       if (!guest || !guest.id) throw new Error('Esta conta não existe como cliente na base de dados.');
-      clearPending();
-      guestMsg('ok', 'Sessão iniciada. A conta fica neste telemóvel até sair.');
+      if (wantKeep('#gKeepIn')) rememberOnPhone(email, pass, guest.name);
+      else clearPending();
+      guestMsg('ok', 'Sessão iniciada. A conta fica neste telemóvel.');
       setTimeout(() => { finishGuestAuth(); openAccount(); }, 250);
     } catch (err) {
       guestMsg('err', authErr(err));
     } finally {
+      guestBusy = false;
       if (btn) btn.disabled = false;
     }
   });
@@ -3492,7 +3647,7 @@ const REVIEWS = [];
   $$('#menuTable,#cartTable,#callTable').forEach((s) => s.addEventListener('change', () => { table = s.value; store.set('aq.mesa', table); fillTables(); if (window.AquaOS) AquaOS.onTable(table); }));
 
   /* menu */
-  let cat = 'todos', query = '', sortAz = false;
+  let cat = 'rapidos', query = '', sortAz = false;
   let lockY = 0, pendingMenuY = null;
   const mtabs = $('#mtabs'), mgrid = $('#mgrid');
   const CAT_PIN = ['rapidos', 'todos', 'entradas', 'pizzas', 'carnes', 'peixes', 'sobremesas', 'cocktails'];
@@ -3679,8 +3834,36 @@ const REVIEWS = [];
     if (/água|agua/.test(n)) return 'i-juice';
     return (m && CAT_ICON[m.cat]) || 'i-snacks';
   }
-  function media(m) {
-    return `<svg class="ico" aria-hidden="true"><use href="#${iconFor(m)}"/></svg>`;
+  const PIC_FOOD = ['assets/prato-petiscos.webp','assets/prato-petiscos-d1.webp','assets/prato-petiscos-d2.webp','assets/petiscos.webp'];
+  const PIC_SWEET = ['assets/prato-mousse.webp','assets/prato-mousse-d1.webp','assets/prato-mousse-d2.webp','assets/sobremesas.webp'];
+  function hashPic(s) {
+    let h = 0;
+    const t = String(s || '');
+    for (let i = 0; i < t.length; i++) h = ((h << 5) - h) + t.charCodeAt(i) | 0;
+    return Math.abs(h);
+  }
+  function picFor(m) {
+    if (m && m.img) return m.img;
+    const catId = (m && m.cat) || '';
+    const n = String((m && (m.name || m.id)) || '').toLowerCase();
+    const sweet = /mousse|gelado|bolo|sobremesa|doce|cupcake|ice/.test(n) || catId === 'sobremesas';
+    const pool = sweet ? PIC_SWEET : PIC_FOOD;
+    return pool[hashPic((m && m.id) || n) % pool.length];
+  }
+  function media(m, eager) {
+    const src = picFor(m);
+    const load = eager ? 'eager' : 'lazy';
+    return `<img alt="" src="${src}" loading="${load}" decoding="async"${eager ? ' fetchpriority="low"' : ''}>`;
+  }
+  function needsOptions(m) {
+    return Boolean(m && ((m.extras && m.extras.length) || m.doneness));
+  }
+  function qtyOf(id) {
+    return cart.filter((l) => l.id === id).reduce((s, l) => s + l.qty, 0);
+  }
+  function addFromCard(m) {
+    if (needsOptions(m)) openItem(m);
+    else addToCart(m.id, 1, '');
   }
   function listedMenu(which, q) {
     const id = which || cat;
@@ -3704,10 +3887,13 @@ const REVIEWS = [];
     mgrid.appendChild(title);
     if (!items.length) { mgrid.insertAdjacentHTML('beforeend', '<p class="mempty">' + esc(tr('menu.empty')) + '</p>'); if (wrap) wrap.scrollTop = 0; return; }
     items.forEach((m, i) => {
-      const el = document.createElement('article'); el.className = 'mcard m-in'; el.style.setProperty('--d', Math.min(i, 10) * 42 + 'ms');
-      el.innerHTML = `<button class="mimg" type="button" aria-label="${esc(tr('menu.details', { n: m.name }))}">${media(m)}</button><div class="mbody"><div><h3>${esc(m.name)}</h3><p>${esc(m.desc)}</p></div><div class="mfoot"><b class="price">${money(m.price)}</b><button class="add" type="button" aria-label="${esc(tr('menu.addAria', { n: m.name }))}">+</button></div></div>`;
+      const el = document.createElement('article'); el.className = 'mcard m-in'; el.dataset.id = m.id; el.style.setProperty('--d', Math.min(i, 10) * 42 + 'ms');
+      const q = qtyOf(m.id);
+      el.innerHTML = `<button class="mimg" type="button" aria-label="${esc(tr('menu.details', { n: m.name }))}">${media(m, i < 6)}</button><div class="mbody"><div class="mhead-row"><h3>${esc(m.name)}</h3><b class="price">${money(m.price)}</b></div><p>${esc(m.desc || '')}</p><div class="mfoot"><div class="mqty"><button type="button" class="mq-minus" aria-label="${esc(tr('dlg.less'))}">−</button><b>${q}</b><button type="button" class="mq-plus" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="madd" type="button">${esc(tr('menu.addCart'))}</button></div></div>`;
       $('.mimg', el).addEventListener('click', () => openItem(m));
-      $('.add', el).addEventListener('click', () => { addToCart(m.id, 1, ''); });
+      $('.madd', el).addEventListener('click', () => addFromCard(m));
+      $('.mq-plus', el).addEventListener('click', () => addFromCard(m));
+      $('.mq-minus', el).addEventListener('click', () => takeFromCart(m.id));
       mgrid.appendChild(el);
     });
     if (wrap) wrap.scrollTop = 0;
@@ -3726,7 +3912,7 @@ const REVIEWS = [];
     $('#itName').textContent = m.name; $('#itPrice').textContent = money(m.price); $('#itDesc').textContent = m.desc; $('#itNote').value = '';
     const pz = $('#itPizzaFee');
     if (pz) { pz.hidden = !isPizzaItem(m); pz.textContent = tr('place.pizzaTake'); }
-    $('#itImg').innerHTML = media(m);
+    $('#itImg').innerHTML = media(m, true);
     $('#itImg').onclick = null;
     const catName = (CATS.find((c) => c[0] === m.cat) || [0, m.cat])[1];
     $('#itInfo').innerHTML = `<div><dt>${esc(tr('menu.cat'))}</dt><dd>${esc(catName)}</dd></div>` +
@@ -3922,6 +4108,42 @@ const REVIEWS = [];
     if (sn) sn.textContent = cartCount() ? tr('cart.nItems', { n: cartCount() }) : '';
     syncCartDock();
     paintShop();
+    paintMenuAside();
+  }
+  function paintMenuAside() {
+    const box = $('#menuAsideLines');
+    const tot = $('#menuAsideTot');
+    if (!box) return;
+    if (!cart.length) {
+      box.innerHTML = '<p class="menu-aside-empty">' + esc(tr('cart.empty')) + '</p>';
+    } else {
+      box.innerHTML = cart.map((l, i) => {
+        const m = lineMenu(l) || l;
+        return `<div class="menu-aside-line" data-i="${i}"><span class="menu-aside-ph">${media(m)}</span><span><b>${esc(l.name || m.name)}</b><small>${money(linePrice(l))}</small></span><span class="mqty"><button type="button" data-aside-minus="${i}" aria-label="${esc(tr('dlg.less'))}">−</button><b>${l.qty}</b><button type="button" data-aside-plus="${i}" aria-label="${esc(tr('dlg.more'))}">+</button></span></div>`;
+      }).join('');
+      $$('[data-aside-minus]', box).forEach((b) => b.addEventListener('click', () => {
+        const i = Number(b.dataset.asideMinus);
+        if (!cart[i]) return;
+        cart[i].qty -= 1;
+        if (cart[i].qty < 1) cart.splice(i, 1);
+        renderCart(); updateFabs();
+      }));
+      $$('[data-aside-plus]', box).forEach((b) => b.addEventListener('click', () => {
+        const i = Number(b.dataset.asidePlus);
+        if (!cart[i]) return;
+        cart[i].qty = Math.min(20, cart[i].qty + 1);
+        renderCart(); updateFabs();
+      }));
+    }
+    if (tot) tot.textContent = money(grandTotal());
+    paintCardQtys();
+  }
+  function paintCardQtys() {
+    if (!mgrid) return;
+    $$('.mcard[data-id]', mgrid).forEach((el) => {
+      const b = $('.mqty b', el);
+      if (b) b.textContent = String(qtyOf(el.dataset.id));
+    });
   }
   function syncCartDock() {
     const edit = $('#cartEdit');
@@ -4838,6 +5060,7 @@ const REVIEWS = [];
     }
   });
   $('#menuCartBtn')?.addEventListener('click', () => openCartView());
+  $('#menuAsideSend')?.addEventListener('click', () => openCartView());
   $('#shopCartBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -5251,8 +5474,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops72"></script>
-<script src="garcom.js?v=ops72"></script>
-<script src="os-bridge.js?v=ops72"></script>
+<script src="os-config.js?v=ops74"></script>
+<script src="garcom.js?v=ops74"></script>
+<script src="os-bridge.js?v=ops74"></script>
 </body>
 </html>
