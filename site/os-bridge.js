@@ -351,7 +351,7 @@
       if (data && Array.isArray(data.menu)) { live = true; return data; }
     } catch (e) { /* estático (Vercel) usa catalog.json */ }
     live = false;
-    const r = await fetch('catalog.json', { cache: 'no-store' });
+    const r = await fetch('catalog.json');
     if (!r.ok) throw new Error('catalog');
     return r.json();
   }
