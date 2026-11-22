@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops85"></script>
+<script src="i18n.js?v=ops86"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-03.webp" type="image/webp">
@@ -867,11 +867,12 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
   linear-gradient(155deg,var(--mic-a,#E6F6FF),var(--mic-b,#BFE7FF) 52%,var(--mic-c,#7EE0FF));
   pointer-events:none}
 .mic::before{content:"";position:absolute;width:min(48%,8rem);aspect-ratio:1;border-radius:32%;background:rgba(255,255,255,.42);box-shadow:0 18px 36px -20px rgba(20,40,70,.45);animation:mic-orb 6.4s ease-in-out infinite}
-.mic .ico{position:relative;z-index:1;width:min(38%,5.6rem);height:min(38%,5.6rem);opacity:1;stroke-width:1.4px;filter:drop-shadow(0 6px 10px rgba(0,40,80,.12));animation:mic-float 4.6s ease-in-out infinite}
+.mic .ico{position:relative;z-index:1;width:min(38%,5.6rem);height:min(38%,5.6rem);opacity:1;stroke-width:.68;filter:drop-shadow(0 4px 8px rgba(0,40,80,.1));animation:mic-float 4.6s ease-in-out infinite;vector-effect:none}
+.mic .ico use,.mic .ico path,.mic .ico circle,.mic .ico ellipse,.mic .ico rect,.mic .ico line{vector-effect:none;stroke-width:.68}
 @keyframes mic-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.05)}}
 @keyframes mic-orb{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.08) translate(4%,-3%)}}
 @media(prefers-reduced-motion:reduce){.mic .ico,.mic::before{animation:none}}
-.mimg .ico{width:min(38%,5.6rem);height:min(38%,5.6rem);opacity:1;stroke-width:1.4px}
+.mimg .ico{width:min(38%,5.6rem);height:min(38%,5.6rem);opacity:1;stroke-width:.68;vector-effect:none}
 .mimg-plus{position:absolute;left:.55rem;bottom:.55rem;z-index:1;width:38px;height:38px;border-radius:50%;background:var(--yellow);border:2px solid #000;display:grid;place-items:center;font:800 1.35rem/1 var(--fh);pointer-events:none;box-shadow:0 8px 16px -8px rgba(0,0,0,.45)}
 .mdet{position:absolute;right:.5rem;bottom:.55rem;z-index:2;min-height:36px;padding:.35rem .7rem;border:2px solid #000;border-radius:999px;background:#fff;color:#000;font:800 .68rem var(--fh);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 16px -10px rgba(0,0,0,.4)}
 .mdet:hover{background:var(--cyan)}
@@ -1009,7 +1010,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 #itDonenessWrap .doneness-row{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;margin:0 0 .35rem;font:800 .78rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:var(--cyan-d)}
 #itDonenessWrap input[type=range]{width:100%;margin:0;accent-color:var(--cyan-d)}
 .dimg img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
-.dimg .mic .ico,.dimg .ico{width:min(42%,6.4rem);height:min(42%,6.4rem);opacity:1;stroke-width:1.35px}
+.dimg .mic .ico,.dimg .ico{width:min(42%,6.4rem);height:min(42%,6.4rem);opacity:1;stroke-width:.68;vector-effect:none}
 .dprice{font:800 1.6rem var(--fh);color:var(--cyan-d);margin:0}
 .dinfo{display:grid;gap:.5rem;margin:0}
 .dinfo div{display:grid;grid-template-columns:7.5rem 1fr;gap:.6rem;font-size:.92rem}
@@ -1266,7 +1267,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops85">
+<link rel="stylesheet" href="garcom.css?v=ops86">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -5814,8 +5815,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops85"></script>
-<script src="garcom.js?v=ops85"></script>
-<script src="os-bridge.js?v=ops85"></script>
+<script src="os-config.js?v=ops86"></script>
+<script src="garcom.js?v=ops86"></script>
+<script src="os-bridge.js?v=ops86"></script>
 </body>
 </html>
