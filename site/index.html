@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops80"></script>
+<script src="i18n.js?v=ops81"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-03.webp" type="image/webp">
@@ -749,24 +749,25 @@ input,select,textarea{border-radius:14px}
 .cart-edit{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;max-width:100%;gap:.45rem;overflow:hidden}
 .cart-dock{flex:none;display:flex;flex-direction:column;min-width:0;margin:0 -.9rem 0;background:#fff}
 .cart-picked{flex:none;min-width:0;max-height:min(28dvh,14rem);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:.35rem .9rem .2rem;border-top:2px solid var(--cyan-line)}
-.cart-picked .dtotal{margin:.35rem 0 .15rem;font-size:.92rem}
+.cart-picked .dtotal{margin:.55rem 0 .2rem;font-size:.92rem}
 .cart-picked .dtotal b{font-size:1.15rem}
-.cart-picked .cline{padding:.45rem 0}
+.cart-picked .cline{padding:.55rem .2rem}
 .cart-picked .cline h3{font-size:.95rem}
 .cart-picked .qtyb{gap:.5rem;padding:.12rem}
 .cart-picked .qtyb button{width:36px;height:36px}
 .cart-id{flex:none;min-width:0;max-height:min(28dvh,14rem);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 .9rem .35rem}
-.cart-id .idbox{margin:.15rem 0 0;padding:.65rem .75rem .7rem;gap:.4rem .55rem;display:grid;grid-template-columns:1fr 1fr}
+.cart-id .idbox{margin:.15rem 0 0;padding:.8rem .8rem .85rem;gap:.5rem .6rem;display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--cyan-line);border-radius:18px;background:#F7FBFE}
 .cart-id .idbox > label{font-size:.8rem;gap:.22rem}
 .cart-id .idbox legend{grid-column:1/-1}
 .cart-id .idbox .chk{grid-column:1/-1}
 .cart-id .idbox input{min-height:44px;padding:.4rem .65rem}
-.cart-id .idbox input[readonly]{background:#F3F7FB;border-color:#E4EEF5;color:#111;pointer-events:none;cursor:default}
+.cart-id .idbox input[readonly]{background:#fff;border-color:#E4EEF5;color:#111;pointer-events:none;cursor:default}
 .cart-id .idbox .acct-lock{grid-column:1/-1;margin:0;font:600 .75rem/1.35 var(--fb);color:var(--muted)}
 .cart-id .chk{font-size:.8rem!important;line-height:1.4!important;align-items:flex-start}
 .cart-id .cs-time,.cart-id .demo,.cart-id .msg:empty{display:none}
-.cart-edit.checkout .cart-id p.cs-time:has(#cartBackMenu){display:block}
 .cart-edit.checkout .cart-id .msg{display:block;min-height:1.2em}
+.cart-id .more-acts{display:none;flex-wrap:wrap;gap:.2rem .7rem;margin:.45rem 0 0}
+.cart-edit.checkout .more-acts{display:flex}
 .cart-id .linkbtn{padding:.25rem}
 .cart-dlg .shop-card{grid-template-columns:5rem minmax(0,1fr) auto;gap:.55rem .65rem;padding:.55rem .5rem;border-radius:18px}
 .cart-dlg .shop-card .shop-ph{width:5rem;height:5rem;border-radius:14px}
@@ -779,14 +780,18 @@ input,select,textarea{border-radius:14px}
 .cart-edit:not(.checkout) .cart-id,
 .cart-edit:not(.has-items) .cart-id{display:none}
 .cart-edit.checkout #shopWrap{display:none}
-.cart-edit.checkout .cart-dock{flex:1 1 auto;min-height:0}
-.cart-edit.checkout .cart-picked{display:block;max-height:min(38dvh,16rem);flex:0 1 auto}
-.cart-edit.checkout .cart-id{display:block;flex:1 1 auto;min-height:0;max-height:none}
+.cart-edit.checkout .cart-dock{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column}
+.cart-edit.checkout .cart-picked{display:block;max-height:none;flex:none;overflow:visible;padding-top:.55rem}
+.cart-edit.checkout .cart-id{display:block;flex:none;overflow:visible;max-height:none;padding-bottom:.5rem}
+.cart-edit.checkout .cart-sticky{grid-template-columns:minmax(6.5rem,auto) minmax(0,1fr)}
+.cart-edit.checkout .cart-sum{pointer-events:none;cursor:default}
+.cart-dlg.can-back .dhead{grid-template-columns:42px minmax(0,1fr) 42px;display:grid;align-items:center}
+.cart-dlg.can-back .dhead h2{text-align:center}
 @media(min-width:480px){
   .cart-dlg .shop-card{grid-template-columns:5.5rem minmax(0,1fr) auto}
   .cart-dlg .shop-card .shop-ph{width:5.5rem;height:5.5rem}
 }
-.cart-sticky{position:relative;bottom:auto;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:.55rem;flex:none;padding:.55rem .9rem calc(.7rem + env(safe-area-inset-bottom,0px));background:#fff;border-top:2px solid var(--cyan-line);box-shadow:0 -12px 24px -18px rgba(0,40,80,.45);min-width:0}
+.cart-sticky{position:relative;bottom:auto;z-index:5;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.55rem;flex:none;padding:.55rem .9rem calc(.7rem + env(safe-area-inset-bottom,0px));background:#fff;border-top:2px solid var(--cyan-line);box-shadow:0 -12px 24px -18px rgba(0,40,80,.45);min-width:0}
 .cart-sum{flex:1;min-width:0;border:0;background:transparent;padding:.15rem .2rem;text-align:left;cursor:pointer;color:inherit}
 .cart-sum small{display:block;font:700 .68rem var(--fh);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .cart-sum b{display:block;font:800 1.15rem var(--fh);color:var(--cyan-d)}
@@ -987,8 +992,10 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .dlg.cart-dlg > .cart-pad{display:flex;flex-direction:column;gap:.4rem;padding:1rem .9rem 0;flex:1;min-height:0}
 .dhead{display:flex;justify-content:space-between;align-items:center;gap:.7rem;position:sticky;top:0;z-index:4;background:#fff;padding:.15rem 0 .45rem;min-width:0}
 .dhead h2{font:800 clamp(1.05rem,5vw,1.4rem)/1.15 var(--fh);text-transform:uppercase;min-width:0;overflow-wrap:anywhere}
-.dx{flex:none;width:42px;height:42px;border:2px solid #000;border-radius:50%;background:#fff;font-size:1.1rem;cursor:pointer;transition:background-color var(--ease),color var(--ease)}
-.dx:hover{background:#000;color:#fff}
+.dback,.dx{flex:none;width:42px;height:42px;border:2px solid #000;border-radius:50%;background:#fff;font-size:1.1rem;cursor:pointer;transition:background-color var(--ease),color var(--ease);display:grid;place-items:center;padding:0}
+.dback .ico{width:1.15rem;height:1.15rem}
+.dback[hidden]{display:none!important}
+.dback:hover,.dx:hover{background:#000;color:#fff}
 .dimg{position:relative;width:100%;height:min(42svh,320px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:var(--sand);color:var(--mic-fg,#0069A8);cursor:pointer}
 .dimg-hint{position:absolute;left:.7rem;bottom:.7rem;z-index:2;background:rgba(10,18,28,.78);color:#fff;font:800 .68rem var(--fh);letter-spacing:.04em;text-transform:uppercase;padding:.38rem .7rem;border-radius:999px;pointer-events:none}
 #itDonenessWrap{margin:.15rem 0 .35rem}
@@ -1006,12 +1013,18 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .qtyb button{width:38px;height:38px;border:0;border-radius:50%;background:var(--cyan-soft);font:800 1.2rem var(--fh);cursor:pointer;transition:background-color var(--ease)}
 .qtyb button:hover{background:var(--yellow)}
 .qtyb b{min-width:1.6ch;text-align:center;font:800 1rem var(--fh)}
-.cline{display:grid;grid-template-columns:1fr auto;gap:.2rem .8rem;padding:.8rem 0;border-bottom:1px dashed var(--cyan-line)}
-.cline h3{font:800 1rem var(--fh)}
-.cline small{display:block;color:var(--muted)}
-.cline .lt{font:800 1rem var(--fh);color:var(--cyan-d);text-align:right}
-.cline .qtyb{grid-column:1;width:fit-content;margin-top:.3rem}
-.cline .rm{grid-column:2;justify-self:end;align-self:center;border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:.85rem;padding:.4rem}
+.cline{display:grid;grid-template-columns:3.15rem minmax(0,1fr) auto;gap:.35rem .65rem;align-items:center;padding:.7rem .15rem;border-bottom:1px dashed var(--cyan-line);border-radius:14px;cursor:pointer}
+.cline:hover{background:#F4FAFF}
+.cline-ph{position:relative;width:3.15rem;height:3.15rem;border-radius:12px;overflow:hidden;background:var(--sand);color:var(--mic-fg,#0069A8);display:grid;place-items:center}
+.cline-ph .mic{position:absolute;inset:0}
+.cline-ph .mic .ico,.cline-ph .ico{width:1.35rem;height:1.35rem}
+.cline h3{margin:0;font:800 .98rem/1.2 var(--fh);overflow-wrap:anywhere}
+.cline small{display:block;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+.cline .lt{font:800 1rem var(--fh);color:var(--cyan-d);text-align:right;align-self:start}
+.cline .qtyb{grid-column:2;width:fit-content;margin-top:.05rem}
+.cline .rm{grid-column:3;justify-self:end;border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:.82rem;padding:.35rem .15rem}
+.cline-fee{grid-template-columns:minmax(0,1fr) auto;cursor:default}
+.cline-fee:hover{background:transparent}
 .dtotal{display:flex;justify-content:space-between;align-items:baseline;margin:0;font:800 1.1rem var(--fh);text-transform:uppercase}
 .dtotal b{font-size:1.6rem;color:var(--cyan-d)}
 .reasons{display:grid;gap:.6rem}
@@ -1246,7 +1259,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops80">
+<link rel="stylesheet" href="garcom.css?v=ops81">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1754,7 +1767,7 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
 </div></dialog>
 
 <dialog class="dlg cart-dlg" id="cartDlg" aria-labelledby="cartT"><div class="dpad cart-pad">
-  <div class="dhead"><h2 id="cartT" data-i18n="cart.title">O seu pedido</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
+  <div class="dhead"><button class="dback" type="button" id="cartBack" hidden data-i18n-aria="cart.backMenu"><svg class="ico" aria-hidden="true"><use href="#i-left"/></svg></button><h2 id="cartT" data-i18n="cart.title">O seu pedido</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
   <div id="cartEdit" class="cart-edit">
     <div class="place-banner" id="cartPlace"></div>
     <label data-i18n-label="menu.table" hidden>Mesa<select id="cartTable"></select></label>
@@ -1786,10 +1799,12 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
     </fieldset>
     <p class="demo" data-demo hidden></p>
     <p class="msg" id="cartMsg" role="status" aria-live="polite"></p>
-    <p class="cs-time"><button class="linkbtn" type="button" id="cartBackMenu" data-i18n="cart.backMenu">Voltar ao menu</button></p>
-    <p class="cs-time"><button class="linkbtn" type="button" id="toHist" data-i18n="cart.my">Ver os meus pedidos</button></p>
-    <p class="cs-time"><button class="linkbtn" type="button" id="cancelCart" hidden data-i18n="cart.cancelDraft">Cancelar este pedido</button></p>
-    <p class="cs-time"><button class="linkbtn" type="button" id="draftNew" hidden data-i18n="cart.newDraft">Guardar rascunho e começar outro</button></p>
+    <div class="more-acts">
+      <button class="linkbtn" type="button" id="cartBackMenu" data-i18n="cart.backMenu">Voltar ao menu</button>
+      <button class="linkbtn" type="button" id="toHist" data-i18n="cart.my">Ver os meus pedidos</button>
+      <button class="linkbtn" type="button" id="cancelCart" hidden data-i18n="cart.cancelDraft">Cancelar este pedido</button>
+      <button class="linkbtn" type="button" id="draftNew" hidden data-i18n="cart.newDraft">Guardar rascunho e começar outro</button>
+    </div>
     </div>
     <div class="cart-sticky" id="cartSticky">
       <button class="cart-sum" type="button" id="cartSumBtn" aria-expanded="false" data-i18n-aria="cart.seeCart"><small data-i18n="cart.total">Total</small><b id="cartStickyT"></b><span id="cartStickyN"></span></button>
@@ -2124,8 +2139,8 @@ const REVIEWS = [];
   function authReturnPending() {
     const h = String(location.hash || '');
     const s = String(location.search || '');
-    return /access_token=|refresh_token=|type=signup|type=email|type=magiclink|type=invite/.test(h)
-      || /(?:^|[?&])(?:aq=confirm|code=)/.test(s);
+    return /access_token=|refresh_token=|type=signup|type=email|type=magiclink|type=invite|type=recovery/.test(h)
+      || /(?:^|[?&])(?:aq=confirm|code=|token_hash=|type=signup|type=email|type=magiclink)/.test(s);
   }
   function landHome() {
     if (authReturnPending()) return;
@@ -2481,7 +2496,7 @@ const REVIEWS = [];
             s.onload = ok; s.onerror = no; document.head.appendChild(s);
           });
         }
-        sb = window.supabase.createClient(url, key, { auth: { storageKey: 'aq-guest-auth', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' } });
+        sb = window.supabase.createClient(url, key, { auth: { storageKey: 'aq-guest-auth', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit' } });
         sb.auth.onAuthStateChange((ev) => {
           if (ev === 'SIGNED_IN' || ev === 'TOKEN_REFRESHED' || ev === 'USER_UPDATED') loadGuest();
           if (ev === 'SIGNED_OUT') { guest = null; paintAccountBox(); paintAccountUi(); }
@@ -2503,8 +2518,9 @@ const REVIEWS = [];
   const PENDING_KEY = 'aq-guest-pending';
   const VAULT_KEY = 'aq-guest-vault';
   function guestRedirect() {
-    const path = location.pathname || '/';
-    return location.origin + path + (path.indexOf('?') >= 0 ? '&' : '?') + 'aq=confirm';
+    const path = (location.pathname || '/').replace(/index\.html$/i, '') || '/';
+    const base = location.origin + (path.endsWith('/') ? path : path + '/');
+    return base + '?aq=confirm';
   }
   function readPending() {
     try {
@@ -2646,42 +2662,76 @@ const REVIEWS = [];
     return !!(guest && guest.id);
   }
   function welcomeGuest() {
-    guestMsg('ok', 'Conta confirmada. Já está ligado' + (guest && guest.name ? ', ' + guest.name.split(' ')[0] : '') + '.');
+    const p = readPending();
+    if (p) rememberOnPhone(p.email, p.password, p.name || (guest && guest.name) || '');
+    clearPending();
+    hideGuestWait();
+    cleanAuthUrl();
+    const who = guest && guest.name ? guest.name.split(' ')[0] : '';
+    say(who ? ('Conta pronta, ' + who + '. Já pode pedir.') : 'Conta confirmada. Já pode pedir.', 'ok');
+    const resume = pendingGuestFn;
     setTimeout(() => {
       finishGuestAuth();
-      openAccount();
-    }, 500);
+      if (resume) return;
+      try {
+        cart = loadCart();
+        if (cart.length) openCartView();
+      } catch (e) { /* */ }
+    }, 180);
+  }
+  async function settleAuthFromUrl() {
+    if (!sb) return;
+    try {
+      const u = new URL(location.href);
+      const code = u.searchParams.get('code');
+      const tokenHash = u.searchParams.get('token_hash') || u.searchParams.get('token');
+      const typeRaw = u.searchParams.get('type') || '';
+      if (code && typeof sb.auth.exchangeCodeForSession === 'function') {
+        try { await sb.auth.exchangeCodeForSession(code); } catch (e) { /* hash implicit */ }
+      }
+      if (tokenHash && typeof sb.auth.verifyOtp === 'function') {
+        const kinds = typeRaw ? [typeRaw, 'signup', 'email'] : ['signup', 'email'];
+        for (const kind of kinds) {
+          try {
+            const r = await sb.auth.verifyOtp({ token_hash: tokenHash, type: kind });
+            if (!r.error) break;
+          } catch (e) { /* próximo tipo */ }
+        }
+      }
+      await sb.auth.getSession();
+    } catch (e) { /* */ }
   }
   async function handleGuestReturn() {
     if (!sb) return;
     const fromMail = authReturnPending();
+    if (fromMail) {
+      await settleAuthFromUrl();
+      await new Promise((r) => setTimeout(r, 140));
+    }
     await loadGuest();
     if (guest && guest.id) {
-      clearPending();
-      if (fromMail) {
-        openGuestAuth('in');
-        hideGuestWait();
-        welcomeGuest();
-      }
-      cleanAuthUrl();
+      if (fromMail) welcomeGuest();
+      else { clearPending(); cleanAuthUrl(); }
       return;
     }
     if (fromMail || readPending()) {
-      try {
-        if (await enterWithPending()) {
-          hideGuestWait();
-          openGuestAuth('in');
-          welcomeGuest();
-          cleanAuthUrl();
-          return;
-        }
-      } catch (e) { /* ainda não confirmou */ }
+      for (let i = 0; i < 8 && !(guest && guest.id); i++) {
+        try {
+          if (await enterWithPending()) break;
+        } catch (e) { /* e-mail ainda a confirmar */ }
+        await new Promise((r) => setTimeout(r, 350 + i * 220));
+        await loadGuest();
+      }
+      if (guest && guest.id) {
+        welcomeGuest();
+        return;
+      }
     }
     if (fromMail) {
       const p = readPending();
       openGuestAuth(p ? 'up' : 'in');
       if (p) showGuestWait(p.email);
-      guestMsg(p ? '' : 'err', p ? 'Ainda a confirmar. Toque no e-mail e volte.' : 'Confirme o e-mail e entre com a palavra-passe.');
+      guestMsg(p ? '' : 'err', p ? 'Ainda a confirmar. Toque no e-mail neste telemóvel — volta já ligado.' : 'Confirme o e-mail. Depois entra automaticamente.');
       const em = $('#gEmailIn');
       if (em && p) em.value = p.email;
     }
@@ -4061,15 +4111,21 @@ const REVIEWS = [];
   function toast(name) { say('Adicionou ' + name + '.', 'ok'); }
 
   /* janela do prato */
-  const itemDlg = $('#itemDlg'); let curItem = null, curQty = 1;
+  const itemDlg = $('#itemDlg'); let curItem = null, curQty = 1, editCartIndex = null;
   const paintItem = () => {
     const extra = $$('#itExtras [data-ex]:checked').reduce((s, x) => s + (Number(x.dataset.price) || 0), 0);
     $('#itQty').textContent = curQty;
-    $('#itAdd').textContent = tr('menu.add', { n: money((curItem.price + extra) * curQty) });
+    const tot = money((curItem.price + extra) * curQty);
+    $('#itAdd').textContent = editCartIndex != null ? tr('cart.update', { n: tot }) : tr('menu.add', { n: tot });
   };
-  function openItem(m) {
-    curItem = m; curQty = 1;
-    $('#itName').textContent = m.name; $('#itPrice').textContent = money(m.price); $('#itDesc').textContent = m.desc; $('#itNote').value = '';
+  function openItem(m, line, lineIndex) {
+    curItem = m;
+    editCartIndex = Number.isInteger(lineIndex) ? lineIndex : null;
+    curQty = line && line.qty ? Math.max(1, line.qty) : 1;
+    $('#itName').textContent = m.name; $('#itPrice').textContent = money(m.price); $('#itDesc').textContent = m.desc;
+    let note = line && line.note ? String(line.note) : '';
+    note = note.replace(/\s*·\s*Ponto\s+\d+%\s*/gi, ' ').replace(/\s*·\s*$/, '').trim();
+    $('#itNote').value = note;
     const pz = $('#itPizzaFee');
     if (pz) { pz.hidden = !isPizzaItem(m); pz.textContent = tr('place.pizzaTake'); }
     $('#itImg').innerHTML = media(m) + `<span class="dimg-hint">${esc(tr('menu.tapAdd'))}</span>`;
@@ -4079,12 +4135,17 @@ const REVIEWS = [];
       (m.ingredients && m.ingredients.length ? `<div><dt>${esc(tr('menu.ing'))}</dt><dd>${esc(m.ingredients.join(', '))}</dd></div>` : '') +
       `<div><dt>${esc(tr('menu.all'))}</dt><dd>${m.allergens && m.allergens.length ? esc(m.allergens.join(', ')) : esc(tr('menu.allHint'))}</dd></div>`;
     const dw = $('#itDonenessWrap');
-    if (m.doneness) { dw.hidden = false; $('#itDoneness').value = '60'; $('#itDpct').textContent = '60'; }
+    if (m.doneness) {
+      dw.hidden = false;
+      const d = line && line.doneness != null ? String(line.doneness) : '60';
+      $('#itDoneness').value = d; $('#itDpct').textContent = d;
+    }
     else dw.hidden = true;
+    const picked = new Set((line && line.extras) || []);
     const ex = $('#itExtras'); ex.innerHTML = '';
     (m.extras || []).forEach((e) => {
       const id = 'ex-' + e.id;
-      ex.insertAdjacentHTML('beforeend', `<label class="chk"><input type="checkbox" data-ex="${esc(e.id)}" data-price="${e.price}" id="${id}"><span>${esc(loc(e))} · ${money(e.price)}</span></label>`);
+      ex.insertAdjacentHTML('beforeend', `<label class="chk"><input type="checkbox" data-ex="${esc(e.id)}" data-price="${e.price}" id="${id}"${picked.has(e.id) ? ' checked' : ''}><span>${esc(loc(e))} · ${money(e.price)}</span></label>`);
     });
     $$('#itExtras [data-ex]').forEach((inp) => inp.addEventListener('change', paintItem));
     paintItem(); itemDlg.showModal();
@@ -4098,11 +4159,20 @@ const REVIEWS = [];
     let note = $('#itNote').value.trim();
     if (doneness != null) note = (note ? note + ' · ' : '') + tr('menu.ponto', { n: doneness });
     if (extras.length) note = (note ? note + ' · ' : '') + extraNames(extras);
+    if (editCartIndex != null && cart[editCartIndex]) {
+      const m = curItem;
+      cart[editCartIndex] = { id: m.id, qty: curQty, note: note || '', extras: extras || [], doneness, name: m.name, price: m.price };
+      editCartIndex = null;
+      renderCart(); updateFabs(); paintMenuCart();
+      itemDlg.close();
+      return;
+    }
     addToCart(curItem.id, curQty, note, extras, doneness);
     if (placeReady(place)) itemDlg.close();
   }
   $('#itAdd').addEventListener('click', () => confirmItemAdd());
   $('#itDoneness')?.addEventListener('input', () => { $('#itDpct').textContent = $('#itDoneness').value; });
+  itemDlg.addEventListener('close', () => { editCartIndex = null; });
 
   /* pedido (carrinho) */
   let ov = null, orderReadonly = false;
@@ -4243,23 +4313,33 @@ const REVIEWS = [];
     if (draftBtn) draftBtn.hidden = !cart.length;
     if (!cart.length) cartBody.innerHTML = '<p class="mempty">' + esc(tr('cart.empty')) + '</p>';
     cart.forEach((l, i) => {
-      const m = lineMenu(l), row = document.createElement('div'); row.className = 'cline';
-      row.innerHTML = `<div><h3>${esc(m.name)}</h3>${l.note ? `<small>“${esc(l.note)}”</small>` : ''}</div><span class="lt">${money(linePrice(l))}</span><div class="qtyb"><button type="button" aria-label="${esc(tr('dlg.less'))}">−</button><b>${l.qty}</b><button type="button" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="rm" type="button">${esc(tr('cart.rm'))}</button>`;
+      const m = lineMenu(l) || l, row = document.createElement('div'); row.className = 'cline';
+      row.setAttribute('role', 'button');
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('aria-label', tr('cart.editItem', { n: m.name || l.name || '' }));
+      row.innerHTML = `<span class="cline-ph">${media(m)}</span><div><h3>${esc(m.name || l.name || '')}</h3>${l.note ? `<small>“${esc(l.note)}”</small>` : '<small>' + esc(tr('cart.tapItem')) + '</small>'}</div><span class="lt">${money(linePrice(l))}</span><div class="qtyb"><button type="button" aria-label="${esc(tr('dlg.less'))}">−</button><b>${l.qty}</b><button type="button" aria-label="${esc(tr('dlg.more'))}">+</button></div><button class="rm" type="button">${esc(tr('cart.rm'))}</button>`;
       const [minus, plus] = $$('.qtyb button', row);
-      minus.addEventListener('click', () => { l.qty -= 1; if (l.qty < 1) cart.splice(i, 1); renderCart(); updateFabs(); });
-      plus.addEventListener('click', () => { l.qty = Math.min(20, l.qty + 1); renderCart(); updateFabs(); });
-      $('.rm', row).addEventListener('click', () => { cart.splice(i, 1); renderCart(); updateFabs(); });
+      minus.addEventListener('click', (e) => { e.stopPropagation(); l.qty -= 1; if (l.qty < 1) cart.splice(i, 1); renderCart(); updateFabs(); });
+      plus.addEventListener('click', (e) => { e.stopPropagation(); l.qty = Math.min(20, l.qty + 1); renderCart(); updateFabs(); });
+      $('.rm', row).addEventListener('click', (e) => { e.stopPropagation(); cart.splice(i, 1); renderCart(); updateFabs(); });
+      row.addEventListener('click', () => {
+        const dish = byId(l.id) || m;
+        if (dish && dish.id) openItem(dish, l, i);
+      });
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+      });
       cartBody.appendChild(row);
     });
     const fee = deliveryFee();
     if (fee && cart.length) {
-      const row = document.createElement('div'); row.className = 'cline';
+      const row = document.createElement('div'); row.className = 'cline cline-fee';
       row.innerHTML = `<div><h3>${esc(tr('place.feeLine', { b: tr('place.' + place.band) }))}</h3><small>${esc(place.address || '')}</small></div><span class="lt">${money(fee)}</span>`;
       cartBody.appendChild(row);
     }
     const pFee = pizzaTakeFee();
     if (pFee && cart.length) {
-      const row = document.createElement('div'); row.className = 'cline';
+      const row = document.createElement('div'); row.className = 'cline cline-fee';
       row.innerHTML = `<div><h3>${esc(tr('place.pizzaFee', { n: pizzaTakeCount() }))}</h3><small>${esc(tr('place.pizzaTake'))}</small></div><span class="lt">${money(pFee)}</span>`;
       cartBody.appendChild(row);
     }
@@ -4327,6 +4407,16 @@ const REVIEWS = [];
       send.dataset.i18n = checkout ? 'cart.send' : 'cart.donePick';
       send.textContent = checkout ? tr('cart.send') : tr('cart.donePick');
     }
+    const viewing = $('#orderView') && !$('#orderView').hidden;
+    const editOn = edit && !edit.hidden && !viewing;
+    const back = $('#cartBack');
+    if (back) {
+      back.hidden = !editOn;
+      back.setAttribute('aria-label', checkout ? tr('cart.backMenu') : tr('dlg.close'));
+    }
+    cartDlg.classList.toggle('can-back', !!editOn);
+    const title = $('#cartT');
+    if (title && editOn) title.textContent = checkout ? tr('cart.confirm') : tr('cart.title');
   }
   function enterCheckout() {
     if (!cart.length) return;
@@ -4410,6 +4500,12 @@ const REVIEWS = [];
     if ($('#cartEdit').classList.contains('checkout')) leaveCheckout();
     else enterCheckout();
   });
+  function cartGoBack() {
+    const edit = $('#cartEdit');
+    if (edit && !edit.hidden && edit.classList.contains('checkout')) leaveCheckout();
+    else if (cartDlg.open) cartDlg.close();
+  }
+  $('#cartBack')?.addEventListener('click', cartGoBack);
   $('#cartBackMenu')?.addEventListener('click', () => leaveCheckout());
   $('#termsLink').addEventListener('click', (e) => { e.preventDefault(); $('#termsDlg').showModal(); });
   $('#cancelCart')?.addEventListener('click', () => {
@@ -4481,7 +4577,7 @@ const REVIEWS = [];
     history.push(o); saveHist(); clearCart(); msg.textContent = '';
     say('Pedido ' + o.code + ' enviado.', 'ok');
     if (mode === 'demo' && !isLive()) watch(o.id, (d) => { o.status = d.status; saveHist(); paintOrderView(); renderHist(); updateFabs(); });
-    orderReadonly = false; ov = o; $('#cartEdit').hidden = true; $('#orderView').hidden = false; paintOrderView(); renderHist(); updateFabs(); startPolling();
+    orderReadonly = false; ov = o; $('#cartEdit').hidden = true; $('#orderView').hidden = false; paintOrderView(); syncCartDock(); renderHist(); updateFabs(); startPolling();
   });
   function extraNames(ids) {
     if (!ids || !ids.length) return '';
@@ -4566,6 +4662,7 @@ const REVIEWS = [];
     $('#cartEdit').hidden = true;
     $('#orderView').hidden = false;
     paintOrderView();
+    syncCartDock();
     if (histDlg.open) histDlg.close();
     cartDlg.showModal();
   }
@@ -5637,8 +5734,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops80"></script>
-<script src="garcom.js?v=ops80"></script>
-<script src="os-bridge.js?v=ops80"></script>
+<script src="os-config.js?v=ops81"></script>
+<script src="garcom.js?v=ops81"></script>
+<script src="os-bridge.js?v=ops81"></script>
 </body>
 </html>
