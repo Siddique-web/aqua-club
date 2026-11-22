@@ -6,7 +6,7 @@
 <meta name="description" content="Aqua Club — complexo de lazer aquático na Beira: piscinas, toboáguas, rio lento, área kids, bar e cabanas VIP.">
 <meta name="color-scheme" content="light">
 <title>Aqua Club — Complexo de Lazer Aquático</title>
-<script src="i18n.js?v=ops84"></script>
+<script src="i18n.js?v=ops85"></script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="image" href="assets/story-03.webp" type="image/webp">
@@ -232,11 +232,11 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .story-copy small{color:var(--muted);font:600 .82rem var(--fb);line-height:1.3;max-width:16rem}
 .story-btn.seen .story-ring{animation:none;background:#7EC8E3}
 @keyframes storyspin{to{transform:rotate(1turn)}}
-.story-dlg{border:0;padding:0;width:min(440px,96vw,calc(94dvh * 9 / 16));max-width:100%;aspect-ratio:9/16;height:auto;max-height:94dvh;margin:auto;background:#041828;color:#fff;border-radius:22px;overflow:hidden;box-sizing:border-box;display:grid}
+.story-dlg{border:0;padding:0;width:min(480px,96vw);max-width:96vw;height:min(94dvh,100%);max-height:94dvh;margin:auto;background:#041828;color:#fff;border-radius:22px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;aspect-ratio:auto}
 .story-dlg::backdrop{background:rgba(0,8,18,.82)}
-.story-stage{position:relative;width:100%;height:100%;min-height:0;background:#041828;cursor:pointer;user-select:none}
-.story-stage picture{display:grid;place-items:center;width:100%;height:100%;min-height:0;background:#041828}
-.story-stage video,.story-stage img#storyImg{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center;background:#041828;display:block}
+.story-stage{position:relative;flex:1 1 auto;width:100%;min-height:0;height:100%;display:grid;place-items:center;background:#041828;cursor:pointer;user-select:none}
+.story-stage picture{display:grid;place-items:center;width:100%;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%;background:#041828;overflow:hidden}
+.story-stage video,.story-stage img#storyImg{width:auto!important;height:auto!important;max-width:100%;max-height:100%;object-fit:contain;object-position:center;background:#041828;display:block}
 .story-dlg.one .story-nav{display:none}
 .story-bar{position:absolute;top:10px;left:12px;right:48px;z-index:4;display:flex;gap:4px;height:3px}
 .story-bar i{flex:1;height:100%;padding:0;border:0;border-radius:99px;background:rgba(255,255,255,.28);overflow:hidden;position:relative}
@@ -1266,7 +1266,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
-<link rel="stylesheet" href="garcom.css?v=ops84">
+<link rel="stylesheet" href="garcom.css?v=ops85">
 </head>
 <body>
 <div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
@@ -1682,7 +1682,7 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
     <button class="story-nav next" type="button" id="storyNext" data-i18n-aria="dlg.next"> </button>
     <div class="story-freeze" aria-hidden="true" data-i18n="story.play">Pausado — toque para continuar</div>
     <p class="story-hint" id="storyHint" data-i18n="story.pause">Toque para pausar</p>
-    <div class="story-cap">
+    <div class="story-cap" hidden>
       <span class="tag y" data-i18n="story.today">Novidades</span>
       <h2 id="storyT" data-i18n="story.title">Aqua Story</h2>
       <p data-i18n="story.lead">Toque na imagem para pausar. Cartazes do Aqua Club.</p>
@@ -5814,8 +5814,8 @@ const REVIEWS = [];
   if (window.AquaI18n && typeof AquaI18n.onChange === 'function') AquaI18n.onChange(() => { if (last) paint(last.temp, last.code); });
 })();
 </script>
-<script src="os-config.js?v=ops84"></script>
-<script src="garcom.js?v=ops84"></script>
-<script src="os-bridge.js?v=ops84"></script>
+<script src="os-config.js?v=ops85"></script>
+<script src="garcom.js?v=ops85"></script>
+<script src="os-bridge.js?v=ops85"></script>
 </body>
 </html>
