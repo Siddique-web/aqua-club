@@ -922,6 +922,11 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 @media(min-width:1100px){
   .menu-stage{grid-template-columns:minmax(0,1fr) 300px;gap:1.35rem;overflow:visible}
   .menu-aside{display:flex;flex-direction:column;position:sticky;top:calc(var(--head-bar) + var(--mtool-h, 8.5rem) + .45rem);z-index:21;max-height:calc(100dvh - var(--head-bar) - var(--mtool-h, 8.5rem) - 1.1rem);overflow:auto}
+  html:not(.staff-chrome) .fabs{
+    right:max(1rem, calc((100vw - min(1280px, 100vw)) / 2 + 2rem + 300px + 1rem));
+    bottom:max(1rem, env(safe-area-inset-bottom,0px));
+    width:11.4rem;
+  }
 }
 .menu-aside.is-flash{box-shadow:0 0 0 3px var(--yellow),0 18px 40px -24px rgba(20,40,70,.45);transition:box-shadow .35s ease}
 .mgrid-wrap{margin-top:.15rem;padding:0;border:0;border-radius:0;background:transparent;max-height:none;overflow:visible}
