@@ -1319,7 +1319,29 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .hs b{font:800 .8rem var(--fh);letter-spacing:.07em;text-transform:uppercase;color:var(--cyan-d)}
 .hs strong{font:800 1.9rem/1.1 var(--fh)}.hs span{font-size:.85rem;color:var(--muted)}
 .hs.warn{background:var(--yellow)}.hs.warn b,.hs.warn span{color:#000}
+.hs.warn.pay-jump{cursor:pointer;border:0;width:100%;text-align:left;font:inherit;color:inherit}
 .hs.ok{background:#E3F8EC}
+.pay-scope,.pay-split{display:grid;gap:.4rem;margin:.15rem 0 .75rem}
+.pay-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem}
+.pay-tabs.trio{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pay-tab{min-height:44px;border:1.5px solid var(--cyan-line);border-radius:14px;background:#fff;font:800 .72rem/1.2 var(--fh);cursor:pointer;padding:.4rem .5rem}
+.pay-tab[aria-pressed=true]{background:#111;color:var(--yellow);border-color:#111}
+.pay-checks{display:grid;gap:.3rem}
+.pay-check{display:flex;align-items:center;justify-content:space-between;gap:.5rem;width:100%;min-height:44px;padding:.5rem .75rem;border:1.5px solid var(--cyan-line);border-radius:14px;background:#fff;text-align:left;cursor:pointer;font:700 .82rem var(--fb)}
+.pay-check[aria-pressed=true]{border-color:#111;box-shadow:inset 0 0 0 1.5px #111}
+.pay-check small{display:block;font:600 .72rem var(--fb);color:var(--muted)}
+.pay-split{padding:.75rem .85rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#F3F7FB}
+.pay-split h3{margin:0;font:800 .95rem var(--fh)}
+.pay-split p{margin:0;font:600 .78rem/1.35 var(--fb);color:#223}
+.pay-n{display:flex;align-items:center;gap:.45rem}
+.pay-n b{min-width:1.6rem;text-align:center;font:800 1.1rem var(--fh)}
+.pay-part{display:grid;grid-template-columns:minmax(0,1fr) 7.2rem;gap:.4rem;align-items:center;font:700 .8rem var(--fb)}
+.pay-part input{min-height:42px;border:1.5px solid var(--cyan-line);border-radius:12px;padding:.35rem .6rem;font:800 .9rem var(--fb);width:100%;box-sizing:border-box}
+.pay-share{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;margin-top:.2rem;font:800 .88rem var(--fh)}
+.pay-share strong{font-size:1.25rem}
+.fab.owe{background:var(--yellow);color:#000}
+.osum li[data-add]{cursor:pointer}
+.osum li[data-add]:hover{background:color-mix(in srgb,var(--cyan-soft) 70%,#fff)}
 .hcard{padding:1rem 1.1rem;border:1.5px solid var(--cyan-line);border-radius:20px;margin-top:.8rem;cursor:pointer;width:100%;text-align:left;background:#fff;font:inherit;color:inherit;display:block}
 .hcard:hover{border-color:var(--cyan);box-shadow:0 14px 28px -22px rgba(0,168,255,.7)}
 .hcard:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
@@ -1807,6 +1829,7 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
 </div>
 <div class="fabs" id="fabs">
   <button class="fab cart" id="fabCart" type="button" hidden><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span id="fabCartTxt" data-i18n="fab.see">Ver pedido</span></button>
+  <button class="fab owe" id="fabOwe" type="button" hidden><svg class="ico" aria-hidden="true"><use href="#i-card"/></svg><span id="fabOweTxt">Por pagar</span></button>
   <button class="fab-hint" id="fabHint" type="button" hidden data-i18n="fab.hint">Precisa de ajuda? Chame o garçom aqui ↓</button>
   <button class="fab order" id="fabOrder" type="button"><svg class="ico" aria-hidden="true"><use href="#i-bag"/></svg><span data-i18n="fab.order">Fazer pedido</span></button>
   <button class="fab call" id="fabCall" type="button"><svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg><span id="fabCallTxt" data-i18n="fab.call">Chamar garçom</span></button>
@@ -1953,9 +1976,12 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
 <dialog class="dlg" id="payDlg" aria-labelledby="payT"><div class="dpad">
   <div class="dhead"><h2 id="payT" data-i18n="pay.title">Pagar a conta</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
   <div id="paySum"></div>
+  <div id="payScope"></div>
+  <div id="paySplit"></div>
   <div class="pays" id="payMethods" role="radiogroup" data-i18n-aria="pay.methods"></div>
   <div id="payInfo"></div>
   <p class="msg" id="payMsg" role="status" aria-live="polite"></p>
+  <button class="btn btn-line btn-block" type="button" id="payCallWaiter">Pedir a conta ao garçom</button>
   <button class="btn btn-cyan btn-block" type="button" id="payGo" hidden></button>
 </div></dialog>
 
@@ -2084,7 +2110,7 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
   </div>
 </dialog>
 
-<script src="i18n.js?v=ops89"></script>
+<script src="i18n.js?v=ops101"></script>
 <script>
 /* ===== LIGAÇÃO AO SISTEMA DE PEDIDOS (opcional) =====
    Deixe vazio para o modo demonstração (a resposta do garçom é simulada).
@@ -2589,8 +2615,14 @@ const REVIEWS = [];
   let cust = {}; try { cust = JSON.parse(store.get('aq.cust') || '{}'); } catch (e) { cust = {}; }
   const saveHist = () => store.set('aq.orders', JSON.stringify(history.slice(-80)));
   const isOpen = (o) => o.status !== 'cancelled' && o.pay !== 'paid' && o.pay !== 'paid_declared';
-  const owed = () => history.filter((o) => o.status !== 'cancelled' && (o.pay === 'unpaid' || o.pay === 'pay_requested'));
-  const owedTotal = () => owed().reduce((s, o) => s + o.total, 0);
+  function orderRemain(o) {
+    if (!o || o.status === 'cancelled' || o.pay === 'paid' || o.pay === 'paid_declared') return 0;
+    const t = Math.round(Number(o.total) || 0);
+    const p = Math.round(Number(o.paidToward) || 0);
+    return Math.max(0, t - p);
+  }
+  const owed = () => history.filter((o) => orderRemain(o) > 0);
+  const owedTotal = () => owed().reduce((s, o) => s + orderRemain(o), 0);
 
   /* ligação ao sistema (Supabase) ou WhatsApp / demonstração */
   const bus = new EventTarget();
@@ -3232,10 +3264,10 @@ const REVIEWS = [];
       store.set('aq.callLog', JSON.stringify(list.slice(0, 40)));
     } catch (e) { /* */ }
   }
-  async function apiCall(code, reason) {
+  async function apiCall(code, reason, extraNote) {
     if (!guest || !guest.id) throw new Error('Entre na sua conta para chamar o garçom.');
     const loc = callLocLabel();
-    const extra = { name: cust.name || '', phone: cust.phone || '', note: loc, place: loc };
+    const extra = { name: cust.name || '', phone: cust.phone || '', note: [loc, extraNote].filter(Boolean).join(' · '), place: loc };
     const mapped = ({ request_bill: 'conta', menu_question: 'duvida', new_order: 'pedido', urgent_other: 'urgente', waiter: 'urgente' }[reason] || reason || 'urgente');
     const n = parseInt(String(place.tableNumber || code).replace(/\D/g, ''), 10);
     const localId = 'c' + Date.now();
@@ -3244,7 +3276,7 @@ const REVIEWS = [];
       table_number: Number.isFinite(n) && n > 0 ? n : 0,
       place: loc,
       reason: mapped,
-      note: loc,
+      note: extra.note || loc,
       status: 'pending',
       created_at: new Date().toISOString(),
       customer_name: extra.name,
@@ -3254,7 +3286,7 @@ const REVIEWS = [];
     try {
       try { await initBackend(); } catch (e) { /* */ }
       if (callsLive() && AquaCalls.mode && AquaCalls.mode() === 'live') {
-        const sid = await AquaCalls.createCall(String(code), reason, loc, DEVICE);
+        const sid = await AquaCalls.createCall(String(code), reason, extra.note || loc, DEVICE);
         if (sid && window.AquaBus) AquaBus.patchCall(localId, { serverId: sid });
         return sid || localId;
       }
@@ -4888,7 +4920,11 @@ const REVIEWS = [];
     $('#ometa').textContent = (ov.code ? ov.code + ' · ' : '') + ov.name + ' · ' + showPhone(ov.phone) + ' · ' + (ov.placeLabel || nice(ov.table) || '') + ' · ' + when(ov.ts);
     const qty = (l) => l.quantity || l.qty || 1;
     const priceCell = (n) => archived ? '' : '<b>' + money(n) + '</b>';
-    $('#osum').innerHTML = ov.lines.map((l) => `<li><span>${qty(l)}× ${esc(l.name)}${lineNote(l)}</span>${priceCell((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`).join('') +
+    $('#osum').innerHTML = ov.lines.map((l) => {
+      const id = l.menuItemId || l.itemId || '';
+      const add = id && id !== 'fee-pizza-take' ? ' data-add="' + esc(id) + '"' : '';
+      return `<li${add}><span>${qty(l)}× ${esc(l.name)}${lineNote(l)}</span>${priceCell((l.unitPriceMzn || l.price || 0) * qty(l))}</li>`;
+    }).join('') +
       (!archived && ov.deliveryFee ? `<li><span>${esc(tr('place.feeLine', { b: tr('place.' + (ov.deliveryBand || 'city')) }))}</span>${priceCell(ov.deliveryFee)}</li>` : '') +
       (!archived && ov.pizzaTakeFee && !(ov.lines || []).some((l) => l.itemId === 'fee-pizza-take' || l.menuItemId === 'fee-pizza-take') ? `<li><span>${esc(tr('place.pizzaTake'))}</span>${priceCell(ov.pizzaTakeFee)}</li>` : '') +
       (archived ? '' : vatLis(ov.total));
@@ -4916,11 +4952,11 @@ const REVIEWS = [];
     $('#omsg').textContent = archived ? tr('cart.recordMsg') : (orderReadonly ? tr('cart.viewOnly') : (ov.status === 'no_confirm' ? tr('st.no_confirm') : canc ? tr('cart.cancelled') : ov.client_ok && !ov.driver_ok ? tr('cart.waitDriver') : ov.driver_ok && !ov.client_ok ? tr('cart.waitYou') : omsgAt(s)));
     $('#opay').textContent = archived ? tr('cart.record') : payTxt(ov.pay, ov);
     const payBtn = $('#orderPay');
-    const unpaid = ov.pay !== 'paid' && !canc && !ov.method;
+    const unpaid = orderRemain(ov) > 0 && !canc;
     if (payBtn) {
       payBtn.hidden = !unpaid;
       payBtn.disabled = false;
-      payBtn.textContent = tr('call.bill');
+      payBtn.textContent = tr('pay.paying') + ' · ' + money(orderRemain(ov));
     }
     const got = $('#orderGot');
     if (got) got.hidden = !waitDel || ov.client_ok || canc;
@@ -5007,6 +5043,14 @@ const REVIEWS = [];
     if (!ov) return;
     askBill(ov);
   });
+  $('#osum')?.addEventListener('click', (e) => {
+    const li = e.target.closest('[data-add]');
+    if (!li) return;
+    const m = byId(li.getAttribute('data-add'));
+    if (!m) return;
+    addFromCard(m);
+    say(tr('pay.reorder', { n: m.name }), 'ok');
+  });
   $('#orderHist').addEventListener('click', () => { cartDlg.close(); openHist(); });
   $('#orderBack')?.addEventListener('click', () => { cartDlg.close(); openHist(); });
   $('#orderGot')?.addEventListener('click', async () => {
@@ -5031,7 +5075,7 @@ const REVIEWS = [];
     const od = owedTotal(), pend = history.filter((o) => o.status !== 'cancelled' && o.pay === 'paid_declared').reduce((s, o) => s + o.total, 0);
     const draftsN = loadDrafts().length;
     const parts = [];
-    if (od) parts.push(`<div class="hs warn"><b>${esc(tr('pay.unpaid'))}</b><strong>${money(od)}</strong><span>${esc(tr('pay.open', { n: owed().length }))}</span></div>`);
+    if (od) parts.push(`<button type="button" class="hs warn pay-jump" data-pay-all><b>${esc(tr('pay.unpaid'))}</b><strong>${money(od)}</strong><span>${esc(tr('pay.open', { n: owed().length }))}</span></button>`);
     if (pend) parts.push(`<div class="hs"><b>${esc(tr('pay.confirming'))}</b><strong>${money(pend)}</strong><span>${esc(tr('pay.confirm'))}</span></div>`);
     if (!parts.length) {
       parts.push(history.length ? `<div class="hs ok"><b>${esc(tr('pay.ok'))}</b><span>${esc(tr('cart.recordHint'))}</span></div>` : `<div class="hs"><b>${esc(draftsN ? tr('st.draft') : tr('pay.none'))}</b><span>${esc(draftsN ? tr('cart.resumeDraft') : tr('pay.noneH'))}</span></div>`);
@@ -5074,43 +5118,111 @@ const REVIEWS = [];
   function openHist() { renderHist(); histDlg.showModal(); }
   $('#histMenu').addEventListener('click', () => { histDlg.close(); $('#menu').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
 
-  /* pagamento — só depois de Pedir a conta */
-  const payDlg = $('#payDlg'); let paySel = null, payTarget = null, payIntent = 'first', payGeo = null, payBusy = false, pendingBillPay = null;
+  /* pagamento — um pedido, vários, mesa e divisão */
+  const payDlg = $('#payDlg');
+  let paySel = null, payTarget = null, payBasket = [], payIntent = 'first', payGeo = null, payBusy = false, pendingBillPay = null, paySendNow = false;
+  let paySplit = { on: false, n: 2, mode: 'equal', pct: 50, custom: 0 };
+  let payScopeMode = 'one';
   function unpaidForBill() {
-    if (pendingBillPay && payable(pendingBillPay) && pendingBillPay.pay !== 'paid') return pendingBillPay;
-    if (ov && payable(ov) && ov.pay !== 'paid') return ov;
-    const live = history.filter((o) => o && o.status !== 'cancelled' && o.pay !== 'paid');
+    if (pendingBillPay && orderRemain(pendingBillPay) > 0) return pendingBillPay;
+    if (ov && orderRemain(ov) > 0) return ov;
+    const live = owed();
     return live.length ? live[live.length - 1] : null;
   }
+  function tableCodeNow() {
+    const n = parseInt(String((place && (place.tableNumber || place.mesa)) || table || '').replace(/\D/g, ''), 10);
+    return Number.isFinite(n) && n > 0 ? String(n) : '';
+  }
+  function orderTableCode(o) {
+    return String((o && (o.table || o.table_number || o.table_code)) || '').replace(/\D/g, '');
+  }
+  function busToGuestOrder(raw) {
+    if (!raw) return null;
+    const local = history.find((x) => (raw.code && x.code === raw.code) || (raw.id && String(x.id) === String(raw.id)));
+    if (local) return local;
+    const payRaw = raw.payment_status || raw.pay;
+    const pay = payRaw === 'declared' ? 'paid_declared' : (payRaw || 'unpaid');
+    const items = raw.items || raw.lines || [];
+    return {
+      id: raw.id, code: raw.code, ts: raw.ts || Date.parse(raw.created_at) || Date.now(),
+      table: String(raw.table_number || raw.table || ''),
+      placeLabel: raw.place_label || raw.placeLabel || '',
+      name: raw.customer_name || raw.name || '',
+      phone: raw.customer_phone || raw.phone || '',
+      lines: items.map((l) => ({
+        menuItemId: l.menuItemId || l.itemId || l.id, itemId: l.itemId || l.menuItemId || l.id,
+        name: l.name, unitPriceMzn: l.unit_price || l.unitPriceMzn || l.price || 0,
+        quantity: l.qty || l.quantity || 1, qty: l.qty || l.quantity || 1, notes: l.notes || l.note || ''
+      })),
+      total: Number(raw.total_mzn || raw.total) || 0, pay,
+      status: raw.status === 'received' ? 'review' : (raw.status || 'review'),
+      method: raw.payment_method || raw.method || '', paidToward: Number(raw.paidToward) || 0, _mate: true
+    };
+  }
+  function tableUnpaid() {
+    const code = tableCodeNow();
+    const seen = {};
+    const out = [];
+    const push = (o) => {
+      if (!o || orderRemain(o) <= 0) return;
+      const k = String(o.code || o.id);
+      if (!k || seen[k]) return;
+      seen[k] = true;
+      out.push(o);
+    };
+    if (code) owed().filter((o) => !orderTableCode(o) || orderTableCode(o) === code).forEach(push);
+    else owed().forEach(push);
+    try {
+      if (code && window.AquaBus) {
+        (AquaBus.read().orders || []).forEach((raw) => {
+          const tn = String(raw.table_number || raw.table || '').replace(/\D/g, '');
+          if (tn === code) push(busToGuestOrder(raw));
+        });
+      }
+    } catch (e) { /* */ }
+    return out;
+  }
+  function basketTotal() { return payBasket.reduce((s, o) => s + orderRemain(o), 0); }
+  function payShareAmount() {
+    const tot = basketTotal();
+    if (!paySplit.on || paySplit.n < 2) return tot;
+    if (paySplit.mode === 'pct') {
+      const p = Math.min(100, Math.max(1, Number(paySplit.pct) || 50));
+      return Math.max(1, Math.round(tot * p / 100));
+    }
+    if (paySplit.mode === 'custom') {
+      const v = Math.round(Number(paySplit.custom) || 0);
+      return Math.min(tot, Math.max(1, v || Math.round(tot / paySplit.n)));
+    }
+    const n = Math.max(2, Math.round(Number(paySplit.n) || 2));
+    return Math.round(tot / n);
+  }
   function afterBillCall() {
-    const o = unpaidForBill();
-    if (!o) { say('Não há conta em aberto para pagar.'); return; }
-    o.billAsked = true;
-    saveHist();
-    pendingBillPay = o;
     try { if (callDlg.open) callDlg.close(); } catch (e) { /* */ }
-    if (payDlg.open) return;
-    if (o.method) return;
-    openPay(o, { first: true, fromBill: true });
+    const list = tableUnpaid().length ? tableUnpaid() : owed();
+    if (!list.length) { say(tr('pay.noneDue')); return; }
+    list.forEach((o) => { o.billAsked = true; });
+    saveHist();
+    openPay(list[0], { first: true, fromBill: true, basket: list });
   }
   function askBill(o) {
-    pendingBillPay = o || unpaidForBill();
-    afterGuest(async () => {
-      const bill = pendingBillPay || unpaidForBill();
-      if (!bill) { say('Não há pedido por pagar.', 'err'); return; }
-      if (payDlg.open) return;
-      pendingBillPay = bill;
-      if (call && ['pending', 'sent', 'accepted'].includes(call.status)) {
-        afterBillCall();
-        return;
-      }
-      fillCallPlace();
-      if (!readCallPlace()) {
-        const ok = await startCall('request_bill');
-        if (!ok) openCall('request_bill');
-        return;
-      }
-      openCall('request_bill');
+    afterGuest(() => {
+      const one = o && orderRemain(o) > 0 ? o : null;
+      const all = owed();
+      const basket = one ? [one] : all.slice();
+      if (!basket.length) { say(tr('pay.noneDue'), 'err'); return; }
+      pendingBillPay = basket[0];
+      payScopeMode = one && all.length > 1 ? 'one' : (all.length > 1 ? 'all' : 'one');
+      openPay(basket[0], { fromBill: true, first: true, basket, pick: all.length > 1 });
+    });
+  }
+  function openPayAll(opts) {
+    afterGuest(() => {
+      const table = !!(opts && opts.table);
+      const list = table ? tableUnpaid() : owed();
+      if (!list.length) { say(tr('pay.noneDue'), 'err'); return; }
+      payScopeMode = table ? 'table' : 'all';
+      openPay(list[0], Object.assign({ fromBill: true, first: true, basket: list }, opts || {}));
     });
   }
   function payLocked(o) {
@@ -5147,79 +5259,178 @@ const REVIEWS = [];
       try { const i = document.createElement('textarea'); i.value = text; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); done(); } catch (e) { /* */ }
     }
   }
+  function paintPaySheet(keepMethod) {
+    const amount = payShareAmount();
+    const tot = basketTotal();
+    const n = payBasket.length;
+    const lab = n > 1 ? tr('pay.nOrders', { n, m: money(tot) }) : (payBasket[0] ? (contaLabel(payBasket[0]) + ' · ' + (payBasket[0].code || '')) : tr('pay.thisOrder'));
+    const splitNote = paySplit.on && amount < tot ? ' · ' + tr('pay.you') + ' ' + money(amount) : '';
+    $('#paySum').innerHTML = `<button type="button" class="hs warn pay-jump" id="payJump"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(lab + splitNote)} · ${esc(tr('pay.tapSend', { m: money(amount) }))}</span></button>`;
+    $('#payJump')?.addEventListener('click', () => applyPayMethod('mpesa'));
+    const mine = owed();
+    const tableList = tableUnpaid();
+    const scope = $('#payScope');
+    if (scope) {
+      const tabs = [
+        ['one', tr('pay.thisOrder')],
+        ['all', tr('pay.all')],
+        ['pick', tr('pay.pick')]
+      ];
+      if (tableCodeNow()) tabs.push(['table', tr('pay.table')]);
+      scope.innerHTML = '<div class="pay-tabs' + (tabs.length > 2 ? '' : '') + '">' + tabs.map(([id, t]) =>
+        '<button type="button" class="pay-tab" data-scope="' + id + '" aria-pressed="' + (payScopeMode === id) + '">' + esc(t) + '</button>'
+      ).join('') + '</div>';
+      if (payScopeMode === 'pick' || payScopeMode === 'one') {
+        const pool = mine.length ? mine : payBasket;
+        scope.insertAdjacentHTML('beforeend', '<div class="pay-checks">' + pool.map((o) => {
+          const on = payBasket.some((x) => String(x.id) === String(o.id) || x.code === o.code);
+          return '<button type="button" class="pay-check" data-oid="' + esc(String(o.id || o.code)) + '" aria-pressed="' + on + '"><span>' + esc(contaLabel(o)) + '<small>' + esc(o.code || '') + (o._mate ? ' · ' + esc(o.name || '') : '') + '</small></span><b>' + money(orderRemain(o)) + '</b></button>';
+        }).join('') + '</div>');
+      } else if (payScopeMode === 'table') {
+        scope.insertAdjacentHTML('beforeend', '<p class="guest-hint">' + esc(tr('pay.tableH')) + '</p><div class="pay-checks">' + tableList.map((o) =>
+          '<div class="pay-check" aria-pressed="true"><span>' + esc(contaLabel(o)) + '<small>' + esc((o.code || '') + ' · ' + (o.name || '')) + '</small></span><b>' + money(orderRemain(o)) + '</b></div>'
+        ).join('') + '</div>');
+      }
+      $$('[data-scope]', scope).forEach((b) => b.addEventListener('click', () => {
+        payScopeMode = b.dataset.scope;
+        if (payScopeMode === 'all') payBasket = mine.slice();
+        else if (payScopeMode === 'table') payBasket = tableList.slice();
+        else if (payScopeMode === 'one') payBasket = (pendingBillPay && orderRemain(pendingBillPay) ? [pendingBillPay] : (mine[0] ? [mine[0]] : payBasket.slice(0, 1)));
+        paintPaySheet(true);
+      }));
+      $$('[data-oid]', scope).forEach((b) => b.addEventListener('click', () => {
+        const pool = mine.length ? mine : payBasket;
+        const hit = pool.find((o) => String(o.id) === b.dataset.oid || o.code === b.dataset.oid);
+        if (!hit) return;
+        const i = payBasket.findIndex((x) => String(x.id) === String(hit.id) || x.code === hit.code);
+        if (payScopeMode === 'one') payBasket = [hit];
+        else if (i >= 0) {
+          if (payBasket.length > 1) payBasket.splice(i, 1);
+        } else payBasket.push(hit);
+        pendingBillPay = payBasket[0] || hit;
+        paintPaySheet(true);
+      }));
+    }
+    const split = $('#paySplit');
+    if (split) {
+      const nPeople = Math.max(2, Math.round(Number(paySplit.n) || 2));
+      const share = payShareAmount();
+      split.innerHTML = '<label class="guest-keep"><input type="checkbox" id="paySplitOn"' + (paySplit.on ? ' checked' : '') + '> ' + esc(tr('pay.split')) + '</label>' +
+        '<p>' + esc(tr('pay.splitH')) + '</p>';
+      if (paySplit.on) {
+        split.insertAdjacentHTML('beforeend',
+          '<div class="pay-n"><span>' + esc(tr('pay.people')) + '</span><button type="button" class="btn btn-line" id="payNMinus">−</button><b>' + nPeople + '</b><button type="button" class="btn btn-line" id="payNPlus">+</button></div>' +
+          '<div class="pay-tabs trio">' +
+            '<button type="button" class="pay-tab" data-smode="equal" aria-pressed="' + (paySplit.mode === 'equal') + '">' + esc(tr('pay.equal')) + '</button>' +
+            '<button type="button" class="pay-tab" data-smode="pct" aria-pressed="' + (paySplit.mode === 'pct') + '">' + esc(tr('pay.pct')) + '</button>' +
+            '<button type="button" class="pay-tab" data-smode="custom" aria-pressed="' + (paySplit.mode === 'custom') + '">' + esc(tr('pay.custom')) + '</button>' +
+          '</div>' +
+          (paySplit.mode === 'pct' ? '<label class="pay-part"><span>' + esc(tr('pay.you')) + ' (%)</span><input id="payPct" type="number" min="1" max="99" inputmode="numeric" value="' + (paySplit.pct || 50) + '"></label>' : '') +
+          (paySplit.mode === 'custom' ? '<label class="pay-part"><span>' + esc(tr('pay.you')) + ' (MT)</span><input id="payCustom" type="number" min="1" inputmode="numeric" value="' + (paySplit.custom || share) + '"></label>' : '') +
+          '<div class="pay-share"><span>' + esc(tr('pay.you')) + '</span><strong>' + money(share) + '</strong></div>' +
+          '<div class="pay-share"><span>' + esc(tr('pay.others')) + '</span><b>' + money(Math.max(0, tot - share)) + '</b></div>'
+        );
+        $('#payNMinus')?.addEventListener('click', () => { paySplit.n = Math.max(2, nPeople - 1); paintPaySheet(true); });
+        $('#payNPlus')?.addEventListener('click', () => { paySplit.n = Math.min(12, nPeople + 1); paintPaySheet(true); });
+        $$('[data-smode]', split).forEach((b) => b.addEventListener('click', () => { paySplit.mode = b.dataset.smode; paintPaySheet(true); }));
+        $('#payPct')?.addEventListener('change', (e) => { paySplit.pct = Math.min(99, Math.max(1, Number(e.target.value) || 50)); paintPaySheet(true); });
+        $('#payCustom')?.addEventListener('change', (e) => { paySplit.custom = Math.max(1, Math.round(Number(e.target.value) || share)); paintPaySheet(true); });
+      }
+      $('#paySplitOn')?.addEventListener('change', (e) => {
+        paySplit.on = e.target.checked;
+        if (paySplit.on && !paySplit.custom) paySplit.custom = Math.round(tot / Math.max(2, paySplit.n));
+        paintPaySheet(true);
+      });
+    }
+    const box = $('#payMethods');
+    if (box && !keepMethod) {
+      box.innerHTML = '';
+      paySel = null;
+      $('#payInfo').innerHTML = '';
+      $('#payGo').hidden = true;
+      const seenPay = {};
+      PAYMENT.methods.forEach((m) => {
+        if (!m || !m.id || seenPay[m.id]) return;
+        seenPay[m.id] = true;
+        const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
+        const short = m.id === 'pos' ? tr('pay.posS') : (m.network ? m.network : tr('pay.mobile'));
+        const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
+        const icn = m.id === 'pos' ? 'i-card' : 'i-phone';
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'payopt' + (m.id === 'mpesa' ? ' pay-mpesa' : m.id === 'emola' ? ' pay-emola' : '');
+        b.dataset.paym = m.id;
+        b.setAttribute('role', 'radio');
+        b.setAttribute('aria-checked', 'false');
+        b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${icn}"/></svg><b>${esc(label)}</b><small>${esc(short)}</small>`;
+        b.addEventListener('click', () => applyPayMethod(m.id));
+        box.appendChild(b);
+      });
+    } else if (paySel) applyPayMethod(paySel.id);
+  }
+  function applyPayMethod(id) {
+    const m = (PAYMENT.methods || []).find((x) => x.id === id);
+    if (!m) return;
+    const amount = payShareAmount();
+    const o = payBasket[0];
+    const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
+    const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
+    paySel = Object.assign({}, m, { label, hint });
+    $$('#payMethods .payopt').forEach((x) => x.setAttribute('aria-checked', String(x.dataset.paym === m.id)));
+    if (m.number) {
+      const holder = m.holder ? `<br><b>${esc(tr('pay.holder', { n: m.holder }))}</b>` : '';
+      $('#payInfo').innerHTML = `<p class="payinfo">${tr('pay.sendTo', { m: money(amount), n: esc(m.number), l: esc(label) })}${holder}<br><small>${esc(hint)}</small></p>
+        <button class="btn btn-cyan btn-block" type="button" id="payCopy">${esc(tr('pay.copyNum'))}: ${esc(m.number)}</button>`;
+      $('#payCopy')?.addEventListener('click', () => {
+        copyPayNumber(m.digits || m.number, $('#payCopy'));
+        persistSession();
+        savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o && o.id, code: o && o.code, amount, ids: payBasket.map((x) => x.id) });
+        $('#payMsg').textContent = tr('pay.stay');
+      });
+      $('#payMsg').textContent = tr('pay.stay');
+      savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o && o.id, code: o && o.code, amount, ids: payBasket.map((x) => x.id) });
+    } else {
+      $('#payInfo').innerHTML = `<p class="payinfo">${esc(hint)}</p>`;
+      $('#payMsg').textContent = o ? tr('pay.posWait', { c: payBasket.map((x) => x.code).filter(Boolean).join(', ') || o.code }) : tr('pay.posH');
+      savePayResume(null);
+    }
+    $('#payGo').hidden = false;
+    $('#payGo').textContent = m.number ? tr('pay.done') : tr('pay.posAsk');
+  }
   async function openPay(order, opts) {
-    if (payBusy || (payDlg && payDlg.open)) return;
-    const o = payable(order) ? order : (payable(ov) ? ov : null);
+    if (payBusy) return;
     const change = !!(opts && opts.change);
-    const first = !!(opts && opts.first) || (!change && o && !o.method);
-    if (!o) { savePayResume(null); return; }
-    if (!(o.billAsked || (opts && opts.fromBill))) return;
+    const seed = payable(order) ? order : (payable(ov) ? ov : unpaidForBill());
+    if (!seed && !(opts && opts.basket && opts.basket.length)) { savePayResume(null); return; }
     payBusy = true;
     try {
-    if (change) {
-      if (payChangeLeft(o) <= 0) { if ($('#omsg')) $('#omsg').textContent = tr('pay.windowGone'); return; }
-      try {
-        const geo = await getOnSite();
-        if (!geo.here) { if ($('#omsg')) $('#omsg').textContent = tr('pay.tooFar'); alert(tr('pay.tooFar')); return; }
-        payGeo = geo;
-      } catch (e) {
-        if ($('#omsg')) $('#omsg').textContent = tr('pay.needHere');
-        alert(tr('pay.needHere'));
-        return;
-      }
-    } else if (!first && o.method) {
-      return;
-    } else {
-      payGeo = null;
-    }
-    payIntent = change ? 'change' : 'first';
-    payTarget = o;
-    const amount = o.total;
-    $('#paySum').innerHTML = `<div class="hs warn"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(contaLabel(o))} · ${esc(o.code)} · ${esc(tr('pay.thisOrder'))}</span></div>`;
-    paySel = null; $('#payInfo').innerHTML = ''; $('#payMsg').textContent = ''; $('#payGo').hidden = true;
-    const box = $('#payMethods'); box.innerHTML = '';
-    const seenPay = {};
-    PAYMENT.methods.forEach((m) => {
-      if (!m || !m.id || seenPay[m.id]) return;
-      seenPay[m.id] = true;
-      const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
-      const short = m.id === 'pos' ? tr('pay.posS') : (m.network ? m.network : tr('pay.mobile'));
-      const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
-      const icn = m.id === 'pos' ? 'i-card' : 'i-phone';
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'payopt' + (m.id === 'mpesa' ? ' pay-mpesa' : m.id === 'emola' ? ' pay-emola' : ''); b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${icn}"/></svg><b>${esc(label)}</b><small>${esc(short)}</small>`;
-      b.addEventListener('click', () => {
-        paySel = Object.assign({}, m, { label, hint }); $$('.payopt', box).forEach((x) => x.setAttribute('aria-checked', String(x === b)));
-        if (m.number) {
-          const holder = m.holder ? `<br><b>${esc(tr('pay.holder', { n: m.holder }))}</b>` : '';
-          $('#payInfo').innerHTML = `<p class="payinfo">${tr('pay.sendTo', { m: money(amount), n: esc(m.number), l: esc(label) })}${holder}<br><small>${esc(hint)}</small></p>
-            <button class="btn btn-cyan btn-block" type="button" id="payCopy">${esc(tr('pay.copyNum'))}: ${esc(m.number)}</button>`;
-          $('#payCopy').addEventListener('click', () => {
-            copyPayNumber(m.digits || m.number, $('#payCopy'));
-            persistSession();
-            savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o.id, code: o.code });
-            $('#payMsg').textContent = tr('pay.stay');
-          });
-          $('#payMsg').textContent = tr('pay.stay');
-          savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o.id, code: o.code });
-        } else {
-          $('#payInfo').innerHTML = `<p class="payinfo">${esc(hint)}</p>`;
-          $('#payMsg').textContent = tr('pay.posWait', { c: o.code });
-          savePayResume(null);
+      if (change && seed) {
+        if (payChangeLeft(seed) <= 0) { if ($('#omsg')) $('#omsg').textContent = tr('pay.windowGone'); return; }
+        try {
+          const geo = await getOnSite();
+          if (!geo.here) { if ($('#omsg')) $('#omsg').textContent = tr('pay.tooFar'); alert(tr('pay.tooFar')); return; }
+          payGeo = geo;
+        } catch (e) {
+          if ($('#omsg')) $('#omsg').textContent = tr('pay.needHere');
+          alert(tr('pay.needHere'));
+          return;
         }
-        $('#payGo').hidden = false; $('#payGo').textContent = m.number ? tr('pay.done') : tr('pay.posAsk');
-      });
-      box.appendChild(b);
-    });
-    const resume = readPayResume();
-    if (resume && resume.method && resume.method !== 'pos' && (String(resume.orderId) === String(o.id) || resume.code === o.code)) {
-      const idx = PAYMENT.methods.findIndex((m) => m.id === resume.method);
-      const btns = $$('.payopt', box);
-      if (idx >= 0 && btns[idx]) btns[idx].click();
-    }
-    if (histDlg.open) histDlg.close();
-    const pt = $('#payT');
-    if (pt) pt.textContent = change ? tr('pay.changeMethod') : tr('pay.title');
-    if (!payDlg.open) payDlg.showModal();
+      } else payGeo = null;
+      payIntent = change ? 'change' : 'first';
+      payBasket = (opts && opts.basket && opts.basket.length) ? opts.basket.slice() : [seed];
+      payBasket = payBasket.filter((o) => orderRemain(o) > 0);
+      if (!payBasket.length) { savePayResume(null); return; }
+      payTarget = payBasket[0];
+      pendingBillPay = payTarget;
+      payBasket.forEach((o) => { o.billAsked = true; });
+      paySendNow = !!(opts && opts.sendNow);
+      if (!opts || !opts.keepSplit) paySplit = { on: false, n: 2, mode: 'equal', pct: 50, custom: 0 };
+      paintPaySheet(false);
+      if (histDlg.open) histDlg.close();
+      const pt = $('#payT');
+      if (pt) pt.textContent = change ? tr('pay.changeMethod') : tr('pay.title');
+      if (!payDlg.open) payDlg.showModal();
+      if (paySendNow) applyPayMethod('mpesa');
     } finally {
       payBusy = false;
     }
@@ -5227,19 +5438,51 @@ const REVIEWS = [];
   function maybeResumePay() {
     const r = readPayResume();
     if (!r || !r.hold || !r.method || r.method === 'pos') return;
-    const o = history.find((x) => String(x.id) === String(r.orderId) || x.code === r.code);
-    if (payLocked(o) || !o) { savePayResume(null); return; }
-    if (!o.billAsked) return;
+    const ids = Array.isArray(r.ids) ? r.ids : [r.orderId];
+    const list = ids.map((id) => history.find((x) => String(x.id) === String(id) || x.code === r.code)).filter((o) => o && orderRemain(o) > 0);
+    const o = list[0] || history.find((x) => String(x.id) === String(r.orderId) || x.code === r.code);
+    if (!o || payLocked(o)) { savePayResume(null); return; }
     if (payDlg.open || payBusy) return;
     const busy = ['cartDlg', 'placeDlg', 'itemDlg', 'callDlg', 'termsDlg', 'guestDlg'].some((id) => { const d = document.getElementById(id); return d && d.open; });
     if (busy) return;
-    openPay(o, { first: !o.method, fromBill: true });
+    openPay(o, { first: true, fromBill: true, basket: list.length ? list : [o], sendNow: true });
+  }
+  async function applyPayBasket(status, method) {
+    let left = payShareAmount();
+    const sorted = payBasket.slice().sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0));
+    for (const o of sorted) {
+      if (left <= 0) break;
+      const rem = orderRemain(o);
+      if (rem <= 0) continue;
+      const take = Math.min(rem, left);
+      o.paidToward = Math.round(Number(o.paidToward) || 0) + take;
+      o.billAsked = true;
+      if (!history.includes(o) && !o._mate) history.push(o);
+      else if (o._mate && !history.some((x) => x.code === o.code || String(x.id) === String(o.id))) history.push(o);
+      const full = o.paidToward >= Math.round(Number(o.total) || 0);
+      if (method === 'pos') {
+        await apiPay(o, full ? 'unpaid' : 'pay_requested', 'pos', full ? '' : String(o.paidToward), payGeo);
+        o.pay = full ? 'unpaid' : 'pay_requested';
+        o.method = 'pos';
+      } else if (full) {
+        await apiPay(o, status, method, '', payGeo);
+        o.pay = status === 'paid_declared' ? 'paid_declared' : o.pay;
+        o.method = method;
+        o.ref = '';
+        if (o.pay === 'paid_declared' && !['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
+      } else {
+        o.method = method;
+        await apiPay(o, 'pay_requested', method, String(o.paidToward), payGeo);
+        o.pay = 'pay_requested';
+      }
+      left -= take;
+    }
   }
   $('#payGo').addEventListener('click', async () => {
     if (!paySel) return;
-    const o = payable(payTarget) ? payTarget : null;
     const msg = $('#payMsg');
-    if (!o) { msg.textContent = tr('pay.fail', { e: '' }); return; }
+    if (!payBasket.length) { msg.textContent = tr('pay.fail', { e: '' }); return; }
+    const o = payBasket[0];
     if (payIntent === 'change') {
       if (payChangeLeft(o) <= 0) { msg.textContent = tr('pay.windowGone'); return; }
       try {
@@ -5250,29 +5493,40 @@ const REVIEWS = [];
     }
     try {
       if (paySel.id === 'pos' || !paySel.number) {
-        await apiPay(o, 'unpaid', 'pos', '', payGeo);
-        o.pay = 'unpaid';
-        o.method = 'pos';
+        await applyPayBasket('unpaid', 'pos');
         savePayResume(null);
         saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close();
-        if (ov && (ov.id === o.id || ov.code === o.code)) { ov = o; if (!cartDlg.open) cartDlg.showModal(); paintOrderView(); }
         say('Pagamento no local (POS).', 'ok');
         return;
       }
-      await apiPay(o, 'paid_declared', paySel.id, '', payGeo);
-      o.pay = 'paid_declared';
-      o.method = paySel.id;
-      o.ref = '';
-      if (!['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) o.status = 'review';
+      await applyPayBasket('paid_declared', paySel.id);
       savePayResume(null);
       saveHist(); renderHist(); updateFabs(); paintOrderView(); payDlg.close();
-      if (ov && (ov.id === o.id || ov.code === o.code)) { ov = o; if (!cartDlg.open) { $('#cartEdit').hidden = true; $('#orderView').hidden = false; cartDlg.showModal(); } paintOrderView(); }
-      say('Pagamento declarado.', 'ok');
+      say(paySplit.on ? tr('pay.shareOk', { m: money(payShareAmount()) }) : 'Pagamento declarado.', 'ok');
     } catch (e) {
       const code = e && (e.code || e.message);
       msg.textContent = code === 'not_on_site' || code === 'need_site' ? tr('pay.tooFar') : code === 'pay_window' ? tr('pay.windowGone') : tr('pay.fail', { e: e.message || e });
       say(msg.textContent, 'err');
     }
+  });
+  $('#payCallWaiter')?.addEventListener('click', () => {
+    payBasket.forEach((o) => { o.billAsked = true; });
+    saveHist();
+    const note = tr('pay.callBill') + ' · ' + money(payShareAmount()) + ' · ' + payBasket.map((o) => o.code).filter(Boolean).join(', ');
+    afterGuest(async () => {
+      try { payDlg.close(); } catch (e) { /* */ }
+      fillCallPlace();
+      if (!readCallPlace()) { openCall('request_bill'); return; }
+      const ok = await startCall('request_bill', note);
+      if (!ok) openCall('request_bill');
+    });
+  });
+  histDlg?.addEventListener('click', (e) => {
+    const jump = e.target.closest('[data-pay-all]');
+    if (!jump) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openPayAll({ sendNow: true });
   });
 
   /* chamar garçom */
@@ -5478,7 +5732,7 @@ const REVIEWS = [];
     callDlg.showModal();
   }
   let SCallReason = 'urgent_other';
-  async function startCall(reason) {
+  async function startCall(reason, extraNote) {
     const msg = $('#callMsg');
     if (call && ['pending', 'sent', 'accepted'].includes(call.status)) {
       if (reason === 'request_bill' || reason === 'conta') { afterBillCall(); return true; }
@@ -5503,7 +5757,7 @@ const REVIEWS = [];
     $('#callForm').hidden = true; $('#callStatus').hidden = false; paintCall();
     if (msg) msg.textContent = tr('cart.sending');
     try {
-      const id = await apiCall(code, reason);
+      const id = await apiCall(code, reason, extraNote);
       call.id = id;
       rememberCall({ id, reason, table: code, ts: Date.now(), status: 'pending' });
       const rr0 = $('#csRate'); if (rr0) { rr0.dataset.on = ''; rr0.innerHTML = ''; rr0.hidden = true; }
@@ -5567,6 +5821,12 @@ const REVIEWS = [];
     fc.classList.toggle('owe', false);
     fc.classList.toggle('live', showStatus);
     fc.classList.toggle('ready', showStatus && liveStatus(liveO.status) === 'ready');
+    const oweN = owedTotal();
+    const fo = $('#fabOwe'), fot = $('#fabOweTxt');
+    if (fo) {
+      fo.hidden = !(oweN > 0);
+      if (fot) fot.textContent = tr('pay.oweFab', { m: money(oweN) });
+    }
     const f = $('#fabCall'), txt = $('#fabCallTxt');
     f.classList.toggle('pending', Boolean(call && (call.status === 'pending' || call.status === 'sent'))); f.classList.toggle('accepted', Boolean(call && call.status === 'accepted'));
     txt.textContent = !call ? tr('fab.call') : call.status === 'pending' ? tr('fab.wait') : call.status === 'sent' ? tr('fab.sent') : call.status === 'accepted' ? tr('fab.coming') : tr('fab.call');
@@ -5593,6 +5853,7 @@ const REVIEWS = [];
       else openHist();
     }
   });
+  $('#fabOwe')?.addEventListener('click', () => openPayAll({ sendNow: true }));
   $('#menuCartBtn')?.addEventListener('click', () => openCartView());
   $('#menuAsideSend')?.addEventListener('click', () => openCartView());
   $('#shopCartBtn')?.addEventListener('click', (e) => {
@@ -5661,7 +5922,7 @@ const REVIEWS = [];
     b.classList.add('ill');
     b.setAttribute('aria-label', tr('menu.seeDish', { n: m.name, p: money(m.price) }));
     b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${iconFor(m)}"/></svg><span class="wk-t"><b>${esc(m.name)}</b><i>${money(m.price)}</i></span>`;
-    b.addEventListener('click', () => openItem(m)); return b;
+    b.addEventListener('click', () => addFromCard(m)); return b;
   }
   let wallIO;
   function watchWall(box) {
@@ -6017,7 +6278,7 @@ const REVIEWS = [];
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=ops100').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=ops101').catch(function () {});
   });
 }
 </script>
