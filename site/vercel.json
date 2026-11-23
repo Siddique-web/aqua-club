@@ -94,6 +94,10 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
     },
     {
+      "source": "/apple-touch-icon-v6.png",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
+    },
+    {
       "source": "/icon-circle-192.png",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
     },
