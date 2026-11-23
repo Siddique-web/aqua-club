@@ -12,15 +12,6 @@
 <meta name="theme-color" content="#00A8FF">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="color-scheme" content="light">
-<script>
-(function () {
-  try {
-    if (sessionStorage.getItem('aq.splash') === '1' || (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches)) || window.navigator.standalone) {
-      document.documentElement.classList.add('aq-no-splash');
-    } else sessionStorage.setItem('aq.splash', '1');
-  } catch (e) { /* */ }
-})();
-</script>
 <link rel="canonical" href="https://www.aquaclub.co.mz/">
 <link rel="icon" type="image/png" sizes="48x48" href="/favicon-aquaclub.png?v=2">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon-aquaclub.png?v=2">
@@ -101,7 +92,8 @@
 <!-- Google Search Console: depois de criar a propriedade https://www.aquaclub.co.mz, cole aqui:
 <meta name="google-site-verification" content="CÓDIGO">
 -->
-<link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/logo-mark.png" type="image/png" fetchpriority="high">
+<link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://prsjpbbvqhqdggsdnzog.supabase.co" crossorigin>
@@ -156,14 +148,14 @@ h1,h2,h3,p{margin:0}
 .btn-line{border-color:#000;background:transparent} .btn-line:hover{background:#000;color:#fff}
 .btn-block{width:100%}
 
-/* splash */
-.splash{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:var(--cyan);animation:splash-out 1.15s ease-in-out forwards}
-html.aq-no-splash .splash{display:none!important}
+/* splash — 4s in/out, circular logo on cyan */
+.splash{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:#00A8FF;animation:splash-screen 4s cubic-bezier(.4,0,.2,1) forwards;pointer-events:none}
 picture.aq-pic{display:contents}
-.splash-mark{width:min(42vw,176px);height:min(42vw,176px);border-radius:50%;overflow:hidden;background:var(--cyan);box-shadow:0 20px 50px rgba(0,0,0,.25);animation:splash-logo 1.6s ease-out both}
-.splash-mark img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;border:0;border-radius:0}
-@keyframes splash-out{0%,65%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden}}
-@keyframes splash-logo{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.splash-halo{width:min(72vw,300px);height:min(72vw,300px);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(0,90,170,.38) 28%,rgba(0,168,255,0) 68%);animation:splash-logo 4s cubic-bezier(.4,0,.2,1) both}
+.splash-mark{width:min(48vw,196px);height:min(48vw,196px);border-radius:50%;overflow:hidden;background:#00A8FF;box-shadow:0 10px 28px rgba(0,40,90,.22)}
+.splash-mark img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;border:0;border-radius:50%}
+@keyframes splash-screen{0%{opacity:0;visibility:visible}14%{opacity:1}72%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes splash-logo{0%{opacity:0;transform:scale(.86)}16%{opacity:1;transform:scale(1)}72%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.04)}}
 
 /* header */
 .header{position:fixed;inset:0 0 auto 0;z-index:90;background:#fff;border-bottom:4px solid var(--cyan);padding-top:env(safe-area-inset-top,0px);overflow:visible;transition:box-shadow var(--ease)}
@@ -1369,20 +1361,20 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .reveal{opacity:0;transition:opacity .8s cubic-bezier(.22,.7,.2,1),transform .8s cubic-bezier(.22,.7,.2,1);transition-delay:var(--d,0ms)}
 .r-up{transform:translateY(36px)}.r-left{transform:translateX(-44px)}.r-right{transform:translateX(44px)}.r-zoom{transform:scale(.94)}
 .reveal.in{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash{display:none}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash,.splash-halo{animation-duration:4s!important}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
 <link rel="stylesheet" href="garcom.css?v=ops90">
 </head>
 <body>
-<div class="splash" role="status" data-i18n-aria="splash"><span class="splash-mark"><img src="assets/logo-mark.png" alt="Aqua Club" width="176" height="176" decoding="async"></span></div>
+<div class="splash" role="status" data-i18n-aria="splash"><span class="splash-halo"><span class="splash-mark"><img src="assets/logo-mark.png" alt="Aqua Club" width="196" height="196" decoding="sync" fetchpriority="high"></span></span></div>
 <script>
 (function () {
   var el = document.querySelector('.splash');
   if (!el) return;
   function gone() { if (el && el.parentNode) el.parentNode.removeChild(el); el = null; }
   el.addEventListener('animationend', gone);
-  setTimeout(gone, 1400);
+  setTimeout(gone, 4200);
 })();
 </script>
 <a class="skip" href="#conteudo" data-i18n="skip">Saltar para o conteúdo</a>
@@ -5940,7 +5932,7 @@ const REVIEWS = [];
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=ops93').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=ops94').catch(function () {});
   });
 }
 </script>
