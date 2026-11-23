@@ -921,12 +921,8 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .menu-aside .btn{width:100%}
 @media(min-width:1100px){
   .menu-stage{grid-template-columns:minmax(0,1fr) 300px;gap:1.35rem;overflow:visible}
-  .menu-aside{display:flex;flex-direction:column;position:sticky;top:calc(var(--head-bar) + var(--mtool-h, 8.5rem) + .45rem);z-index:21;max-height:calc(100dvh - var(--head-bar) - var(--mtool-h, 8.5rem) - 1.1rem);overflow:auto}
-  html:not(.staff-chrome) .fabs{
-    right:max(1rem, calc((100vw - min(1280px, 100vw)) / 2 + 2rem + 300px + 1rem));
-    bottom:max(1rem, env(safe-area-inset-bottom,0px));
-    width:11.4rem;
-  }
+  .menu-aside{display:flex;flex-direction:column;position:sticky;top:calc(var(--head-bar) + var(--mtool-h, 8.5rem) + .45rem);z-index:21;max-height:calc(100dvh - var(--head-bar) - var(--mtool-h, 8.5rem) - 8.8rem);overflow:auto}
+  html:not(.staff-chrome) .fabs{width:12rem}
 }
 .menu-aside.is-flash{box-shadow:0 0 0 3px var(--yellow),0 18px 40px -24px rgba(20,40,70,.45);transition:box-shadow .35s ease}
 .mgrid-wrap{margin-top:.15rem;padding:0;border:0;border-radius:0;background:transparent;max-height:none;overflow:visible}
@@ -4215,6 +4211,36 @@ const REVIEWS = [];
   function syncMenuAsidePin() {
     const tool = $('#menu .mtool');
     if (tool) document.documentElement.style.setProperty('--mtool-h', Math.round(tool.getBoundingClientRect().height) + 'px');
+    placeFabsDock();
+  }
+  function placeFabsDock() {
+    const fabs = $('#fabs');
+    const aside = $('#menuAside');
+    if (!fabs) return;
+    const wide = window.matchMedia('(min-width:1100px)').matches;
+    const asideOn = !!(wide && aside && getComputedStyle(aside).display !== 'none' && aside.getBoundingClientRect().width > 40);
+    if (!asideOn || document.documentElement.classList.contains('staff-chrome') || document.documentElement.classList.contains('dlg-open')) {
+      fabs.style.top = '';
+      fabs.style.left = '';
+      fabs.style.right = '';
+      fabs.style.bottom = '';
+      return;
+    }
+    const ar = aside.getBoundingClientRect();
+    const fabW = fabs.offsetWidth || 192;
+    const fabH = fabs.offsetHeight || 112;
+    const gap = 16;
+    const safe = 16;
+    const left = Math.round(Math.max(12, ar.right - fabW));
+    if (window.innerHeight - ar.bottom >= fabH + gap + safe) {
+      fabs.style.top = Math.round(ar.bottom + gap) + 'px';
+      fabs.style.bottom = 'auto';
+    } else {
+      fabs.style.top = 'auto';
+      fabs.style.bottom = safe + 'px';
+    }
+    fabs.style.left = left + 'px';
+    fabs.style.right = 'auto';
   }
   function paintMenuScrub() {
     const box = $('#menuScrub');
@@ -5489,6 +5515,7 @@ const REVIEWS = [];
     f.classList.toggle('pending', Boolean(call && (call.status === 'pending' || call.status === 'sent'))); f.classList.toggle('accepted', Boolean(call && call.status === 'accepted'));
     txt.textContent = !call ? tr('fab.call') : call.status === 'pending' ? tr('fab.wait') : call.status === 'sent' ? tr('fab.sent') : call.status === 'accepted' ? tr('fab.coming') : tr('fab.call');
     paintMenuCart();
+    placeFabsDock();
   }
   function paintMenuCart() {
     const n = cartCount();
