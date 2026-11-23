@@ -1,6 +1,6 @@
 /* Cache de estáticos para visitas repetidas e picos de tráfego.
    HTML vai sempre à rede; imagens e o menu revalidam em segundo plano. */
-const VER = 'aq-ops95';
+const VER = 'aq-ops96';
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
@@ -25,6 +25,11 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   const path = url.pathname;
+  const isLaunch = /apple-touch|favicon|icon-launch|icon-circle|icon-pwa|icon-maskable|site\.webmanifest/i.test(path);
+  if (isLaunch) {
+    event.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
+    return;
+  }
   const isAsset = /\/assets\//.test(path) || /\.(webp|jpe?g|png|gif|svg|woff2?)$/i.test(path);
   const isStatic = /\.(js|css)$/i.test(path) || /\/catalog\.json$/i.test(path);
   const isNav = req.mode === 'navigate' || path.endsWith('.html') || path === '/' || path.endsWith('/');
