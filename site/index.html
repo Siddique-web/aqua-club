@@ -921,11 +921,9 @@ section.band{display:block;border:0;border-radius:0;background:transparent;curso
 .menu-aside .btn{width:100%}
 .menu-rail{display:contents}
 @media(min-width:1100px){
-  .menu-stage{grid-template-columns:minmax(0,1fr) 300px;gap:1.35rem;overflow:visible}
-  .menu-rail{display:flex;flex-direction:column;gap:.9rem;align-self:start;position:sticky;top:calc(var(--head-bar) + var(--mtool-h, 8.5rem) + .45rem);z-index:21;max-height:calc(100dvh - var(--head-bar) - var(--mtool-h, 8.5rem) - 1.1rem);min-width:0}
-  .menu-aside{display:flex;flex-direction:column;position:static;max-height:none;overflow:auto;flex:1 1 auto;min-height:0}
-  .menu-rail .fabs{position:static!important;inset:auto!important;width:100%;max-width:none;z-index:1;pointer-events:auto;margin:0}
-  .menu-rail .fab{width:100%}
+  .menu-stage{grid-template-columns:minmax(0,1fr) 300px;gap:1.35rem;overflow:visible;align-items:start}
+  .menu-rail{display:block;position:static;align-self:start}
+  .menu-aside{display:block;position:static;max-height:none;overflow:visible}
 }
 .menu-aside.is-flash{box-shadow:0 0 0 3px var(--yellow),0 18px 40px -24px rgba(20,40,70,.45);transition:box-shadow .35s ease}
 .mgrid-wrap{margin-top:.15rem;padding:0;border:0;border-radius:0;background:transparent;max-height:none;overflow:visible}
@@ -1060,11 +1058,19 @@ html:not(.staff-chrome) .fabs{bottom:max(.75rem, env(safe-area-inset-bottom,0px)
 .guest-keep input{width:1.15rem;height:1.15rem;margin:.12rem 0 0;flex:none;accent-color:#111}
 .guest-saved{display:grid;gap:.4rem;margin:.1rem 0 .15rem}
 .guest-saved[hidden]{display:none!important}
-.guest-saved .btn{margin:0;min-height:44px;font-size:.72rem}
+.guest-saved-lab{margin:0;font:800 .72rem/1.2 var(--fh);letter-spacing:.04em;text-transform:uppercase;color:#5a6a76}
 .guest-saved-list{display:grid;gap:.3rem}
-.guest-chip{display:flex;align-items:center;justify-content:space-between;gap:.5rem;width:100%;min-height:44px;padding:.45rem .75rem;border:1.5px solid #000;border-radius:14px;background:#fff;font:700 .82rem var(--fb);text-align:left;cursor:pointer}
+.guest-chip{display:flex;flex-direction:column;align-items:flex-start;gap:.12rem;width:100%;min-height:44px;padding:.55rem .8rem;border:1.5px solid #000;border-radius:14px;background:#fff;font:800 .88rem/1.2 var(--fh);text-align:left;cursor:pointer}
+.guest-chip.is-on{background:#111;color:#fff;border-color:#111}
+.guest-chip.is-on small{color:rgba(255,255,255,.72)}
 .guest-chip:hover{background:var(--cyan-soft)}
+.guest-chip.is-on:hover{background:#111}
 .guest-chip small{display:block;font:600 .72rem var(--fb);color:var(--muted)}
+.guest-confirm{display:grid;gap:.45rem;padding:.7rem .8rem .8rem;border:1.5px solid var(--cyan-line);border-radius:16px;background:#F3F7FB}
+.guest-confirm[hidden]{display:none!important}
+.guest-confirm-t{margin:0;font:800 .95rem/1.25 var(--fh)}
+.guest-confirm-who{margin:0;font:800 1.05rem/1.2 var(--fh)}
+#gManualIn[hidden]{display:none!important}
 .guest-note{margin:.2rem 0 0;font-size:.8rem;color:var(--muted);text-align:center}
 .guest-hint{margin:0;font:600 .78rem/1.35 var(--fb);color:#223}
 .guest-wait{display:grid;gap:.7rem;padding:.35rem 0 .2rem;text-align:center}
@@ -2034,13 +2040,23 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
     </form>
     <form class="guest-form" id="guestFormIn" hidden novalidate>
       <div class="guest-saved" id="gSavedBox" hidden>
-        <button class="btn btn-line btn-block" type="button" id="gUseSaved">Usar conta guardada neste telemóvel</button>
+        <p class="guest-saved-lab">Conta neste telemóvel</p>
         <div class="guest-saved-list" id="gSavedList"></div>
       </div>
+      <div class="guest-confirm" id="gConfirmBox" hidden>
+        <p class="guest-confirm-t">Quer entrar com esta conta?</p>
+        <p class="guest-confirm-who" id="gConfirmWho"></p>
+        <p class="guest-hint" id="gConfirmMail"></p>
+        <p class="guest-hint">Os dados já estão neste telemóvel. Confirme para entrar sem voltar a escrever.</p>
+        <button class="btn btn-cyan btn-block" type="submit" id="gConfirmYes">Sim, entrar</button>
+        <button class="btn btn-line btn-block" type="button" id="gConfirmOther">Usar outra conta</button>
+      </div>
+      <div id="gManualIn">
       <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</span><input name="username" id="gEmailIn" type="email" autocomplete="username" required placeholder="nome@email.com"></label>
       <label><span class="g-ico-lab"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg>Palavra-passe</span><input name="password" id="gPassIn" type="password" autocomplete="current-password" required minlength="6"></label>
-      <label class="guest-keep"><input type="checkbox" id="gKeepIn" checked> Manter-me ligado neste telemóvel</label>
-      <button class="btn btn-cyan btn-block" type="submit">Entrar</button>
+      <label class="guest-keep"><input type="checkbox" id="gKeepIn" checked> Guardar esta conta neste telemóvel</label>
+      <button class="btn btn-cyan btn-block" type="submit" id="gManualEnter">Entrar</button>
+      </div>
       <p class="guest-msg" id="gMsgIn" role="alert"></p>
     </form>
     <div class="guest-wait" id="guestWaitMail" hidden>
@@ -2663,11 +2679,17 @@ const REVIEWS = [];
       return Array.isArray(list) ? list.filter((x) => x && emailOk(x.email) && x.password) : [];
     } catch (e) { return []; }
   }
-  function saveVault(email, password, name) {
+  function saveVault(email, password, name, phone) {
     const em = String(email || '').trim().toLowerCase();
     if (!emailOk(em) || !password) return;
     const list = readVault().filter((x) => String(x.email).toLowerCase() !== em);
-    list.unshift({ email: em, password, name: String(name || '').trim(), at: Date.now() });
+    list.unshift({
+      email: em,
+      password,
+      name: String(name || '').trim(),
+      phone: String(phone || '').replace(/\D/g, ''),
+      at: Date.now()
+    });
     try { store.set(VAULT_KEY, JSON.stringify(list.slice(0, 6))); } catch (e) { /* */ }
     try { store.set('aq-guest-email', em); } catch (e) { /* */ }
   }
@@ -2675,13 +2697,35 @@ const REVIEWS = [];
     const el = $(id);
     return !el || el.checked;
   }
-  function rememberOnPhone(email, password, name) {
-    saveVault(email, password, name);
+  function rememberOnPhone(email, password, name, phone) {
+    saveVault(email, password, name, phone);
     try {
       if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
-        navigator.credentials.store(new PasswordCredential({ id: email, password, name: name || 'Aqua Club' })).catch(() => {});
+        navigator.credentials.store(new PasswordCredential({ id: String(email).trim().toLowerCase(), password, name: name || 'Aqua Club' })).catch(() => {});
       }
     } catch (e) { /* */ }
+  }
+  function maskMail(email) {
+    const s = String(email || '');
+    const at = s.indexOf('@');
+    if (at < 1) return s;
+    const u = s.slice(0, at);
+    return (u[0] || '') + '•••' + s.slice(at);
+  }
+  function vaultRows() {
+    const rows = [];
+    const seen = {};
+    [readPending(), ...readVault()].forEach((x) => {
+      const em = x && emailOk(x.email) ? String(x.email).toLowerCase() : '';
+      if (!em || !x.password || seen[em]) return;
+      seen[em] = true;
+      rows.push(x);
+    });
+    return rows;
+  }
+  function findSaved(email) {
+    const em = String(email || '').trim().toLowerCase();
+    return vaultRows().find((x) => String(x.email).toLowerCase() === em) || null;
   }
   async function pickPhoneCredentials(forcePrompt) {
     try {
@@ -2690,56 +2734,70 @@ const REVIEWS = [];
           password: true,
           mediation: forcePrompt ? 'required' : 'optional'
         });
-        if (cred && cred.id && cred.password) {
-          return { email: String(cred.id).trim().toLowerCase(), password: cred.password, name: cred.name || '' };
+        const id = cred && cred.id ? String(cred.id).trim().toLowerCase() : '';
+        if (cred && emailOk(id) && cred.password) {
+          return { email: id, password: cred.password, name: cred.name || '' };
         }
       }
     } catch (e) { /* cancelado ou sem suporte */ }
-    const v = readVault();
-    return v[0] || null;
+    return vaultRows()[0] || null;
   }
   function fillLogin(email, password) {
     const em = $('#gEmailIn'), pw = $('#gPassIn');
     if (em && email) em.value = email;
     if (pw && password) pw.value = password;
   }
-  function paintSavedAccounts() {
+  function setLoginMode(mode) {
+    const confirm = $('#gConfirmBox');
+    const manual = $('#gManualIn');
+    const saved = mode === 'confirm';
+    if (confirm) confirm.hidden = !saved;
+    if (manual) manual.hidden = saved;
+    const em = $('#gEmailIn'), pw = $('#gPassIn');
+    if (em) em.required = !saved;
+    if (pw) pw.required = !saved;
+  }
+  function paintSavedAccounts(activeEmail) {
     const box = $('#gSavedBox'), list = $('#gSavedList');
     if (!box) return;
-    const vault = readVault();
-    const pending = readPending();
-    const rows = [];
-    const seen = {};
-    [pending, ...vault].forEach((x) => {
-      if (!x || !x.email || seen[x.email]) return;
-      seen[x.email] = true;
-      rows.push(x);
-    });
+    const rows = vaultRows();
     box.hidden = !rows.length;
+    const on = String(activeEmail || '').toLowerCase();
     if (list) {
       list.innerHTML = rows.map((x) => {
-        const label = x.name ? '<b>' + String(x.name).split(' ')[0] + '</b><small>' + x.email + '</small>' : '<b>' + x.email + '</b>';
-        return '<button type="button" class="guest-chip" data-saved-mail="' + x.email.replace(/"/g, '') + '">' + label + '</button>';
+        const mail = String(x.email).toLowerCase();
+        const who = esc((x.name && String(x.name).split(' ')[0]) || mail);
+        const cls = 'guest-chip' + (mail === on ? ' is-on' : '');
+        return '<button type="button" class="' + cls + '" data-saved-mail="' + mail.replace(/"/g, '') + '"><span>' + who + '</span><small>' + esc(maskMail(mail)) + '</small></button>';
       }).join('');
     }
   }
-  async function applySavedAccount(email) {
-    const em = String(email || '').trim().toLowerCase();
-    const row = readVault().find((x) => String(x.email).toLowerCase() === em) || (readPending() && String(readPending().email).toLowerCase() === em ? readPending() : null);
-    if (row && row.password) {
-      fillLogin(row.email, row.password);
-      guestMsg('', 'Conta guardada. A entrar…');
-      $('#guestFormIn')?.requestSubmit();
-      return;
+  function applySavedAccount(email) {
+    const row = findSaved(email) || vaultRows()[0];
+    if (!row || !row.password) {
+      setLoginMode('manual');
+      guestMsg('err', 'Não há conta guardada neste telemóvel. Escreva o e-mail e a palavra-passe uma vez.');
+      return false;
     }
-    const cred = await pickPhoneCredentials(true);
-    if (cred) {
-      fillLogin(cred.email, cred.password);
-      guestMsg('', 'Conta do telemóvel. A entrar…');
-      $('#guestFormIn')?.requestSubmit();
-      return;
+    fillLogin(row.email, row.password);
+    paintSavedAccounts(row.email);
+    const who = $('#gConfirmWho'), mail = $('#gConfirmMail');
+    if (who) who.textContent = (row.name && String(row.name).trim()) || row.email;
+    if (mail) mail.textContent = maskMail(row.email);
+    setLoginMode('confirm');
+    guestMsg('', 'Conta encontrada neste telemóvel. Confirme para entrar.');
+    return true;
+  }
+  function showManualLogin(keepEmail) {
+    setLoginMode('manual');
+    paintSavedAccounts('');
+    const pw = $('#gPassIn');
+    if (pw && !keepEmail) pw.value = '';
+    if (!keepEmail) {
+      const em = $('#gEmailIn');
+      if (em) em.value = '';
     }
-    guestMsg('err', 'Não há palavra-passe guardada. Escreva-a uma vez e marque «Manter-me ligado».');
+    guestMsg('', vaultRows().length ? 'Escreva outra conta, ou volte a escolher a que está neste telemóvel.' : '');
   }
   function showGuestWait(email) {
     const w = $('#guestWaitMail');
@@ -2777,7 +2835,7 @@ const REVIEWS = [];
   }
   function welcomeGuest() {
     const p = readPending();
-    if (p) rememberOnPhone(p.email, p.password, p.name || (guest && guest.name) || '');
+    if (p) rememberOnPhone(p.email, p.password, p.name || (guest && guest.name) || '', p.phone || (guest && guest.phone) || '');
     clearPending();
     hideGuestWait();
     cleanAuthUrl();
@@ -2997,17 +3055,27 @@ const REVIEWS = [];
     $('#guestFormIn').hidden = up;
     guestMsg('', '');
     if (!up) {
-      paintSavedAccounts();
-      const saved = (readVault()[0] && readVault()[0].email) || store.get('aq-guest-email') || (readPending() && readPending().email);
-      if (saved && !$('#gEmailIn').value) $('#gEmailIn').value = saved;
-      pickPhoneCredentials(false).then((c) => {
-        if (!c || $('#guestFormIn')?.hidden) return;
-        if (!$('#gEmailIn').value || String($('#gEmailIn').value).toLowerCase() === c.email) fillLogin(c.email, c.password);
-      });
+      const rows = vaultRows();
+      if (rows.length) {
+        applySavedAccount(rows[0].email);
+        setTimeout(() => {
+          if ($('#guestFormIn')?.hidden) return;
+          const row = vaultRows()[0];
+          if (row) fillLogin(row.email, row.password);
+        }, 80);
+      } else {
+        setLoginMode('manual');
+        paintSavedAccounts('');
+        pickPhoneCredentials(false).then((c) => {
+          if (!c || $('#guestFormIn')?.hidden || vaultRows().length) return;
+          fillLogin(c.email, c.password);
+          applySavedAccount(c.email);
+        });
+      }
     }
   }
   function openGuestAuth(tab) {
-    const hasSaved = !!(readVault().length || store.get('aq-guest-email') || readPending());
+    const hasSaved = vaultRows().length > 0;
     showGuestTab(tab || (hasSaved ? 'in' : 'up'));
     $('#guestDlg').showModal();
   }
@@ -3017,9 +3085,7 @@ const REVIEWS = [];
     await loadGuest();
     if (guest && guest.id) return fn();
     pendingGuestFn = fn;
-    const vault = readVault();
-    openGuestAuth(vault.length || store.get('aq-guest-email') ? 'in' : 'up');
-    if (vault[0] && vault[0].password && !$('#gPassIn').value) fillLogin(vault[0].email, vault[0].password);
+    openGuestAuth(vaultRows().length ? 'in' : 'up');
   }
   function finishGuestAuth() {
     const fn = pendingGuestFn; pendingGuestFn = null;
@@ -3042,7 +3108,7 @@ const REVIEWS = [];
   }
   $('#guestTabUp')?.addEventListener('click', () => showGuestTab('up'));
   $('#guestTabIn')?.addEventListener('click', () => showGuestTab('in'));
-  $('#gUseSaved')?.addEventListener('click', () => applySavedAccount($('#gEmailIn')?.value || (readVault()[0] && readVault()[0].email)));
+  $('#gConfirmOther')?.addEventListener('click', () => showManualLogin(false));
   $('#gSavedList')?.addEventListener('click', (e) => {
     const b = e.target.closest('[data-saved-mail]');
     if (b) applySavedAccount(b.getAttribute('data-saved-mail'));
@@ -3080,7 +3146,7 @@ const REVIEWS = [];
     guestMsg('', 'A criar a sua conta…');
     try {
       writePending({ email, password: pass, name, phone });
-      if (wantKeep('#gKeepUp')) rememberOnPhone(email, pass, name);
+      if (wantKeep('#gKeepUp')) rememberOnPhone(email, pass, name, phone);
       const { data, error } = await sb.auth.signUp({
         email, password: pass,
         options: { data: { name, phone }, emailRedirectTo: guestRedirect() }
@@ -3104,7 +3170,7 @@ const REVIEWS = [];
         guestMsg('ok', 'Conta criada. Confirme o e-mail; depois entram os dados já guardados neste telemóvel.');
         return;
       }
-      if (wantKeep('#gKeepUp')) rememberOnPhone(email, pass, name);
+      if (wantKeep('#gKeepUp')) rememberOnPhone(email, pass, name, phone);
       else clearPending();
       guestMsg('ok', 'Conta criada e ligada. Bem-vindo, ' + guest.name.split(' ')[0] + '.');
       setTimeout(() => { finishGuestAuth(); openAccount(); }, 350);
@@ -3124,10 +3190,13 @@ const REVIEWS = [];
   $('#guestFormIn')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     guestMsg('', '');
-    const email = $('#gEmailIn').value.trim().toLowerCase();
-    const pass = $('#gPassIn').value;
-    if (!emailOk(email)) { guestMsg('err', 'Indique o e-mail da conta.'); return; }
-    if (!pass) { guestMsg('err', 'Indique a palavra-passe.'); return; }
+    const confirmOn = $('#gConfirmBox') && !$('#gConfirmBox').hidden;
+    const savedRow = confirmOn ? (findSaved($('#gEmailIn')?.value) || vaultRows()[0]) : null;
+    if (savedRow) fillLogin(savedRow.email, savedRow.password);
+    const email = String((savedRow && savedRow.email) || $('#gEmailIn').value || '').trim().toLowerCase();
+    const pass = String((savedRow && savedRow.password) || $('#gPassIn').value || '');
+    if (!emailOk(email)) { guestMsg('err', 'Indique o e-mail da conta.'); showManualLogin(true); return; }
+    if (!pass) { guestMsg('err', 'Indique a palavra-passe.'); showManualLogin(true); return; }
     try { await initBackend(); } catch (err) { /* */ }
     if (!sb) { guestMsg('err', 'Sem ligação à nuvem.'); return; }
     const btn = e.submitter || $('#guestFormIn button[type=submit]');
@@ -3142,12 +3211,13 @@ const REVIEWS = [];
       await upsertCustomerRow((await sb.auth.getUser()).data.user, p || {});
       await loadGuest();
       if (!guest || !guest.id) throw new Error('Esta conta não existe como cliente na base de dados.');
-      if (wantKeep('#gKeepIn')) rememberOnPhone(email, pass, guest.name);
-      else clearPending();
-      guestMsg('ok', 'Sessão iniciada. A conta fica neste telemóvel.');
+      rememberOnPhone(email, pass, guest.name, guest.phone);
+      clearPending();
+      guestMsg('ok', 'Sessão iniciada. A conta ficou neste telemóvel.');
       setTimeout(() => { finishGuestAuth(); openAccount(); }, 250);
     } catch (err) {
       guestMsg('err', authErr(err));
+      if (/incorrectos|Invalid login/i.test(String((err && err.message) || ''))) showManualLogin(true);
     } finally {
       guestBusy = false;
       if (btn) btn.disabled = false;
@@ -4222,11 +4292,7 @@ const REVIEWS = [];
     const fabs = $('#fabs');
     const rail = $('#menuRail');
     if (!fabs) return;
-    const home = document.body;
-    const wide = window.matchMedia('(min-width:1100px)').matches;
-    const dock = !!(wide && rail && !document.documentElement.classList.contains('staff-chrome'));
-    if (dock && fabs.parentElement !== rail) rail.appendChild(fabs);
-    if (!dock && rail && fabs.parentElement === rail) home.appendChild(fabs);
+    if (rail && fabs.parentElement === rail) document.body.appendChild(fabs);
     fabs.style.top = '';
     fabs.style.left = '';
     fabs.style.right = '';
@@ -5951,7 +6017,7 @@ const REVIEWS = [];
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=ops98').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=ops100').catch(function () {});
   });
 }
 </script>
