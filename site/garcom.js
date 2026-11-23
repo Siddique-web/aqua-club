@@ -298,7 +298,7 @@
                 const i = (S.calls || []).findIndex((c) => String(c.id) === String(n.id));
                 if (i >= 0) S.calls[i] = Object.assign({}, S.calls[i], n);
                 else S.calls = (S.calls || []).concat([n]);
-                if (S.open && S.view === 'app' && S.tab === 'calls') renderTab();
+                if (S.open && S.view === 'app' && S.tab === 'calls') schedulePaint();
               }
               cb();
             })
@@ -635,7 +635,8 @@
   const S = { open: false, view: 'boot', authTab: 'in', tab: 'orders', me: null, calls: [], mine: null, mineAt: 0, team: null,
     period: 7, hper: 7, zone: 'all', of: emptyOf(), cf: emptyCf(), msg: '', msgType: '', unsub: null, pollT: 0, tickT: 0, lastPend: null, pendingN: 0, soundOn: store.get('aq.gp.sound') !== '0', recovery: false,
     osDesk: null, osStaff: store.get('aq.os.staff') || '', osMsg: '', osN: 0, osPoll: 0, livePoll: 0, liveCalls: [], lastLive: null,
-    heard: new Set(), alertCalls: false, alertOrders: false };
+    heard: new Set(), alertCalls: false, alertOrders: false,
+    paintHold: 0, paintQueued: false, paintT: 0, tabHtml: '', tabQuiet: false, acting: false, lastActKey: '', lastActAt: 0 };
   const mt = (n) => Number(n || 0).toLocaleString('pt-PT') + ' MT';
   function vatParts(gross) {
     const v = window.aquaVat ? window.aquaVat(gross) : { total: Math.round(Number(gross) || 0), base: 0, iva: 0, geral: false };
@@ -848,7 +849,32 @@
     root.innerHTML = '<header class="gp-top"><div class="gp-brand"><img src="assets/logo.webp" alt="" width="38" height="38" onerror="this.onerror=null;this.src=&quot;assets/logo.png&quot;"><span>Aqua <b>Club</b> · Garçom</span></div><span class="sp"></span><span class="gp-mode" id="gpMode"></span>' +
       '<button class="gp-x" type="button" data-act="close" aria-label="Fechar área do garçom">' + ic('x') + '</button></header><div class="gp-scroll" id="gpScroll"><div class="gp-wrap" id="gpMain"></div></div>';
     document.body.appendChild(root);
-    root.addEventListener('click', onClick); root.addEventListener('submit', onSubmit); root.addEventListener('change', onFilterChange);
+    let downAct = null;
+    root.addEventListener('pointerdown', (e) => {
+      const hit = e.target.closest('[data-act], button, a, input, select, textarea');
+      downAct = e.target.closest('[data-act]') || null;
+      if (hit) holdPaint(2200);
+    }, true);
+    root.addEventListener('pointercancel', () => { downAct = null; }, true);
+    root.addEventListener('pointerup', (e) => {
+      const b = e.target.closest('[data-act]');
+      const same = b && b === downAct;
+      downAct = null;
+      if (!same) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      holdPaint(2200);
+      onClick(e);
+    }, true);
+    root.addEventListener('click', (e) => {
+      if (!e.target.closest('[data-act]')) return;
+      if (S.lastActAt && Date.now() - S.lastActAt < 520) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      onClick(e);
+    });
+    root.addEventListener('submit', onSubmit); root.addEventListener('change', onFilterChange);
   }
   function setInert(on) { Array.from(document.body.children).forEach((el) => { if (el === root || el === pn || el === toasts || /^(SCRIPT|STYLE|LINK|DIALOG)$/.test(el.tagName)) return; if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert'); }); }
   async function openPortal(tab) {
@@ -948,7 +974,7 @@
       S.liveCalls = mapped;
       mergeLiveIntoCalls();
       paintCallBadge();
-      if (!document.hidden && S.open && S.view === 'app' && ['calls', 'orders', 'dash', 'member', 'team'].includes(S.tab) && sigOf(mapped) !== prev) renderTab();
+      if (!document.hidden && S.open && S.view === 'app' && S.tab === 'calls' && sigOf(mapped) !== prev) schedulePaint();
     } catch (e) { /* */ }
   }
   function applyCallLists(osId, patch) {
@@ -1040,10 +1066,11 @@
     );
     S.mineAt = 0;
     if (action === 'accept' && S.tab !== 'calls') S.tab = 'calls';
+    schedulePaint(true);
     await refreshLiveCalls();
     try { await loadOsDesk(); } catch (e) { /* */ }
     await refreshCalls();
-    renderTab();
+    schedulePaint(true);
     try {
       const card = root && root.querySelector('.gc.mine[data-id="' + CSS.escape(String(id)) + '"], .gc.mine');
       if (card) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -1058,7 +1085,7 @@
       window.__aqStaffUp = true;
       const bump = () => {
         refreshLiveCalls();
-        if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) loadOsDesk().then(() => { if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) renderTab(); }).catch(() => {});
+        if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) loadOsDesk().then(() => { if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) schedulePaint(); }).catch(() => {});
       };
       window.addEventListener('aq-os-up', bump);
       window.addEventListener('aq-os-live', () => bindStaffSock());
@@ -1076,7 +1103,7 @@
       S.osSock = window.io(origin || undefined, { transports: ['websocket', 'polling'], withCredentials: true });
       S.osSock.on('call:new', () => { refreshLiveCalls(); refreshCalls(); });
       S.osSock.on('call:updated', () => { refreshLiveCalls(); refreshCalls(); });
-      S.osSock.on('order:new', () => { loadOsDesk().then(() => { pingNewOrders(S.osDesk && S.osDesk.orders); if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) renderTab(); }); });
+      S.osSock.on('order:new', () => { loadOsDesk().then(() => { pingNewOrders(S.osDesk && S.osDesk.orders); if (['orders', 'dash', 'team', 'member', 'stats'].includes(S.tab)) schedulePaint(); }); });
       return;
     }
     if (!window.io && origin && !document.querySelector('script[data-aq-io]')) {
@@ -1092,13 +1119,13 @@
     if (document.hidden) return;
     beatPresence();
     loadOsDesk().then(() => {
-      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'people', 'tables'].includes(S.tab)) renderTab();
+      if (S.open && S.view === 'app' && ['orders', 'dash', 'team', 'member', 'stats', 'people', 'tables'].includes(S.tab)) schedulePaint();
     }).catch(() => {});
     if (S.open && S.view === 'app' && S.tab === 'people' && S.me && S.me.role === 'admin') {
       const now = Date.now();
       if (!S._peopleAt || now - S._peopleAt > 5000) {
         S._peopleAt = now;
-        loadPeople().then(() => { if (S.tab === 'people') renderTab(); }).catch(() => {});
+        loadPeople().then(() => { if (S.tab === 'people') schedulePaint(); }).catch(() => {});
       }
     }
   }
@@ -1140,7 +1167,7 @@
       const pend = mergedCalls().filter((c) => c.status === 'pending');
       paintCallBadge();
       pingNewCalls(pend);
-      if (!document.hidden && S.open && S.view === 'app' && ['calls', 'dash', 'member', 'team', 'stats'].includes(S.tab) && sigOf(S.calls) !== prev) renderTab();
+      if (!document.hidden && S.open && S.view === 'app' && ['calls', 'dash', 'member', 'team', 'stats'].includes(S.tab) && sigOf(S.calls) !== prev) schedulePaint();
     } catch (e) { /* offline: tenta no próximo ciclo */ }
   }
   function tick() {
@@ -1166,7 +1193,7 @@
     else if (v === 'noprofile') m.innerHTML = viewSimple('shield', 'Conta sem perfil', 'A sua conta existe mas ainda não tem perfil de equipa. Peça ao administrador para verificar, ou saia e crie a conta de novo.', true);
     else if (v === 'recover') m.innerHTML = viewRecover();
     else if (v === 'error') m.innerHTML = viewSimple('alert', 'Não foi possível carregar', esc(S.msg || 'Verifique a ligação à internet.'), false, true);
-    else if (v === 'app') { m.innerHTML = appFrame(); renderTab(); }
+    else if (v === 'app') { S.tabHtml = ''; S.tabQuiet = false; m.innerHTML = appFrame(); renderTab(true); }
     document.documentElement.classList.toggle('gp-admin', !!(S.open && S.me && v === 'app'));
     const brand = root && $('.gp-brand span', root);
     if (brand) brand.innerHTML = 'Aqua <b>Club</b> · ' + (S.me && S.me.role === 'admin' && v === 'app' ? 'Admin' : 'Garçom');
@@ -1256,7 +1283,7 @@
       if (admin && (t === 'team' || t === 'dash' || t === 'member' || t === 'stats')) { c.innerHTML = loadingHTML; await loadTeam(); }
       if (admin && t === 'people') { c.innerHTML = loadingHTML; await loadPeople(); }
     } catch (e) { toast(esc(e.message), 'alert', 'err'); if (!S.mine) S.mine = []; }
-    if (S.tab === t) renderTab();
+    if (S.tab === t) { S.tabHtml = ''; S.tabQuiet = false; renderTab(true); }
   }
   async function loadMine() { S.mine = await backend().myCalls(startOfDay(Date.now()) - 29 * 864e5); S.mineAt = Date.now(); }
   async function loadTeam() { const be = backend(); const [staff, calls] = await Promise.all([be.team(), be.listCalls(startOfDay(Date.now()) - 29 * 864e5)]); S.team = { staff, calls }; }
@@ -1276,10 +1303,56 @@
     ((S.people && S.people.presence) || []).forEach((p) => { if (p && p.user_id) m[p.user_id] = p; });
     return m;
   }
-  function renderTab() {
+  function holdPaint(ms) {
+    S.paintHold = Date.now() + (ms || 900);
+  }
+  function schedulePaint(force) {
+    if (S.acting && !force) {
+      S.paintQueued = true;
+      if (!S.paintT) S.paintT = setTimeout(() => { S.paintT = 0; schedulePaint(false); }, 280);
+      return;
+    }
+    if (!force && S.paintHold && Date.now() < S.paintHold) {
+      S.paintQueued = true;
+      const wait = Math.max(80, S.paintHold - Date.now());
+      if (!S.paintT) S.paintT = setTimeout(() => { S.paintT = 0; schedulePaint(false); }, wait);
+      return;
+    }
+    if (S.paintT) { clearTimeout(S.paintT); S.paintT = 0; }
+    S.paintQueued = false;
+    renderTab(!!force);
+  }
+  function applyLocalOrder(id, body) {
+    const list = S.osDesk && S.osDesk.orders;
+    if (!list) return;
+    const o = list.find((x) => String(x.id) === String(id) || String(x.code) === String(id));
+    if (!o) return;
+    if (body.status) o.status = body.status;
+    if (body.payment_status) { o.payment_status = body.payment_status; o.pay = body.payment_status; }
+    if (body.payment_method) { o.payment_method = body.payment_method; o.method = body.payment_method; }
+    if (body.driver_ok) o.driver_ok = true;
+    if (body.client_ok) o.client_ok = true;
+    if (body.received_ok) {
+      o.received_ok = true; o.client_ok = true; o.driver_ok = true;
+      if (isPaid(o)) o.status = 'delivered';
+    }
+  }
+  function renderTab(force) {
     const c = $('#gpc'); if (!c || S.view !== 'app') return;
     const f = { orders: tabOrders, calls: tabCalls, hist: tabHist, stats: tabStats, profile: tabProfile, team: tabTeam, dash: tabDash, member: tabMember, people: tabPeople, tables: tabTables }[S.tab] || tabOrders;
-    const sc = $('#gpScroll'), y = sc ? sc.scrollTop : 0; c.innerHTML = f(); if (sc) sc.scrollTop = y; tick();
+    const sc = $('#gpScroll'), y = sc ? sc.scrollTop : 0;
+    const html = f();
+    if (!force && html === S.tabHtml) {
+      if (sc) sc.scrollTop = y;
+      $$('.gp-tab, .gp-side-btn', root).forEach((b) => b.setAttribute('aria-selected', String(tabSelected(b.dataset.t))));
+      return;
+    }
+    S.tabHtml = html;
+    c.classList.toggle('gp-quiet', !!S.tabQuiet);
+    c.innerHTML = html;
+    if (sc) sc.scrollTop = y;
+    S.tabQuiet = true;
+    tick();
     $$('.gp-tab, .gp-side-btn', root).forEach((b) => b.setAttribute('aria-selected', String(tabSelected(b.dataset.t))));
   }
 
@@ -2160,7 +2233,7 @@
   function onFilterChange(e) {
     const f = e.target.closest('form[data-form="ofilter"],form[data-form="cfilter"]');
     if (!f) return;
-    if (e.target.matches('select, input[type="date"]')) { applyNamedFilter(f); renderTab(); }
+    if (e.target.matches('select, input[type="date"]')) { applyNamedFilter(f); renderTab(true); }
   }
   function doExport(kind) {
     const stamp = dayKey(Date.now());
@@ -2220,6 +2293,11 @@
   async function onClick(e) {
     unlockAudio();
     const b = e.target.closest('[data-act]'); if (!b || !root.contains(b)) return; const a = b.dataset.act, be = backend();
+    const actKey = a + '\0' + (b.dataset.id || '') + '\0' + (b.dataset.do || '') + '\0' + (b.dataset.t || '') + '\0' + (b.dataset.v || '') + '\0' + (b.dataset.k || '');
+    const now = Date.now();
+    if (S.lastActKey === actKey && now - S.lastActAt < 520) return;
+    S.lastActKey = actKey; S.lastActAt = now;
+    holdPaint(2200);
     if (a === 'close') return closePortal();
     if (a === 'authtab') { S.authTab = b.dataset.v; S.msg = ''; S.msgType = ''; S.view = 'auth'; return render(); }
     if (a === 'pw') { const i = b.parentElement.querySelector('input'); i.type = i.type === 'password' ? 'text' : 'password'; return; }
@@ -2244,9 +2322,10 @@
         const body = { payment_status: 'paid' };
         await patchDeskOrder(o.id, body);
       }
-      toast('Pedidos desta mesa marcados como pagos.', 'check', 'ok'); await loadOsDesk(); renderTab(); return;
+      toast('Pedidos desta mesa marcados como pagos.', 'check', 'ok'); await loadOsDesk(); schedulePaint(true); return;
     }
     if (a === 'osord') {
+      if (S.acting) return;
       const doWhat = b.dataset.do, id = b.dataset.id;
       const body = doWhat === 'paid' ? { payment_status: 'paid' }
         : doWhat === 'pospaid' ? { payment_status: 'paid', payment_method: 'pos' }
@@ -2254,23 +2333,31 @@
         : doWhat === 'driver' ? { driver_ok: true, status: 'on_the_way' }
         : doWhat === 'receive' ? { received_ok: true, client_ok: true, driver_ok: true }
         : { status: doWhat };
+      S.acting = true;
+      holdPaint(2800);
+      applyLocalOrder(id, body);
       b.disabled = true;
-      const r = await patchDeskOrder(id, body);
-      b.disabled = false;
-      if (r) {
-        const paidNow = (r.payment_status === 'paid' || r.pay === 'paid');
-        const gotNow = !!(r.received_ok || (r.driver_ok && r.client_ok));
-        const msg = r.status === 'delivered' && paidNow ? 'Pedido entregue — pago e recebido.'
-          : doWhat === 'receive' && !paidNow ? 'Recebido pelo cliente. Falta confirmar o pagamento.'
-          : (doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid') && gotNow ? 'Pagamento confirmado — pedido entregue.'
-          : doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid' ? 'Pagamento confirmado.'
-          : doWhat === 'driver' ? 'Saiu para entrega.'
-          : doWhat === 'ready' ? 'Pedido marcado como pronto.'
-          : 'Pedido em preparação.';
-        toast(msg, 'check', 'ok');
-        await loadOsDesk();
-        renderTab();
-      } else toast('Não foi possível atualizar este pedido.', 'alert', 'err');
+      schedulePaint(true);
+      try {
+        const r = await patchDeskOrder(id, body);
+        if (r) {
+          const paidNow = (r.payment_status === 'paid' || r.pay === 'paid');
+          const gotNow = !!(r.received_ok || (r.driver_ok && r.client_ok));
+          const msg = r.status === 'delivered' && paidNow ? 'Pedido entregue — pago e recebido.'
+            : doWhat === 'receive' && !paidNow ? 'Recebido pelo cliente. Falta confirmar o pagamento.'
+            : (doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid') && gotNow ? 'Pagamento confirmado — pedido entregue.'
+            : doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid' ? 'Pagamento confirmado.'
+            : doWhat === 'driver' ? 'Saiu para entrega.'
+            : doWhat === 'ready' ? 'Pedido marcado como pronto.'
+            : 'Pedido em preparação.';
+          toast(msg, 'check', 'ok');
+          await loadOsDesk();
+          schedulePaint(true);
+        } else toast('Não foi possível atualizar este pedido.', 'alert', 'err');
+      } finally {
+        S.acting = false;
+        holdPaint(350);
+      }
       return;
     }
     if (a === 'tab') return enterTab(b.dataset.t);
@@ -2291,20 +2378,27 @@
     }
     if (a === 'freset') {
       if (b.dataset.k === 'cf') { S.cf = emptyCf(); S.zone = 'all'; } else S.of = emptyOf();
-      return renderTab();
+      return renderTab(true);
     }
-    if (a === 'zone') { S.zone = b.dataset.v; return renderTab(); }
-    if (a === 'hper') { S.hper = +b.dataset.v; return renderTab(); }
-    if (a === 'period') { S.period = +b.dataset.v; return renderTab(); }
+    if (a === 'zone') { S.zone = b.dataset.v; return renderTab(true); }
+    if (a === 'hper') { S.hper = +b.dataset.v; return renderTab(true); }
+    if (a === 'period') { S.period = +b.dataset.v; return renderTab(true); }
     if (a === 'sound') { S.soundOn = b.checked; store.set('aq.gp.sound', S.soundOn ? '1' : '0'); if (S.soundOn) beep(); return; }
-    if (a === 'notif') { try { await Notification.requestPermission(); } catch (x) { /* */ } return renderTab(); }
+    if (a === 'notif') { try { await Notification.requestPermission(); } catch (x) { /* */ } return renderTab(true); }
     if (a === 'simulate') { await guard(() => be.simulateCall()); return refreshCalls(); }
     if (a === 'resetdemo') { await be.resetDemo(); S.mine = null; S.calls = []; S.lastPend = null; return boot(); }
     if (a === 'accept' || a === 'complete' || a === 'release') {
-      if (b.disabled) return; b.disabled = true; const id = b.dataset.id;
-      const ok = await finishStaffCall(id, a);
-      b.disabled = false;
-      if (!ok) toast(a === 'accept' ? 'Outro colega já aceitou este chamado.' : 'Não foi possível atualizar este chamado.', 'alert', 'err');
+      if (b.disabled || S.acting) return;
+      S.acting = true;
+      holdPaint(2800);
+      b.disabled = true; const id = b.dataset.id;
+      try {
+        const ok = await finishStaffCall(id, a);
+        if (!ok) toast(a === 'accept' ? 'Outro colega já aceitou este chamado.' : 'Não foi possível atualizar este chamado.', 'alert', 'err');
+      } finally {
+        S.acting = false;
+        holdPaint(350);
+      }
       return;
     }
     if (a === 'member') {
@@ -2312,13 +2406,13 @@
       const next = { approve: [true, 'waiter'], promote: [true, 'admin'], demote: [true, 'waiter'], disable: [false, m.role] }[d];
       if (d === 'disable' && !confirm('Desativar ' + m.name + '? Deixa de poder entrar e aceitar chamados.')) return;
       const ok = await guard(() => be.setStaff(m.id, next[0], next[1]));
-      if (ok) { toast(d === 'approve' ? esc(m.name) + ' aprovado(a).' : 'Equipa atualizada.', 'check', 'ok'); await guard(loadTeam); if (S.tab === 'member' && d === 'disable') return enterTab('team'); renderTab(); }
+      if (ok) { toast(d === 'approve' ? esc(m.name) + ' aprovado(a).' : 'Equipa atualizada.', 'check', 'ok'); await guard(loadTeam); if (S.tab === 'member' && d === 'disable') return enterTab('team'); renderTab(true); }
     }
   }
   async function onSubmit(e) {
     e.preventDefault(); const f = e.target, kind = f.dataset.form, be = backend(), v = Object.fromEntries(new FormData(f).entries());
     if (!kind) return;
-    if (kind === 'ofilter' || kind === 'cfilter') { applyNamedFilter(f); renderTab(); return; }
+    if (kind === 'ofilter' || kind === 'cfilter') { applyNamedFilter(f); renderTab(true); return; }
     if (!be && kind !== 'osadmin') return;
     say(f, '');
     const email = String(v.email || '').trim();
@@ -2401,10 +2495,10 @@
         if (be && be.mode === 'live' && be.setStaffCode && f.dataset.phone) await be.setStaffCode(f.dataset.phone, next);
         else if (be && be.setPin) await be.setPin(f.dataset.id, next);
         else throw new Error('Sem permissão para alterar a senha.');
-        say(f, 'Palavra-passe actualizada.', 'ok'); await guard(loadTeam); renderTab();
+        say(f, 'Palavra-passe actualizada.', 'ok'); await guard(loadTeam); renderTab(true);
       } else if (kind === 'invite') {
         if (!be || !be.inviteStaff) throw new Error('Sem permissão para criar perfil.');
-        busy(f, true); await be.inviteStaff({ name: v.name, pin: v.pin, phone: v.phone }); f.reset(); say(f, 'Perfil criado. O garçom entra com este PIN.', 'ok'); await guard(loadTeam); renderTab();
+        busy(f, true); await be.inviteStaff({ name: v.name, pin: v.pin, phone: v.phone }); f.reset(); say(f, 'Perfil criado. O garçom entra com este PIN.', 'ok'); await guard(loadTeam); renderTab(true);
       }
     } catch (x) {
       if (kind === 'in' || kind === 'up' || kind === 'recover' || kind === 'pin' || kind === 'osadmin') { S.msg = x.message; S.msgType = 'err'; if (S.view === 'auth' || S.view === 'recover') { const keep = Object.assign({}, v); render(); const nf = $('form', root); if (nf) { ['name', 'email', 'phone', 'pin'].forEach((k) => { if (nf.elements[k] && keep[k]) nf.elements[k].value = keep[k]; }); } } }

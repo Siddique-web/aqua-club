@@ -10,13 +10,13 @@
   "theme_color": "#00A8FF",
   "icons": [
     {
-      "src": "/favicon-aquaclub.png",
+      "src": "/favicon-aquaclub.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/favicon.ico",
+      "src": "/favicon.ico?v=2",
       "sizes": "48x48",
       "type": "image/x-icon"
     }

@@ -51,6 +51,7 @@ html.gp-open .fabs { visibility: hidden !important; pointer-events: none !import
 .gp button { font-family: inherit; }
 .gi { width: 20px; height: 20px; flex: none; overflow: visible; vector-effect: non-scaling-stroke; }
 #gpc { display: grid; gap: 1rem; }
+#gpc.gp-quiet .gc { animation: none !important; }
 
 .gp-top {
   flex: none; display: flex; align-items: center; gap: .8rem; background: #fff; border-bottom: 4px solid var(--cyan, #00A8FF);
@@ -83,9 +84,11 @@ html.gp-open .fabs { visibility: hidden !important; pointer-events: none !import
 .gp-dot.on { background: #16A34A; box-shadow: 0 0 0 4px rgba(22, 163, 74, .22); }
 
 /* botões */
-.gb { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 46px; padding: .6rem 1.25rem; border: 2px solid transparent; border-radius: 999px; font: 800 .8rem var(--fh, system-ui); letter-spacing: .07em; text-transform: uppercase; cursor: pointer; background: var(--cyan, #00A8FF); color: #000; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
-.gb:hover { transform: translateY(-1px); background: var(--yellow, #FFD700); box-shadow: 0 10px 20px -10px rgba(0, 0, 0, .4); }
-.gb:active { transform: scale(.97); }
+.gb { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 46px; padding: .6rem 1.25rem; border: 2px solid transparent; border-radius: 999px; font: 800 .8rem var(--fh, system-ui); letter-spacing: .07em; text-transform: uppercase; cursor: pointer; background: var(--cyan, #00A8FF); color: #000; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: background .2s ease, box-shadow .2s ease, color .2s ease; }
+@media (hover: hover) and (pointer: fine) {
+  .gb:hover { transform: translateY(-1px); background: var(--yellow, #FFD700); box-shadow: 0 10px 20px -10px rgba(0, 0, 0, .4); }
+}
+.gb:active { transform: scale(.98); }
 .gb[disabled] { opacity: .55; pointer-events: none; }
 .gb.dark { background: #000; color: #fff; } .gb.dark:hover { background: var(--cyan, #00A8FF); color: #000; }
 .gb.line { background: transparent; border-color: #000; } .gb.line:hover { background: #000; color: #fff; }
