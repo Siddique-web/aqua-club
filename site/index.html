@@ -13,12 +13,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://www.aquaclub.co.mz/">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=7">
-<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=7">
-<link rel="shortcut icon" href="/favicon-48.png?v=7">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-v7.png">
-<link rel="icon" href="/favicon.ico?v=7" sizes="48x48">
-<link rel="manifest" href="/site.webmanifest?v=7">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=8">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=8">
+<link rel="shortcut icon" href="/favicon-48.png?v=8">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-v8.png">
+<link rel="icon" href="/favicon.ico?v=8" sizes="48x48">
+<link rel="manifest" href="/site.webmanifest?v=8">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Aqua Club">
 <meta property="og:locale" content="pt_MZ">
@@ -91,8 +91,7 @@
 <!-- Google Search Console: depois de criar a propriedade https://www.aquaclub.co.mz, cole aqui:
 <meta name="google-site-verification" content="CÓDIGO">
 -->
-<link rel="preload" as="image" href="assets/logo-mark.png" type="image/png" fetchpriority="high">
-<link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/slide-01.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://prsjpbbvqhqdggsdnzog.supabase.co" crossorigin>
@@ -148,12 +147,6 @@ h1,h2,h3,p{margin:0}
 .btn-block{width:100%}
 
 picture.aq-pic{display:contents}
-.splash{position:fixed;inset:0;z-index:400;display:grid;place-items:center;background:#00A8FF;animation:aq-splash 3s cubic-bezier(.4,0,.2,1) forwards}
-.splash-halo{width:min(72vw,300px);height:min(72vw,300px);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(0,90,170,.4) 28%,rgba(0,168,255,0) 70%);animation:aq-splash-logo 3s cubic-bezier(.4,0,.2,1) both}
-.splash-mark{width:min(50vw,204px);height:min(50vw,204px);border-radius:50%;overflow:hidden;background:#00A8FF;box-shadow:0 12px 32px rgba(0,40,90,.24)}
-.splash-mark img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;border:0;border-radius:50%}
-@keyframes aq-splash{0%{opacity:0}16%{opacity:1}68%{opacity:1}100%{opacity:0;visibility:hidden}}
-@keyframes aq-splash-logo{0%{opacity:0;transform:scale(.88)}18%{opacity:1;transform:scale(1)}68%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.03)}}
 
 /* header */
 .header{position:fixed;inset:0 0 auto 0;z-index:90;background:#fff;border-bottom:4px solid var(--cyan);padding-top:env(safe-area-inset-top,0px);overflow:visible;transition:box-shadow var(--ease)}
@@ -1360,22 +1353,12 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .reveal{opacity:0;transition:opacity .8s cubic-bezier(.22,.7,.2,1),transform .8s cubic-bezier(.22,.7,.2,1);transition-delay:var(--d,0ms)}
 .r-up{transform:translateY(36px)}.r-left{transform:translateX(-44px)}.r-right{transform:translateX(44px)}.r-zoom{transform:scale(.94)}
 .reveal.in{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.splash,.splash-halo{animation-duration:3s!important}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}.story-ring{animation:none}}
 html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bub,html.aq-pause .mtrack,html.aq-pause .tag .dot,html.aq-pause .cv em,html.aq-pause .fab.cart.live,html.aq-pause .fab.call.pending{animation-play-state:paused!important}
 </style>
 <link rel="stylesheet" href="garcom.css?v=ops90">
 </head>
 <body>
-<div class="splash" role="status" data-i18n-aria="splash"><span class="splash-halo"><span class="splash-mark"><img src="assets/logo-mark.png" alt="Aqua Club" width="204" height="204" decoding="sync" fetchpriority="high"></span></span></div>
-<script>
-(function () {
-  var el = document.querySelector('.splash');
-  if (!el) return;
-  function gone() { if (el && el.parentNode) el.parentNode.removeChild(el); el = null; }
-  el.addEventListener('animationend', gone);
-  setTimeout(gone, 3200);
-})();
-</script>
 <a class="skip" href="#conteudo" data-i18n="skip">Saltar para o conteúdo</a>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -5946,7 +5929,7 @@ const REVIEWS = [];
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=ops97').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=ops98').catch(function () {});
   });
 }
 </script>

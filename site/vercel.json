@@ -102,6 +102,10 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     },
     {
+      "source": "/apple-touch-icon-v8.png",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
       "source": "/icon-launch-192.png",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
     },
