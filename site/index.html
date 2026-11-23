@@ -10,15 +10,25 @@
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <meta name="author" content="Aqua Club">
 <meta name="theme-color" content="#00A8FF">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="color-scheme" content="light">
+<script>
+(function () {
+  try {
+    if (sessionStorage.getItem('aq.splash') === '1' || (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches)) || window.navigator.standalone) {
+      document.documentElement.classList.add('aq-no-splash');
+    } else sessionStorage.setItem('aq.splash', '1');
+  } catch (e) { /* */ }
+})();
+</script>
 <link rel="canonical" href="https://www.aquaclub.co.mz/">
 <link rel="icon" type="image/png" sizes="48x48" href="/favicon-aquaclub.png?v=2">
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon-aquaclub.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="/favicon-aquaclub.png?v=2">
 <link rel="shortcut icon" href="/favicon-aquaclub.png?v=2">
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon-aquaclub.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3">
 <link rel="icon" href="/favicon.ico?v=2" sizes="48x48">
-<link rel="manifest" href="/site.webmanifest">
+<link rel="manifest" href="/site.webmanifest?v=3">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Aqua Club">
 <meta property="og:locale" content="pt_MZ">
@@ -148,8 +158,9 @@ h1,h2,h3,p{margin:0}
 
 /* splash */
 .splash{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:var(--cyan);animation:splash-out 1.15s ease-in-out forwards}
+html.aq-no-splash .splash{display:none!important}
 picture.aq-pic{display:contents}
-.splash img{width:min(46vw,190px);height:auto;border-radius:50%;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:splash-logo 1.6s ease-out both}
+.splash img{width:min(42vw,176px);height:min(42vw,176px);object-fit:cover;border-radius:50%;background:var(--cyan);box-shadow:0 20px 50px rgba(0,0,0,.25);animation:splash-logo 1.6s ease-out both}
 @keyframes splash-out{0%,65%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden}}
 @keyframes splash-logo{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
 
@@ -1363,7 +1374,16 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
 <link rel="stylesheet" href="garcom.css?v=ops90">
 </head>
 <body>
-<div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo.webp" alt="Aqua Club" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
+<div class="splash" role="status" data-i18n-aria="splash"><img src="assets/logo-splash.png" alt="Aqua Club" width="176" height="176" decoding="async"></div>
+<script>
+(function () {
+  var el = document.querySelector('.splash');
+  if (!el) return;
+  function gone() { if (el && el.parentNode) el.parentNode.removeChild(el); el = null; }
+  el.addEventListener('animationend', gone);
+  setTimeout(gone, 1400);
+})();
+</script>
 <a class="skip" href="#conteudo" data-i18n="skip">Saltar para o conteúdo</a>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -5919,7 +5939,7 @@ const REVIEWS = [];
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=ops91').catch(function () {});
   });
 }
 </script>

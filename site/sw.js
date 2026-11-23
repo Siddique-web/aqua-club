@@ -1,11 +1,11 @@
 /* Cache de estáticos para visitas repetidas e picos de tráfego.
    HTML vai sempre à rede; imagens e o menu revalidam em segundo plano. */
-const VER = 'aq-ops87';
+const VER = 'aq-ops91';
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(VER);
-    await cache.addAll(['./', './catalog.json']).catch(() => {});
+    await cache.addAll(['./catalog.json']).catch(() => {});
     self.skipWaiting();
   })());
 });
