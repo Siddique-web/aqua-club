@@ -685,14 +685,47 @@
       throw e;
     } finally { clearTimeout(t); }
   }
+  function kitchenRank(s) {
+    if (s === 'cancelled') return 9;
+    if (s === 'delivered') return 4;
+    if (s === 'on_the_way') return 3;
+    if (s === 'ready') return 2;
+    if (s === 'preparing') return 1;
+    return 0;
+  }
+  function mergeDeskOrders(incoming) {
+    const prev = (S.osDesk && S.osDesk.orders) || [];
+    const olds = new Map();
+    prev.forEach((o) => {
+      if (o && o.id != null) olds.set(String(o.id), o);
+      if (o && o.code) olds.set(String(o.code), o);
+    });
+    return (incoming || []).map((n) => {
+      const old = olds.get(String(n.id)) || olds.get(String(n.code));
+      if (!old || !old._staffAt || Date.now() - old._staffAt > 20000) return n;
+      const keepKitchen = kitchenRank(old.status) > kitchenRank(n.status);
+      const keepPaid = (old.payment_status === 'paid' || old.pay === 'paid') && n.payment_status !== 'paid' && n.pay !== 'paid';
+      if (!keepKitchen && !keepPaid && !old.received_ok) return n;
+      return Object.assign({}, n, {
+        status: keepKitchen ? old.status : n.status,
+        payment_status: keepPaid ? old.payment_status : n.payment_status,
+        pay: keepPaid ? old.pay : n.pay,
+        driver_ok: !!(old.driver_ok || n.driver_ok),
+        client_ok: !!(old.client_ok || n.client_ok),
+        received_ok: !!(old.received_ok || n.received_ok),
+        _staffAt: old._staffAt
+      });
+    });
+  }
   async function loadOsDesk() {
-    if (S._deskBusy) return S._deskBusy;
+    const seq = (S._deskSeq = (S._deskSeq || 0) + 1);
     const countOpen = (orders) => (orders || []).filter((o) => o.status !== 'cancelled' && o.status !== 'delivered').length;
     const be = backend();
-    S._deskBusy = (async () => {
+    const run = (async () => {
     if (be && be.mode === 'live' && be.listOrders) {
       try {
-        const orders = await be.listOrders();
+        const orders = mergeDeskOrders(await be.listOrders());
+        if (seq !== S._deskSeq) return;
         S.osDesk = { orders, calls: S.calls || [], role: (S.me && S.me.role) || 'waiter' };
         S.osMsg = '';
         setOrderBadge(countOpen(orders));
@@ -713,10 +746,11 @@
       } else if (e.status === 401) { S.osDesk = null; S.osMsg = ''; }
       else if (!S.osDesk) S.osMsg = e.message || 'Sem ligação ao sistema de pedidos.';
     }
+    if (seq !== S._deskSeq) return;
     setOrderBadge(countOpen(S.osDesk && S.osDesk.orders));
     pingNewOrders(S.osDesk && S.osDesk.orders);
-    })().finally(() => { S._deskBusy = null; });
-    return S._deskBusy;
+    })();
+    return run;
   }
   let root = null, pn = null, toasts = null, deb = 0;
 
@@ -1327,7 +1361,8 @@
     if (!list) return;
     const o = list.find((x) => String(x.id) === String(id) || String(x.code) === String(id));
     if (!o) return;
-    if (body.status) o.status = body.status;
+    if (body.status && kitchenRank(body.status) >= kitchenRank(o.status)) o.status = body.status;
+    else if (body.status && !o.status) o.status = body.status;
     if (body.payment_status) { o.payment_status = body.payment_status; o.pay = body.payment_status; }
     if (body.payment_method) { o.payment_method = body.payment_method; o.method = body.payment_method; }
     if (body.driver_ok) o.driver_ok = true;
@@ -1336,6 +1371,7 @@
       o.received_ok = true; o.client_ok = true; o.driver_ok = true;
       if (isPaid(o)) o.status = 'delivered';
     }
+    o._staffAt = Date.now();
   }
   function renderTab(force) {
     const c = $('#gpc'); if (!c || S.view !== 'app') return;
@@ -1925,8 +1961,8 @@
       if (xfer) acts.push('<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="paid">Confirmar pagamento</button>');
       if (posDue) acts.push('<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="pospaid">POS cobrado → Pago</button>');
       if (admin && pst !== 'paid' && !posDue && !xfer) acts.push('<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="markpaid">Confirmar pago</button>');
-      if (!['preparing', 'ready', 'on_the_way', 'delivered'].includes(o.status)) acts.push('<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="preparing">A preparar</button>');
-      if (!['ready', 'on_the_way', 'delivered'].includes(o.status)) acts.push('<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="ready">Pedido pronto</button>');
+      if (kitchenRank(o.status) < 1) acts.push('<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="preparing">A preparar</button>');
+      if (kitchenRank(o.status) < 2) acts.push('<button class="gb line" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="ready">Pedido pronto</button>');
       if (isDelivery(o) && (o.status === 'ready' || o.status === 'on_the_way') && !o.driver_ok && !got) acts.push('<button class="gb" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="driver">Saiu para entrega</button>');
       if (!got) acts.push('<button class="gb ok" type="button" data-act="osord" data-id="' + esc(o.id) + '" data-do="receive">Marcar entregue</button>');
     }
@@ -2276,12 +2312,14 @@
     }
   }
   async function patchDeskOrder(id, body) {
-    let r = null;
     const be = backend();
     if (be && be.mode === 'live' && be.patchOrder) {
-      try { r = await be.patchOrder(id, body); } catch (e) { r = null; }
+      const r = await be.patchOrder(id, body);
+      if (window.AquaBus) AquaBus.patchOrder(id, body);
+      return r;
     }
-    if (!r && hasOsApi()) {
+    let r = null;
+    if (hasOsApi()) {
       try { r = await osFetch('/desk/orders/' + id, { method: 'PATCH', body }); } catch (e) { r = null; }
     }
     if (window.AquaBus) {
@@ -2337,13 +2375,16 @@
       holdPaint(2800);
       applyLocalOrder(id, body);
       b.disabled = true;
+      if (b.parentNode) b.remove();
       schedulePaint(true);
       try {
         const r = await patchDeskOrder(id, body);
         if (r) {
-          const paidNow = (r.payment_status === 'paid' || r.pay === 'paid');
-          const gotNow = !!(r.received_ok || (r.driver_ok && r.client_ok));
-          const msg = r.status === 'delivered' && paidNow ? 'Pedido entregue — pago e recebido.'
+          applyLocalOrder(id, Object.assign({}, body, r));
+          const paidNow = (r.payment_status === 'paid' || r.pay === 'paid' || body.payment_status === 'paid');
+          const gotNow = !!(r.received_ok || body.received_ok || (r.driver_ok && r.client_ok));
+          const stNow = r.status || body.status;
+          const msg = stNow === 'delivered' && paidNow ? 'Pedido entregue — pago e recebido.'
             : doWhat === 'receive' && !paidNow ? 'Recebido pelo cliente. Falta confirmar o pagamento.'
             : (doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid') && gotNow ? 'Pagamento confirmado — pedido entregue.'
             : doWhat === 'paid' || doWhat === 'pospaid' || doWhat === 'markpaid' ? 'Pagamento confirmado.'
@@ -2351,8 +2392,8 @@
             : doWhat === 'ready' ? 'Pedido marcado como pronto.'
             : 'Pedido em preparação.';
           toast(msg, 'check', 'ok');
-          await loadOsDesk();
           schedulePaint(true);
+          loadOsDesk().then(() => schedulePaint(true)).catch(() => {});
         } else toast('Não foi possível atualizar este pedido.', 'alert', 'err');
       } finally {
         S.acting = false;
