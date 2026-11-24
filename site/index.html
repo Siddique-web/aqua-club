@@ -140,10 +140,11 @@ h1,h2,h3,p{margin:0}
 
 /* botões */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.85rem 1.5rem;border:2px solid transparent;border-radius:4px;font:800 .82rem var(--fh);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:#000;cursor:pointer;transition:transform var(--ease),box-shadow var(--ease),background-color var(--ease),color var(--ease),border-color var(--ease)}
-.btn:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 14px 28px -10px rgba(0,0,0,.35)}
+@media(hover:hover){.btn:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 14px 28px -10px rgba(0,0,0,.35)}}
 .btn:active{transform:scale(1)}
-.btn-cyan{background:var(--cyan)} .btn-cyan:hover{background:var(--yellow)}
-.btn-line{border-color:#000;background:transparent} .btn-line:hover{background:#000;color:#fff}
+.btn-cyan{background:var(--cyan)}
+.btn-line{border-color:#000;background:transparent}
+@media(hover:hover){.btn-cyan:hover{background:var(--yellow)}.btn-line:hover{background:#000;color:#fff}}
 .btn-block{width:100%}
 
 picture.aq-pic{display:contents}
@@ -312,7 +313,7 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .story-ring{position:absolute;inset:0;border-radius:50%;padding:11px;background:conic-gradient(from 210deg,#7EE0FF,#00A8FF,#0069A8,#00A8FF,#7EE0FF);box-shadow:0 14px 32px -12px rgba(0,80,140,.55);animation:storyspin 7s linear infinite;pointer-events:none}
 .story-ring::before{content:"";position:absolute;inset:11px;border-radius:50%;background:#fff;z-index:0}
 .story-orb picture{position:absolute;inset:16px;width:calc(100% - 32px);height:calc(100% - 32px);border-radius:50%;overflow:hidden;z-index:1;background:#111;display:block}
-.story-thumb{width:100%;height:100%;object-fit:cover;object-position:center;display:block;border-radius:50%}
+.story-thumb{width:100%;height:100%;object-fit:cover;object-position:center 28%;display:block;border-radius:50%}
 .story-plus{position:absolute;right:-4px;bottom:-4px;z-index:2;width:2.75rem;height:2.75rem;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#7EE0FF,#00A8FF,#0069A8);color:#fff;box-shadow:0 0 0 3px #fff;transform:none}
 .story-plus svg{width:1.45rem;height:1.45rem;stroke:#fff;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 .story-copy{display:grid;gap:.12rem;min-width:0;justify-items:center;text-align:center}
@@ -320,7 +321,7 @@ html[lang^="zh"] .display,html[lang^="zh"] .nav a,html[lang^="zh"] .btn,html[lan
 .story-copy small{color:var(--muted);font:600 .82rem var(--fb);line-height:1.3;max-width:16rem}
 .story-btn.seen .story-ring{animation:none;background:#7EC8E3}
 @keyframes storyspin{to{transform:rotate(1turn)}}
-.story-dlg{border:0;padding:0;width:min(480px,96vw);max-width:96vw;height:min(94dvh,100%);max-height:94dvh;margin:auto;background:#041828;color:#fff;border-radius:22px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;aspect-ratio:auto}
+.story-dlg{border:0;padding:0;width:min(430px,96vw,calc(94dvh * 9 / 16));height:min(94dvh,calc(96vw * 16 / 9));max-width:96vw;max-height:94dvh;aspect-ratio:9/16;margin:auto;background:#041828;color:#fff;border-radius:22px;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column}
 .story-dlg::backdrop{background:rgba(0,8,18,.82)}
 .story-stage{position:relative;flex:1 1 auto;width:100%;min-height:0;height:100%;display:grid;place-items:center;background:#041828;cursor:pointer;user-select:none}
 .story-stage picture{display:grid;place-items:center;width:100%;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%;background:#041828;overflow:hidden}
@@ -1008,7 +1009,7 @@ html.staff-chrome .fabs{bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))}
 .fab{display:grid;grid-template-columns:18px minmax(0,1fr);align-items:center;justify-items:start;column-gap:.42rem;min-height:48px;padding:.42rem .7rem .42rem .52rem;border:0;border-radius:18px;font:800 .62rem/1.15 var(--fh);letter-spacing:.045em;text-transform:uppercase;color:#000;cursor:pointer;width:100%;max-width:none;overflow:visible;white-space:normal;text-align:left;box-shadow:0 12px 26px -10px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.7);transition:transform var(--ease),background-color var(--ease)}
 .fab .ico{width:16px;height:16px;flex:none}
 .fab span{display:block;min-width:0;width:100%;overflow:visible;text-overflow:unset;white-space:normal;overflow-wrap:break-word;word-break:keep-all;hyphens:none;line-height:1.18}
-.fab:hover{transform:translateY(-3px) scale(1.03)}
+@media(hover:hover){.fab:hover{transform:translateY(-3px) scale(1.03)}}
 @media(min-width:720px){
   .fabs{right:1.1rem;bottom:calc(1.1rem + env(safe-area-inset-bottom,0px));width:12rem}
   .fab{min-height:50px;padding:.48rem .8rem .48rem .58rem;font-size:.68rem;border-radius:20px}
@@ -1076,18 +1077,19 @@ html:not(.staff-chrome) .fabs{bottom:max(.75rem, env(safe-area-inset-bottom,0px)
 .guest-wait{display:grid;gap:.7rem;padding:.35rem 0 .2rem;text-align:center}
 .guest-wait p{margin:0;font:600 .9rem/1.45 var(--fb);color:#223}
 .guest-wait b{word-break:break-all}
-.dlg::backdrop{background:rgba(0,20,35,.62);backdrop-filter:blur(3px)}
+.dlg::backdrop{background:rgba(0,20,35,.62)}
 .dlg[open]{animation:sheet .35s ease}
 @keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.dlg[open]{animation:none}}
+#payDlg[open],#histDlg[open]{animation:none}
 @media(min-width:700px){.dlg{margin:auto;border-radius:28px;max-height:92dvh}}
 dialog:not([open]){display:none!important}
 .dlg.cart-dlg[open]{display:flex;flex-direction:column;width:min(640px,100%);max-width:100%;height:min(100dvh,920px);max-height:100dvh;overflow:hidden;min-width:0}
 @media(min-width:700px){.dlg.cart-dlg[open]{height:min(92dvh,860px);max-height:92dvh;border-radius:28px;margin:auto;width:min(680px,96vw)}}
 .cart-dlg .dhead{flex:none}
 .cart-dlg #orderView:not([hidden]){flex:1;min-height:0;overflow:auto}
-html:has(dialog[open]),html.dlg-open{overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
+html.dlg-open{overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
 html.dlg-open body{position:fixed;left:0;right:0;width:100%;overflow:hidden;overscroll-behavior:none}
-html:has(dialog[open]) .fabs,html:has(dialog[open]) .pn,html:has(dialog[open]) .menu-scrub,
 html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidden!important;pointer-events:none!important}
 #placeDlg.place-dlg[open]{height:100dvh;max-height:100dvh;overflow:hidden;animation:none;transform:none}
 #placeDlg > .place-pad{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;gap:.55rem;padding:1rem .9rem calc(.85rem + env(safe-area-inset-bottom,0px));pointer-events:auto}
@@ -1102,7 +1104,7 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .dback,.dx{flex:none;width:42px;height:42px;border:2px solid #000;border-radius:50%;background:#fff;font-size:1.1rem;cursor:pointer;transition:background-color var(--ease),color var(--ease);display:grid;place-items:center;padding:0}
 .dback .ico{width:1.15rem;height:1.15rem}
 .dback[hidden]{display:none!important}
-.dback:hover,.dx:hover{background:#000;color:#fff}
+@media(hover:hover){.dback:hover,.dx:hover{background:#000;color:#fff}}
 .dimg{position:relative;width:100%;height:min(42svh,320px);border-radius:20px;overflow:hidden;display:grid;place-items:center;background:var(--sand);color:var(--mic-fg,#0069A8);cursor:pointer}
 .dimg-hint{position:absolute;left:.7rem;bottom:.7rem;z-index:2;background:rgba(10,18,28,.78);color:#fff;font:800 .68rem var(--fh);letter-spacing:.04em;text-transform:uppercase;padding:.38rem .7rem;border-radius:999px;pointer-events:none}
 #itDonenessWrap{margin:.15rem 0 .35rem}
@@ -1319,7 +1321,9 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .hs b{font:800 .8rem var(--fh);letter-spacing:.07em;text-transform:uppercase;color:var(--cyan-d)}
 .hs strong{font:800 1.9rem/1.1 var(--fh)}.hs span{font-size:.85rem;color:var(--muted)}
 .hs.warn{background:var(--yellow)}.hs.warn b,.hs.warn span{color:#000}
-.hs.warn.pay-jump{cursor:pointer;border:0;width:100%;text-align:left;font:inherit;color:inherit}
+.hs.warn.pay-jump{cursor:pointer;border:0;width:100%;text-align:left;font:inherit;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation;appearance:none;-webkit-appearance:none}
+.pay-tab,.pay-check,.payopt,.pay-n .btn,#payGo,#payCallWaiter,#payCopy{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#payDlg .dpad{overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .hs.ok{background:#E3F8EC}
 .pay-scope,.pay-split{display:grid;gap:.4rem;margin:.15rem 0 .75rem}
 .pay-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem}
@@ -1363,16 +1367,18 @@ html.dlg-open .fabs,html.dlg-open .pn,html.dlg-open .menu-scrub{visibility:hidde
 .pays{display:grid;gap:.6rem}
 .payopt{display:grid;gap:.1rem;text-align:left;padding:.9rem 1.1rem;border:2px solid var(--cyan-line);border-radius:18px;background:#fff;cursor:pointer;transition:border-color var(--ease),background-color var(--ease),transform var(--ease)}
 .payopt b{font:800 1rem var(--fh)}.payopt small{color:var(--muted)}
-.payopt:hover{border-color:var(--cyan);transform:translateX(4px)}
+@media(hover:hover){.payopt:hover{border-color:var(--cyan)}}
 .payopt[aria-checked=true]{border-color:var(--cyan);background:var(--cyan-soft)}
 .payopt.pay-mpesa{border-color:#E60000;background:#fff1f1}
 .payopt.pay-mpesa small{color:#9b0000}
-.payopt.pay-mpesa:hover,.payopt.pay-mpesa[aria-checked=true]{border-color:#E60000;background:#E60000;color:#fff}
-.payopt.pay-mpesa[aria-checked=true] small,.payopt.pay-mpesa:hover small{color:rgba(255,255,255,.9)}
+.payopt.pay-mpesa[aria-checked=true]{border-color:#E60000;background:#E60000;color:#fff}
+.payopt.pay-mpesa[aria-checked=true] small{color:rgba(255,255,255,.9)}
+@media(hover:hover){.payopt.pay-mpesa:hover{border-color:#E60000;background:#E60000;color:#fff}.payopt.pay-mpesa:hover small{color:rgba(255,255,255,.9)}}
 .payopt.pay-emola{border-color:#FF6A00;background:#fff4eb}
 .payopt.pay-emola small{color:#b34a00}
-.payopt.pay-emola:hover,.payopt.pay-emola[aria-checked=true]{border-color:#FF6A00;background:#FF6A00;color:#fff}
-.payopt.pay-emola[aria-checked=true] small,.payopt.pay-emola:hover small{color:rgba(255,255,255,.9)}
+.payopt.pay-emola[aria-checked=true]{border-color:#FF6A00;background:#FF6A00;color:#fff}
+.payopt.pay-emola[aria-checked=true] small{color:rgba(255,255,255,.9)}
+@media(hover:hover){.payopt.pay-emola:hover{border-color:#FF6A00;background:#FF6A00;color:#fff}.payopt.pay-emola:hover small{color:rgba(255,255,255,.9)}}
 .payinfo{margin:0;padding:.9rem 1rem;border-radius:16px;background:var(--cyan-soft);font-size:.95rem}
 .terms{margin:0;padding-left:1.2rem;display:grid;gap:.7rem;font-size:.95rem}
 .fab.cart.owe{background:var(--yellow)}
@@ -1566,8 +1572,8 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
         <span class="story-orb">
           <span class="story-ring" aria-hidden="true"></span>
           <picture>
-            <source type="image/webp" srcset="assets/story-01.webp">
-            <img class="story-thumb" src="assets/story-01.jpg" alt="" width="96" height="96" decoding="async">
+            <source type="image/webp" srcset="assets/story-04.webp">
+            <img class="story-thumb" src="assets/story-04.jpg" alt="" width="96" height="96" decoding="async">
           </picture>
           <span class="story-plus" title="Ver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg></span>
         </span>
@@ -1797,8 +1803,8 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
     <div class="story-bar" id="storyBars" aria-hidden="true"></div>
     <button class="story-x" type="button" id="storyClose" data-i18n-aria="dlg.close">✕</button>
     <picture>
-      <source type="image/webp" srcset="assets/story-01.webp">
-      <img id="storyImg" src="assets/story-01.jpg" alt="Jam Session — Chinho e amigos">
+      <source type="image/webp" srcset="assets/story-04.webp">
+      <img id="storyImg" src="assets/story-04.jpg" alt="Karaokê — todas as quartas-feiras">
     </picture>
     <button class="story-nav prev" type="button" id="storyPrev" data-i18n-aria="dlg.prev"> </button>
     <button class="story-nav next" type="button" id="storyNext" data-i18n-aria="dlg.next"> </button>
@@ -1975,9 +1981,34 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
 
 <dialog class="dlg" id="payDlg" aria-labelledby="payT"><div class="dpad">
   <div class="dhead"><h2 id="payT" data-i18n="pay.title">Pagar a conta</h2><button class="dx" type="button" data-close data-i18n-aria="dlg.close">✕</button></div>
-  <div id="paySum"></div>
-  <div id="payScope"></div>
-  <div id="paySplit"></div>
+  <div id="paySum">
+    <button type="button" class="hs warn pay-jump" id="payJump"><b id="paySumTitle">A pagar</b><strong id="payAmt">0 MT</strong><span id="paySumLab"></span></button>
+  </div>
+  <div id="payScope">
+    <div class="pay-tabs" id="payTabs">
+      <button type="button" class="pay-tab" data-scope="one">Só este pedido</button>
+      <button type="button" class="pay-tab" data-scope="all">Todos os pedidos</button>
+      <button type="button" class="pay-tab" data-scope="pick">Escolher pedidos</button>
+      <button type="button" class="pay-tab" data-scope="table" hidden>Conta da mesa</button>
+    </div>
+    <div class="pay-checks" id="payChecks"></div>
+  </div>
+  <div id="paySplit" class="pay-split">
+    <label class="guest-keep"><input type="checkbox" id="paySplitOn"> Dividir a conta</label>
+    <p id="paySplitH">Pague só a sua parte. O restante fica em aberto até cada um liquidar.</p>
+    <div id="paySplitMore" hidden>
+      <div class="pay-n"><span id="payPeopleLab">Pessoas</span><button type="button" class="btn btn-line" id="payNMinus">−</button><b id="payNVal">2</b><button type="button" class="btn btn-line" id="payNPlus">+</button></div>
+      <div class="pay-tabs trio">
+        <button type="button" class="pay-tab" data-smode="equal">Iguais</button>
+        <button type="button" class="pay-tab" data-smode="pct">%</button>
+        <button type="button" class="pay-tab" data-smode="custom">Valores</button>
+      </div>
+      <label class="pay-part" id="payPctRow" hidden><span>A sua parte (%)</span><input id="payPct" type="number" min="1" max="99" inputmode="numeric" value="50"></label>
+      <label class="pay-part" id="payCustomRow" hidden><span>A sua parte (MT)</span><input id="payCustom" type="number" min="1" inputmode="numeric" value=""></label>
+      <div class="pay-share"><span>A sua parte</span><strong id="payYouAmt">0 MT</strong></div>
+      <div class="pay-share"><span>Restante</span><b id="payRestAmt">0 MT</b></div>
+    </div>
+  </div>
   <div class="pays" id="payMethods" role="radiogroup" data-i18n-aria="pay.methods"></div>
   <div id="payInfo"></div>
   <p class="msg" id="payMsg" role="status" aria-live="polite"></p>
@@ -2110,7 +2141,7 @@ html.aq-pause .wcol,html.aq-pause .story-ring,html.aq-pause .w,html.aq-pause .bu
   </div>
 </dialog>
 
-<script src="i18n.js?v=ops101"></script>
+<script src="i18n.js?v=ops103"></script>
 <script>
 /* ===== LIGAÇÃO AO SISTEMA DE PEDIDOS (opcional) =====
    Deixe vazio para o modo demonstração (a resposta do garçom é simulada).
@@ -3527,6 +3558,8 @@ const REVIEWS = [];
     if (window.__aqLiveBound) return;
     window.__aqLiveBound = true;
     const bump = () => {
+      if (payDlg && payDlg.open) return;
+      if (histDlg && histDlg.open) return;
       refreshFromBus();
       refreshCallsFromBus();
       updateFabs();
@@ -3545,6 +3578,7 @@ const REVIEWS = [];
     if (pollT) return;
     pollT = setInterval(() => {
       if (document.hidden) return;
+      if ((payDlg && payDlg.open) || (histDlg && histDlg.open)) return;
       refreshFromBus();
       refreshCallsFromBus();
       updateFabs();
@@ -5259,143 +5293,159 @@ const REVIEWS = [];
       try { const i = document.createElement('textarea'); i.value = text; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); done(); } catch (e) { /* */ }
     }
   }
-  function paintPaySheet(keepMethod) {
+  function sameOrder(a, b) {
+    return !!(a && b && (String(a.id) === String(b.id) || (a.code && a.code === b.code)));
+  }
+  function fillPayMethods() {
+    const box = $('#payMethods');
+    if (!box) return;
+    box.innerHTML = '';
+    const seenPay = {};
+    PAYMENT.methods.forEach((m) => {
+      if (!m || !m.id || seenPay[m.id]) return;
+      seenPay[m.id] = true;
+      const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
+      const short = m.id === 'pos' ? tr('pay.posS') : (m.network ? m.network : tr('pay.mobile'));
+      const icn = m.id === 'pos' ? 'i-card' : 'i-phone';
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'payopt' + (m.id === 'mpesa' ? ' pay-mpesa' : m.id === 'emola' ? ' pay-emola' : '');
+      b.dataset.paym = m.id;
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', 'false');
+      b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${icn}"/></svg><b>${esc(label)}</b><small>${esc(short)}</small>`;
+      box.appendChild(b);
+    });
+  }
+  function paintPaySheet() {
     const amount = payShareAmount();
     const tot = basketTotal();
     const n = payBasket.length;
     const lab = n > 1 ? tr('pay.nOrders', { n, m: money(tot) }) : (payBasket[0] ? (contaLabel(payBasket[0]) + ' · ' + (payBasket[0].code || '')) : tr('pay.thisOrder'));
     const splitNote = paySplit.on && amount < tot ? ' · ' + tr('pay.you') + ' ' + money(amount) : '';
-    $('#paySum').innerHTML = `<button type="button" class="hs warn pay-jump" id="payJump"><b>${esc(tr('pay.paying'))}</b><strong>${money(amount)}</strong><span>${esc(lab + splitNote)} · ${esc(tr('pay.tapSend', { m: money(amount) }))}</span></button>`;
-    $('#payJump')?.addEventListener('click', () => applyPayMethod('mpesa'));
-    const mine = owed();
-    const tableList = tableUnpaid();
-    const scope = $('#payScope');
-    if (scope) {
-      const tabs = [
-        ['one', tr('pay.thisOrder')],
-        ['all', tr('pay.all')],
-        ['pick', tr('pay.pick')]
-      ];
-      if (tableCodeNow()) tabs.push(['table', tr('pay.table')]);
-      scope.innerHTML = '<div class="pay-tabs' + (tabs.length > 2 ? '' : '') + '">' + tabs.map(([id, t]) =>
-        '<button type="button" class="pay-tab" data-scope="' + id + '" aria-pressed="' + (payScopeMode === id) + '">' + esc(t) + '</button>'
-      ).join('') + '</div>';
-      if (payScopeMode === 'pick' || payScopeMode === 'one') {
-        const pool = mine.length ? mine : payBasket;
-        scope.insertAdjacentHTML('beforeend', '<div class="pay-checks">' + pool.map((o) => {
-          const on = payBasket.some((x) => String(x.id) === String(o.id) || x.code === o.code);
-          return '<button type="button" class="pay-check" data-oid="' + esc(String(o.id || o.code)) + '" aria-pressed="' + on + '"><span>' + esc(contaLabel(o)) + '<small>' + esc(o.code || '') + (o._mate ? ' · ' + esc(o.name || '') : '') + '</small></span><b>' + money(orderRemain(o)) + '</b></button>';
-        }).join('') + '</div>');
-      } else if (payScopeMode === 'table') {
-        scope.insertAdjacentHTML('beforeend', '<p class="guest-hint">' + esc(tr('pay.tableH')) + '</p><div class="pay-checks">' + tableList.map((o) =>
-          '<div class="pay-check" aria-pressed="true"><span>' + esc(contaLabel(o)) + '<small>' + esc((o.code || '') + ' · ' + (o.name || '')) + '</small></span><b>' + money(orderRemain(o)) + '</b></div>'
-        ).join('') + '</div>');
+    const title = $('#paySumTitle');
+    if (title) title.textContent = tr('pay.paying');
+    const amt = $('#payAmt');
+    if (amt) amt.textContent = money(amount);
+    const sumLab = $('#paySumLab');
+    if (sumLab) sumLab.textContent = lab + splitNote + ' · ' + tr('pay.tapSend', { m: money(amount) });
+    const hasTable = !!tableCodeNow();
+    const tabTable = $('#payTabs [data-scope="table"]');
+    if (tabTable) tabTable.hidden = !hasTable;
+    $$('#payTabs [data-scope]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.scope === payScopeMode)));
+    const checks = $('#payChecks');
+    if (checks) {
+      const pool = payScopeMode === 'table' ? tableUnpaid() : owed();
+      const showList = payScopeMode === 'pick' || payScopeMode === 'table' || (payScopeMode === 'one' && pool.length > 1);
+      if (!showList) checks.innerHTML = '';
+      else {
+        checks.innerHTML = pool.map((o) => {
+          const on = payBasket.some((x) => sameOrder(x, o));
+          const key = esc(String(o.id || o.code));
+          return '<button type="button" class="pay-check" data-oid="' + key + '" aria-pressed="' + on + '"><span>' + esc(contaLabel(o)) + '<small>' + esc(o.code || '') + (o._mate ? ' · ' + esc(o.name || '') : '') + '</small></span><b>' + money(orderRemain(o)) + '</b></button>';
+        }).join('');
       }
-      $$('[data-scope]', scope).forEach((b) => b.addEventListener('click', () => {
-        payScopeMode = b.dataset.scope;
-        if (payScopeMode === 'all') payBasket = mine.slice();
-        else if (payScopeMode === 'table') payBasket = tableList.slice();
-        else if (payScopeMode === 'one') payBasket = (pendingBillPay && orderRemain(pendingBillPay) ? [pendingBillPay] : (mine[0] ? [mine[0]] : payBasket.slice(0, 1)));
-        paintPaySheet(true);
-      }));
-      $$('[data-oid]', scope).forEach((b) => b.addEventListener('click', () => {
-        const pool = mine.length ? mine : payBasket;
-        const hit = pool.find((o) => String(o.id) === b.dataset.oid || o.code === b.dataset.oid);
-        if (!hit) return;
-        const i = payBasket.findIndex((x) => String(x.id) === String(hit.id) || x.code === hit.code);
-        if (payScopeMode === 'one') payBasket = [hit];
-        else if (i >= 0) {
-          if (payBasket.length > 1) payBasket.splice(i, 1);
-        } else payBasket.push(hit);
-        pendingBillPay = payBasket[0] || hit;
-        paintPaySheet(true);
-      }));
     }
-    const split = $('#paySplit');
-    if (split) {
+    const more = $('#paySplitMore'), onEl = $('#paySplitOn');
+    if (onEl) onEl.checked = !!paySplit.on;
+    if (more) more.hidden = !paySplit.on;
+    if (paySplit.on) {
       const nPeople = Math.max(2, Math.round(Number(paySplit.n) || 2));
-      const share = payShareAmount();
-      split.innerHTML = '<label class="guest-keep"><input type="checkbox" id="paySplitOn"' + (paySplit.on ? ' checked' : '') + '> ' + esc(tr('pay.split')) + '</label>' +
-        '<p>' + esc(tr('pay.splitH')) + '</p>';
-      if (paySplit.on) {
-        split.insertAdjacentHTML('beforeend',
-          '<div class="pay-n"><span>' + esc(tr('pay.people')) + '</span><button type="button" class="btn btn-line" id="payNMinus">−</button><b>' + nPeople + '</b><button type="button" class="btn btn-line" id="payNPlus">+</button></div>' +
-          '<div class="pay-tabs trio">' +
-            '<button type="button" class="pay-tab" data-smode="equal" aria-pressed="' + (paySplit.mode === 'equal') + '">' + esc(tr('pay.equal')) + '</button>' +
-            '<button type="button" class="pay-tab" data-smode="pct" aria-pressed="' + (paySplit.mode === 'pct') + '">' + esc(tr('pay.pct')) + '</button>' +
-            '<button type="button" class="pay-tab" data-smode="custom" aria-pressed="' + (paySplit.mode === 'custom') + '">' + esc(tr('pay.custom')) + '</button>' +
-          '</div>' +
-          (paySplit.mode === 'pct' ? '<label class="pay-part"><span>' + esc(tr('pay.you')) + ' (%)</span><input id="payPct" type="number" min="1" max="99" inputmode="numeric" value="' + (paySplit.pct || 50) + '"></label>' : '') +
-          (paySplit.mode === 'custom' ? '<label class="pay-part"><span>' + esc(tr('pay.you')) + ' (MT)</span><input id="payCustom" type="number" min="1" inputmode="numeric" value="' + (paySplit.custom || share) + '"></label>' : '') +
-          '<div class="pay-share"><span>' + esc(tr('pay.you')) + '</span><strong>' + money(share) + '</strong></div>' +
-          '<div class="pay-share"><span>' + esc(tr('pay.others')) + '</span><b>' + money(Math.max(0, tot - share)) + '</b></div>'
-        );
-        $('#payNMinus')?.addEventListener('click', () => { paySplit.n = Math.max(2, nPeople - 1); paintPaySheet(true); });
-        $('#payNPlus')?.addEventListener('click', () => { paySplit.n = Math.min(12, nPeople + 1); paintPaySheet(true); });
-        $$('[data-smode]', split).forEach((b) => b.addEventListener('click', () => { paySplit.mode = b.dataset.smode; paintPaySheet(true); }));
-        $('#payPct')?.addEventListener('change', (e) => { paySplit.pct = Math.min(99, Math.max(1, Number(e.target.value) || 50)); paintPaySheet(true); });
-        $('#payCustom')?.addEventListener('change', (e) => { paySplit.custom = Math.max(1, Math.round(Number(e.target.value) || share)); paintPaySheet(true); });
-      }
-      $('#paySplitOn')?.addEventListener('change', (e) => {
-        paySplit.on = e.target.checked;
-        if (paySplit.on && !paySplit.custom) paySplit.custom = Math.round(tot / Math.max(2, paySplit.n));
-        paintPaySheet(true);
-      });
+      const nv = $('#payNVal');
+      if (nv) nv.textContent = String(nPeople);
+      $$('#paySplit [data-smode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.smode === paySplit.mode)));
+      const pctRow = $('#payPctRow'), custRow = $('#payCustomRow');
+      if (pctRow) pctRow.hidden = paySplit.mode !== 'pct';
+      if (custRow) custRow.hidden = paySplit.mode !== 'custom';
+      const pct = $('#payPct');
+      if (pct && document.activeElement !== pct) pct.value = String(paySplit.pct || 50);
+      const cust = $('#payCustom');
+      if (cust && document.activeElement !== cust) cust.value = String(paySplit.custom || amount);
+      const you = $('#payYouAmt'), rest = $('#payRestAmt');
+      if (you) you.textContent = money(amount);
+      if (rest) rest.textContent = money(Math.max(0, tot - amount));
     }
-    const box = $('#payMethods');
-    if (box && !keepMethod) {
-      box.innerHTML = '';
-      paySel = null;
-      $('#payInfo').innerHTML = '';
-      $('#payGo').hidden = true;
-      const seenPay = {};
-      PAYMENT.methods.forEach((m) => {
-        if (!m || !m.id || seenPay[m.id]) return;
-        seenPay[m.id] = true;
-        const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
-        const short = m.id === 'pos' ? tr('pay.posS') : (m.network ? m.network : tr('pay.mobile'));
-        const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
-        const icn = m.id === 'pos' ? 'i-card' : 'i-phone';
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'payopt' + (m.id === 'mpesa' ? ' pay-mpesa' : m.id === 'emola' ? ' pay-emola' : '');
-        b.dataset.paym = m.id;
-        b.setAttribute('role', 'radio');
-        b.setAttribute('aria-checked', 'false');
-        b.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#${icn}"/></svg><b>${esc(label)}</b><small>${esc(short)}</small>`;
-        b.addEventListener('click', () => applyPayMethod(m.id));
-        box.appendChild(b);
-      });
-    } else if (paySel) applyPayMethod(paySel.id);
+    if (paySel) applyPayMethod(paySel.id, { quiet: true });
   }
-  function applyPayMethod(id) {
+  function schedulePaySheet() {
+    if (schedulePaySheet._t) return;
+    schedulePaySheet._t = requestAnimationFrame(() => {
+      schedulePaySheet._t = 0;
+      paintPaySheet();
+    });
+  }
+  function applyPayMethod(id, opts) {
     const m = (PAYMENT.methods || []).find((x) => x.id === id);
     if (!m) return;
+    const quiet = !!(opts && opts.quiet);
     const amount = payShareAmount();
     const o = payBasket[0];
     const label = m.id === 'pos' ? tr('pay.pos') : (m.id === 'mpesa' ? tr('pay.mpesa') : m.id === 'emola' ? tr('pay.emola') : m.label);
     const hint = m.id === 'pos' ? tr('pay.posH') : (m.id === 'emola' ? tr('pay.emolaH') : tr('pay.mpesaH'));
+    const same = !!(paySel && paySel.id === m.id);
     paySel = Object.assign({}, m, { label, hint });
     $$('#payMethods .payopt').forEach((x) => x.setAttribute('aria-checked', String(x.dataset.paym === m.id)));
-    if (m.number) {
-      const holder = m.holder ? `<br><b>${esc(tr('pay.holder', { n: m.holder }))}</b>` : '';
-      $('#payInfo').innerHTML = `<p class="payinfo">${tr('pay.sendTo', { m: money(amount), n: esc(m.number), l: esc(label) })}${holder}<br><small>${esc(hint)}</small></p>
+    const info = $('#payInfo');
+    const holder = m.holder ? `<br><b>${esc(tr('pay.holder', { n: m.holder }))}</b>` : '';
+    const sendHtml = m.number
+      ? `${tr('pay.sendTo', { m: money(amount), n: esc(m.number), l: esc(label) })}${holder}<br><small>${esc(hint)}</small>`
+      : esc(hint);
+    const p = info && info.querySelector('.payinfo');
+    if (quiet && same && p) {
+      p.innerHTML = sendHtml;
+    } else if (m.number) {
+      if (info) info.innerHTML = `<p class="payinfo">${sendHtml}</p>
         <button class="btn btn-cyan btn-block" type="button" id="payCopy">${esc(tr('pay.copyNum'))}: ${esc(m.number)}</button>`;
-      $('#payCopy')?.addEventListener('click', () => {
-        copyPayNumber(m.digits || m.number, $('#payCopy'));
-        persistSession();
-        savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o && o.id, code: o && o.code, amount, ids: payBasket.map((x) => x.id) });
-        $('#payMsg').textContent = tr('pay.stay');
-      });
       $('#payMsg').textContent = tr('pay.stay');
       savePayResume({ method: m.id, hold: true, fromBill: true, orderId: o && o.id, code: o && o.code, amount, ids: payBasket.map((x) => x.id) });
     } else {
-      $('#payInfo').innerHTML = `<p class="payinfo">${esc(hint)}</p>`;
+      if (info) info.innerHTML = `<p class="payinfo">${sendHtml}</p>`;
       $('#payMsg').textContent = o ? tr('pay.posWait', { c: payBasket.map((x) => x.code).filter(Boolean).join(', ') || o.code }) : tr('pay.posH');
       savePayResume(null);
     }
-    $('#payGo').hidden = false;
-    $('#payGo').textContent = m.number ? tr('pay.done') : tr('pay.posAsk');
+    const go = $('#payGo');
+    if (go) {
+      go.hidden = false;
+      go.textContent = m.number ? tr('pay.done') : tr('pay.posAsk');
+    }
+    if (!quiet) {
+      try { info && info.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { /* */ }
+    }
+  }
+  function revealPaySend() {
+    applyPayMethod('mpesa');
+    const m = (PAYMENT.methods || []).find((x) => x.id === 'mpesa');
+    if (m && (m.digits || m.number)) copyPayNumber(m.digits || m.number, $('#payCopy'));
+  }
+  function setPayScope(mode) {
+    payScopeMode = mode;
+    const mine = owed();
+    if (mode === 'all') payBasket = mine.slice();
+    else if (mode === 'table') payBasket = tableUnpaid();
+    else if (mode === 'one') {
+      const cur = payBasket[0] || pendingBillPay;
+      payBasket = cur && orderRemain(cur) > 0 ? [cur] : (mine[0] ? [mine[0]] : []);
+    } else if (mode === 'pick' && !payBasket.length) payBasket = mine.slice();
+    pendingBillPay = payBasket[0] || pendingBillPay;
+    schedulePaySheet();
+  }
+  function togglePayOrder(id) {
+    const pool = payScopeMode === 'table' ? tableUnpaid() : owed();
+    const hit = pool.find((o) => String(o.id) === String(id) || o.code === id);
+    if (!hit) return;
+    if (payScopeMode === 'one') {
+      payBasket = [hit];
+      pendingBillPay = hit;
+      schedulePaySheet();
+      return;
+    }
+    if (payScopeMode === 'all' || payScopeMode === 'table') payScopeMode = 'pick';
+    const i = payBasket.findIndex((x) => sameOrder(x, hit));
+    if (i >= 0) {
+      if (payBasket.length > 1) payBasket.splice(i, 1);
+    } else payBasket.push(hit);
+    pendingBillPay = payBasket[0] || hit;
+    schedulePaySheet();
   }
   async function openPay(order, opts) {
     if (payBusy) return;
@@ -5425,12 +5475,19 @@ const REVIEWS = [];
       payBasket.forEach((o) => { o.billAsked = true; });
       paySendNow = !!(opts && opts.sendNow);
       if (!opts || !opts.keepSplit) paySplit = { on: false, n: 2, mode: 'equal', pct: 50, custom: 0 };
-      paintPaySheet(false);
+      paySel = null;
+      fillPayMethods();
+      const info = $('#payInfo');
+      if (info) info.innerHTML = '';
+      const go0 = $('#payGo');
+      if (go0) go0.hidden = true;
+      paintPaySheet();
+      bindPayDlg();
       if (histDlg.open) histDlg.close();
       const pt = $('#payT');
       if (pt) pt.textContent = change ? tr('pay.changeMethod') : tr('pay.title');
       if (!payDlg.open) payDlg.showModal();
-      if (paySendNow) applyPayMethod('mpesa');
+      if (paySendNow) revealPaySend();
     } finally {
       payBusy = false;
     }
@@ -5478,8 +5535,47 @@ const REVIEWS = [];
       left -= take;
     }
   }
-  $('#payGo').addEventListener('click', async () => {
-    if (!paySel) return;
+  function bindPayDlg() {
+    if (!payDlg || payDlg.dataset.payBound) return;
+    payDlg.dataset.payBound = '1';
+    payDlg.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close]')) return;
+      if (e.target.closest('#payJump')) { e.preventDefault(); revealPaySend(); return; }
+      const tab = e.target.closest('#payTabs [data-scope]');
+      if (tab) { e.preventDefault(); setPayScope(tab.dataset.scope); return; }
+      const row = e.target.closest('[data-oid]');
+      if (row) { e.preventDefault(); togglePayOrder(row.getAttribute('data-oid')); return; }
+      const sm = e.target.closest('[data-smode]');
+      if (sm) { e.preventDefault(); paySplit.mode = sm.dataset.smode; schedulePaySheet(); return; }
+      const pm = e.target.closest('[data-paym]');
+      if (pm) { e.preventDefault(); applyPayMethod(pm.dataset.paym); return; }
+      if (e.target.closest('#payNMinus')) { paySplit.n = Math.max(2, (Number(paySplit.n) || 2) - 1); schedulePaySheet(); return; }
+      if (e.target.closest('#payNPlus')) { paySplit.n = Math.min(12, (Number(paySplit.n) || 2) + 1); schedulePaySheet(); return; }
+      if (e.target.closest('#payCopy') && paySel && paySel.number) {
+        copyPayNumber(paySel.digits || paySel.number, $('#payCopy'));
+      }
+    });
+    payDlg.addEventListener('change', (e) => {
+      if (e.target && e.target.id === 'paySplitOn') {
+        paySplit.on = e.target.checked;
+        if (paySplit.on && !paySplit.custom) paySplit.custom = Math.round(basketTotal() / Math.max(2, paySplit.n || 2));
+        schedulePaySheet();
+      }
+    });
+    payDlg.addEventListener('input', (e) => {
+      if (!e.target) return;
+      if (e.target.id === 'payPct') {
+        paySplit.pct = Math.min(99, Math.max(1, Number(e.target.value) || 50));
+        schedulePaySheet();
+      }
+      if (e.target.id === 'payCustom') {
+        paySplit.custom = Math.max(1, Math.round(Number(e.target.value) || 0));
+        schedulePaySheet();
+      }
+    });
+  }
+  $('#payGo')?.addEventListener('click', async () => {
+    if (!paySel) { revealPaySend(); return; }
     const msg = $('#payMsg');
     if (!payBasket.length) { msg.textContent = tr('pay.fail', { e: '' }); return; }
     const o = payBasket[0];
@@ -5528,6 +5624,7 @@ const REVIEWS = [];
     e.stopPropagation();
     openPayAll({ sendNow: true });
   });
+  bindPayDlg();
 
   /* chamar garçom */
   const callDlg = $('#callDlg'); let call = null, callTimer = 0, stopCall = null;
@@ -6104,6 +6201,7 @@ const REVIEWS = [];
     const img = $('#storyImg'), bars = $('#storyBars'), hint = $('#storyHint');
     if (!btn || !dlg || !img || !bars) return;
     const STORIES = [
+      { img: 'assets/story-04.jpg', t: 'Karaokê — todas as quartas-feiras' },
       { img: 'assets/story-03.jpg', t: 'Menu executivo — segunda-feira' },
       { img: 'assets/story-01.jpg', t: 'Jam Session — Chinho e amigos' },
       { img: 'assets/story-02.jpg', t: 'Aniversários no Aqua Club' }
@@ -6278,7 +6376,7 @@ const REVIEWS = [];
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js?v=ops101').catch(function () {});
+    navigator.serviceWorker.register('sw.js?v=ops103').catch(function () {});
   });
 }
 </script>

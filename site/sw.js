@@ -1,6 +1,6 @@
 /* Cache de estáticos para visitas repetidas e picos de tráfego.
    HTML vai sempre à rede; imagens e o menu revalidam em segundo plano. */
-const VER = 'aq-ops101';
+const VER = 'aq-ops103';
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
